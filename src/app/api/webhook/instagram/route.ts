@@ -1,7 +1,20 @@
 import { createClient as createAdminClient, type SupabaseClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
+import { isOverLimit } from '@/lib/plans'
 
 type AdminClient = SupabaseClient
+
+async function checkUserLimit(supabase: AdminClient, userId: string): Promise<boolean> {
+  const month = new Date().toISOString().slice(0, 7)
+  const [{ data: profile }, { data: usage }] = await Promise.all([
+    supabase.from('profiles').select('plan').eq('id', userId).single(),
+    supabase.from('usage_logs').select('comment_count, dm_count').eq('user_id', userId).eq('month', month).single(),
+  ])
+  const plan = profile?.plan || 'free'
+  const comments = usage?.comment_count || 0
+  const dms = usage?.dm_count || 0
+  return !isOverLimit(plan, comments, dms)
+}
 
 // Webhook verification (GET)
 export async function GET(request: NextRequest) {
@@ -67,11 +80,16 @@ async function handleComment(supabase: AdminClient, value: any) {
   if (!accounts?.length) return
 
   for (const account of accounts) {
-    // 자기 댓글이면 스킵
     if (account.ig_user_id === igUserId) continue
 
+    // 플랜 한도 체크
+    const withinLimit = await checkUserLimit(supabase, account.user_id)
+    if (!withinLimit) {
+      console.log(`[Webhook] User ${account.user_id} over plan limit, skipping`)
+      continue
+    }
+
     try {
-      // Claude로 응대 생성
       const reply = await generateReply(account.user_id, text, supabase)
       if (!reply || reply === 'SKIP') continue
 
@@ -132,8 +150,13 @@ async function handleMessage(supabase: AdminClient, value: any) {
   if (!accounts?.length) return
 
   for (const account of accounts) {
-    // 자기 자신이 보낸 DM이면 스킵
     if (account.ig_user_id === senderId) continue
+
+    const withinLimit = await checkUserLimit(supabase, account.user_id)
+    if (!withinLimit) {
+      console.log(`[Webhook] User ${account.user_id} over plan limit (DM), skipping`)
+      continue
+    }
 
     try {
       const reply = await generateReply(account.user_id, text, supabase, 'dm')
