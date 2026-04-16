@@ -1367,31 +1367,145 @@ function connectYT(){
 }
 
 function startLearnAnim(){
-  var pct=0;
   var ring=document.getElementById('learn-ring-fill');
   var num=document.getElementById('learn-num');
   var status=document.getElementById('learn-status');
+  var detail=document.getElementById('learn-detail');
   var btn=document.getElementById('learn-btn');
+  var tagsEl=document.getElementById('learn-tags');
   var C=376;
-  if(learnTimer) clearInterval(learnTimer);
-  pct=0;
-  learnTimer=setInterval(function(){
-    pct+=1;
-    if(pct>100){ pct=100; clearInterval(learnTimer); }
-    if(num) num.textContent=pct;
-    if(ring) ring.style.strokeDashoffset=C-(C*pct/100);
-    if(status){
-      if(pct<30) status.textContent='게시물 분석 중...';
-      else if(pct<60) status.textContent='말투 패턴 추출 중...';
-      else if(pct<90) status.textContent='AI 모델 구축 중...';
-      else status.textContent='학습 완료!';
+
+  function setPct(p, msg) {
+    if(num) num.textContent=p;
+    if(ring) ring.style.strokeDashoffset=C-(C*p/100);
+    if(status) status.textContent=msg;
+  }
+
+  function updateTags(characteristics, tone) {
+    if(!tagsEl) return;
+    while(tagsEl.firstChild) tagsEl.removeChild(tagsEl.firstChild);
+    (characteristics||[]).forEach(function(c, i){
+      var tag=document.createElement('div');
+      tag.className='learn-tag';
+      tag.style.animationDelay=(i*0.3)+'s';
+      tag.textContent=c;
+      tagsEl.appendChild(tag);
+    });
+    if(tone){
+      var t=document.createElement('div');
+      t.className='learn-tag';
+      t.style.animationDelay=((characteristics||[]).length*0.3)+'s';
+      t.textContent=tone;
+      tagsEl.appendChild(t);
     }
-    if(pct>=100 && btn){
-      btn.style.opacity='1';
-      btn.style.pointerEvents='auto';
-      btn.textContent='완료 — 다음 단계로';
+  }
+
+  function showManualInput() {
+    var existing=document.getElementById('learn-manual-wrap');
+    if(existing) existing.remove();
+    var wrap=document.createElement('div');
+    wrap.id='learn-manual-wrap';
+    wrap.style.cssText='padding:16px 24px';
+    var ta=document.createElement('textarea');
+    ta.id='learn-manual';
+    ta.className='sheet-ta';
+    ta.rows=6;
+    ta.placeholder='예시:\n감사해요~ 저도 이 제품 진짜 좋아해요 ㅎㅎ\n오 맞아요! 프로필 링크에서 확인해보세요\n너무 예쁘게 찍어주셨네요 감사합니다\n\n한 줄에 하나씩 입력해주세요 (최소 3개)';
+    ta.style.cssText='margin:0;min-height:120px';
+    wrap.appendChild(ta);
+    var hero=document.querySelector('.learn-hero');
+    if(hero) hero.parentNode.insertBefore(wrap, hero.nextSibling);
+  }
+
+  setPct(5, '게시물 가져오는 중...');
+  if(detail) detail.textContent='Instagram 최근 게시물을 읽고 있어요.';
+
+  fetch('/api/tone/fetch-posts').then(function(r){ return r.json(); }).then(function(postsData){
+    var captions = postsData.captions || [];
+
+    if(captions.length < 3) {
+      setPct(10, '게시물이 부족해요');
+      if(detail) detail.textContent='직접 말투 샘플을 입력해주세요. 평소 댓글 다는 스타일로 3개 이상.';
+      showManualInput();
+      if(btn){ btn.style.opacity='1'; btn.style.pointerEvents='auto'; btn.textContent='이 말투로 학습시키기'; btn.onclick=function(){ doLearnFromManual(); }; }
+      return;
     }
-  }, 60);
+
+    setPct(30, '게시물 ' + captions.length + '개 분석 중...');
+    if(detail) detail.textContent='@' + (postsData.username||'') + '의 말투를 학습하고 있어요.';
+    setTimeout(function(){ setPct(50, '말투 패턴 추출 중...'); }, 1500);
+
+    fetch('/api/tone/learn', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({ samples: captions.slice(0, 10) })
+    }).then(function(r){ return r.json(); }).then(function(result){
+      if(result.success && result.style) {
+        setPct(100, '학습 완료!');
+        if(detail) detail.textContent='AI가 말투를 완벽하게 학습했어요.';
+        updateTags(result.style.characteristics, result.style.tone);
+        if(btn){ btn.style.opacity='1'; btn.style.pointerEvents='auto'; btn.textContent='완료 — 다음 단계로'; btn.onclick=function(){ go('v-complete'); }; }
+      } else {
+        setPct(0, '학습 실패');
+        if(detail) detail.textContent=(result.error||'다시 시도해주세요');
+        if(btn){ btn.style.opacity='1'; btn.style.pointerEvents='auto'; btn.textContent='다시 시도'; btn.onclick=function(){ startLearnAnim(); }; }
+      }
+    }).catch(function(e){
+      setPct(0, '오류 발생');
+      if(detail) detail.textContent=e.message;
+      if(btn){ btn.style.opacity='1'; btn.style.pointerEvents='auto'; btn.textContent='다시 시도'; btn.onclick=function(){ startLearnAnim(); }; }
+    });
+  }).catch(function(){
+    setPct(10, '게시물을 가져올 수 없어요');
+    if(detail) detail.textContent='직접 말투 샘플을 입력해주세요.';
+    showManualInput();
+    if(btn){ btn.style.opacity='1'; btn.style.pointerEvents='auto'; btn.textContent='이 말투로 학습시키기'; btn.onclick=function(){ doLearnFromManual(); }; }
+  });
+}
+
+function doLearnFromManual(){
+  var ta=document.getElementById('learn-manual');
+  if(!ta) return;
+  var lines=ta.value.split('\n').map(function(l){ return l.trim(); }).filter(function(l){ return l.length>5; });
+  if(lines.length<3){ alert('최소 3개의 샘플을 입력해주세요 (한 줄에 하나)'); return; }
+
+  var status=document.getElementById('learn-status');
+  var detail=document.getElementById('learn-detail');
+  var ring=document.getElementById('learn-ring-fill');
+  var num=document.getElementById('learn-num');
+  var btn=document.getElementById('learn-btn');
+  var tagsEl=document.getElementById('learn-tags');
+  var C=376;
+
+  if(num) num.textContent='50';
+  if(ring) ring.style.strokeDashoffset=C-(C*50/100);
+  if(status) status.textContent='AI 말투 분석 중...';
+  if(btn){ btn.style.opacity='.4'; btn.style.pointerEvents='none'; btn.textContent='분석 중...'; }
+
+  fetch('/api/tone/learn', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({ samples: lines })
+  }).then(function(r){ return r.json(); }).then(function(result){
+    if(result.success && result.style){
+      if(num) num.textContent='100';
+      if(ring) ring.style.strokeDashoffset=0;
+      if(status) status.textContent='학습 완료!';
+      if(detail) detail.textContent='AI가 말투를 완벽하게 학습했어요.';
+      if(tagsEl && result.style.characteristics){
+        while(tagsEl.firstChild) tagsEl.removeChild(tagsEl.firstChild);
+        result.style.characteristics.forEach(function(c,i){
+          var tag=document.createElement('div'); tag.className='learn-tag'; tag.style.animationDelay=(i*0.3)+'s'; tag.textContent=c; tagsEl.appendChild(tag);
+        });
+      }
+      if(btn){ btn.style.opacity='1'; btn.style.pointerEvents='auto'; btn.textContent='완료 — 다음 단계로'; btn.onclick=function(){ go('v-complete'); }; }
+    } else {
+      if(status) status.textContent='분석 실패';
+      if(detail) detail.textContent=result.error||'다시 시도해주세요';
+      if(btn){ btn.style.opacity='1'; btn.style.pointerEvents='auto'; btn.textContent='다시 시도'; }
+    }
+  }).catch(function(){
+    if(status) status.textContent='오류 발생';
+    if(btn){ btn.style.opacity='1'; btn.style.pointerEvents='auto'; btn.textContent='다시 시도'; }
+  });
 }
 
 function selectPlan(plan){
