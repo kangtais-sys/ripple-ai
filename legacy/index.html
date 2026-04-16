@@ -1,0 +1,2383 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>리플 AI</title>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --accent:#4F46E5;
+  --accent-l:#EEF2FF;
+  --accent-d:#3730A3;
+  --bg:#F9FAFB;
+  --surface:#FFFFFF;
+  --border:#F0F1F3;
+  --border-2:#E5E7EB;
+  --text-1:#111827;
+  --text-2:#6B7280;
+  --text-3:#9CA3AF;
+  --success:#059669;
+  --success-l:#ECFDF5;
+  --warn:#D97706;
+  --warn-l:#FFFBEB;
+  --danger:#DC2626;
+  --danger-l:#FEF2F2;
+  --sb-w:224px;
+}
+body{font-family:'Pretendard',-apple-system,sans-serif;background:var(--bg);min-height:100vh;color:var(--text-1);overflow-x:hidden;font-size:14px}
+.app{display:flex;min-height:100vh}
+
+/* ─── SIDEBAR ─── */
+.sb{
+  width:var(--sb-w);flex-shrink:0;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  position:fixed;top:0;left:0;height:100vh;
+  z-index:200;transition:transform .25s ease;
+  overflow-y:auto;
+}
+.sb-top{
+  padding:20px 16px 12px;
+  border-bottom:1px solid var(--border);
+}
+.sb-logo{display:flex;align-items:center;gap:9px}
+.sb-logo-mark{
+  width:30px;height:30px;border-radius:8px;
+  background:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;
+}
+.sb-logo-mark svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:2}
+.sb-logo-name{font-size:15px;font-weight:800;color:var(--text-1);letter-spacing:-.3px}
+.sb-logo-sub{font-size:10px;color:var(--text-3);margin-top:1px}
+
+.sb-nav{padding:10px 10px;flex:1}
+.nav-group{margin-bottom:20px}
+.nav-label{font-size:10px;font-weight:700;color:var(--text-3);letter-spacing:.8px;text-transform:uppercase;padding:0 6px 6px;display:block}
+.nb{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 10px;border-radius:8px;
+  cursor:pointer;font-size:13px;color:var(--text-2);
+  border:none;background:none;width:100%;text-align:left;
+  margin-bottom:1px;transition:all .12s;font-weight:500;
+  position:relative;
+}
+.nb:hover{background:var(--bg);color:var(--text-1)}
+.nb.on{
+  background:var(--accent-l);color:var(--accent);
+  font-weight:600;
+}
+.nb.on::before{
+  content:"";position:absolute;left:0;top:50%;transform:translateY(-50%);
+  width:3px;height:18px;background:var(--accent);border-radius:0 2px 2px 0;
+}
+.nb svg{flex-shrink:0;width:15px;height:15px;opacity:.55}
+.nb:hover svg{opacity:.8}.nb.on svg{opacity:1}
+.nb-badge{
+  margin-left:auto;font-size:10px;font-weight:700;
+  background:var(--danger);color:#fff;
+  border-radius:100px;padding:1px 6px;min-width:18px;text-align:center;
+}
+.nb.on .nb-badge{background:var(--accent);color:#fff}
+
+.sb-bottom{padding:12px;border-top:1px solid var(--border)}
+.trial-card{
+  border:1px solid var(--border-2);border-radius:10px;
+  padding:12px 14px;
+}
+.trial-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.trial-label{font-size:11px;font-weight:600;color:var(--text-2)}
+.trial-badge{font-size:10px;font-weight:700;color:var(--accent);background:var(--accent-l);padding:2px 8px;border-radius:100px}
+.trial-bar-bg{height:4px;background:var(--border);border-radius:100px}
+.trial-bar-fill{height:4px;background:var(--accent);border-radius:100px;width:43%}
+.trial-sub{font-size:11px;color:var(--text-3);margin-top:6px}
+.trial-btn{
+  width:100%;margin-top:10px;padding:8px;border-radius:8px;
+  background:var(--accent);color:#fff;border:none;cursor:pointer;
+  font-size:12px;font-weight:700;transition:background .15s;
+}
+.trial-btn:hover{background:var(--accent-d)}
+
+.sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.2);z-index:199;backdrop-filter:blur(2px)}
+.sb-overlay.show{display:block}
+
+/* ─── MAIN ─── */
+.mn{flex:1;min-width:0;margin-left:var(--sb-w);transition:margin-left .25s;display:flex;flex-direction:column;min-height:100vh}
+.vw{display:none;flex:1}
+.vw.on{display:block}
+
+/* 상단 헤더 */
+.topnav{
+  background:var(--surface);border-bottom:1px solid var(--border);
+  padding:0 28px;height:52px;display:flex;align-items:center;
+  justify-content:space-between;gap:12px;
+  position:sticky;top:0;z-index:100;
+}
+.topnav-left{display:flex;align-items:center;gap:12px}
+.topnav-title{font-size:15px;font-weight:700;color:var(--text-1)}
+.topnav-right{display:flex;align-items:center;gap:8px}
+.topnav-logo{font-size:15px;font-weight:800;color:var(--text-1);display:none}
+
+.burger{background:none;border:none;cursor:pointer;padding:4px;color:var(--text-2);display:flex;flex-direction:column;gap:4px}
+.burger span{display:block;width:18px;height:1.5px;background:currentColor;border-radius:2px}
+
+/* 하단 탭 */
+.bottom-nav{
+  display:none;position:fixed;bottom:0;left:0;right:0;
+  background:var(--surface);border-top:1px solid var(--border);
+  z-index:198;padding:6px 0 max(6px,env(safe-area-inset-bottom));
+}
+.bn-items{display:flex;justify-content:space-around}
+.bn-item{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:6px 4px;border:none;background:none;cursor:pointer;
+  flex:1;font-size:9px;color:var(--text-3);position:relative;
+}
+.bn-item.on{color:var(--accent)}
+.bn-badge{position:absolute;top:4px;right:calc(50% - 18px);font-size:9px;font-weight:700;background:var(--danger);color:#fff;border-radius:100px;padding:0 5px;min-width:16px;text-align:center}
+
+/* ─── PAGE LAYOUT ─── */
+.page{padding:28px;max-width:1200px}
+.page-header{margin-bottom:24px}
+.page-title{font-size:20px;font-weight:800;color:var(--text-1);letter-spacing:-.4px}
+.page-sub{font-size:13px;color:var(--text-2);margin-top:4px}
+
+/* ─── CARDS ─── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px}
+.card-sm{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px}
+.card-title{font-size:13px;font-weight:700;color:var(--text-1);margin-bottom:14px}
+.card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+
+/* ─── GRIDS ─── */
+.grid-4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.grid-3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid-cols{display:grid;grid-template-columns:1fr 300px;gap:14px}
+@keyframes spulse{0%,100%{box-shadow:0 0 0 0 rgba(5,150,105,.4)}50%{box-shadow:0 0 0 5px rgba(5,150,105,0)}}
+
+/* ─── STAT CARDS ─── */
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:18px 20px}
+.stat-label{font-size:12px;color:var(--text-2);font-weight:500;margin-bottom:8px}
+.stat-val{font-size:28px;font-weight:800;color:var(--text-1);line-height:1;letter-spacing:-.5px}
+.stat-val.accent{color:var(--accent)}
+.stat-val.success{color:var(--success)}
+.stat-val.warn{color:var(--warn)}
+.stat-val.danger{color:var(--danger)}
+.stat-delta{font-size:11px;font-weight:600;margin-top:6px}
+.stat-delta.up{color:var(--success)}.stat-delta.dn{color:var(--danger)}
+
+/* ─── COMMON ELEMENTS ─── */
+.badge{display:inline-flex;align-items:center;font-size:11px;padding:2px 8px;border-radius:6px;font-weight:600;white-space:nowrap}
+.badge-accent{background:var(--accent-l);color:var(--accent-d)}
+.badge-success{background:var(--success-l);color:var(--success)}
+.badge-warn{background:var(--warn-l);color:var(--warn)}
+.badge-danger{background:var(--danger-l);color:var(--danger)}
+.badge-gray{background:var(--bg);color:var(--text-2)}
+.badge-neutral{background:var(--border);color:var(--text-2)}
+
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dot-ig{background:#E1306C}.dot-tk{background:#00C897}.dot-yt{background:#FF0000}.dot-th{background:#999}.dot-success{background:var(--success)}.dot-accent{background:var(--accent)}
+
+.btn{padding:7px 14px;border-radius:8px;font-size:12px;cursor:pointer;border:1px solid var(--border-2);background:var(--surface);color:var(--text-1);font-weight:600;transition:all .12s;display:inline-flex;align-items:center;gap:6px}
+.btn:hover{background:var(--bg);border-color:var(--text-3)}
+.btn-accent{background:var(--accent);color:#fff;border-color:var(--accent)}.btn-accent:hover{background:var(--accent-d)}
+.btn-sm{padding:5px 10px;font-size:11px}
+.btn-xs{padding:3px 8px;font-size:10px;border-radius:6px}
+.btn-ghost{border-color:transparent;background:transparent}.btn-ghost:hover{background:var(--bg);border-color:transparent}
+
+.input{width:100%;padding:8px 12px;border:1px solid var(--border-2);border-radius:8px;font-size:13px;background:var(--surface);color:var(--text-1);outline:none;transition:border-color .12s;font-family:inherit}
+.input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,70,229,.1)}
+.input-label{font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:4px;display:block}
+textarea.input{resize:none;height:80px;line-height:1.6}
+select.input{cursor:pointer}
+.form-group{margin-bottom:14px}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+.toggle{position:relative;width:36px;height:20px;flex-shrink:0}
+.toggle input{opacity:0;width:0;height:0}
+.slider{position:absolute;cursor:pointer;inset:0;background:#D1D5DB;border-radius:100px;transition:.2s}
+.slider:before{position:absolute;content:"";width:14px;height:14px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+input:checked+.slider{background:var(--accent)}
+input:checked+.slider:before{transform:translateX(16px)}
+
+.divider{height:1px;background:var(--border);margin:16px 0}
+
+/* ─── LIST ROWS ─── */
+.row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.row:last-child{border:none;padding-bottom:0}
+.row-avatar{width:32px;height:32px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text-2);flex-shrink:0;border:1px solid var(--border)}
+.row-body{flex:1;min-width:0}
+.row-name{font-size:13px;font-weight:600;color:var(--text-1)}
+.row-sub{font-size:11px;color:var(--text-2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row-right{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:3px}
+.row-time{font-size:11px;color:var(--text-3)}
+
+/* ─── MESSAGE THREAD ─── */
+.msg-item{border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:8px;background:var(--surface);transition:border-color .12s}
+.msg-item:hover{border-color:var(--border-2)}
+.msg-item.open{border-color:var(--accent)}
+.msg-item.pinned{border-left:3px solid var(--danger)}
+.msg-head{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer}
+.msg-info{flex:1;min-width:0}
+.msg-user{font-size:13px;font-weight:700;color:var(--text-1)}
+.msg-prev{font-size:12px;color:var(--text-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.msg-meta{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.msg-chev{font-size:10px;color:var(--text-3);transition:transform .2s;flex-shrink:0}
+.msg-item.open .msg-chev{transform:rotate(180deg)}
+.thread{display:none;border-top:1px solid var(--border);padding:0 14px}
+.msg-item.open .thread{display:block}
+.t-row{display:flex;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)}
+.t-row:last-child{border:none}
+.t-av{width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700}
+.t-av.usr{background:var(--bg);color:var(--text-2);border:1px solid var(--border)}
+.t-av.ai{background:var(--accent);color:#fff}
+.t-body{flex:1}
+.t-name{font-size:11px;font-weight:700;color:var(--text-1);margin-bottom:3px}
+.t-name.ai-n{color:var(--accent)}
+.t-msg{font-size:12px;color:var(--text-1);line-height:1.6;background:var(--bg);padding:8px 12px;border-radius:8px}
+.t-msg.ai-m{background:var(--accent-l);border-left:2px solid var(--accent)}
+.t-time{font-size:10px;color:var(--text-3);margin-top:4px}
+.thread-act{padding:10px 0;display:flex;gap:8px;border-top:1px solid var(--border)}
+
+/* ─── CRM ─── */
+.crm-group{margin-bottom:10px}
+.crm-group-head{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 14px;border-radius:10px;cursor:pointer;
+  border:1px solid var(--border);background:var(--surface);
+  transition:background .12s;user-select:none;
+}
+.crm-group-head:hover{background:var(--bg)}
+.crm-group-head.open{border-color:var(--accent);background:var(--accent-l)}
+.crm-group-title{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--text-1)}
+.crm-group-chev{font-size:10px;color:var(--text-3);transition:transform .2s}
+.crm-group-head.open .crm-group-chev{transform:rotate(180deg)}
+.crm-group-body{display:none;margin-top:4px;border:1px solid var(--border);border-radius:10px;overflow:hidden}
+.crm-group-body.show{display:block}
+.crm-row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-bottom:1px solid var(--border);background:var(--surface)}
+.crm-row:last-child{border:none}
+.crm-row:hover{background:var(--bg)}
+.crm-av{width:36px;height:36px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--text-2);flex-shrink:0;border:1px solid var(--border)}
+.crm-info{flex:1;min-width:0}
+.crm-name{font-size:13px;font-weight:600;color:var(--text-1)}
+.crm-sub{font-size:11px;color:var(--text-2);margin-top:1px}
+.crm-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px;flex-shrink:0}
+.score-bar{width:60px;height:4px;background:var(--bg);border-radius:100px}
+.score-fill{height:4px;border-radius:100px}
+
+/* ─── 미션 (오늘 할 일) ─── */
+.mission-header-bar{
+  background:var(--accent);border-radius:12px;
+  padding:16px 20px;margin-bottom:16px;
+  display:flex;align-items:center;gap:16px;
+}
+.streak-num{font-size:32px;font-weight:800;color:#fff;line-height:1}
+.streak-lbl{font-size:11px;color:rgba(255,255,255,.6);margin-top:2px}
+.streak-divider{width:1px;height:40px;background:rgba(255,255,255,.2)}
+.streak-info{flex:1}
+.streak-title{font-size:14px;font-weight:700;color:#fff}
+.streak-sub{font-size:12px;color:rgba(255,255,255,.6);margin-top:2px}
+.mission-item{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:8px;transition:border-color .12s}
+.mission-item:hover{border-color:var(--border-2)}
+.mission-item.done{border-color:var(--success);background:var(--success-l)}
+.mi-head{display:flex;align-items:center;gap:12px}
+.mi-check{width:20px;height:20px;border-radius:6px;border:2px solid var(--border-2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.mission-item.done .mi-check{background:var(--success);border-color:var(--success)}
+.mi-info{flex:1}
+.mi-title{font-size:13px;font-weight:700;color:var(--text-1)}
+.mi-desc{font-size:12px;color:var(--text-2);margin-top:2px}
+.mi-pts{font-size:12px;font-weight:700;color:var(--accent);flex-shrink:0}
+.mi-bar-wrap{margin-top:10px}
+.mi-bar-row{display:flex;justify-content:space-between;font-size:11px;color:var(--text-2);margin-bottom:4px}
+.mi-bar-bg{height:5px;background:var(--border);border-radius:100px;overflow:hidden}
+.mi-bar-fill{height:5px;background:var(--accent);border-radius:100px}
+.mission-item.done .mi-bar-fill{background:var(--success)}
+.mi-reward{display:flex;align-items:center;gap:8px;margin-top:10px;padding-top:10px;border-top:1px solid rgba(0,0,0,.06);font-size:11px;color:var(--text-2)}
+
+/* ─── ONBOARDING ─── */
+.onboarding-wrap{max-width:640px;margin:0 auto;padding:48px 24px}
+.step-bar{display:flex;align-items:center;margin-bottom:40px;gap:0}
+.step-item{display:flex;align-items:center;flex:1}
+.step-circle{
+  width:32px;height:32px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:700;flex-shrink:0;
+  border:2px solid var(--border-2);
+  background:var(--surface);color:var(--text-3);
+  transition:all .2s;
+}
+.step-item.done .step-circle{background:var(--success);border-color:var(--success);color:#fff}
+.step-item.active .step-circle{background:var(--accent);border-color:var(--accent);color:#fff}
+.step-label{font-size:11px;color:var(--text-3);margin-top:4px;white-space:nowrap}
+.step-item.done .step-label,.step-item.active .step-label{color:var(--text-2);font-weight:600}
+.step-line{flex:1;height:2px;background:var(--border);margin:0 8px;transition:background .2s}
+.step-item.done + .step-item .step-line,.step-item.done .step-line{background:var(--success)}
+.step-col{display:flex;flex-direction:column;align-items:center}
+
+.ob-step{display:none}.ob-step.on{display:block}
+.ob-title{font-size:22px;font-weight:800;color:var(--text-1);letter-spacing:-.5px;margin-bottom:6px}
+.ob-sub{font-size:14px;color:var(--text-2);margin-bottom:28px;line-height:1.6}
+.connect-card{
+  border:1px solid var(--border);border-radius:12px;
+  padding:14px 16px;margin-bottom:8px;
+  display:flex;align-items:center;gap:14px;
+  background:var(--surface);transition:border-color .12s;
+}
+.connect-card.connected{border-color:var(--success)}
+.connect-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.connect-info{flex:1;min-width:0}
+.connect-name{font-size:14px;font-weight:700;color:var(--text-1)}
+.connect-handle{font-size:12px;color:var(--text-2);margin-top:2px}
+.connect-ok{font-size:11px;font-weight:600;color:var(--success);margin-top:2px}
+.ob-actions{margin-top:28px;display:flex;gap:10px;justify-content:flex-end}
+
+/* ─── BARCHART ─── */
+.bar-row{margin-bottom:10px}
+.bar-row:last-child{margin:0}
+.bar-label-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text-2);margin-bottom:4px}
+.bar-label-row span:last-child{font-weight:700;color:var(--text-1)}
+.bar-bg{height:6px;background:var(--border);border-radius:100px}
+.bar-fill{height:6px;border-radius:100px;background:var(--accent);transition:width .6s ease}
+
+/* ─── FILTER ─── */
+.filter-row{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+.filter-input{flex:1;min-width:140px;padding:7px 12px;border:1px solid var(--border-2);border-radius:8px;font-size:12px;background:var(--surface);color:var(--text-1);outline:none;font-family:inherit}
+.filter-input:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(79,70,229,.1)}
+.filter-select{padding:7px 10px;border:1px solid var(--border-2);border-radius:8px;font-size:12px;background:var(--surface);color:var(--text-1);outline:none;cursor:pointer}
+.filter-date{padding:6px 10px;border:1px solid var(--border-2);border-radius:8px;font-size:11px;background:var(--surface);color:var(--text-1);outline:none}
+
+/* ─── TABLE ─── */
+.table-wrap{overflow-x:auto;border:1px solid var(--border);border-radius:12px}
+.table{width:100%;border-collapse:collapse;min-width:680px;font-size:12px}
+.table th{text-align:left;padding:10px 14px;font-size:11px;font-weight:700;color:var(--text-3);letter-spacing:.3px;text-transform:uppercase;border-bottom:1px solid var(--border);background:var(--bg)}
+.table td{padding:12px 14px;border-bottom:1px solid var(--border);color:var(--text-1);background:var(--surface);vertical-align:middle}
+.table tr:last-child td{border-bottom:none}
+.table tr:hover td{background:var(--bg)}
+
+/* ─── PLATFORM CARDS ─── */
+.platform-card{
+  border:1px solid var(--border);border-radius:12px;
+  padding:14px 16px;margin-bottom:8px;
+  display:flex;align-items:center;gap:14px;
+  background:var(--surface);transition:all .12s;
+}
+.platform-card:hover{border-color:var(--border-2)}
+.platform-card.connected{border-left:3px solid var(--success)}
+.platform-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.platform-info{flex:1;min-width:0}
+.platform-name{font-size:14px;font-weight:700;color:var(--text-1)}
+.platform-handle{font-size:12px;color:var(--text-2);margin-top:2px}
+.platform-ok{font-size:11px;font-weight:600;color:var(--success);margin-top:2px}
+
+/* ─── HT OPTIONS ─── */
+.ht-option{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 14px;border-radius:10px;
+  border:1px solid var(--border);margin-bottom:8px;
+  cursor:pointer;transition:all .12s;background:var(--surface);
+}
+.ht-option:hover{border-color:var(--border-2)}
+.ht-option.selected{border-color:var(--accent);background:var(--accent-l)}
+.ht-radio{width:16px;height:16px;border-radius:50%;border:2px solid var(--border-2);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.ht-option.selected .ht-radio{border-color:var(--accent)}
+.ht-dot{width:6px;height:6px;border-radius:50%;display:none}
+.ht-option.selected .ht-dot{display:block;background:var(--accent)}
+.ht-lbl{flex:1}
+.ht-name{font-size:13px;font-weight:700;color:var(--text-1)}
+.ht-desc{font-size:11px;color:var(--text-2);margin-top:2px}
+
+/* ─── SETUP STEPS (AI 말투) ─── */
+.setup-step{display:flex;align-items:flex-start;gap:12px;margin-bottom:14px}
+.step-num-sm{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0}
+.step-num-sm.todo{background:var(--accent);color:#fff}
+.step-num-sm.done{background:var(--success-l);color:var(--success);border:1px solid var(--success)}
+.step-body-sm{flex:1}
+.step-title-sm{font-size:13px;font-weight:700;color:var(--text-1)}
+.step-sub-sm{font-size:12px;color:var(--text-2);margin-top:2px}
+.prog-bar{height:4px;background:var(--border);border-radius:100px;margin-top:8px;overflow:hidden}
+.prog-fill{height:4px;background:var(--accent);border-radius:100px;animation:pg 1.2s ease forwards}
+@keyframes pg{from{width:0}to{width:var(--w)}}
+
+/* ─── KAKAO ─── */
+.kakao-wrap{background:#FAE100;border-radius:14px;padding:16px;max-width:280px}
+.kakao-header{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.kakao-ic{width:30px;height:30px;border-radius:7px;background:#3A1D1D;display:flex;align-items:center;justify-content:center;font-size:14px}
+.kakao-name{font-size:13px;font-weight:700;color:#111}
+.kakao-body{background:#fff;border-radius:8px;padding:12px}
+.kakao-msg{font-size:12px;color:#111;line-height:1.7}
+.kakao-btn{display:block;width:100%;text-align:center;background:#3A1D1D;color:#FAE100;border-radius:7px;padding:8px;font-size:11px;font-weight:700;margin-top:10px;border:none;cursor:pointer}
+
+/* ─── PRICING ─── */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.plan-card{border:1px solid var(--border);border-radius:14px;padding:24px;background:var(--surface);position:relative}
+.plan-card.featured{border-color:var(--accent);border-width:2px}
+.plan-badge{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-size:10px;font-weight:700;padding:3px 12px;border-radius:0 0 8px 8px;white-space:nowrap}
+.plan-name{font-size:15px;font-weight:800;color:var(--text-1)}
+.plan-desc{font-size:12px;color:var(--text-2);margin-top:3px}
+.plan-price{font-size:30px;font-weight:800;color:var(--text-1);margin:14px 0 2px;letter-spacing:-.5px;line-height:1}
+.plan-period{font-size:12px;color:var(--text-3)}
+.plan-features{margin-top:16px}
+.plan-feat{font-size:12px;color:var(--text-2);padding:6px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:7px}
+.plan-feat:last-of-type{border:none}
+.plan-feat.off{color:var(--text-3)}
+.plan-feat .check{color:var(--success);font-size:12px;flex-shrink:0}
+.plan-feat .x{color:var(--text-3);flex-shrink:0}
+.plan-btn{width:100%;margin-top:16px;padding:10px;border-radius:9px;font-size:13px;cursor:pointer;border:1px solid var(--border-2);background:var(--surface);color:var(--text-1);font-weight:700;transition:all .15s}
+.plan-btn:hover{background:var(--bg)}
+.plan-btn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}.plan-btn.primary:hover{background:var(--accent-d)}
+
+/* ─── OUTREACH ─── */
+.ol-row{display:flex;align-items:flex-start;gap:10px;padding:11px 0;border-bottom:1px solid var(--border)}
+.ol-row:last-child{border:none}
+.ol-av{width:32px;height:32px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text-2);flex-shrink:0;border:1px solid var(--border)}
+.ol-info{flex:1;min-width:0}
+.ol-user{font-size:12px;font-weight:700;color:var(--text-1)}
+.ol-comment{font-size:11px;color:var(--text-2);margin-top:2px;line-height:1.5}
+.ol-meta{display:flex;align-items:center;gap:6px;margin-top:4px}
+.ol-time{font-size:10px;color:var(--text-3)}
+.ol-status{font-size:10px;font-weight:600;padding:2px 7px;border-radius:6px}
+.os-sent{background:var(--success-l);color:var(--success)}.os-queued{background:var(--warn-l);color:var(--warn)}.os-replied{background:var(--accent-l);color:var(--accent-d)}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:1100px){.grid-cols{grid-template-columns:1fr}}
+@media(max-width:900px){.grid-4{grid-template-columns:1fr 1fr}.pricing-grid{grid-template-columns:1fr}.form-grid{grid-template-columns:1fr}.grid-2{grid-template-columns:1fr}.grid-3{grid-template-columns:1fr 1fr}}
+@media(max-width:640px){
+  :root{--sb-w:260px}
+  .sb{transform:translateX(-100%)}.sb.open{transform:translateX(0)}
+  .mn{margin-left:0;padding-bottom:68px}
+  .topnav{padding:0 14px}.topnav-logo{display:block}
+  .page{padding:16px}
+  .bottom-nav{display:block}
+  .burger{display:flex}
+  .grid-4,.grid-3{grid-template-columns:1fr 1fr}
+  .grid-cols,.grid-2{grid-template-columns:1fr}
+  .pricing-grid{grid-template-columns:1fr}
+  .ob-title{font-size:18px}
+  .streak-num{font-size:26px}
+}
+@media(min-width:641px){.burger{display:none}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ═══ SIDEBAR ═══ -->
+<div class="sb" id="sidebar">
+  <div class="sb-top">
+    <div class="sb-logo">
+      <div class="sb-logo-mark" style="width:34px;height:34px;border-radius:9px">
+        <svg viewBox="0 0 18 18" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 14 Q3 5 13 5" stroke-width="2.2"/>
+          <path d="M3 14 Q3 9 9 9" stroke-width="2.2"/>
+          <circle cx="3" cy="14" r="1.5" fill="#fff" stroke="none"/>
+        </svg>
+      </div>
+      <div>
+        <div class="sb-logo-name" style="font-size:18px;letter-spacing:-.5px">리플 AI</div>
+        <div class="sb-logo-sub">내 SNS 매니저</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sb-nav">
+    <button class="nb on" id="nb-dash" onclick="go('dash',this)">
+      <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="5" height="5" rx="1"/><rect x="8" y="1" width="5" height="5" rx="1"/><rect x="1" y="8" width="5" height="5" rx="1"/><rect x="8" y="8" width="5" height="5" rx="1"/></svg>
+      홈
+    </button>
+
+    <div class="nav-group">
+      <span class="nav-label">관리</span>
+      <button class="nb" id="nb-msg" onclick="go('msg',this)">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12.5 8a2 2 0 0 1-2 2H4.5L2 13V3.5a2 2 0 0 1 2-2h6.5a2 2 0 0 1 2 2V8z"/></svg>
+        댓글·DM 자동 관리
+        <span class="nb-badge">7</span>
+      </button>
+      <button class="nb" id="nb-instadm" onclick="go('instadm',this)">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12.5 8a2 2 0 0 1-2 2H4.5L2 13V3.5a2 2 0 0 1 2-2h6.5a2 2 0 0 1 2 2V8z"/></svg>
+        댓글 달면 DM 발송
+      </button>
+      <button class="nb" id="nb-biz" onclick="go('biz',this)">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="12" height="8" rx="1"/><path d="M4 4V3a3 3 0 0 1 6 0v1M1 8h12"/></svg>
+        수익화/비즈니스
+        <span class="nb-badge">12</span>
+      </button>
+      <button class="nb" id="nb-crm" onclick="go('crm',this)">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="5" cy="4" r="2.5"/><path d="M1 12c0-2 1.8-3.5 4-3.5s4 1.5 4 3.5"/><circle cx="10.5" cy="4.5" r="2"/><path d="M10.5 9c1.5 0 3 1 3 2.5"/></svg>
+        팔로워 관리
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-label">성장</span>
+      <button class="nb" id="nb-outreach" onclick="go('outreach',this)">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1l1.5 4.5H13l-3.75 2.75 1.5 4.5L7 10 3.25 12.75l1.5-4.5L1 5.5h4.5z"/></svg>
+        먼저 말 걸기
+      </button>
+      <button class="nb" id="nb-mission" onclick="go('mission',this)">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7h10M2 4h5M2 10h7"/></svg>
+        오늘 할 일
+        <span class="nb-badge" style="background:var(--accent)">3</span>
+      </button>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-label">설정</span>
+      <button class="nb" id="nb-acct" onclick="go('acct',this)">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="4.5" r="3"/><path d="M1.5 13c0-2.5 2.5-4 5.5-4s5.5 1.5 5.5 4"/></svg>
+        계정 연동
+      </button>
+      <button class="nb" id="nb-pers" onclick="go('pers',this)">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="7" cy="7" r="5.5"/><path d="M4.5 8.5s1 1.5 2.5 1.5 2.5-1.5 2.5-1.5"/><circle cx="5" cy="6" r=".8" fill="currentColor" stroke="none"/><circle cx="9" cy="6" r=".8" fill="currentColor" stroke="none"/></svg>
+        AI 말투 학습
+      </button>
+      <button class="nb" id="nb-kakao" onclick="go('kakao',this)">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M7 1.5C3.9 1.5 1.5 3.5 1.5 6c0 1.6.9 3 2.3 3.9L3.2 12l2.6-1.7A5.5 5.5 0 0 0 7 10.5c3.1 0 5.5-2 5.5-4.4S10.1 1.5 7 1.5z"/></svg>
+        카카오/메일 알림 <span style="font-size:9px;font-weight:800;color:var(--danger);background:var(--danger-l);padding:1px 5px;border-radius:4px;margin-left:2px">FREE</span>
+      </button>
+      <button class="nb" id="nb-price" onclick="go('price',this)">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="12" height="8" rx="1.5"/><path d="M1 6h12M4 9h2M8 9h2"/></svg>
+        이용권
+      </button>
+    </div>
+  </div>
+
+  <div class="sb-bottom">
+    <div class="trial-card">
+      <div class="trial-top">
+        <span class="trial-label">무료 체험 중</span>
+        <span class="trial-badge">D-4</span>
+      </div>
+      <div class="trial-bar-bg"><div class="trial-bar-fill"></div></div>
+      <div class="trial-sub">7일 중 3일 사용됨</div>
+      <button class="trial-btn">프리미엄으로 업그레이드</button>
+    </div>
+  </div>
+</div>
+<div class="sb-overlay" id="sb-overlay" onclick="closeSb()"></div>
+
+<!-- ═══ MAIN ═══ -->
+<div class="mn" id="main-area">
+
+  <!-- 모바일 탑바 -->
+  <div class="topnav" id="topnav">
+    <div class="topnav-left">
+      <button class="burger" onclick="toggleSb()"><span></span><span></span><span></span></button>
+      <div class="topnav-logo">리플 AI</div>
+    </div>
+<div class="topnav-right" id="topnav-right" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+      <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-3)">
+        <div class="dot dot-ig"></div>Instagram
+        <div class="dot dot-tk" style="margin-left:3px"></div>TikTok
+        <div class="dot dot-yt" style="margin-left:3px"></div>YouTube
+      </div>
+      <span style="font-size:11px;color:var(--text-3);border-left:1px solid var(--border);padding-left:12px">2025년 1월 15일</span>
+      <div style="display:flex;align-items:center;gap:7px;border-left:1px solid var(--border);padding-left:12px">
+        <div id="status-dot" style="width:7px;height:7px;border-radius:50%;background:var(--success);flex-shrink:0;animation:spulse 2s infinite"></div>
+        <span id="status-lbl" style="font-size:12px;font-weight:600;color:var(--text-2)">AI 자동 응대 켜짐</span>
+        <button id="ai-toggle" onclick="toggleAI()" style="padding:2px 9px;border-radius:5px;border:1px solid var(--border-2);background:var(--surface);font-size:11px;font-weight:700;color:var(--success);cursor:pointer">ON</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 하단 탭 -->
+  <div class="bottom-nav">
+    <div class="bn-items">
+      <button class="bn-item on" id="bn-dash" onclick="goMobile('dash','bn-dash')"><svg width="18" height="18" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="1" width="5" height="5" rx="1"/><rect x="8" y="1" width="5" height="5" rx="1"/><rect x="1" y="8" width="5" height="5" rx="1"/><rect x="8" y="8" width="5" height="5" rx="1"/></svg>홈</button>
+      <button class="bn-item" id="bn-msg" onclick="goMobile('msg','bn-msg')"><div style="position:relative;display:inline-block"><svg width="18" height="18" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12.5 8a2 2 0 0 1-2 2H4.5L2 13V3.5a2 2 0 0 1 2-2h6.5a2 2 0 0 1 2 2V8z"/></svg><span class="bn-badge">7</span></div>댓글</button>
+      <button class="bn-item" id="bn-instadm" onclick="goMobile('instadm','bn-instadm')"><svg width="18" height="18" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12.5 8a2 2 0 0 1-2 2H4.5L2 13V3.5a2 2 0 0 1 2-2h6.5a2 2 0 0 1 2 2V8z"/></svg>DM발송</button>
+      <button class="bn-item" id="bn-mission" onclick="goMobile('mission','bn-mission')"><svg width="18" height="18" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 7h10M2 4h5M2 10h7"/></svg>할 일</button>
+      <button class="bn-item" id="bn-biz" onclick="goMobile('biz','bn-biz')"><div style="position:relative;display:inline-block"><svg width="18" height="18" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="4" width="12" height="8" rx="1"/><path d="M4 4V3a3 3 0 0 1 6 0v1M1 8h12"/></svg><span class="bn-badge">12</span></div>수익</button>
+    </div>
+  </div>
+
+  <!-- ══ 온보딩 ══ -->
+  <div class="vw" id="v-onboarding">
+    <div class="onboarding-wrap">
+
+      <!-- 스텝 바 -->
+      <div class="step-bar" id="stepbar">
+        <div class="step-col"><div class="step-circle" id="sc1">1</div><div class="step-label">계정 연동</div></div>
+        <div class="step-line" id="sl1"></div>
+        <div class="step-col"><div class="step-circle" id="sc2">2</div><div class="step-label">말투 · 알림</div></div>
+        <div class="step-line" id="sl2"></div>
+        <div class="step-col"><div class="step-circle" id="sc3">3</div><div class="step-label">성장 설정</div></div>
+      </div>
+
+      <!-- Step 1: 계정 연동 -->
+      <div class="ob-step on" id="ob1">
+        <div class="ob-title">SNS 계정을 연동하세요</div>
+        <div class="ob-sub">연동한 계정의 댓글과 DM을 AI가 대신 관리해드려요. 게시물과 말투도 자동으로 학습해요.</div>
+
+        <div class="connect-card connected">
+          <div class="connect-icon" style="background:#FEF2F2">📷</div>
+          <div class="connect-info">
+            <div class="connect-name">Instagram</div>
+            <div class="connect-handle">@yuminhye_beauty · 팔로워 312,000</div>
+            <div class="connect-ok">연동 완료 — 게시물 200개 학습 중</div>
+          </div>
+          <span class="badge badge-success">연결됨</span>
+        </div>
+        <div class="connect-card connected">
+          <div class="connect-icon" style="background:#ECFDF5">♪</div>
+          <div class="connect-info">
+            <div class="connect-name">TikTok</div>
+            <div class="connect-handle">@peerstory · 팔로워 89,400</div>
+            <div class="connect-ok">연동 완료 — 영상 50개 학습 중</div>
+          </div>
+          <span class="badge badge-success">연결됨</span>
+        </div>
+        <div class="connect-card">
+          <div class="connect-icon" style="background:#FFF7ED">▶</div>
+          <div class="connect-info">
+            <div class="connect-name">YouTube</div>
+            <div class="connect-handle">@15초유민혜 · 구독자 42,000</div>
+          </div>
+          <button class="btn btn-sm">연동하기</button>
+        </div>
+        <div class="connect-card">
+          <div class="connect-icon" style="background:var(--bg)">✦</div>
+          <div class="connect-info">
+            <div class="connect-name">Threads</div>
+            <div class="connect-handle" style="color:var(--text-3)">미연동</div>
+          </div>
+          <button class="btn btn-sm">연동하기</button>
+        </div>
+
+        <div class="ob-actions">
+          <button class="btn btn-ghost btn-sm" onclick="goDash()">나중에</button>
+          <button class="btn btn-accent" onclick="nextStep(2)">다음 — 말투 · 알림 설정</button>
+        </div>
+      </div>
+
+      <!-- Step 2: 말투 + 카카오 -->
+      <div class="ob-step" id="ob2">
+        <div class="ob-title">AI 말투와 알림을 설정하세요</div>
+        <div class="ob-sub">AI가 내 계정 게시물을 분석해 말투를 학습했어요. 카카오 알림으로 중요한 순간을 놓치지 마세요.</div>
+
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-title">AI 말투 학습 현황</div>
+          <div class="setup-step">
+            <div class="step-num-sm done">✓</div>
+            <div class="step-body-sm">
+              <div class="step-title-sm">계정 분석 완료</div>
+              <div class="step-sub-sm">게시물 250개 분석 완료</div>
+              <div class="prog-bar"><div class="prog-fill" style="--w:100%;width:100%"></div></div>
+            </div>
+          </div>
+          <div class="setup-step" style="margin-bottom:0">
+            <div class="step-num-sm done">✓</div>
+            <div class="step-body-sm">
+              <div class="step-title-sm">말투 학습 완료 — 일치도 98%</div>
+              <div class="step-sub-sm">#친근한 #위트있는 #공감형 #이모지 활용</div>
+              <div class="prog-bar"><div class="prog-fill" style="--w:100%;width:100%"></div></div>
+            </div>
+          </div>
+          <div class="divider" style="margin:12px 0 10px"></div>
+          <div class="form-group" style="margin:0">
+            <label class="input-label">추가 설명 (금지어, 브랜드 특이사항 등)</label>
+            <textarea class="input" placeholder="예: 협찬 문의는 info@millimilli.co 로 안내, 가격 흥정 절대 불가, 환불은 구매처 안내..."></textarea>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">카카오 알림 설정</div>
+          <div class="form-grid" style="margin-bottom:12px">
+            <div class="form-group" style="margin:0">
+              <label class="input-label">전화번호</label>
+              <input class="input" type="tel" placeholder="010-0000-0000">
+            </div>
+            <div class="form-group" style="margin:0">
+              <label class="input-label">일일 리포트 시간</label>
+              <select class="input"><option>오전 8:00</option><option>오전 9:00</option><option>오전 10:00</option></select>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border-radius:8px">
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--text-1)">일일 요약 리포트</div>
+                <div style="font-size:11px;color:var(--text-2);margin-top:2px">매일 아침 응대 현황 요약</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border-radius:8px">
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--text-1)">요주의 즉시 알림</div>
+                <div style="font-size:11px;color:var(--text-2);margin-top:2px">결제 문제, 부정 이슈 발생 시 즉시</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border-radius:8px">
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--text-1)">수익 문의 알림</div>
+                <div style="font-size:11px;color:var(--text-2);margin-top:2px">광고, 협업, 수출 문의 즉시</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="ob-actions">
+          <button class="btn btn-ghost btn-sm" onclick="nextStep(1)">이전</button>
+          <button class="btn btn-ghost btn-sm" onclick="goDash()">나중에</button>
+          <button class="btn btn-accent" onclick="nextStep(3)">다음 — 성장 설정</button>
+        </div>
+      </div>
+
+      <!-- Step 3: 성장 설정 -->
+      <div class="ob-step" id="ob3">
+        <div class="ob-title">계정 성장 방법을 설정하세요</div>
+        <div class="ob-sub">AI가 내 분야 사람들에게 먼저 다가가서 자연스럽게 팔로워를 늘려요. 안전한 범위에서 자동으로 실행돼요.</div>
+
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-title">먼저 말 걸기 타겟</div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border-radius:8px">
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--text-1)">해시태그 타겟</div>
+                <div style="font-size:11px;color:var(--text-2);margin-top:2px">#뷰티 #스킨케어 #올리브영</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border-radius:8px">
+              <div>
+                <div style="font-size:13px;font-weight:600;color:var(--text-1)">경쟁 계정 팔로워</div>
+                <div style="font-size:11px;color:var(--text-2);margin-top:2px">@laneige_kr, @innisfree 팔로워</div>
+              </div>
+              <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom:12px">
+          <div class="card-title">일 최대 활동량</div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+            <span style="font-size:12px;color:var(--text-2);min-width:90px">선댓글 한도</span>
+            <input type="range" min="10" max="100" value="50" style="flex:1;accent-color:var(--accent)" oninput="document.getElementById('sl-out').textContent=this.value+'개'">
+            <span id="sl-out" style="font-size:12px;font-weight:700;color:var(--accent);min-width:36px">50개</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <span style="font-size:12px;color:var(--text-2);min-width:90px">선DM 한도</span>
+            <input type="range" min="1" max="30" value="15" style="flex:1;accent-color:var(--accent)" oninput="document.getElementById('sl-dm').textContent=this.value+'개'">
+            <span id="sl-dm" style="font-size:12px;font-weight:700;color:var(--accent);min-width:36px">15개</span>
+          </div>
+          <div style="margin-top:10px;padding:8px 12px;background:var(--success-l);border-radius:8px;font-size:11px;color:var(--success)">
+            현재 설정은 플랫폼 가이드라인 내 안전 범위예요.
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Human-touch 모드</div>
+          <div class="ht-option selected" id="ht1" onclick="selHt('ht1')">
+            <div class="ht-radio"><div class="ht-dot"></div></div>
+            <div class="ht-lbl">
+              <div class="ht-name">휴먼터치 <span class="badge badge-accent" style="margin-left:6px;font-size:10px">권장</span></div>
+              <div class="ht-desc">내 활동 패턴 기반 2~15분 랜덤 지연. 야간 슬립 자동 적용</div>
+            </div>
+          </div>
+          <div class="ht-option" id="ht2" onclick="selHt('ht2')">
+            <div class="ht-radio"><div class="ht-dot"></div></div>
+            <div class="ht-lbl">
+              <div class="ht-name">즉시 응답</div>
+              <div class="ht-desc">수신 즉시 응대. 빠르지만 자동화처럼 보일 수 있음</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ob-actions">
+          <button class="btn btn-ghost btn-sm" onclick="nextStep(2)">이전</button>
+          <button class="btn btn-accent" onclick="goDash()">설정 완료 — 대시보드로</button>
+        </div>
+      </div>
+
+    </div><!-- /onboarding-wrap -->
+  </div><!-- /v-onboarding -->
+
+  <!-- ══ 대시보드 ══ -->
+  <div class="vw on" id="v-dash">
+    <div class="page">
+      <div class="page-header">
+        <div class="page-title">홈</div>
+        <div class="page-sub">리플 AI가 오늘 한 일을 확인하세요</div>
+      </div>
+
+      <!-- 1-2-3 온보딩 스텝 바 (JS로 상태 제어) -->
+      <div id="step-banner" style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:0;margin-bottom:16px;overflow:hidden">
+        <!-- 스텝 진행 바 -->
+        <div style="display:flex;align-items:stretch;border-bottom:1px solid var(--border)">
+          <div id="step-btn-1" onclick="gotoStep(1)" style="flex:1;padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;border-right:1px solid var(--border);background:var(--success-l);transition:background .15s">
+            <div style="width:26px;height:26px;border-radius:50%;background:var(--success);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0">✓</div>
+            <div><div style="font-size:12px;font-weight:700;color:var(--success)">계정 연동</div><div style="font-size:10px;color:var(--success);margin-top:1px">완료</div></div>
+          </div>
+          <div id="step-btn-2" onclick="gotoStep(2)" style="flex:1;padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;border-right:1px solid var(--border);background:var(--success-l);transition:background .15s">
+            <div style="width:26px;height:26px;border-radius:50%;background:var(--success);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0">✓</div>
+            <div><div style="font-size:12px;font-weight:700;color:var(--success)">말투·알림 설정</div><div style="font-size:10px;color:var(--success);margin-top:1px">완료</div></div>
+          </div>
+          <div id="step-btn-3" onclick="gotoStep(3)" style="flex:1;padding:12px 16px;display:flex;align-items:center;gap:10px;cursor:pointer;background:var(--accent-l);transition:background .15s">
+            <div style="width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0">3</div>
+            <div><div style="font-size:12px;font-weight:700;color:var(--accent)">성장 설정</div><div style="font-size:10px;color:var(--accent);margin-top:1px">권장 — 먼저 말 걸기 타겟 설정</div></div>
+          </div>
+          <div style="padding:12px 16px;display:flex;align-items:center;flex-shrink:0">
+            <button onclick="document.getElementById('step-detail').style.display='none';document.getElementById('step-banner').style.display='none'" style="font-size:11px;color:var(--text-3);background:none;border:none;cursor:pointer">닫기 ✕</button>
+          </div>
+        </div>
+        <!-- 스텝 상세 (step 3 기본 표시) -->
+        <div id="step-detail" style="padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;background:var(--accent-l)">
+          <div>
+            <div style="font-size:13px;font-weight:700;color:var(--accent-d)" id="step-detail-title">성장 설정이 남아 있어요</div>
+            <div style="font-size:12px;color:var(--accent);margin-top:3px" id="step-detail-sub">먼저 말 걸기 타겟과 활동량을 설정하면 팔로워가 자동으로 늘어요.</div>
+          </div>
+          <button id="step-detail-btn" class="btn btn-accent btn-sm" onclick="go('outreach',document.getElementById('nb-outreach'))">성장 설정하기 →</button>
+        </div>
+      </div>
+      <!-- 절약 시간 & 금액 환산 배너 -->
+      <div style="background:linear-gradient(135deg,#4F46E5 0%,#7C3AED 100%);border-radius:16px;padding:24px 28px;margin-bottom:16px;color:#fff;position:relative;overflow:hidden">
+        <div style="position:absolute;top:-20px;right:-20px;width:120px;height:120px;background:rgba(255,255,255,.08);border-radius:50%"></div>
+        <div style="position:absolute;bottom:-30px;right:60px;width:80px;height:80px;background:rgba(255,255,255,.05);border-radius:50%"></div>
+        <div style="font-size:12px;font-weight:600;opacity:.85;margin-bottom:12px;letter-spacing:.5px">⏱ 이번 달 리플 AI가 절약해준 시간</div>
+        <div style="display:flex;align-items:flex-end;gap:20px;flex-wrap:wrap">
+          <div>
+            <div style="font-size:42px;font-weight:800;letter-spacing:-1.5px;line-height:1">72<span style="font-size:20px;font-weight:700;margin-left:2px">시간</span></div>
+            <div style="font-size:12px;opacity:.7;margin-top:4px">댓글 · DM · 먼저 말 걸기 자동 응대</div>
+          </div>
+          <div style="width:1px;height:48px;background:rgba(255,255,255,.2);flex-shrink:0"></div>
+          <div>
+            <div style="font-size:11px;opacity:.7;margin-bottom:4px">시급 9,860원 기준 환산</div>
+            <div style="font-size:32px;font-weight:800;letter-spacing:-1px;line-height:1">₩709,920<span style="font-size:14px;font-weight:600;margin-left:4px">상당</span></div>
+            <div style="font-size:11px;opacity:.6;margin-top:4px">2026년 최저시급 기준</div>
+          </div>
+          <div style="width:1px;height:48px;background:rgba(255,255,255,.2);flex-shrink:0"></div>
+          <div style="display:flex;flex-direction:column;gap:6px">
+            <div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:50%;background:#34D399;flex-shrink:0"></div><span style="font-size:12px;opacity:.9">댓글 응대 — 38시간</span></div>
+            <div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:50%;background:#60A5FA;flex-shrink:0"></div><span style="font-size:12px;opacity:.9">DM 응대 — 22시간</span></div>
+            <div style="display:flex;align-items:center;gap:6px"><div style="width:8px;height:8px;border-radius:50%;background:#F9A8D4;flex-shrink:0"></div><span style="font-size:12px;opacity:.9">먼저 말 걸기 — 12시간</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="grid-4" style="margin-bottom:16px">
+        <div class="stat-card">
+          <div class="stat-label">오늘 댓글 응대</div>
+          <div class="stat-val accent" style="font-size:26px">89건</div>
+          <div class="stat-delta up">어제 +12건</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">오늘 DM 응대</div>
+          <div class="stat-val accent" style="font-size:26px">35건</div>
+          <div class="stat-delta up">어제 +6건</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">이번 달 누적 응대</div>
+          <div class="stat-val" style="font-size:22px;letter-spacing:-.5px">1,842건</div>
+          <div class="stat-delta up">절약 시간 72시간</div>
+        </div>
+        <div class="stat-card" style="border:2px solid var(--danger);background:var(--danger-l)">
+          <div class="stat-label" style="color:var(--danger);font-weight:700">요주의 미확인</div>
+          <div class="stat-val danger" style="font-size:26px">7건</div>
+          <div style="margin-top:6px"><button class="btn btn-xs" style="background:var(--danger);color:#fff;border:none;border-radius:6px;padding:3px 10px;font-size:11px;font-weight:700;cursor:pointer" onclick="go('msg',document.getElementById('nb-msg'))">바로 확인 →</button></div>
+        </div>
+      </div>
+
+      <!-- 메인 2컬럼 -->
+      <div class="grid-cols">
+        <div>
+          <!-- 즉시 확인 필요 -->
+          <div class="card" style="margin-bottom:14px;border-left:3px solid var(--danger)">
+            <div class="card-header">
+              <div class="card-title" style="color:var(--danger)">즉시 확인 필요</div>
+              <button class="btn btn-ghost btn-sm" onclick="go('msg',document.getElementById('nb-msg'))">전체 보기</button>
+            </div>
+            <div class="row">
+              <div class="row-avatar" style="background:var(--danger-l);color:var(--danger)">B</div>
+              <div class="row-body">
+                <div class="row-name">@beauty_lover99 <span class="badge badge-danger" style="margin-left:4px">결제 문제</span></div>
+                <div class="row-sub">"공동구매 결제가 계속 오류가 나는데 환불은 어떻게 해요?"</div>
+              </div>
+              <div class="row-right">
+                <span class="row-time">2분 전</span>
+                <button class="btn btn-xs" style="background:var(--danger);color:#fff;border:none;border-radius:5px;padding:3px 8px;font-size:10px;font-weight:700;cursor:pointer;margin-top:3px" onclick="go('msg',document.getElementById('nb-msg'))">확인</button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="row-avatar" style="background:var(--warn-l);color:var(--warn)">S</div>
+              <div class="row-body">
+                <div class="row-name">@skin_trouble_k <span class="badge badge-warn" style="margin-left:4px">부정 이슈</span></div>
+                <div class="row-sub">"이거 쓰고 트러블 났어요 신고 어떻게 해요..."</div>
+              </div>
+              <div class="row-right">
+                <span class="row-time">18분 전</span>
+                <button class="btn btn-xs" style="background:var(--warn);color:#fff;border:none;border-radius:5px;padding:3px 8px;font-size:10px;font-weight:700;cursor:pointer;margin-top:3px" onclick="go('msg',document.getElementById('nb-msg'))">확인</button>
+              </div>
+            </div>
+            <div class="row">
+              <div class="row-avatar" style="background:var(--accent-l);color:var(--accent-d)">C</div>
+              <div class="row-body">
+                <div class="row-name">@collab_brand_k <span class="badge badge-accent" style="margin-left:4px">B2B 제안</span></div>
+                <div class="row-sub">"OEM 협업 및 견적 문의드립니다."</div>
+              </div>
+              <div class="row-right">
+                <span class="row-time">1시간 전</span>
+                <button class="btn btn-xs" style="background:var(--accent);color:#fff;border:none;border-radius:5px;padding:3px 8px;font-size:10px;font-weight:700;cursor:pointer;margin-top:3px" onclick="go('biz',document.getElementById('nb-biz'))">확인</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- 댓글 유형 분석 -->
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-title">댓글 유형 분석</div>
+            <div class="bar-row"><div class="bar-label-row"><span>제품 문의</span><span>45%</span></div><div class="bar-bg"><div class="bar-fill" style="width:45%"></div></div></div>
+            <div class="bar-row"><div class="bar-label-row"><span>후기 / 공감</span><span>28%</span></div><div class="bar-bg"><div class="bar-fill" style="width:28%;background:var(--success)"></div></div></div>
+            <div class="bar-row"><div class="bar-label-row"><span>구매 링크 요청</span><span>15%</span></div><div class="bar-bg"><div class="bar-fill" style="width:15%;background:#6366F1"></div></div></div>
+            <div class="bar-row"><div class="bar-label-row"><span>협찬 / 협업 문의</span><span>7%</span></div><div class="bar-bg"><div class="bar-fill" style="width:7%;background:var(--warn)"></div></div></div>
+            <div class="bar-row"><div class="bar-label-row"><span style="color:var(--danger)">부정 댓글</span><span style="color:var(--danger)">3%</span></div><div class="bar-bg"><div class="bar-fill" style="width:3%;background:var(--danger)"></div></div></div>
+          </div>
+
+          <!-- 최근 자동 응대 -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">최근 자동 응대</div>
+              <button class="btn btn-ghost btn-sm" onclick="go('msg',document.getElementById('nb-msg'))">전체 보기</button>
+            </div>
+            <div class="row">
+              <div class="dot dot-ig" style="flex-shrink:0"></div>
+              <div class="row-body">
+                <div class="row-name">@yuna__daily</div>
+                <div class="row-sub">제품 문의 — "올리브영·스마트스토어에서 구매 가능해요!"</div>
+              </div>
+              <div class="row-right"><span class="row-time">2분 전</span><span class="badge badge-neutral">응대완료</span></div>
+            </div>
+            <div class="row">
+              <div class="dot dot-tk" style="flex-shrink:0"></div>
+              <div class="row-body">
+                <div class="row-name">@cool_tommi99</div>
+                <div class="row-sub">구매 링크 요청 — DM으로 링크 자동발송 완료</div>
+              </div>
+              <div class="row-right"><span class="row-time">8분 전</span><span class="badge badge-neutral">응대완료</span></div>
+            </div>
+            <div class="row">
+              <div class="dot dot-yt" style="flex-shrink:0"></div>
+              <div class="row-body">
+                <div class="row-name">@makeup_kang</div>
+                <div class="row-sub">성분 문의 — "500달톤 이하 성분만 엄선했어요"</div>
+              </div>
+              <div class="row-right"><span class="row-time">15분 전</span><span class="badge badge-neutral">응대완료</span></div>
+            </div>
+            <div class="row">
+              <div class="dot dot-ig" style="flex-shrink:0"></div>
+              <div class="row-body">
+                <div class="row-name">@beauty_love_j</div>
+                <div class="row-sub">긍정 후기 — 감사 댓글 자동 작성</div>
+              </div>
+              <div class="row-right"><span class="row-time">22분 전</span><span class="badge badge-neutral">응대완료</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 오른쪽 -->
+        <div>
+          <!-- 감정 분석 -->
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-title">감정 분석</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px">
+              <div style="background:var(--success-l);border-radius:8px;padding:12px;text-align:center">
+                <div style="font-size:24px;margin-bottom:2px">😊</div><div style="font-size:22px;font-weight:800;color:var(--success)">68%</div>
+                <div style="font-size:11px;color:var(--success);margin-top:2px;font-weight:600">긍정</div>
+              </div>
+              <div style="background:var(--bg);border-radius:8px;padding:12px;text-align:center">
+                <div style="font-size:24px;margin-bottom:2px">😐</div><div style="font-size:22px;font-weight:800;color:var(--text-2)">26%</div>
+                <div style="font-size:11px;color:var(--text-3);margin-top:3px;font-weight:600">중립</div>
+              </div>
+              <div style="background:var(--danger-l);border-radius:8px;padding:12px;text-align:center">
+                <div style="font-size:24px;margin-bottom:2px">😠</div><div style="font-size:22px;font-weight:800;color:var(--danger)">6%</div>
+                <div style="font-size:11px;color:var(--danger);margin-top:3px;font-weight:600">부정</div>
+              </div>
+            </div>
+            <div style="padding:8px 12px;background:var(--bg);border-radius:8px;font-size:12px;color:var(--text-2)">
+              AI 말투 일치도 <strong style="color:var(--accent)">98%</strong> — 팬들이 AI인지 눈치채지 못하고 있어요.
+            </div>
+          </div>
+
+          <!-- 오늘 할 일 요약 -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">오늘 할 일</div>
+              <button class="btn btn-ghost btn-sm" onclick="go('mission',document.getElementById('nb-mission'))">전체 보기</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+              <div style="width:18px;height:18px;border-radius:5px;background:var(--success);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div style="flex:1;font-size:12px;color:var(--text-2);text-decoration:line-through">댓글 자동응대 10건</div>
+              <span class="badge badge-success" style="font-size:10px">완료</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+              <div style="width:18px;height:18px;border-radius:5px;border:2px solid var(--border-2);flex-shrink:0"></div>
+              <div style="flex:1">
+                <div style="font-size:12px;font-weight:600;color:var(--text-1)">먼저 말 걸기 10개</div>
+                <div style="font-size:11px;color:var(--text-3);margin-top:1px">7/10 진행 중</div>
+              </div>
+              <span class="badge badge-accent" style="font-size:10px">70%</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)">
+              <div style="width:18px;height:18px;border-radius:5px;border:2px solid var(--border-2);flex-shrink:0"></div>
+              <div style="flex:1">
+                <div style="font-size:12px;font-weight:600;color:var(--text-1)">팔로워 CRM 확인</div>
+                <div style="font-size:11px;color:var(--text-3);margin-top:1px">미완료</div>
+              </div>
+              <button class="btn btn-xs" onclick="go('crm',document.getElementById('nb-crm'))">바로가기</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 0 0">
+              <div style="width:18px;height:18px;border-radius:5px;border:2px solid var(--border-2);flex-shrink:0"></div>
+              <div style="flex:1">
+                <div style="font-size:12px;font-weight:600;color:var(--text-1)">수익 문의 12건 처리</div>
+                <div style="font-size:11px;color:var(--text-3);margin-top:1px">미완료</div>
+              </div>
+              <button class="btn btn-xs" onclick="go('biz',document.getElementById('nb-biz'))">바로가기</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 댓글·DM ══ -->
+  <div class="vw" id="v-msg">
+    <div class="page">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <div><div class="page-title">댓글·DM 자동 관리</div><div class="page-sub">받은 댓글과 AI 응대 내역</div></div>
+      </div>
+
+      <!-- 기간 탭 + 숫자 박스 -->
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+        <div style="display:flex;gap:4px">
+          <button onclick="setPeriod(this,'오늘')" style="padding:5px 14px;font-size:12px;font-weight:600;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer">오늘</button>
+          <button onclick="setPeriod(this,'7일')" style="padding:5px 14px;font-size:12px;font-weight:600;border-radius:6px;border:1px solid var(--border-2);background:var(--surface);color:var(--text-2);cursor:pointer">7일</button>
+          <button onclick="setPeriod(this,'30일')" style="padding:5px 14px;font-size:12px;font-weight:600;border-radius:6px;border:1px solid var(--border-2);background:var(--surface);color:var(--text-2);cursor:pointer">30일</button>
+        </div>
+        <span id="period-label" style="font-size:11px;color:var(--text-3)">오늘 00:00 기준</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:16px">
+        <div class="stat-card" style="padding:14px 16px">
+          <div class="stat-label">댓글 수신</div>
+          <div class="stat-val" style="font-size:24px">284</div>
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:6px">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3)"><span style="display:flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:#E1306C;display:inline-block"></span>IG</span><span>156</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3)"><span style="display:flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:#00C897;display:inline-block"></span>TK</span><span>84</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3)"><span style="display:flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:#FF0000;display:inline-block"></span>YT</span><span>44</span></div>
+          </div>
+        </div>
+        <div class="stat-card" style="padding:14px 16px;border-color:var(--success)">
+          <div class="stat-label">댓글 응대</div>
+          <div class="stat-val success" style="font-size:24px">256</div>
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:6px">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3)"><span style="display:flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:#E1306C;display:inline-block"></span>IG</span><span>142</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3)"><span style="display:flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:#00C897;display:inline-block"></span>TK</span><span>77</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3)"><span style="display:flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:#FF0000;display:inline-block"></span>YT</span><span>37</span></div>
+          </div>
+        </div>
+        <div class="stat-card" style="padding:14px 16px">
+          <div class="stat-label">DM 수신</div>
+          <div class="stat-val" style="font-size:24px">87</div>
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:6px">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3)"><span style="display:flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:#E1306C;display:inline-block"></span>IG</span><span>42</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3)"><span style="display:flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:#00C897;display:inline-block"></span>TK</span><span>31</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3)"><span style="display:flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:#FF0000;display:inline-block"></span>YT</span><span>14</span></div>
+          </div>
+        </div>
+        <div class="stat-card" style="padding:14px 16px;border-color:var(--success)">
+          <div class="stat-label">DM 응대</div>
+          <div class="stat-val success" style="font-size:24px">79</div>
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:6px">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3)"><span style="display:flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:#E1306C;display:inline-block"></span>IG</span><span>38</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3)"><span style="display:flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:#00C897;display:inline-block"></span>TK</span><span>29</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3)"><span style="display:flex;align-items:center;gap:3px"><span style="width:5px;height:5px;border-radius:50%;background:#FF0000;display:inline-block"></span>YT</span><span>12</span></div>
+          </div>
+        </div>
+        <div class="stat-card" style="padding:14px 16px;border:2px solid var(--danger);background:var(--danger-l)">
+          <div class="stat-label" style="color:var(--danger);font-weight:700">요주의</div>
+          <div class="stat-val danger" style="font-size:24px">7</div>
+          <div style="margin-top:6px"><button onclick="document.getElementById('nb-msg').click()" class="btn btn-xs" style="background:var(--danger);color:#fff;border:none;border-radius:5px;padding:3px 8px;font-size:10px;font-weight:700;cursor:pointer;width:100%">바로 확인</button></div>
+        </div>
+        <div class="stat-card" style="padding:14px 16px;border-color:var(--warn)">
+          <div class="stat-label" style="color:var(--warn);font-weight:600">미응대</div>
+          <div class="stat-val warn" style="font-size:24px">28</div>
+          <div style="display:flex;flex-direction:column;gap:2px;margin-top:6px">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3)"><span>IG</span><span>14</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3)"><span>TK</span><span>9</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--text-3)"><span>YT</span><span>5</span></div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+        <button onclick="selCh(this)" style="padding:5px 14px;font-size:12px;font-weight:600;border-radius:6px;border:1px solid var(--accent);background:var(--accent);color:#fff;cursor:pointer">전체</button>
+        <button onclick="selCh(this)" style="padding:5px 14px;font-size:12px;font-weight:600;border-radius:6px;border:1px solid var(--border-2);background:var(--surface);color:var(--text-2);cursor:pointer;display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:#E1306C;display:inline-block"></span>Instagram</button>
+        <button onclick="selCh(this)" style="padding:5px 14px;font-size:12px;font-weight:600;border-radius:6px;border:1px solid var(--border-2);background:var(--surface);color:var(--text-2);cursor:pointer;display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:#00C897;display:inline-block"></span>TikTok</button>
+        <button onclick="selCh(this)" style="padding:5px 14px;font-size:12px;font-weight:600;border-radius:6px;border:1px solid var(--border-2);background:var(--surface);color:var(--text-2);cursor:pointer;display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:#FF0000;display:inline-block"></span>YouTube</button>
+        <button onclick="selCh(this)" style="padding:5px 14px;font-size:12px;font-weight:600;border-radius:6px;border:1px solid var(--border-2);background:var(--surface);color:var(--text-2);cursor:pointer;display:flex;align-items:center;gap:5px"><span style="width:7px;height:7px;border-radius:50%;background:#999;display:inline-block"></span>Threads</button>
+        <div style="margin-left:auto;display:flex;gap:6px">
+          <select style="padding:5px 10px;font-size:12px;border:1px solid var(--border-2);border-radius:6px;background:var(--surface);color:var(--text-2);cursor:pointer;outline:none"><option>댓글+DM</option><option>댓글만</option><option>DM만</option></select>
+          <select style="padding:5px 10px;font-size:12px;border:1px solid var(--border-2);border-radius:6px;background:var(--surface);color:var(--text-2);cursor:pointer;outline:none"><option>전체</option><option>미응대</option><option>요주의</option><option>응대완료</option></select>
+        </div>
+      </div>
+      <div class="filter-row">
+        <input class="filter-input" type="text" placeholder="유저명, 키워드 검색...">
+        <input class="filter-date" type="date" value="2025-01-09">
+        <span style="font-size:11px;color:var(--text-3)">~</span>
+        <input class="filter-date" type="date" value="2025-01-15">
+        <button class="btn btn-accent btn-sm">검색</button>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--danger);margin-bottom:8px">요주의 — 즉시 확인 필요</div>
+      <div class="msg-item pinned open" id="mi1">
+        <div class="msg-head" onclick="toggleMsg('mi1')">
+          <div class="row-avatar" style="background:var(--danger-l);color:var(--danger)">B</div>
+          <div class="msg-info">
+            <div class="msg-user">@beauty_lover99 <span class="badge badge-danger" style="margin-left:5px">결제 문제</span></div>
+            <div class="msg-prev">"공동구매 결제가 계속 오류가 나는데 환불은 어떻게 해요?"</div>
+          </div>
+          <div class="msg-meta"><span style="font-size:11px;color:var(--text-3)">2분 전</span></div>
+          <div class="msg-chev">▼</div>
+        </div>
+        <div class="thread">
+          <div class="t-row"><div class="t-av usr">B</div><div class="t-body"><div class="t-name">@beauty_lover99</div><div class="t-msg">"공동구매 결제가 계속 오류가 나는데 환불은 어떻게 해요? 카드 두 번 결제된 것 같기도 해요 ㅠㅠ"</div><div class="t-time">2025.01.15 오전 10:12 · Instagram</div></div></div>
+          <div class="t-row"><div class="t-av ai">M</div><div class="t-body"><div class="t-name ai-n">리플 AI</div><div class="t-msg ai-m">안녕하세요! 불편을 드려서 정말 죄송해요. 결제 오류 및 중복 결제 문제는 구매하신 플랫폼 고객센터에서 바로 처리해 드릴 수 있어요. 올리브영 1800-0033 / 스마트스토어는 마이페이지 문의하기로 접수해 주세요.</div><div class="t-time">리플 AI 자동응대 · 오전 10:13</div></div></div>
+          <div class="thread-act">
+            <button class="btn btn-sm" style="color:var(--danger);border-color:var(--danger)">직접 응대 필요 표시</button>
+            <button class="btn btn-sm">수정</button>
+            <button class="btn btn-sm" style="background:var(--success);color:#fff;border-color:var(--success)" onclick="this.textContent='승인됨 ✓';this.style.opacity='.6';this.disabled=true">승인</button>
+          </div>
+        </div>
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--text-3);margin:12px 0 8px">일반 메시지</div>
+      <div class="msg-item" id="mi3">
+        <div class="msg-head" onclick="toggleMsg('mi3')">
+          <div class="row-avatar">Y</div>
+          <div class="msg-info">
+            <div class="msg-user">@yuna__daily <span class="badge badge-success" style="margin-left:5px">열성팬</span></div>
+            <div class="msg-prev">😊 "제품 어디서 구매해요? 올리브영에서 못 찾겠어요"</div>
+          </div>
+          <div class="msg-meta"><span class="badge badge-neutral">제품 문의</span><span style="font-size:11px;color:var(--text-3)">35분 전</span></div>
+          <div class="msg-chev">▼</div>
+        </div>
+        <div class="thread">
+          <div class="t-row"><div class="t-av usr">Y</div><div class="t-body"><div class="t-name">@yuna__daily</div><div class="t-msg">"제품 어디서 구매해요? 링크 알려주세요!"</div><div class="t-time">오전 9:40 · Instagram</div></div></div>
+          <div class="t-row"><div class="t-av ai">M</div><div class="t-body"><div class="t-name ai-n">리플 AI</div><div class="t-msg ai-m">올리브영·스마트스토어·카페24에서 구매 가능해요! 프로필 링크에 바로 있어요.</div><div class="t-time">리플 AI · 오전 9:41</div></div></div>
+          <div class="t-row"><div class="t-av usr">Y</div><div class="t-body"><div class="t-name">@yuna__daily</div><div class="t-msg">"감사해요!! 바로 주문했어요"</div><div class="t-time">오전 9:44</div></div></div>
+        </div>
+      </div>
+      <div class="msg-item" id="mi4">
+        <div class="msg-head" onclick="toggleMsg('mi4')">
+          <div class="row-avatar" style="background:#e8f5e9;color:#2e7d32">C</div>
+          <div class="msg-info">
+            <div class="msg-user">@cool_tommi99 <span class="badge badge-success" style="margin-left:5px">열성팬</span></div>
+            <div class="msg-prev">❤️ "이 제품 진짜 최고예요!! 주변에 다 추천하고 있어요"</div>
+          </div>
+          <div class="msg-meta"><span class="badge badge-success">긍정 후기</span><span style="font-size:11px;color:var(--text-3)">1시간 전</span></div>
+          <div class="msg-chev">▼</div>
+        </div>
+        <div class="thread">
+          <div class="t-row"><div class="t-av usr">C</div><div class="t-body"><div class="t-name">@cool_tommi99</div><div class="t-msg">"이 제품 진짜 최고예요!! 피부가 촉촉해지고 트러블도 없어졌어요"</div><div class="t-time">오전 8:30 · TikTok</div></div></div>
+          <div class="t-row"><div class="t-av ai">M</div><div class="t-body"><div class="t-name ai-n">리플 AI</div><div class="t-msg ai-m">이런 후기 정말 감사해요! 앞으로도 좋은 제품으로 보답할게요.</div><div class="t-time">리플 AI · 오전 8:32</div></div></div>
+        </div>
+      </div>
+      <div class="msg-item" id="mi5">
+        <div class="msg-head" onclick="toggleMsg('mi5')">
+          <div class="row-avatar">J</div>
+          <div class="msg-info">
+            <div class="msg-user">@jiny_beauty</div>
+            <div class="msg-prev">🧪 "500달톤 이하 성분이 뭔가요? 민감성 피부인데 써도 될까요?"</div>
+          </div>
+          <div class="msg-meta"><span class="badge badge-neutral">성분 문의</span><span style="font-size:11px;color:var(--text-3)">2시간 전</span></div>
+          <div class="msg-chev">▼</div>
+        </div>
+        <div class="thread">
+          <div class="t-row"><div class="t-av usr">J</div><div class="t-body"><div class="t-name">@jiny_beauty</div><div class="t-msg">"500달톤 이하 성분이 뭔가요? 민감성 피부에 자극 없을지 걱정돼요"</div><div class="t-time">오전 7:10 · YouTube</div></div></div>
+          <div class="t-row"><div class="t-av ai">M</div><div class="t-body"><div class="t-name ai-n">리플 AI</div><div class="t-msg ai-m">500달톤 이하 성분은 피부 장벽을 통과해 효과를 내는 저분자 성분이에요! MILLIMILLI는 민감성 피부 테스트 완료 제품이라 안심하고 사용하실 수 있어요.</div><div class="t-time">리플 AI · 오전 7:11</div></div></div>
+        </div>
+      </div>
+      <div style="text-align:center;padding:14px 0;border-top:1px solid var(--border);margin-top:8px">
+        <button class="btn btn-ghost btn-sm" style="color:var(--accent)" id="more-msg-btn" onclick="document.getElementById('more-msgs').style.display='block';this.style.display='none'">댓글·DM 더보기 (1,281건) ↓</button>
+      </div>
+      <div id="more-msgs" style="display:none">
+        <div class="msg-item" id="mi10"><div class="msg-head" onclick="toggleMsg('mi10')"><div class="row-avatar">H</div><div class="msg-info"><div class="msg-user">@hazel_skin</div><div class="msg-prev">😍 "어제 올린 루틴 영상 너무 도움됐어요! 쿠션 추천해 주세요"</div></div><div class="msg-meta"><span class="badge badge-neutral">제품 문의</span><span style="font-size:11px;color:var(--text-3)">1시간 전</span></div><div class="msg-chev">▼</div></div><div class="thread"><div class="t-row"><div class="t-av ai">M</div><div class="t-body"><div class="t-name ai-n">리플 AI</div><div class="t-msg ai-m">MILLIMILLI 쿠션은 500달톤 이하 성분으로 민감 피부도 편하게! 프로필 링크에서 구매하실 수 있어요.</div><div class="t-time">리플 AI · 1시간 전</div></div></div><div class="thread-act"><button class="btn btn-sm" style="color:var(--danger);border-color:var(--danger)">직접 응대</button><button class="btn btn-sm">수정</button><button class="btn btn-sm" style="background:var(--success);color:#fff;border-color:var(--success)" onclick="this.textContent='승인됨 ✓';this.style.opacity='.6';this.disabled=true">승인</button></div></div></div>
+        <div class="msg-item" id="mi11"><div class="msg-head" onclick="toggleMsg('mi11')"><div class="row-avatar">M</div><div class="msg-info"><div class="msg-user">@makeup_minjoo</div><div class="msg-prev">🧪 "500달톤 이하 성분 설명 더 해주실 수 있어요?"</div></div><div class="msg-meta"><span class="badge badge-neutral">성분 문의</span><span style="font-size:11px;color:var(--text-3)">2시간 전</span></div><div class="msg-chev">▼</div></div><div class="thread"><div class="t-row"><div class="t-av ai">M</div><div class="t-body"><div class="t-name ai-n">리플 AI</div><div class="t-msg ai-m">500달톤이란 피부 흡수 가능한 분자 크기예요! 이하 성분만 쓰면 실제 피부 속까지 전달돼요.</div></div></div><div class="thread-act"><button class="btn btn-sm" style="color:var(--danger);border-color:var(--danger)">직접 응대</button><button class="btn btn-sm">수정</button><button class="btn btn-sm" style="background:var(--success);color:#fff;border-color:var(--success)" onclick="this.textContent='승인됨 ✓';this.style.opacity='.6';this.disabled=true">승인</button></div></div></div>
+        <div class="msg-item" id="mi12"><div class="msg-head" onclick="toggleMsg('mi12')"><div class="row-avatar">J</div><div class="msg-info"><div class="msg-user">@jjin_beauty</div><div class="msg-prev">❤️ "진짜 피부 좋아졌어요!! 고마워요"</div></div><div class="msg-meta"><span class="badge badge-success">긍정 후기</span><span style="font-size:11px;color:var(--text-3)">2시간 전</span></div><div class="msg-chev">▼</div></div><div class="thread"><div class="t-row"><div class="t-av ai">M</div><div class="t-body"><div class="t-name ai-n">리플 AI</div><div class="t-msg ai-m">이런 후기 너무 행복해요! 앞으로도 더 좋은 제품으로 보답할게요.</div></div></div><div class="thread-act"><button class="btn btn-sm" style="background:var(--success);color:#fff;border-color:var(--success)" onclick="this.textContent='승인됨 ✓';this.style.opacity='.6';this.disabled=true">승인</button></div></div></div>
+        <div class="msg-item" id="mi13"><div class="msg-head" onclick="toggleMsg('mi13')"><div class="row-avatar">L</div><div class="msg-info"><div class="msg-user">@luna_glowing</div><div class="msg-prev">🛒 "공동구매 언제 또 해요? 놓쳤어요 ㅠ"</div></div><div class="msg-meta"><span class="badge badge-neutral">이벤트 문의</span><span style="font-size:11px;color:var(--text-3)">3시간 전</span></div><div class="msg-chev">▼</div></div><div class="thread"><div class="t-row"><div class="t-av ai">M</div><div class="t-body"><div class="t-name ai-n">리플 AI</div><div class="t-msg ai-m">아쉽게도 이번 공구는 마감됐어요! 다음 공구 알림은 카카오 채널 @millimilli 에서 받으실 수 있어요.</div></div></div><div class="thread-act"><button class="btn btn-sm" style="background:var(--success);color:#fff;border-color:var(--success)" onclick="this.textContent='승인됨 ✓';this.style.opacity='.6';this.disabled=true">승인</button></div></div></div>
+        <div class="msg-item" id="mi14"><div class="msg-head" onclick="toggleMsg('mi14')"><div class="row-avatar">P</div><div class="msg-info"><div class="msg-user">@pinkdairy__</div><div class="msg-prev">💸 "올리브영 쿠폰 쓸 수 있어요?"</div></div><div class="msg-meta"><span class="badge badge-neutral">구매 문의</span><span style="font-size:11px;color:var(--text-3)">3시간 전</span></div><div class="msg-chev">▼</div></div><div class="thread"><div class="t-row"><div class="t-av ai">M</div><div class="t-body"><div class="t-name ai-n">리플 AI</div><div class="t-msg ai-m">올리브영 앱 쿠폰·포인트 모두 사용 가능해요! 오프라인 매장에서도 쿠폰 적용돼요.</div></div></div><div class="thread-act"><button class="btn btn-sm" style="background:var(--success);color:#fff;border-color:var(--success)" onclick="this.textContent='승인됨 ✓';this.style.opacity='.6';this.disabled=true">승인</button></div></div></div>
+        <div class="msg-item" id="mi15"><div class="msg-head" onclick="toggleMsg('mi15')"><div class="row-avatar">S</div><div class="msg-info"><div class="msg-user">@somi_glow</div><div class="msg-prev">😊 "배송 얼마나 걸려요?"</div></div><div class="msg-meta"><span class="badge badge-neutral">배송 문의</span><span style="font-size:11px;color:var(--text-3)">4시간 전</span></div><div class="msg-chev">▼</div></div><div class="thread"><div class="t-row"><div class="t-av ai">M</div><div class="t-body"><div class="t-name ai-n">리플 AI</div><div class="t-msg ai-m">스마트스토어 기준 오후 2시 전 주문 시 당일 발송, 일반적으로 1-2일 내 수령 가능해요!</div></div></div><div class="thread-act"><button class="btn btn-sm" style="background:var(--success);color:#fff;border-color:var(--success)" onclick="this.textContent='승인됨 ✓';this.style.opacity='.6';this.disabled=true">승인</button></div></div></div>
+        <div class="msg-item" id="mi16"><div class="msg-head" onclick="toggleMsg('mi16')"><div class="row-avatar">R</div><div class="msg-info"><div class="msg-user">@rosie_daily_k</div><div class="msg-prev">🧴 "민감성 피부에도 괜찮나요?"</div></div><div class="msg-meta"><span class="badge badge-neutral">성분 문의</span><span style="font-size:11px;color:var(--text-3)">5시간 전</span></div><div class="msg-chev">▼</div></div><div class="thread"><div class="t-row"><div class="t-av ai">M</div><div class="t-body"><div class="t-name ai-n">리플 AI</div><div class="t-msg ai-m">MILLIMILLI 제품은 민감성 피부 테스트 완료 제품이에요! 저자극 성분만 사용해서 안심하고 사용하셔도 돼요.</div></div></div><div class="thread-act"><button class="btn btn-sm" style="background:var(--success);color:#fff;border-color:var(--success)" onclick="this.textContent='승인됨 ✓';this.style.opacity='.6';this.disabled=true">승인</button></div></div></div>
+        <div class="msg-item" id="mi17"><div class="msg-head" onclick="toggleMsg('mi17')"><div class="row-avatar">W</div><div class="msg-info"><div class="msg-user">@wonji_beauty</div><div class="msg-prev">🇯🇵 "日本に発送できますか？"</div></div><div class="msg-meta"><span class="badge badge-neutral">해외 배송</span><span style="font-size:11px;color:var(--text-3)">5시간 전</span></div><div class="msg-chev">▼</div></div><div class="thread"><div class="t-row"><div class="t-av ai">M</div><div class="t-body"><div class="t-name ai-n">리플 AI</div><div class="t-msg ai-m">現在、海外への直接発送は承っておりません。ただし、韓国の転送サービスをご利用いただけます！</div></div></div><div class="thread-act"><button class="btn btn-sm" style="background:var(--success);color:#fff;border-color:var(--success)" onclick="this.textContent='승인됨 ✓';this.style.opacity='.6';this.disabled=true">승인</button></div></div></div>
+        <div class="msg-item" id="mi18"><div class="msg-head" onclick="toggleMsg('mi18')"><div class="row-avatar">T</div><div class="msg-info"><div class="msg-user">@theskinlove</div><div class="msg-prev">✨ "신제품 언제 나와요?"</div></div><div class="msg-meta"><span class="badge badge-neutral">신제품 문의</span><span style="font-size:11px;color:var(--text-3)">6시간 전</span></div><div class="msg-chev">▼</div></div><div class="thread"><div class="t-row"><div class="t-av ai">M</div><div class="t-body"><div class="t-name ai-n">리플 AI</div><div class="t-msg ai-m">다음 달 신제품 출시 예정이에요! 카카오 채널 @millimilli 팔로우하시면 가장 먼저 알 수 있어요.</div></div></div><div class="thread-act"><button class="btn btn-sm" style="background:var(--success);color:#fff;border-color:var(--success)" onclick="this.textContent='승인됨 ✓';this.style.opacity='.6';this.disabled=true">승인</button></div></div></div>
+        <div class="msg-item" id="mi19"><div class="msg-head" onclick="toggleMsg('mi19')"><div class="row-avatar">N</div><div class="msg-info"><div class="msg-user">@nana_skin_diary</div><div class="msg-prev">💌 "저 영상 보고 따라해봤어요! 완전 대박"</div></div><div class="msg-meta"><span class="badge badge-success">긍정 후기</span><span style="font-size:11px;color:var(--text-3)">7시간 전</span></div><div class="msg-chev">▼</div></div><div class="thread"><div class="t-row"><div class="t-av ai">M</div><div class="t-body"><div class="t-name ai-n">리플 AI</div><div class="t-msg ai-m">와 진짜 뿌듯해요!! 다음에도 도움 되는 영상 열심히 올릴게요 :)</div></div></div><div class="thread-act"><button class="btn btn-sm" style="background:var(--success);color:#fff;border-color:var(--success)" onclick="this.textContent='승인됨 ✓';this.style.opacity='.6';this.disabled=true">승인</button></div></div></div>
+        <div style="text-align:center;padding:14px 0;border-top:1px solid var(--border);margin-top:8px">
+          <button class="btn btn-ghost btn-sm" style="color:var(--accent)">다음 페이지 (1,271건) ↓</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 인스타 댓글→DM 발송 ══ -->
+  <div class="vw" id="v-instadm">
+    <div class="page">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <div>
+          <div class="page-title">댓글 달면 DM 발송 <span style="font-size:12px;font-weight:600;color:var(--text-3);background:var(--bg);padding:2px 8px;border-radius:6px;margin-left:6px">Instagram</span></div>
+          <div class="page-sub">댓글에 키워드가 달리면 AI가 자동으로 DM을 발송해요</div>
+        </div>
+      </div>
+      <!-- 상단 현황 -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;margin-bottom:20px;align-items:center">
+        <div class="stat-card">
+          <div class="stat-label">오늘 발송 DM</div>
+          <div class="stat-val accent" style="font-size:26px">127건</div>
+          <div class="stat-delta up">어제 대비 +23건</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">이번 달 총 발송</div>
+          <div class="stat-val" style="font-size:22px">3,841건</div>
+          <div class="stat-delta up">전월 대비 +18%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">활성 자동화 규칙</div>
+          <div class="stat-val success" style="font-size:26px">4개</div>
+          <div class="stat-delta" style="color:var(--text-3)">게시물 4개 연결됨</div>
+        </div>
+        <button onclick="document.getElementById('dm-send-list').style.display=document.getElementById('dm-send-list').style.display==='none'?'block':'none'" class="btn btn-sm" style="white-space:nowrap;height:fit-content">발송 설정 리스트 보기</button>
+      </div>
+
+      <!-- 발송 설정 리스트 (토글) -->
+      <div id="dm-send-list" style="display:none;margin-bottom:20px">
+        <div class="card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px">
+            <div class="card-title" style="margin:0">발송 설정 내역</div>
+            <div style="display:flex;gap:6px">
+              <select style="padding:4px 10px;font-size:12px;border:1px solid var(--border-2);border-radius:6px;background:var(--surface);outline:none"><option>전체</option><option>예약 중</option><option>발송 완료</option><option>OFF</option></select>
+            </div>
+          </div>
+          <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
+            <div style="display:grid;grid-template-columns:60px 1fr 1fr 80px 80px 60px;gap:0;background:var(--bg)">
+              <div style="padding:9px 12px;font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px">썸네일</div>
+              <div style="padding:9px 12px;font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px">인식 키워드</div>
+              <div style="padding:9px 12px;font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px">발송 DM 내용</div>
+              <div style="padding:9px 12px;font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px;text-align:center">발송 수</div>
+              <div style="padding:9px 12px;font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px;text-align:center">상태</div>
+              <div style="padding:9px 12px;font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px;text-align:center">ON/OFF</div>
+            </div>
+            <!-- Row 1 -->
+            <div style="display:grid;grid-template-columns:60px 1fr 1fr 80px 80px 60px;border-top:1px solid var(--border);align-items:center">
+              <div style="padding:10px 12px"><div style="width:40px;height:40px;border-radius:6px;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743);display:flex;align-items:center;justify-content:center;font-size:16px">🧴</div></div>
+              <div style="padding:10px 12px;font-size:12px;color:var(--text-1)">링크, 구매, 어디서</div>
+              <div style="padding:10px 12px;font-size:12px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">안녕하세요! 구매 링크 보내드릴게요...</div>
+              <div style="padding:10px 12px;text-align:center;font-weight:700;color:var(--accent)">87건</div>
+              <div style="padding:10px 12px;text-align:center"><span class="badge badge-success">발송 중</span></div>
+              <div style="padding:10px 12px;text-align:center"><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label></div>
+            </div>
+            <!-- Row 2 -->
+            <div style="display:grid;grid-template-columns:60px 1fr 1fr 80px 80px 60px;border-top:1px solid var(--border);align-items:center">
+              <div style="padding:10px 12px"><div style="width:40px;height:40px;border-radius:6px;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:16px">✨</div></div>
+              <div style="padding:10px 12px;font-size:12px;color:var(--text-1)">이벤트, 참여, 어떻게</div>
+              <div style="padding:10px 12px;font-size:12px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">이벤트 참여 방법 안내드릴게요!</div>
+              <div style="padding:10px 12px;text-align:center;font-weight:700;color:var(--accent)">34건</div>
+              <div style="padding:10px 12px;text-align:center"><span class="badge badge-success">발송 중</span></div>
+              <div style="padding:10px 12px;text-align:center"><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label></div>
+            </div>
+            <!-- Row 3 -->
+            <div style="display:grid;grid-template-columns:60px 1fr 1fr 80px 80px 60px;border-top:1px solid var(--border);align-items:center">
+              <div style="padding:10px 12px"><div style="width:40px;height:40px;border-radius:6px;background:linear-gradient(135deg,#11998e,#38ef7d);display:flex;align-items:center;justify-content:center;font-size:16px">📦</div></div>
+              <div style="padding:10px 12px;font-size:12px;color:var(--text-1)">신제품, 출시, 언제</div>
+              <div style="padding:10px 12px;font-size:12px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">신제품 출시 정보 DM 드릴게요</div>
+              <div style="padding:10px 12px;text-align:center;font-weight:700;color:var(--accent)">6건</div>
+              <div style="padding:10px 12px;text-align:center"><span class="badge badge-warn">예약 중</span></div>
+              <div style="padding:10px 12px;text-align:center"><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label></div>
+            </div>
+            <!-- Row 4 -->
+            <div style="display:grid;grid-template-columns:60px 1fr 1fr 80px 80px 60px;border-top:1px solid var(--border);align-items:center;opacity:.6">
+              <div style="padding:10px 12px"><div style="width:40px;height:40px;border-radius:6px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:16px">🎁</div></div>
+              <div style="padding:10px 12px;font-size:12px;color:var(--text-2)">증정, 사은품, 쿠폰</div>
+              <div style="padding:10px 12px;font-size:12px;color:var(--text-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">쿠폰 코드 발송 예정</div>
+              <div style="padding:10px 12px;text-align:center;font-weight:700;color:var(--text-3)">0건</div>
+              <div style="padding:10px 12px;text-align:center"><span class="badge badge-neutral">OFF</span></div>
+              <div style="padding:10px 12px;text-align:center"><label class="toggle"><input type="checkbox"><span class="slider"></span></label></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 새 자동화 추가 마법사 -->
+      <div class="card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:8px">
+          <div>
+            <div class="card-title" style="margin:0">새 자동화 규칙 추가</div>
+            <div style="font-size:12px;color:var(--text-2);margin-top:3px">댓글에 특정 키워드가 달리면 자동으로 DM을 보내요</div>
+          </div>
+          <button class="btn btn-accent btn-sm" onclick="resetWizard()">+ 새로 시작</button>
+        </div>
+
+        <!-- 스텝 인디케이터 -->
+        <div style="display:flex;align-items:center;margin-bottom:20px">
+          <div class="wstep-item" id="wi1" style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+            <div id="wc1" style="width:30px;height:30px;border-radius:50%;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;cursor:pointer" onclick="gotoWizard(1)">1</div>
+            <div style="font-size:10px;font-weight:600;color:var(--accent);text-align:center;white-space:nowrap">게시물 선택</div>
+          </div>
+          <div id="wl1" style="flex:1;height:2px;background:var(--border);margin:0 4px;margin-bottom:14px"></div>
+          <div class="wstep-item" id="wi2" style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+            <div id="wc2" style="width:30px;height:30px;border-radius:50%;background:var(--border);color:var(--text-3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;cursor:pointer" onclick="gotoWizard(2)">2</div>
+            <div style="font-size:10px;font-weight:600;color:var(--text-3);text-align:center;white-space:nowrap">댓글 인식</div>
+          </div>
+          <div id="wl2" style="flex:1;height:2px;background:var(--border);margin:0 4px;margin-bottom:14px"></div>
+          <div class="wstep-item" id="wi3" style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+            <div id="wc3" style="width:30px;height:30px;border-radius:50%;background:var(--border);color:var(--text-3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;cursor:pointer" onclick="gotoWizard(3)">3</div>
+            <div style="font-size:10px;font-weight:600;color:var(--text-3);text-align:center;white-space:nowrap">대댓글 설정</div>
+          </div>
+          <div id="wl3" style="flex:1;height:2px;background:var(--border);margin:0 4px;margin-bottom:14px"></div>
+          <div class="wstep-item" id="wi4" style="display:flex;flex-direction:column;align-items:center;gap:4px;flex:1">
+            <div id="wc4" style="width:30px;height:30px;border-radius:50%;background:var(--border);color:var(--text-3);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;cursor:pointer" onclick="gotoWizard(4)">4</div>
+            <div style="font-size:10px;font-weight:600;color:var(--text-3);text-align:center;white-space:nowrap">DM 내용</div>
+          </div>
+        </div>
+
+        <!-- STEP 1: 게시물 선택 -->
+        <div id="wiz-step-1">
+          <div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:4px">연결할 Instagram 게시물을 선택하세요</div>
+          <div style="font-size:12px;color:var(--text-2);margin-bottom:14px">선택한 게시물에 특정 댓글이 달리면 DM이 자동으로 발송돼요</div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px">
+            <div class="wiz-post" id="wp1" onclick="selectPost('wp1')" style="border:2px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .15s;position:relative">
+              <div style="aspect-ratio:1;background:linear-gradient(135deg,#f09433,#e6683c,#dc2743);display:flex;align-items:center;justify-content:center;font-size:36px">🧴</div>
+              <div style="padding:8px 10px;border-top:1px solid var(--border)"><div style="font-size:11px;font-weight:600;color:var(--text-1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">클렌징 루틴 공유</div><div style="font-size:10px;color:var(--text-3);margin-top:2px">댓글 284 · 좋아요 1.2만</div></div>
+              <div class="wiz-check" id="wc-wp1" style="display:none;position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:none;align-items:center;justify-content:center;font-weight:800">✓</div>
+            </div>
+            <div class="wiz-post" id="wp2" onclick="selectPost('wp2')" style="border:2px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .15s;position:relative">
+              <div style="aspect-ratio:1;background:linear-gradient(135deg,#667eea,#764ba2);display:flex;align-items:center;justify-content:center;font-size:36px">✨</div>
+              <div style="padding:8px 10px;border-top:1px solid var(--border)"><div style="font-size:11px;font-weight:600;color:var(--text-1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">신제품 출시 이벤트</div><div style="font-size:10px;color:var(--text-3);margin-top:2px">댓글 512 · 좋아요 2.1만</div></div>
+              <div class="wiz-check" id="wc-wp2" style="display:none;position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;align-items:center;justify-content:center;font-weight:800">✓</div>
+            </div>
+            <div class="wiz-post" id="wp3" onclick="selectPost('wp3')" style="border:2px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .15s;position:relative">
+              <div style="aspect-ratio:1;background:linear-gradient(135deg,#11998e,#38ef7d);display:flex;align-items:center;justify-content:center;font-size:36px">🌿</div>
+              <div style="padding:8px 10px;border-top:1px solid var(--border)"><div style="font-size:11px;font-weight:600;color:var(--text-1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">스킨케어 루틴 영상</div><div style="font-size:10px;color:var(--text-3);margin-top:2px">댓글 198 · 좋아요 8.4천</div></div>
+              <div class="wiz-check" id="wc-wp3" style="display:none;position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;align-items:center;justify-content:center;font-weight:800">✓</div>
+            </div>
+            <div class="wiz-post" id="wp4" onclick="selectPost('wp4')" style="border:2px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .15s;position:relative">
+              <div style="aspect-ratio:1;background:linear-gradient(135deg,#f7971e,#ffd200);display:flex;align-items:center;justify-content:center;font-size:36px">📦</div>
+              <div style="padding:8px 10px;border-top:1px solid var(--border)"><div style="font-size:11px;font-weight:600;color:var(--text-1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">MILLIMILLI 언박싱</div><div style="font-size:10px;color:var(--text-3);margin-top:2px">댓글 341 · 좋아요 1.5만</div></div>
+              <div class="wiz-check" id="wc-wp4" style="display:none;position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;align-items:center;justify-content:center;font-weight:800">✓</div>
+            </div>
+            <div class="wiz-post" id="wp5" onclick="selectPost('wp5')" style="border:2px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .15s;position:relative">
+              <div style="aspect-ratio:1;background:linear-gradient(135deg,#fc466b,#3f5efb);display:flex;align-items:center;justify-content:center;font-size:36px">💄</div>
+              <div style="padding:8px 10px;border-top:1px solid var(--border)"><div style="font-size:11px;font-weight:600;color:var(--text-1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">공동구매 오픈 안내</div><div style="font-size:10px;color:var(--text-3);margin-top:2px">댓글 892 · 좋아요 3.2만</div></div>
+              <div class="wiz-check" id="wc-wp5" style="display:none;position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;align-items:center;justify-content:center;font-weight:800">✓</div>
+            </div>
+            <div class="wiz-post" id="wp6" onclick="selectPost('wp6')" style="border:2px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:all .15s;position:relative">
+              <div style="aspect-ratio:1;background:linear-gradient(135deg,#43e97b,#38f9d7);display:flex;align-items:center;justify-content:center;font-size:36px">🎁</div>
+              <div style="padding:8px 10px;border-top:1px solid var(--border)"><div style="font-size:11px;font-weight:600;color:var(--text-1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">500달톤 성분 설명</div><div style="font-size:10px;color:var(--text-3);margin-top:2px">댓글 127 · 좋아요 5.6천</div></div>
+              <div class="wiz-check" id="wc-wp6" style="display:none;position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;align-items:center;justify-content:center;font-weight:800">✓</div>
+            </div>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border-radius:8px;font-size:12px;color:var(--text-2)">
+            <span id="post-selected-label">아직 선택하지 않았어요</span>
+            <button class="btn btn-accent btn-sm" onclick="gotoWizard(2)">다음 — 댓글 인식 설정</button>
+          </div>
+        </div>
+
+        <!-- STEP 2: 댓글 인식 -->
+        <div id="wiz-step-2" style="display:none">
+          <div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:4px">어떤 댓글에 반응할까요?</div>
+          <div style="font-size:12px;color:var(--text-2);margin-bottom:14px">아래 키워드 중 하나라도 포함된 댓글에 자동으로 반응해요</div>
+          <div style="margin-bottom:12px">
+            <label class="input-label">인식할 키워드 (쉼표로 구분)</label>
+            <input class="input" type="text" value="링크, 구매, 어디서, 살수있어, 구매링크" placeholder="예: 링크, 구매, 어디서...">
+            <div style="font-size:11px;color:var(--text-3);margin-top:5px">키워드가 없으면 모든 댓글에 반응해요 (주의: DM이 많이 발송될 수 있어요)</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+            <label style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:8px;cursor:pointer">
+              <input type="radio" name="comment-type" checked style="accent-color:var(--accent)">
+              <div><div style="font-size:13px;font-weight:600;color:var(--text-1)">특정 키워드 포함 댓글</div><div style="font-size:11px;color:var(--text-2);margin-top:1px">위에 입력한 키워드가 들어간 댓글에만</div></div>
+            </label>
+            <label style="display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--bg);border-radius:8px;cursor:pointer">
+              <input type="radio" name="comment-type" style="accent-color:var(--accent)">
+              <div><div style="font-size:13px;font-weight:600;color:var(--text-1)">모든 댓글</div><div style="font-size:11px;color:var(--text-2);margin-top:1px">게시물에 달리는 모든 댓글에 반응</div></div>
+            </label>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn btn-sm" onclick="gotoWizard(1)">이전</button>
+            <button class="btn btn-accent btn-sm" onclick="gotoWizard(3)">다음 — 대댓글 설정</button>
+          </div>
+        </div>
+
+        <!-- STEP 3: 대댓글 -->
+        <div id="wiz-step-3" style="display:none">
+          <div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:4px">대댓글을 자동으로 달까요?</div>
+          <div style="font-size:12px;color:var(--text-2);margin-bottom:14px">DM 발송 전, 댓글에 자동으로 대댓글을 달 수 있어요</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;padding:12px 14px;border:1px solid var(--border);border-radius:10px">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--text-1)">대댓글 자동 작성</div>
+              <div style="font-size:11px;color:var(--text-2);margin-top:2px">댓글에 자동으로 답글을 달아요</div>
+            </div>
+            <label class="toggle"><input type="checkbox" id="auto-reply-toggle" checked onchange="document.getElementById('auto-reply-text').style.display=this.checked?'block':'none'"><span class="slider"></span></label>
+          </div>
+          <div id="auto-reply-text" style="margin-bottom:12px">
+            <label class="input-label">대댓글 내용</label>
+            <textarea class="input" style="height:72px">DM 확인해주세요! 링크 보내드렸어요 😊</textarea>
+            <div style="font-size:11px;color:var(--text-3);margin-top:5px">💡 팁: DM을 확인하도록 유도하는 문구가 효과적이에요</div>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn btn-sm" onclick="gotoWizard(2)">이전</button>
+            <button class="btn btn-accent btn-sm" onclick="gotoWizard(4)">다음 — DM 내용 설정</button>
+          </div>
+        </div>
+
+        <!-- STEP 4: DM 내용 -->
+        <div id="wiz-step-4" style="display:none">
+          <div style="font-size:14px;font-weight:700;color:var(--text-1);margin-bottom:4px">발송할 DM 내용을 설정하세요</div>
+          <div style="font-size:12px;color:var(--text-2);margin-bottom:14px">댓글 작성자에게 자동으로 발송될 DM이에요</div>
+          <div style="margin-bottom:12px">
+            <label class="input-label">DM 제목 / 첫 문장</label>
+            <input class="input" type="text" value="안녕하세요! MILLIMILLI 구매 링크 보내드릴게요 :)">
+          </div>
+          <div style="margin-bottom:12px">
+            <label class="input-label">DM 본문</label>
+            <textarea class="input" style="height:100px">안녕하세요! 관심 가져주셔서 감사해요 💕
+구매 링크: https://smartstore.naver.com/millimilli
+
+올리브영에서도 구매 가능해요!
+궁금한 점 있으시면 편하게 DM 주세요.</textarea>
+          </div>
+          <div style="display:flex;gap:8px;margin-bottom:12px">
+            <div style="flex:1">
+              <label class="input-label">발송 지연 시간</label>
+              <select class="input"><option>즉시 발송</option><option selected>1~3분 후 (자연스럽게)</option><option>5분 후</option><option>10분 후</option></select>
+            </div>
+            <div style="flex:1">
+              <label class="input-label">1인 최대 발송 횟수</label>
+              <select class="input"><option selected>1회 (중복 방지)</option><option>제한 없음</option></select>
+            </div>
+          </div>
+          <!-- DM 미리보기 -->
+          <div style="background:var(--bg);border-radius:10px;padding:12px 14px;margin-bottom:14px">
+            <div style="font-size:11px;font-weight:700;color:var(--text-3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.3px">DM 미리보기</div>
+            <div style="background:var(--surface);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--text-1);line-height:1.65;border:1px solid var(--border)">
+              안녕하세요! MILLIMILLI 구매 링크 보내드릴게요 :)<br><br>
+              안녕하세요! 관심 가져주셔서 감사해요 💕<br>
+              구매 링크: https://smartstore.naver.com/millimilli<br><br>
+              올리브영에서도 구매 가능해요!<br>
+              궁금한 점 있으시면 편하게 DM 주세요.
+            </div>
+          </div>
+          <div style="display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn btn-sm" onclick="gotoWizard(3)">이전</button>
+            <button class="btn btn-accent" onclick="alert('자동화 규칙이 저장되었어요! 🎉\n\n선택한 게시물에 키워드 댓글이 달리면 DM이 자동 발송돼요.');resetWizard()">저장 및 활성화</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <!-- ══ 수익 문의 ══ -->
+  <div class="vw" id="v-biz">
+    <div class="page">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <div><div class="page-title">수익화/비즈니스</div><div class="page-sub">광고·협업·판매 문의를 AI가 자동으로 분류해요</div></div>
+        <div style="display:flex;gap:8px"><button class="btn btn-sm">구글 시트</button><button class="btn btn-sm">다운받기</button></div>
+      </div>
+      <div class="grid-4" style="margin-bottom:16px">
+        <div class="stat-card"><div class="stat-label">협찬·광고 문의</div><div class="stat-val accent">5건</div><div class="stat-delta" style="color:var(--text-3)">예상 광고비 합산 중</div></div>
+        <div class="stat-card"><div class="stat-label">구매 의향 고객</div><div class="stat-val success">4건</div><div class="stat-delta up">즉각 전환 가능</div></div>
+        <div class="stat-card"><div class="stat-label">OEM · 협업</div><div class="stat-val warn">2건</div><div class="stat-delta" style="color:var(--text-3)">B2B 검토 필요</div></div>
+        <div class="stat-card" style="border:2px solid var(--accent);background:var(--accent-l)"><div class="stat-label" style="color:var(--accent);font-weight:700">이번 주 예상 수익</div><div class="stat-val accent" style="font-size:28px;letter-spacing:-.5px">1,200만</div><div class="stat-delta up" style="font-size:12px;font-weight:700">접수 기준 합산</div></div>
+      </div>
+
+      <!-- 수익화/비즈니스 문의 리스트 -->
+      <div class="card" style="margin-bottom:16px">
+        <div class="card-header">
+          <div class="card-title">수익화/비즈니스 문의</div>
+          <span class="badge badge-neutral">12건</span>
+        </div>
+        <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
+          <div style="display:grid;grid-template-columns:120px 1fr 1fr 90px 80px 80px 80px;background:var(--bg)">
+            <div style="padding:9px 12px;font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px">계정</div>
+            <div style="padding:9px 12px;font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px">브랜드명 / 상품명</div>
+            <div style="padding:9px 12px;font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px">메시지 내용</div>
+            <div style="padding:9px 12px;font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px">유형</div>
+            <div style="padding:9px 12px;font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px">금액</div>
+            <div style="padding:9px 12px;font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px">수신일</div>
+            <div style="padding:9px 12px;font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:120px 1fr 1fr 90px 80px 80px 80px;border-top:1px solid var(--border);align-items:center">
+            <div style="padding:11px 12px"><div style="font-weight:700;font-size:12px">@kbeauty_brand1</div><div style="font-size:10px;color:var(--text-3)">뷰티 브랜드</div></div>
+            <div style="padding:11px 12px;font-size:12px;font-weight:600">케이뷰티코 / 신제품 쿠션</div>
+            <div style="padding:11px 12px;font-size:11px;color:var(--text-2)">"광고 협업 제안, 광고비 200만원"</div>
+            <div style="padding:11px 12px"><span class="badge badge-accent">협찬/광고</span></div>
+            <div style="padding:11px 12px;font-weight:800;color:var(--accent);font-size:12px">200만원</div>
+            <div style="padding:11px 12px;font-size:11px;color:var(--text-3)">1.15</div>
+            <div style="padding:11px 12px"><button class="btn btn-sm btn-xs">답장</button></div>
+          </div>
+          <div style="display:grid;grid-template-columns:120px 1fr 1fr 90px 80px 80px 80px;border-top:1px solid var(--border);align-items:center">
+            <div style="padding:11px 12px"><div style="font-weight:700;font-size:12px">@japan_import_co</div><div style="font-size:10px;color:var(--text-3)">일본 수입사</div></div>
+            <div style="padding:11px 12px;font-size:12px;font-weight:600">재팬뷰티 / MILLIMILLI 전체</div>
+            <div style="padding:11px 12px;font-size:11px;color:var(--text-2)">"수출 가능한지요? 500만엔 규모"</div>
+            <div style="padding:11px 12px"><span class="badge badge-warn">수출 문의</span></div>
+            <div style="padding:11px 12px;font-weight:800;color:var(--accent);font-size:12px">~4,500만</div>
+            <div style="padding:11px 12px;font-size:11px;color:var(--text-3)">1.14</div>
+            <div style="padding:11px 12px"><button class="btn btn-sm btn-accent btn-xs">긴급</button></div>
+          </div>
+          <div style="display:grid;grid-template-columns:120px 1fr 1fr 90px 80px 80px 80px;border-top:1px solid var(--border);align-items:center">
+            <div style="padding:11px 12px"><div style="font-weight:700;font-size:12px">@us_kbeauty_shop</div><div style="font-size:10px;color:var(--text-3)">미국 셀러</div></div>
+            <div style="padding:11px 12px;font-size:12px;font-weight:600">US K-Beauty / MILLIMILLI</div>
+            <div style="padding:11px 12px;font-size:11px;color:var(--text-2)">"Amazon US reselling, ~$30,000"</div>
+            <div style="padding:11px 12px"><span class="badge badge-warn">Amazon</span></div>
+            <div style="padding:11px 12px;font-weight:800;color:var(--accent);font-size:12px">~4,200만</div>
+            <div style="padding:11px 12px;font-size:11px;color:var(--text-3)">1.13</div>
+            <div style="padding:11px 12px"><button class="btn btn-sm btn-accent btn-xs">긴급</button></div>
+          </div>
+          <div style="display:grid;grid-template-columns:120px 1fr 1fr 90px 80px 80px 80px;border-top:1px solid var(--border);align-items:center">
+            <div style="padding:11px 12px"><div style="font-weight:700;font-size:12px">@skincare_yt_kr</div><div style="font-size:10px;color:var(--text-3)">유튜버 82만</div></div>
+            <div style="padding:11px 12px;font-size:12px;font-weight:600">스킨케어TV / MILLIMILLI 크림</div>
+            <div style="padding:11px 12px;font-size:11px;color:var(--text-2)">"리뷰 광고 제안, 예산 500만원↑"</div>
+            <div style="padding:11px 12px"><span class="badge badge-accent">유튜브 광고</span></div>
+            <div style="padding:11px 12px;font-weight:800;color:var(--accent);font-size:12px">500만원↑</div>
+            <div style="padding:11px 12px;font-size:11px;color:var(--text-3)">1.12</div>
+            <div style="padding:11px 12px"><button class="btn btn-sm btn-accent btn-xs">긴급</button></div>
+          </div>
+          <div style="padding:10px 14px;text-align:center;border-top:1px solid var(--border)">
+            <button class="btn btn-ghost btn-sm" style="color:var(--accent)">더보기 (8건) ↓</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 자동 발송 설정 (간소화) -->
+      <div class="card" style="margin-top:0">
+        <div class="card-header">
+          <div class="card-title">자동 발송 설정</div>
+          <span class="badge badge-accent">AI 자동 발송</span>
+        </div>
+        <p style="font-size:12px;color:var(--text-2);margin-bottom:10px">활성화 시 답장 템플릿이 자동 발송돼요. 비활성화 시 해당 유형은 응대하지 않아요.</p>
+        <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:12px">
+          <div style="display:grid;grid-template-columns:1fr auto;padding:9px 14px;background:var(--bg);border-bottom:1px solid var(--border)">
+            <span style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px">문의 유형</span>
+            <span style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px">자동 발송</span>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border)"><span style="font-size:13px;font-weight:600;color:var(--text-1)">협찬·광고 문의</span><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border)"><span style="font-size:13px;font-weight:600;color:var(--text-1)">수출·해외 유통 문의</span><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--border)"><span style="font-size:13px;font-weight:600;color:var(--text-1)">OEM·협업 제안</span><label class="toggle"><input type="checkbox" checked><span class="slider"></span></label></div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px"><span style="font-size:13px;font-weight:600;color:var(--text-1)">Amazon·플랫폼 판매</span><label class="toggle"><input type="checkbox"><span class="slider"></span></label></div>
+        </div>
+        <button class="btn btn-sm" onclick="document.getElementById('template-popup').style.display='flex'">템플릿 설정 →</button>
+      </div>
+
+      <!-- 템플릿 설정 팝업 -->
+      <div id="template-popup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;align-items:center;justify-content:center;padding:20px">
+        <div style="background:var(--surface);border-radius:16px;width:100%;max-width:500px;box-shadow:0 20px 60px rgba(0,0,0,.2)">
+          <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:15px;font-weight:800;color:var(--text-1)">자동 발송 템플릿 설정</div>
+            <button onclick="document.getElementById('template-popup').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-3)">✕</button>
+          </div>
+          <div style="padding:20px">
+            <div class="form-grid" style="margin-bottom:12px">
+              <div class="form-group" style="margin:0"><label class="input-label">담당자 이메일</label><input class="input" type="email" value="info@millimilli.co"></div>
+              <div class="form-group" style="margin:0"><label class="input-label">카카오톡 채널 ID</label><input class="input" type="text" value="@millimilli"></div>
+              <div class="form-group" style="margin:0"><label class="input-label">연락처 (선택)</label><input class="input" type="text" placeholder="070-0000-0000"></div>
+              <div class="form-group" style="margin:0"><label class="input-label">담당자명</label><input class="input" type="text" value="유민혜 대표"></div>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+              <label class="input-label">자동 발송 템플릿 메시지</label>
+              <textarea class="input" style="height:80px">안녕하세요! 문의 주셔서 감사해요. MILLIMILLI 담당자 유민혜입니다.
+자세한 협의는 아래로 연락 주시면 빠르게 안내드릴게요.
+이메일: info@millimilli.co | 카톡: @millimilli</textarea>
+            </div>
+          </div>
+          <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn btn-sm" onclick="document.getElementById('template-popup').style.display='none'">닫기</button>
+            <button class="btn btn-accent btn-sm" onclick="document.getElementById('template-popup').style.display='none'">저장</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 팔로워 관리 ══ -->
+  <div class="vw" id="v-crm">
+    <div class="page">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <div><div class="page-title">팔로워 관리</div><div class="page-sub">AI가 자동으로 분류한 팔로워 데이터베이스</div></div>
+        <button class="btn btn-accent btn-sm">+ 수동 추가</button>
+      </div>
+      <!-- 다운로드 + 기간 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:10px">
+        <div style="display:flex;gap:6px;align-items:center">
+          <span style="font-size:12px;color:var(--text-2)">기준:</span>
+          <select style="padding:4px 10px;font-size:12px;border:1px solid var(--border-2);border-radius:6px;background:var(--surface);color:var(--text-2);cursor:pointer;outline:none"><option>최근 30일 (2024.12.16 ~ 2025.01.15)</option><option>최근 7일</option><option>이번 달</option><option>전체</option></select>
+        </div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-sm">구글 시트로 내보내기</button>
+          <button class="btn btn-sm">엑셀 다운로드</button>
+        </div>
+      </div>
+      <div class="grid-4" style="margin-bottom:16px">
+        <div class="stat-card"><div class="stat-label">⭐ 열성팬</div><div class="stat-val">142명</div></div>
+        <div class="stat-card"><div class="stat-label">⚠️ 관리 필요</div><div class="stat-val danger">11명</div></div>
+        <div class="stat-card"><div class="stat-label">🛒 구매 의향 높음</div><div class="stat-val accent">89명</div></div>
+        <div class="stat-card"><div class="stat-label">🤝 협업 문의</div><div class="stat-val">23명</div></div>
+      </div>
+      <!-- 열성팬 -->
+      <div class="crm-group">
+        <div class="crm-group-head open" onclick="toggleCrm(this)">
+          <div class="crm-group-title">⭐ 열성팬 <span class="badge badge-success" style="margin-left:4px">142명</span></div>
+          <span style="font-size:11px;color:var(--text-3);margin-right:8px">2024.12.16 ~ 2025.01.15</span>
+          <span class="crm-group-chev">▼</span>
+        </div>
+        <div class="crm-group-body show">
+          <div class="crm-row"><div class="crm-av">Y</div><div class="crm-info"><div class="crm-name">@yuna__daily</div><div class="crm-sub">Instagram · 댓글 38회 · 후기 게시물 2개</div></div><div class="crm-right"><div class="score-bar"><div class="score-fill" style="width:92%;background:var(--accent)"></div></div><span style="font-size:11px;font-weight:700;color:var(--accent)">92점</span></div></div>
+          <div class="crm-row"><div class="crm-av">S</div><div class="crm-info"><div class="crm-name">@seoulnista</div><div class="crm-sub">YouTube · 댓글 29회 · 영상 공유 5회</div></div><div class="crm-right"><div class="score-bar"><div class="score-fill" style="width:85%;background:var(--accent)"></div></div><span style="font-size:11px;font-weight:700;color:var(--accent)">85점</span></div></div>
+          <div class="crm-row"><div class="crm-av">H</div><div class="crm-info"><div class="crm-name">@hazel_skin</div><div class="crm-sub">TikTok · 영상 공유 8회 · 댓글 22회</div></div><div class="crm-right"><div class="score-bar"><div class="score-fill" style="width:78%;background:var(--accent)"></div></div><span style="font-size:11px;font-weight:700;color:var(--accent)">78점</span></div></div>
+          <div style="padding:8px 14px;text-align:center;border-top:1px solid var(--border)"><button class="btn btn-ghost btn-sm" style="color:var(--accent)">더보기 (139명) ↓</button></div>
+        </div>
+      </div>
+      <!-- 관리 필요 -->
+      <div class="crm-group">
+        <div class="crm-group-head" onclick="toggleCrm(this)">
+          <div class="crm-group-title">⚠️ 관리 필요 <span class="badge badge-danger" style="margin-left:4px">11명</span></div>
+          <span style="font-size:11px;color:var(--text-3);margin-right:8px">2024.12.16 ~ 2025.01.15</span>
+          <span class="crm-group-chev">▼</span>
+        </div>
+        <div class="crm-group-body">
+          <div class="crm-row"><div class="crm-av" style="background:var(--danger-l);color:var(--danger)">S</div><div class="crm-info"><div class="crm-name">@skin_trouble_k</div><div class="crm-sub">부정 댓글 4회 · 트러블 클레임 · 즉시 응대 필요</div></div><div class="crm-right"><button class="btn btn-sm" style="color:var(--danger);border-color:var(--danger)" onclick="document.getElementById('monitor-popup').style.display='flex'">모니터링</button></div></div>
+          <div class="crm-row"><div class="crm-av" style="background:var(--warn-l);color:var(--warn)">P</div><div class="crm-info"><div class="crm-name">@peeve_user22</div><div class="crm-sub">부정 댓글 2회 · 배송 불만</div></div><div class="crm-right"><button class="btn btn-sm" style="color:var(--danger);border-color:var(--danger)" onclick="document.getElementById('monitor-popup').style.display='flex'">모니터링</button></div></div>
+          <div style="padding:8px 14px;text-align:center;border-top:1px solid var(--border)"><button class="btn btn-ghost btn-sm" style="color:var(--danger)">더보기 (9명) ↓</button></div>
+        </div>
+      </div>
+      <!-- 구매 의향 -->
+      <div class="crm-group">
+        <div class="crm-group-head" onclick="toggleCrm(this)">
+          <div class="crm-group-title">🛒 구매 의향 높음 <span class="badge badge-accent" style="margin-left:4px">89명</span></div>
+          <span style="font-size:11px;color:var(--text-3);margin-right:8px">2024.12.16 ~ 2025.01.15</span>
+          <span class="crm-group-chev">▼</span>
+        </div>
+        <div class="crm-group-body">
+          <div class="crm-row"><div class="crm-av">C</div><div class="crm-info"><div class="crm-name">@cool_tommi99</div><div class="crm-sub">TikTok · 구매 문의 12회 · 링크 클릭 다수</div></div><div class="crm-right"><div class="score-bar"><div class="score-fill" style="width:78%;background:var(--success)"></div></div><span style="font-size:11px;font-weight:700;color:var(--success)">78점</span></div></div>
+          <div style="padding:8px 14px;text-align:center;border-top:1px solid var(--border)"><button class="btn btn-ghost btn-sm" style="color:var(--accent)">더보기 (88명) ↓</button></div>
+        </div>
+      </div>
+      <!-- 협업 문의 -->
+      <div class="crm-group">
+        <div class="crm-group-head" onclick="toggleCrm(this)">
+          <div class="crm-group-title">🤝 협업 문의 <span class="badge badge-neutral" style="margin-left:4px">23명</span></div>
+          <span style="font-size:11px;color:var(--text-3);margin-right:8px">2024.12.16 ~ 2025.01.15</span>
+          <span class="crm-group-chev">▼</span>
+        </div>
+        <div class="crm-group-body">
+          <div class="crm-row"><div class="crm-av">M</div><div class="crm-info"><div class="crm-name">@minjung_daily</div><div class="crm-sub">인플루언서 5만 · 협찬 문의 DM · 2025.01.14</div></div><div class="crm-right"><button class="btn btn-sm" onclick="document.getElementById('collab-popup').style.display='flex'">답장</button></div></div>
+          <div style="padding:8px 14px;text-align:center;border-top:1px solid var(--border)"><button class="btn btn-ghost btn-sm" style="color:var(--accent)">더보기 (22명) ↓</button></div>
+        </div>
+      </div>
+
+      <!-- 모니터링 팝업 -->
+      <div id="monitor-popup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;align-items:center;justify-content:center;padding:20px">
+        <div style="background:var(--surface);border-radius:16px;width:100%;max-width:480px;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden">
+          <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:15px;font-weight:800;color:var(--danger)">⚠️ 부정 댓글·DM 내역</div>
+            <button onclick="document.getElementById('monitor-popup').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-3)">✕</button>
+          </div>
+          <div style="padding:16px 20px;max-height:400px;overflow-y:auto">
+            <div style="font-size:12px;font-weight:700;color:var(--text-3);margin-bottom:8px">@skin_trouble_k 부정 이력</div>
+            <div style="border:1px solid var(--danger-l);border-radius:8px;overflow:hidden;margin-bottom:10px">
+              <div style="padding:10px 14px;border-bottom:1px solid var(--border);background:var(--danger-l)"><div style="font-size:11px;color:var(--danger);font-weight:600">2025.01.15 10:12 · Instagram 댓글</div><div style="font-size:12px;color:var(--text-1);margin-top:4px">"이 제품 써서 트러블 났어요!! 환불 어떻게 해요 진짜"</div></div>
+              <div style="padding:10px 14px;border-bottom:1px solid var(--border);background:var(--danger-l)"><div style="font-size:11px;color:var(--danger);font-weight:600">2025.01.13 14:30 · Instagram 댓글</div><div style="font-size:12px;color:var(--text-1);margin-top:4px">"민감성 피부에 자극 장난 아니에요 ㅠ"</div></div>
+              <div style="padding:10px 14px;background:var(--danger-l)"><div style="font-size:11px;color:var(--danger);font-weight:600">2025.01.10 09:15 · Instagram DM</div><div style="font-size:12px;color:var(--text-1);margin-top:4px">"배송도 늦고 제품도 별로 환불 요청합니다"</div></div>
+            </div>
+            <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px">임시 답장 초안 (AI 작성)</div>
+            <textarea style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:none;height:80px;outline:none">안녕하세요, 불편을 드려 정말 죄송해요 ㅠ 민감성 피부이신 분께 자극이 된 것 같아 마음이 무겁네요. 환불 또는 교환으로 빠르게 도와드릴게요. DM 주시면 바로 처리해 드리겠습니다!</textarea>
+          </div>
+          <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn btn-sm" onclick="document.getElementById('monitor-popup').style.display='none'">닫기</button>
+            <button class="btn btn-sm" style="color:var(--danger);border-color:var(--danger)">직접 응대 필요 표시</button>
+            <button class="btn btn-sm" style="background:var(--success);color:#fff;border-color:var(--success)" onclick="document.getElementById('monitor-popup').style.display='none';alert('답장이 승인되었어요!')">승인 발송</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 협업 답장 팝업 -->
+      <div id="collab-popup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;align-items:center;justify-content:center;padding:20px">
+        <div style="background:var(--surface);border-radius:16px;width:100%;max-width:520px;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden">
+          <div style="padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <div style="font-size:15px;font-weight:800;color:var(--text-1)">🤝 협업 문의 답장</div>
+            <button onclick="document.getElementById('collab-popup').style.display='none'" style="background:none;border:none;cursor:pointer;font-size:18px;color:var(--text-3)">✕</button>
+          </div>
+          <div style="padding:16px 20px">
+            <div style="background:var(--bg);border-radius:8px;padding:12px;margin-bottom:12px">
+              <div style="font-size:11px;font-weight:700;color:var(--text-3);margin-bottom:5px">@minjung_daily 협업 문의 원문 · 2025.01.14</div>
+              <div style="font-size:12px;color:var(--text-2);line-height:1.65">"안녕하세요! 인플루언서 민정이에요. 팔로워 5만 뷰티 계정 운영 중인데, MILLIMILLI 제품 협찬 또는 공동 콘텐츠 협업 가능한지요? 인스타그램 피드·릴스 각 1개씩 포함한 패키지 제안드릴 수 있어요."</div>
+            </div>
+            <div style="font-size:12px;font-weight:600;color:var(--text-2);margin-bottom:6px">답장 작성</div>
+            <textarea style="width:100%;padding:10px;border:1px solid var(--border);border-radius:8px;font-size:12px;font-family:inherit;resize:none;height:100px;outline:none">안녕하세요, 민정님! 관심 감사해요 :)
+MILLIMILLI 협업 제안 검토해 볼게요. 구체적인 조건과 포트폴리오를 info@millimilli.co 로 보내주시면 빠르게 답변드릴게요!</textarea>
+          </div>
+          <div style="padding:12px 20px;border-top:1px solid var(--border);display:flex;gap:8px;justify-content:flex-end">
+            <button class="btn btn-sm" onclick="document.getElementById('collab-popup').style.display='none'">닫기</button>
+            <button class="btn btn-sm btn-accent" onclick="document.getElementById('collab-popup').style.display='none';alert('답장이 발송되었어요!')">발송하기</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 선댓글/선DM 추천 -->
+      <div class="card" style="margin-top:16px">
+        <div class="card-header">
+          <div class="card-title">선댓글 · 선DM 승인 대기</div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:12px;color:var(--text-2)">자동 발송</span>
+            <label class="toggle"><input type="checkbox" id="auto-crm-toggle"><span class="slider"></span></label>
+            <button class="btn btn-accent btn-sm">전체 승인</button>
+          </div>
+        </div>
+        <p style="font-size:12px;color:var(--text-2);margin-bottom:14px">AI가 열성팬과 구매 의향 팔로워에게 선댓글/선DM 초안을 준비했어요. 확인 후 승인하세요.</p>
+
+        <!-- 선댓글 추천 1 -->
+        <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:10px">
+          <div style="background:var(--bg);padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <div class="row-avatar">Y</div>
+            <div style="flex:1;min-width:100px">
+              <div style="font-size:12px;font-weight:700;color:var(--text-1)">@yuna__daily <span class="badge badge-success" style="margin-left:4px">열성팬</span></div>
+              <div style="font-size:11px;color:var(--text-2);margin-top:1px">새 게시물 업로드 · Instagram · 10분 전</div>
+            </div>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-sm btn-accent" onclick="this.closest('[style*=border]').style.opacity='.4'">승인</button>
+              <button class="btn btn-sm" style="color:var(--danger);border-color:var(--danger)" onclick="this.closest('[style*=border]').style.display='none'">거절</button>
+            </div>
+          </div>
+          <div style="padding:12px 14px">
+            <div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:5px">게시물 내용</div>
+            <div style="font-size:11px;color:var(--text-2);background:var(--bg);padding:8px 10px;border-radius:6px;margin-bottom:10px">"오늘 아침 스킨케어 루틴 공유해요 🌿"</div>
+            <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.3px;margin-bottom:5px">AI 선댓글 초안</div>
+            <div style="font-size:12px;color:var(--text-1);background:var(--accent-l);border-left:2px solid var(--accent);padding:8px 12px;border-radius:0 6px 6px 0;margin-bottom:8px">우리 유나님 오늘도 빛나시네요! MILLIMILLI 같이 쓰고 계신 거 아닌가요? 😆</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-sm btn-ghost" style="color:var(--accent)">수정하기</button>
+                <span style="font-size:10px;color:var(--text-3);align-self:center">발송: Instagram 댓글</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-2)">
+                자동 관리
+                <label class="toggle" style="width:30px;height:17px"><input type="checkbox"><span class="slider" style="border-radius:100px"></span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 선DM 추천 1 -->
+        <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
+          <div style="background:var(--bg);padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+            <div class="row-avatar">C</div>
+            <div style="flex:1;min-width:100px">
+              <div style="font-size:12px;font-weight:700;color:var(--text-1)">@cool_tommi99 <span class="badge badge-accent" style="margin-left:4px">구매의향</span></div>
+              <div style="font-size:11px;color:var(--text-2);margin-top:1px">프로필 방문 5회 · 링크 클릭 3회 · 어제</div>
+            </div>
+            <div style="display:flex;gap:6px">
+              <button class="btn btn-sm btn-accent" onclick="this.closest('[style*=border]').style.opacity='.4'">승인</button>
+              <button class="btn btn-sm" style="color:var(--danger);border-color:var(--danger)" onclick="this.closest('[style*=border]').style.display='none'">거절</button>
+            </div>
+          </div>
+          <div style="padding:12px 14px">
+            <div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:5px">AI 선DM 초안</div>
+            <div style="font-size:12px;color:var(--text-1);background:var(--accent-l);border-left:2px solid var(--accent);padding:8px 12px;border-radius:0 6px 6px 0;margin-bottom:8px">안녕하세요! 저번에 MILLIMILLI 제품 관심 가져주셔서 감사해요. 혹시 궁금한 점 있으시면 편하게 물어봐 주세요 :)</div>
+            <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:6px">
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-sm btn-ghost" style="color:var(--accent)">수정하기</button>
+                <span style="font-size:10px;color:var(--text-3);align-self:center">발송: Instagram DM</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-2)">
+                자동 관리
+                <label class="toggle" style="width:30px;height:17px"><input type="checkbox" checked><span class="slider" style="border-radius:100px"></span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ AI 말투 학습 ══ -->
+  <div class="vw" id="v-pers">
+    <div class="page">
+      <div class="page-header"><div class="page-title">AI 말투 학습</div><div class="page-sub">AI가 학습한 말투를 확인하고 수정하세요</div></div>
+      <div class="grid-2">
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-title">학습 현황</div>
+            <div class="setup-step"><div class="step-num-sm done">✓</div><div class="step-body-sm"><div class="step-title-sm">계정 분석 완료</div><div class="step-sub-sm">Instagram 200개 · TikTok 50개 · YouTube 30개</div><div class="prog-bar"><div class="prog-fill" style="--w:100%;width:100%"></div></div></div></div>
+            <div class="setup-step"><div class="step-num-sm done">✓</div><div class="step-body-sm"><div class="step-title-sm">말투 학습 완료 — 일치도 98%</div><div class="step-sub-sm">#친근한 #위트있는 #공감형 #이모지 활용</div><div class="prog-bar"><div class="prog-fill" style="--w:100%;width:100%"></div></div></div></div>
+            <div class="setup-step" style="margin:0"><div class="step-num-sm todo">3</div><div class="step-body-sm"><div class="step-title-sm">추가 정보 입력 권장 <span class="badge badge-accent" style="margin-left:4px">입력 권장</span></div><div class="step-sub-sm">금지어, 브랜드 특이사항 추가 시 품질 향상</div><div class="prog-bar"><div class="prog-fill" style="--w:60%;width:60%"></div></div></div></div>
+          </div>
+
+          <!-- AI 분석 결과 카드 -->
+          <div class="card" style="margin-bottom:14px;border:1px solid var(--accent);background:var(--accent-l)">
+            <div class="card-title" style="color:var(--accent-d)">리플 AI 학습 분석 결과</div>
+            <div style="font-size:13px;color:var(--text-1);line-height:1.75;margin-bottom:12px">
+              <strong>유민혜님은</strong> 친근하고 위트 있는 말투를 즐겨 쓰며, 팔로워와 '우리'라는 감각으로 소통하는 스타일이에요. 이모지를 적극 활용하고, 정보를 짧고 명확하게 전달하는 경향이 있어요.
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="background:rgba(255,255,255,.7);border-radius:8px;padding:10px 14px">
+                <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">팔로워 프로필 참고</div>
+                <div style="font-size:12px;color:var(--text-2)">20~30대 여성 중심 · K-뷰티 관심층 · 민감성 피부 고민 보유자 비중 높음. @laneige_kr · @innisfree 팔로워와 겹치는 비율 약 34%</div>
+              </div>
+              <div style="background:rgba(255,255,255,.7);border-radius:8px;padding:10px 14px">
+                <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">말투 특징</div>
+                <div style="font-size:12px;color:var(--text-2)">짧은 문장 선호 · 이모지 평균 2~3개/댓글 · "우리 ~님" "감사해요!" "너무 좋아요" 자주 사용 · 부정적 상황에서도 공감형 어조 유지</div>
+              </div>
+              <div style="background:rgba(255,255,255,.7);border-radius:8px;padding:10px 14px">
+                <div style="font-size:10px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px">주 활동 시간</div>
+                <div style="font-size:12px;color:var(--text-2)">오전 10시~12시, 오후 8시~11시에 활동 집중. 게시물 반응은 오후 9시~10시 최고치. 야간에도 댓글 응대 이력 다수</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">금지 키워드</div>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px">
+              <span class="badge badge-danger">타사 브랜드명 직접 언급</span>
+              <span class="badge badge-danger">가격 흥정 수락</span>
+              <span class="badge badge-danger">의학적 효능 보장</span>
+            </div>
+            <input class="input" type="text" placeholder="금지 키워드 추가...">
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-title">기본 정보</div>
+            <div class="form-grid" style="margin-bottom:10px">
+              <div class="form-group" style="margin:0"><label class="input-label">연령대</label><select class="input"><option>20대 초반</option><option selected>20대 후반</option><option>30대 초반</option></select></div>
+              <div class="form-group" style="margin:0"><label class="input-label">성별</label><select class="input"><option selected>여성</option><option>남성</option><option>무관</option></select></div>
+              <div class="form-group" style="margin:0"><label class="input-label">직업</label><input class="input" value="인플루언서 / 브랜드 대표"></div>
+              <div class="form-group" style="margin:0"><label class="input-label">운영 브랜드명</label><input class="input" value="MILLIMILLI, 랄라라운지"></div>
+              <div class="form-group" style="margin:0"><label class="input-label">카카오톡 채널</label><input class="input" placeholder="@채널아이디" value="@millimilli"></div>
+              <div class="form-group" style="margin:0"><label class="input-label">이메일</label><input class="input" type="email" value="info@millimilli.co"></div>
+            </div>
+            <div class="form-group" style="margin-bottom:10px">
+              <label class="input-label">말투 추가 설명</label>
+              <textarea class="input" style="height:72px">친근하고 따뜻한 어조. 팔로워를 '우리'로 칭함. 이모지 혼용. 구매 링크는 올리브영·스마트스토어. 협찬 문의는 이메일로.</textarea>
+            </div>
+            <button class="btn btn-accent btn-sm">저장</button>
+          </div>
+          <div class="card">
+            <div class="card-title">주요 상황별 응대 예시</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="background:var(--bg);border-radius:8px;padding:11px">
+                <div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px">제품 문의</div>
+                <div style="font-size:11px;color:var(--text-2);font-style:italic;margin-bottom:5px">"이 제품 어디서 사요?"</div>
+                <div style="font-size:12px;color:var(--text-1);background:var(--accent-l);border-left:2px solid var(--accent);padding:6px 10px;border-radius:0 6px 6px 0">올리브영·스마트스토어에서 구매 가능해요! 프로필 링크에 있어요.</div>
+              </div>
+              <div style="background:var(--bg);border-radius:8px;padding:11px">
+                <div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px">협찬 문의</div>
+                <div style="font-size:11px;color:var(--text-2);font-style:italic;margin-bottom:5px">"협업 제안 드립니다"</div>
+                <div style="font-size:12px;color:var(--text-1);background:var(--accent-l);border-left:2px solid var(--accent);padding:6px 10px;border-radius:0 6px 6px 0">관심 감사해요! <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c3aaada5ac83aeaaafafaaaeaaafafaaeda0ac">[email&#160;protected]</a> 로 보내주시면 검토할게요.</div>
+              </div>
+              <div style="background:var(--bg);border-radius:8px;padding:11px">
+                <div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px">이벤트 참여</div>
+                <div style="font-size:11px;color:var(--text-2);font-style:italic;margin-bottom:5px">"이벤트 어떻게 참여해요?"</div>
+                <div style="font-size:12px;color:var(--text-1);background:var(--accent-l);border-left:2px solid var(--accent);padding:6px 10px;border-radius:0 6px 6px 0">프로필 링크 이벤트 페이지에서 응모 가능해요! 꼭 당첨되길 바랄게요.</div>
+              </div>
+              <div style="background:var(--bg);border-radius:8px;padding:11px">
+                <div style="font-size:10px;font-weight:700;color:var(--text-3);text-transform:uppercase;letter-spacing:.3px;margin-bottom:4px">일상 / 안부</div>
+                <div style="font-size:11px;color:var(--text-2);font-style:italic;margin-bottom:5px">"오늘 너무 예뻐요 언니!"</div>
+                <div style="font-size:12px;color:var(--text-1);background:var(--accent-l);border-left:2px solid var(--accent);padding:6px 10px;border-radius:0 6px 6px 0">감사해요 우리 팬 최고! 덕분에 오늘 하루도 힘내요.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 먼저 말 걸기 ══ -->
+  <div class="vw" id="v-outreach">
+    <div class="page">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <div><div class="page-title">먼저 말 걸기</div><div class="page-sub">AI가 새로운 사람들에게 먼저 다가가요</div></div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-2)">켜짐<label class="toggle"><input type="checkbox" checked><span class="slider"></span></label></div>
+      </div>
+      <div class="grid-4" style="margin-bottom:16px">
+        <div class="stat-card"><div class="stat-label">오늘 선댓글</div><div class="stat-val accent">23</div><div class="stat-delta" style="color:var(--text-3)">한도 50개 중 46%</div></div>
+        <div class="stat-card"><div class="stat-label">오늘 선DM</div><div class="stat-val">8</div><div class="stat-delta" style="color:var(--text-3)">한도 20개 중 40%</div></div>
+        <div class="stat-card"><div class="stat-label">답장 받음</div><div class="stat-val success">6</div><div class="stat-delta up">응답률 19%</div></div>
+        <div class="stat-card"><div class="stat-label">이번 달 신규 팔로워</div><div class="stat-val success">+312</div><div class="stat-delta up">먼저 말 걸기 효과</div></div>
+      </div>
+      <div class="grid-2">
+        <div>
+          <div class="card" style="margin-bottom:14px">
+            <div class="card-title">타겟 설정</div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border-radius:8px">
+                <div><div style="font-size:13px;font-weight:600;color:var(--text-1)">#뷰티 #스킨케어 #올리브영</div><div style="font-size:11px;color:var(--text-2);margin-top:2px">해시태그 타겟 · 하루 30개</div></div>
+                <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border-radius:8px">
+                <div><div style="font-size:13px;font-weight:600;color:var(--text-1)">경쟁 계정 팔로워</div><div style="font-size:11px;color:var(--text-2);margin-top:2px">@laneige_kr, @innisfree · 하루 20개</div></div>
+                <label class="toggle"><input type="checkbox" checked><span class="slider"></span></label>
+              </div>
+            </div>
+            <button class="btn btn-sm btn-accent" style="margin-top:10px;width:100%;justify-content:center">+ 타겟 추가</button>
+          </div>
+          <div class="card">
+            <div class="card-title">안전 설정</div>
+            <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+              <span style="font-size:12px;color:var(--text-2);min-width:90px">일 최대 선댓글</span>
+              <input type="range" min="10" max="100" value="50" style="flex:1;accent-color:var(--accent)" oninput="document.getElementById('ol-out').textContent=this.value+'개'">
+              <span id="ol-out" style="font-size:12px;font-weight:700;color:var(--accent);min-width:36px">50개</span>
+            </div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="font-size:12px;color:var(--text-2);min-width:90px">일 최대 선DM</span>
+              <input type="range" min="1" max="30" value="20" style="flex:1;accent-color:var(--accent)" oninput="document.getElementById('ol-dm').textContent=this.value+'개'">
+              <span id="ol-dm" style="font-size:12px;font-weight:700;color:var(--accent);min-width:36px">20개</span>
+            </div>
+            <div style="margin-top:10px;padding:8px 12px;background:var(--success-l);border-radius:8px;font-size:11px;color:var(--success)">현재 설정은 플랫폼 가이드라인 내 안전 범위예요.</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-title">오늘 먼저 말 건 내역</div>
+          <div style="border:1px solid var(--border);border-radius:10px;overflow:hidden">
+            <div class="ol-row"><div class="ol-av">K</div><div class="ol-info"><div class="ol-user">@kbeauty_daily</div><div class="ol-comment">"와, 이 카페 분위기 너무 예쁘다! 혹시 강남 쪽인가요?"</div><div class="ol-meta"><span class="ol-time">3분 전</span><span class="ol-status os-sent">발송완료</span></div></div></div>
+            <div class="ol-row"><div class="ol-av">S</div><div class="ol-info"><div class="ol-user">@skincare_lover_j</div><div class="ol-comment">"500달톤 이하 성분이 중요하다는 거 처음 알았어요!"</div><div class="ol-meta"><span class="ol-time">8분 전</span><span class="ol-status os-replied">답장 받음</span></div></div></div>
+            <div class="ol-row"><div class="ol-av">M</div><div class="ol-info"><div class="ol-user">@morning_glow_kr</div><div class="ol-comment">"아침 루틴 영상 너무 도움됐어요! 쿠션 추천해 주실 수 있어요?"</div><div class="ol-meta"><span class="ol-time">15분 전</span><span class="ol-status os-replied">답장 받음</span></div></div></div>
+            <div class="ol-row"><div class="ol-av">H</div><div class="ol-info"><div class="ol-user">@hana_skinroutine</div><div class="ol-comment">"민감성 피부인데 이 루틴 해봐도 될까요?"</div><div class="ol-meta"><span class="ol-time">31분 전</span><span class="ol-status os-queued">대기 중</span></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 오늘 할 일 ══ -->
+  <div class="vw" id="v-mission">
+    <div class="page">
+      <div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:10px">
+        <div><div class="page-title">오늘 할 일</div><div class="page-sub">미션을 완료하면 AI 응대 포인트를 드려요</div></div>
+        <div style="font-size:14px;font-weight:700;color:var(--accent)">1,240P 보유</div>
+      </div>
+
+      <!-- 자동화 포인트 안내 -->
+      <div style="background:var(--accent-l);border:1px solid var(--accent);border-radius:10px;padding:12px 16px;margin-bottom:14px;display:flex;align-items:center;gap:12px">
+        <div style="font-size:20px">⚡</div>
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--accent-d)">자동화만 켜두어도 알아서 포인트를 벌어요!</div>
+          <div style="font-size:12px;color:var(--accent);margin-top:2px">AI가 댓글 응대, 먼저 말 걸기를 자동으로 하면서 포인트가 쌓여요. 오늘 벌어둔 포인트: <strong>+50P</strong></div>
+        </div>
+        <div style="margin-left:auto;text-align:right;flex-shrink:0">
+          <div style="font-size:30px;font-weight:800;color:var(--accent);line-height:1;letter-spacing:-1px">1,240</div>
+          <div style="font-size:11px;color:var(--accent);font-weight:600">보유 포인트</div>
+        </div>
+      </div>
+      <div class="mission-header-bar">
+        <div><div class="streak-num">7</div><div class="streak-lbl">연속 활동일</div></div>
+        <div class="streak-divider"></div>
+        <div class="streak-info">
+          <div class="streak-title">일주일 연속 미션 달성!</div>
+          <div class="streak-sub">7일 연속으로 팔로워가 +312명 늘었어요. 오늘도 완료하면 AI 응대 포인트 +500건 추가!</div>
+        </div>
+      </div>
+
+      <div class="mission-item done">
+        <div class="mi-head">
+          <div class="mi-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="mi-info"><div class="mi-title">댓글 자동응대 10건</div><div class="mi-desc">MINE AI가 댓글 10건 이상 응대하기</div></div>
+          <div style="font-size:18px;font-weight:800;color:var(--success)">+50P</div>
+          <span class="badge badge-success">완료</span>
+        </div>
+      </div>
+
+      <div class="mission-item">
+        <div class="mi-head">
+          <div class="mi-check"></div>
+          <div class="mi-info"><div class="mi-title">먼저 말 걸기 10개</div><div class="mi-desc">새로운 계정에 선댓글 10개 남기기</div></div>
+          <div style="font-size:18px;font-weight:800;color:var(--accent)">+100P</div>
+          <span class="badge badge-accent">진행 중</span>
+        </div>
+        <div class="mi-bar-wrap">
+          <div class="mi-bar-row"><span>7/10 완료</span><span>70%</span></div>
+          <div class="mi-bar-bg"><div class="mi-bar-fill" style="width:70%"></div></div>
+        </div>
+        <div class="mi-reward">완료 시 이번 달 AI 응대 포인트 +100건 추가</div>
+      </div>
+
+      <div class="mission-item">
+        <div class="mi-head">
+          <div class="mi-check"></div>
+          <div class="mi-info"><div class="mi-title">팔로워 CRM 확인</div><div class="mi-desc">열성팬 상위 5명 확인 및 선DM 설정</div></div>
+          <div style="font-size:18px;font-weight:800;color:var(--text-3)">+50P</div>
+          <span class="badge badge-neutral">미완료</span>
+        </div>
+        <div class="mi-bar-wrap">
+          <div class="mi-bar-row"><span>0/5 완료</span><span>0%</span></div>
+          <div class="mi-bar-bg"><div class="mi-bar-fill" style="width:0%"></div></div>
+        </div>
+        <div class="mi-reward">완료 시 포인트 +50P 즉시 적립 <button class="btn btn-xs" style="margin-left:auto" onclick="go('crm',document.getElementById('nb-crm'))">바로가기</button></div>
+      </div>
+
+      <div class="mission-item">
+        <div class="mi-head">
+          <div class="mi-check"></div>
+          <div class="mi-info"><div class="mi-title">수익 문의 12건 처리</div><div class="mi-desc">미확인 수익 문의 확인 및 답장</div></div>
+          <div style="font-size:18px;font-weight:800;color:var(--text-3)">+200P</div>
+          <span class="badge badge-neutral">미완료</span>
+        </div>
+        <div class="mi-bar-wrap">
+          <div class="mi-bar-row"><span>0/12 완료</span><span>0%</span></div>
+          <div class="mi-bar-bg"><div class="mi-bar-fill" style="width:0%"></div></div>
+        </div>
+        <div class="mi-reward">완료 시 다음 달 요금 10% 할인쿠폰 <button class="btn btn-xs" style="margin-left:auto" onclick="go('biz',document.getElementById('nb-biz'))">바로가기</button></div>
+      </div>
+
+      <div class="card" style="margin-top:14px">
+        <div class="card-title">포인트 사용처</div>
+        <div class="grid-3" style="margin-top:4px">
+          <div style="background:var(--bg);border-radius:10px;padding:14px;text-align:center"><div style="font-size:15px;font-weight:800;color:var(--text-1)">AI 응대</div><div style="font-size:12px;color:var(--text-2);margin:4px 0 8px">100P = 100건 추가</div><button class="btn btn-sm btn-accent" style="width:100%;justify-content:center">사용</button></div>
+          <div style="background:var(--bg);border-radius:10px;padding:14px;text-align:center"><div style="font-size:15px;font-weight:800;color:var(--text-1)">요금 할인</div><div style="font-size:12px;color:var(--text-2);margin:4px 0 8px">500P = 5,000원 할인</div><button class="btn btn-sm btn-accent" style="width:100%;justify-content:center">사용</button></div>
+          <div style="background:var(--bg);border-radius:10px;padding:14px;text-align:center"><div style="font-size:15px;font-weight:800;color:var(--text-1)">먼저 말 걸기</div><div style="font-size:12px;color:var(--text-2);margin:4px 0 8px">200P = 하루 +20개</div><button class="btn btn-sm btn-accent" style="width:100%;justify-content:center">사용</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 계정 연동 ══ -->
+  <div class="vw" id="v-acct">
+    <div class="page">
+      <div class="page-header"><div class="page-title">계정 연동</div><div class="page-sub">SNS 계정을 연동해야 AI가 자동으로 관리해드려요</div></div>
+
+      <!-- Instagram -->
+      <div class="platform-card connected">
+        <div class="platform-icon" style="background:linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);display:flex;align-items:center;justify-content:center">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+        </div>
+        <div class="platform-info"><div class="platform-name">Instagram</div><div class="platform-handle">@yuminhye_beauty · 팔로워 312,000</div><div class="platform-ok">연동 완료 · 게시물 200개 학습</div></div>
+        <button class="btn btn-sm" style="opacity:.6;cursor:default;color:var(--success);border-color:var(--success)">연결됨</button>
+      </div>
+
+      <!-- TikTok -->
+      <div class="platform-card connected">
+        <div class="platform-icon" style="background:#010101;display:flex;align-items:center;justify-content:center">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.17 8.17 0 0 0 4.77 1.52V6.78a4.85 4.85 0 0 1-1-.09z"/></svg>
+        </div>
+        <div class="platform-info"><div class="platform-name">TikTok</div><div class="platform-handle">@peerstory · 팔로워 89,400</div><div class="platform-ok">연동 완료 · 영상 50개 학습</div></div>
+        <button class="btn btn-sm" style="opacity:.6;cursor:default;color:var(--success);border-color:var(--success)">연결됨</button>
+      </div>
+
+      <!-- YouTube -->
+      <div class="platform-card">
+        <div class="platform-icon" style="background:#FF0000;display:flex;align-items:center;justify-content:center">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>
+        </div>
+        <div class="platform-info"><div class="platform-name">YouTube</div><div class="platform-handle">@15초유민혜 · 구독자 42,000</div></div>
+        <button class="btn btn-sm btn-accent">연동하기</button>
+      </div>
+
+      <!-- Threads -->
+      <div class="platform-card">
+        <div class="platform-icon" style="background:#000;display:flex;align-items:center;justify-content:center">
+          <svg width="20" height="20" viewBox="0 0 192 192" fill="#fff"><path d="M141.537 88.988c-.707-.304-1.423-.592-2.147-.862a73.47 73.47 0 0 0-1.043-.384c-5.767-2.025-12.032-3.105-18.6-3.105C100.94 84.637 87 97.61 87 114.01c0 16.358 13.94 29.295 31.747 29.295 6.58 0 12.84-1.08 18.6-3.105.724-.27 1.44-.558 2.147-.862l.714 3.73H164V88.637l-22.463.351zm-4.403 37.388c-5.767 2.025-12.032 3.105-18.6 3.105-14.804 0-26.747-8.87-26.747-19.47s11.943-19.47 26.747-19.47c6.568 0 12.833 1.08 18.6 3.105.724.27 1.44.557 2.147.862v30.905c-.707.305-1.423.593-2.147.863z"/><path d="M96 0C43.178 0 0 43.178 0 96s43.178 96 96 96 96-43.178 96-96S148.822 0 96 0zm0 176c-44.112 0-80-35.888-80-80s35.888-80 80-80 80 35.888 80 80-35.888 80-80 80z"/></svg>
+        </div>
+        <div class="platform-info"><div class="platform-name">Threads</div><div class="platform-handle" style="color:var(--text-3)">미연동</div></div>
+        <button class="btn btn-sm">연동하기</button>
+      </div>
+
+      <!-- 카카오/메일 알림 연동 -->
+      <div style="margin-top:20px;margin-bottom:6px;font-size:13px;font-weight:700;color:var(--text-1)">카카오 / 메일 알림</div>
+      <div class="platform-card">
+        <div class="platform-icon" style="background:#FAE100;display:flex;align-items:center;justify-content:center">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="#3C1E1E"><path d="M12 3C6.486 3 2 6.486 2 10.8c0 2.73 1.688 5.147 4.237 6.618L5.2 21l4.35-2.893C10.248 18.362 11.112 18.48 12 18.48c5.514 0 10-3.486 10-7.68S17.514 3 12 3z"/></svg>
+        </div>
+        <div class="platform-info">
+          <div class="platform-name">카카오 알림</div>
+          <div class="platform-handle">중요 이슈·일일 리포트를 카카오로 받아요</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input type="text" class="input" style="width:130px;font-size:12px;padding:6px 10px" placeholder="010-0000-0000">
+          <button class="btn btn-sm btn-accent">인증</button>
+        </div>
+      </div>
+      <div class="platform-card">
+        <div class="platform-icon" style="background:#EA4335;display:flex;align-items:center;justify-content:center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M20 4H4C2.9 4 2 4.9 2 6v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+        </div>
+        <div class="platform-info">
+          <div class="platform-name">이메일 알림</div>
+          <div class="platform-handle">수익·협업 문의 이메일 리포트</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <input type="email" class="input" style="width:160px;font-size:12px;padding:6px 10px" value="info@millimilli.co">
+          <button class="btn btn-sm btn-accent">저장</button>
+        </div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <div class="card-title">응대 모드</div>
+        <div class="ht-option selected" id="ht1" onclick="selHt('ht1')"><div class="ht-radio"><div class="ht-dot"></div></div><div class="ht-lbl"><div class="ht-name">휴먼터치 <span class="badge badge-accent" style="margin-left:6px">권장</span></div><div class="ht-desc">2~15분 랜덤 지연, 야간 슬립 자동 적용</div></div></div>
+        <div class="ht-option" id="ht2" onclick="selHt('ht2')"><div class="ht-radio"><div class="ht-dot"></div></div><div class="ht-lbl"><div class="ht-name">즉시 응답</div><div class="ht-desc">수신 즉시 응대, 봇처럼 보일 수 있음</div></div></div>
+        <div class="divider"></div>
+        <div class="form-grid">
+          <div class="form-group"><label class="input-label">활동 시간</label><select class="input"><option>09:00 ~ 23:00</option><option>24시간</option></select></div>
+          <div class="form-group"><label class="input-label">일 최대 댓글</label><input type="number" value="300" class="input"></div>
+          <div class="form-group"><label class="input-label">일 최대 DM</label><input type="number" value="100" class="input"></div>
+          <div class="form-group"><label class="input-label">카카오 알림</label><select class="input"><option>요주의 즉시 알림</option><option>일 1회 요약</option></select></div>
+        </div>
+        <button class="btn btn-accent" style="margin-top:4px">저장</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 카카오 알림 ══ -->
+  <div class="vw" id="v-kakao">
+    <div class="page">
+      <div class="page-header"><div style="display:flex;align-items:center;gap:10px"><div class="page-title">카카오/메일 알림</div><span style="font-size:11px;font-weight:700;background:#ECFDF5;color:#059669;border:1px solid #6EE7B7;padding:3px 10px;border-radius:100px">[무료]</span></div><div class="page-sub">카카오와 이메일로 중요한 순간을 바로 받아보세요</div></div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-title">알림 설정</div>
+          <div class="form-grid" style="margin-bottom:14px">
+            <div class="form-group" style="margin:0"><label class="input-label">전화번호</label><input type="text" class="input" value="010-1234-5678"></div>
+            <div class="form-group" style="margin:0"><label class="input-label">일일 리포트 시간</label><select class="input"><option>오전 8:00</option><option>오전 9:00</option></select></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div onclick="showKakaoPreview('daily')" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border-radius:8px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--accent-l)'" onmouseout="this.style.background='var(--bg)'"><div><div style="font-size:13px;font-weight:600;color:var(--text-1)">일일 요약 리포트</div><div style="font-size:11px;color:var(--text-2);margin-top:1px">매일 아침 응대 현황 요약 — 클릭 시 미리보기</div></div><label class="toggle" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="slider"></span></label></div>
+            <div onclick="showKakaoPreview('urgent')" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border-radius:8px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--danger-l)'" onmouseout="this.style.background='var(--bg)'"><div><div style="font-size:13px;font-weight:600;color:var(--text-1)">요주의 즉시 알림</div><div style="font-size:11px;color:var(--text-2);margin-top:1px">결제 문제, 부정 이슈 발생 시 — 클릭 시 미리보기</div></div><label class="toggle" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="slider"></span></label></div>
+            <div onclick="showKakaoPreview('biz')" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border-radius:8px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--accent-l)'" onmouseout="this.style.background='var(--bg)'"><div><div style="font-size:13px;font-weight:600;color:var(--text-1)">수익 문의 알림</div><div style="font-size:11px;color:var(--text-2);margin-top:1px">광고, 협업, 수출 문의 즉시 — 클릭 시 미리보기</div></div><label class="toggle" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="slider"></span></label></div>
+            <div onclick="showKakaoPreview('earn')" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border-radius:8px;cursor:pointer;transition:background .15s" onmouseover="this.style.background='var(--success-l)'" onmouseout="this.style.background='var(--bg)'"><div><div style="font-size:13px;font-weight:600;color:var(--text-1)">브랜드 협업 제안 받기</div><div style="font-size:11px;color:var(--text-2);margin-top:1px">비즈니스 협업 제안을 알림톡으로 받아요 — 클릭 시 미리보기</div></div><label class="toggle" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="slider"></span></label></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--bg);border-radius:8px"><div><div style="font-size:13px;font-weight:600;color:var(--text-1)">인태기 극복 푸시</div><div style="font-size:11px;color:var(--text-2);margin-top:1px">3일 이상 포스팅 없으면 AI 잔소리 알림</div></div><label class="toggle"><input type="checkbox"><span class="slider"></span></label></div>
+          </div>
+          <button class="btn btn-accent" style="margin-top:14px">저장</button>
+        </div>
+        <div class="card">
+          <div class="card-title">알림 미리보기</div>
+          <div style="font-size:11px;color:var(--text-3);margin-bottom:8px">왼쪽 항목을 클릭하면 해당 알림 미리보기가 표시돼요</div>
+          <div class="kakao-wrap">
+            <div class="kakao-header"><div class="kakao-ic">M</div><div class="kakao-name">리플 AI 알림</div></div>
+            <div class="kakao-body">
+              <div class="kakao-msg" id="kakao-preview-msg" style="white-space:pre-line">안녕하세요, 유민혜님!
+
+어제 리플 AI 완료:
+댓글 89건 / DM 31건
+절약 시간 4시간 = 40,000원 절감
+
+요주의 2건 확인 필요</div>
+              <button class="kakao-btn">리플 AI에서 확인하기</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 이용권 ══ -->
+  <div class="vw" id="v-price">
+    <div class="page">
+      <div class="page-header"><div class="page-title">이용권</div><div class="page-sub">7일 무료 체험 후 원하는 이용권을 선택하세요</div></div>
+      <!-- AI 계정 분석 기반 추천 -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:20px;margin-bottom:16px">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px">리플 AI 계정 분석 결과</div>
+            <div style="font-size:18px;font-weight:800;color:var(--text-1);letter-spacing:-.3px">@yuminhye_beauty 계정 기준, <span style="color:var(--accent)">프리미엄</span>을 추천해요</div>
+            <div style="font-size:13px;color:var(--text-2);margin-top:6px;line-height:1.65">
+              팔로워 312,000 · 일 평균 댓글 180건 · DM 42건<br>
+              월 예상 응대 건수: <strong style="color:var(--text-1)">약 6,600건</strong> → 베이직 초과, 프리미엄 적합
+            </div>
+          </div>
+          <div style="background:var(--accent-l);border:1px solid var(--accent);border-radius:10px;padding:14px 18px;text-align:center;flex-shrink:0">
+            <div style="font-size:11px;font-weight:700;color:var(--accent);margin-bottom:4px">이번 달 절감 예상</div>
+            <div style="font-size:28px;font-weight:800;color:var(--accent);line-height:1;letter-spacing:-.5px">120h</div>
+            <div style="font-size:11px;color:var(--accent);margin-top:3px">= 약 120만원 절감</div>
+          </div>
+        </div>
+        <div style="margin-top:14px;padding:10px 14px;background:var(--accent-l);border-radius:8px;font-size:12px;color:var(--accent-d)">
+          💡 프리미엄 이용권 기준 월 15,000건까지 응대 가능해요. 남은 여유분으로 팔로워도 자동으로 늘려드려요.
+        </div>
+      </div>
+      <div style="background:var(--accent);border-radius:14px;padding:24px;margin-bottom:20px;color:#fff">
+        <div style="font-size:13px;font-weight:600;color:rgba(255,255,255,.6);margin-bottom:6px">지난 7일간 절약한 시간</div>
+        <div style="font-size:36px;font-weight:800;letter-spacing:-1px;margin-bottom:8px">28시간<span style="font-size:18px;font-weight:500;color:rgba(255,255,255,.6);margin-left:6px">= 280,000원 절감</span></div>
+        <div style="font-size:13px;color:rgba(255,255,255,.6)">월 환산 약 120시간 · 시급 10,000원 기준</div>
+      </div>
+      <div class="pricing-grid">
+        <div class="plan-card"><div class="plan-name">베이직</div><div class="plan-desc">소규모 인플루언서</div><div class="plan-price">₩29,900</div><div class="plan-period">/ 월</div><div class="plan-features"><div class="plan-feat"><span class="check">✓</span> 계정 1개 연동</div><div class="plan-feat"><span class="check">✓</span> 월 3,000건 응대</div><div class="plan-feat"><span class="check">✓</span> 댓글·DM 자동화</div><div class="plan-feat off"><span class="x">✗</span> 수익 문의</div><div class="plan-feat off"><span class="x">✗</span> 팔로워 관리</div><div class="plan-feat off"><span class="x">✗</span> 먼저 말 걸기</div></div><button class="plan-btn">시작하기</button></div>
+        <div class="plan-card featured"><div class="plan-badge">가장 인기</div><div class="plan-name">프리미엄</div><div class="plan-desc">중대형 인플루언서 · 브랜드</div><div class="plan-price">₩79,900</div><div class="plan-period">/ 월</div><div class="plan-features"><div class="plan-feat"><span class="check">✓</span> 계정 3개 연동</div><div class="plan-feat"><span class="check">✓</span> 월 15,000건 응대</div><div class="plan-feat"><span class="check">✓</span> 댓글·DM 자동화</div><div class="plan-feat"><span class="check">✓</span> 수익 문의 인박스</div><div class="plan-feat"><span class="check">✓</span> 팔로워 관리 + CRM</div><div class="plan-feat"><span class="check">✓</span> 먼저 말 걸기 (일 50개)</div><div class="plan-feat"><span class="check">✓</span> 카카오 알림 (전체)</div></div><button class="plan-btn primary">시작하기</button></div>
+        <div class="plan-card"><div class="plan-name">기업형</div><div class="plan-desc">MCN · 대형 브랜드 · 대행사</div><div class="plan-price">문의</div><div class="plan-period">맞춤 견적</div><div class="plan-features"><div class="plan-feat"><span class="check">✓</span> 계정 무제한</div><div class="plan-feat"><span class="check">✓</span> 응대 무제한</div><div class="plan-feat"><span class="check">✓</span> 전담 매니저 배정</div><div class="plan-feat"><span class="check">✓</span> White-label 제공</div><div class="plan-feat"><span class="check">✓</span> 팀 계정 (다중 유저)</div><div class="plan-feat"><span class="check">✓</span> 0.8L 파트너 할인</div></div><button class="plan-btn">문의하기</button></div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /mn -->
+</div><!-- /app -->
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+var aiOn = true;
+var currentStep = 1;
+var allViews = ['dash','onboarding','msg','instadm','biz','crm','pers','outreach','mission','acct','kakao','price'];
+
+function go(id, el){
+  allViews.forEach(function(v){
+    var vEl = document.getElementById('v-'+v); if(vEl) vEl.classList.remove('on');
+    var nb = document.getElementById('nb-'+v); if(nb) nb.classList.remove('on');
+  });
+  var view = document.getElementById('v-'+id); if(view) view.classList.add('on');
+  if(el) el.classList.add('on');
+  closeSb(); window.scrollTo(0,0);
+}
+function goMobile(id, bnId){
+  go(id, document.getElementById('nb-'+id));
+  document.querySelectorAll('.bn-item').forEach(function(b){ b.classList.remove('on'); });
+  var bn = document.getElementById(bnId); if(bn) bn.classList.add('on');
+}
+function toggleSb(){
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sb-overlay').classList.toggle('show');
+}
+function closeSb(){
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sb-overlay').classList.remove('show');
+}
+function toggleMsg(id){ var e = document.getElementById(id); if(e) e.classList.toggle('open'); }
+function toggleCrm(head){
+  head.classList.toggle('open');
+  var b = head.nextElementSibling; if(b) b.classList.toggle('show');
+}
+function selHt(id){
+  ['ht1','ht2'].forEach(function(i){
+    var e = document.getElementById(i); if(!e) return;
+    e.classList.remove('selected');
+    var d = e.querySelector('.ht-dot'); if(d) d.style.display='none';
+  });
+  var s = document.getElementById(id); if(!s) return;
+  s.classList.add('selected');
+  var dot = s.querySelector('.ht-dot'); if(dot) dot.style.display='block';
+}
+function nextStep(step){
+  currentStep = step;
+  document.querySelectorAll('.ob-step').forEach(function(s){ s.classList.remove('on'); });
+  var t = document.getElementById('ob'+step); if(t) t.classList.add('on');
+  for(var i=1;i<=3;i++){
+    var sc = document.getElementById('sc'+i);
+    var sl = document.getElementById('sl'+i);
+    if(!sc) continue;
+    if(i < step){
+      sc.innerHTML='✓';
+      sc.style.cssText='width:28px;height:28px;border-radius:50%;background:var(--success);border:2px solid var(--success);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700';
+      if(sl) sl.style.background='var(--success)';
+    } else if(i===step){
+      sc.textContent=i;
+      sc.style.cssText='width:28px;height:28px;border-radius:50%;background:var(--accent);border:2px solid var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700';
+    } else {
+      sc.textContent=i;
+      sc.style.cssText='width:28px;height:28px;border-radius:50%;background:var(--surface);border:2px solid var(--border-2);color:var(--text-3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700';
+      if(sl) sl.style.background='var(--border)';
+    }
+  }
+}
+function goDash(){
+  go('dash', document.getElementById('nb-dash'));
+  document.querySelectorAll('.bn-item').forEach(function(b){ b.classList.remove('on'); });
+  var bn = document.getElementById('bn-dash'); if(bn) bn.classList.add('on');
+}
+function toggleAI(){
+  aiOn = !aiOn;
+  var btn = document.getElementById('ai-toggle');
+  var dot = document.getElementById('status-dot');
+  var lbl = document.getElementById('status-lbl');
+  if(aiOn){
+    if(btn){ btn.textContent='ON'; btn.style.color='var(--success)'; btn.style.borderColor='var(--border-2)'; }
+    if(dot){ dot.style.background='var(--success)'; dot.style.animationName='spulse'; }
+    if(lbl) lbl.textContent='AI 자동 응대 켜짐';
+  } else {
+    if(btn){ btn.textContent='OFF'; btn.style.color='var(--text-3)'; btn.style.borderColor='var(--border-2)'; }
+    if(dot){ dot.style.background='var(--text-3)'; dot.style.animationName='none'; }
+    if(lbl) lbl.textContent='AI 자동 응대 꺼짐';
+  }
+}
+function setPeriod(btn, label){
+  document.querySelectorAll('[onclick*="setPeriod"]').forEach(function(b){
+    b.style.background='var(--surface)'; b.style.color='var(--text-2)'; b.style.borderColor='var(--border-2)';
+  });
+  btn.style.background='var(--accent)'; btn.style.color='#fff'; btn.style.borderColor='var(--accent)';
+  var lbl = document.getElementById('period-label'); if(lbl) lbl.textContent=label+' 00:00 기준';
+}
+function selCh(btn){
+  var parent = btn.parentElement;
+  parent.querySelectorAll('button').forEach(function(b){
+    b.style.background='var(--surface)'; b.style.color='var(--text-2)'; b.style.borderColor='var(--border-2)';
+  });
+  btn.style.background='var(--accent)'; btn.style.color='#fff'; btn.style.borderColor='var(--accent)';
+}
+function gotoStep(step){
+  var subs={1:'계정 연동이 필요해요',2:'말투·알림 설정이 남아 있어요',3:'성장 설정이 남아 있어요'};
+  var descs={1:'Instagram, TikTok 등 계정을 연동하면 AI가 자동으로 관리해요.',2:'AI 말투 학습과 카카오 알림을 설정하세요.',3:'먼저 말 걸기 타겟과 활동량을 설정하면 팔로워가 자동으로 늘어요.'};
+  var tgts={1:'acct',2:'pers',3:'outreach'};
+  var det=document.getElementById('step-detail'); if(det) det.style.display='flex';
+  var dt=document.getElementById('step-detail-title'); if(dt) dt.textContent=subs[step];
+  var ds=document.getElementById('step-detail-sub'); if(ds) ds.textContent=descs[step];
+  var db=document.getElementById('step-detail-btn');
+  if(db){ db.textContent=(step===1?'계정 연동':step===2?'말투·알림 설정':'성장 설정')+'하기 →';
+    db.onclick=function(){ go(tgts[step], document.getElementById('nb-'+tgts[step])); }; }
+}
+function showKakaoPreview(type){
+  var msgs={
+    daily:'안녕하세요, 유민혜님!\n\n어제 리플 AI 완료:\n댓글 89건 / DM 31건\n절약 시간 4시간 = 40,000원 절감\n\n요주의 2건 확인 필요',
+    urgent:'⚠️ 요주의 이슈!\n\n@beauty_lover99 결제 오류 댓글\n→ 리플 AI에서 즉시 확인하세요',
+    biz:'💼 수익 문의 도착!\n\n@kbeauty_brand1 광고 협업 제안\n예산 200만원\n→ 수익화/비즈니스에서 확인',
+    earn:'🚀 수익화 제안 (0.8L 플랫폼)\n\n뷰티 브랜드 A 협찬 제안\n예상 광고비: 150만원'
+  };
+  var el=document.getElementById('kakao-preview-msg'); if(el) el.textContent=msgs[type]||'';
+}
+(function init(){
+  var d = document.querySelector('#ht1 .ht-dot'); if(d) d.style.display='block';
+})();
+
+// ─── 댓글/DM: 두 개의 독립 메뉴로 분리됨 ───
+
+// ─── DM 자동화 마법사 ───
+var wizStep = 1;
+var selectedPost = null;
+
+function gotoWizard(step){
+  for(var i=1;i<=4;i++){
+    var s = document.getElementById('wiz-step-'+i); if(s) s.style.display = i===step ? 'block' : 'none';
+    var c2 = document.getElementById('wc'+i);
+    if(c2){
+      if(i < step){ c2.textContent='✓'; c2.style.background='var(--success)'; c2.style.color='#fff'; }
+      else if(i===step){ c2.textContent=i; c2.style.background='var(--accent)'; c2.style.color='#fff'; }
+      else { c2.textContent=i; c2.style.background='var(--border)'; c2.style.color='var(--text-3)'; }
+    }
+    var lbl = document.querySelector('#wi'+i+' div:last-child');
+    if(lbl){
+      if(i < step){ lbl.style.color='var(--success)'; }
+      else if(i===step){ lbl.style.color='var(--accent)'; }
+      else { lbl.style.color='var(--text-3)'; }
+    }
+    var line = document.getElementById('wl'+i);
+    if(line) line.style.background = i < step ? 'var(--success)' : 'var(--border)';
+  }
+  wizStep = step;
+}
+
+function selectPost(id){
+  // Deselect all
+  ['wp1','wp2','wp3','wp4','wp5','wp6'].forEach(function(p){
+    var el = document.getElementById(p);
+    var chk = document.getElementById('wc-'+p);
+    if(el){ el.style.borderColor='var(--border)'; }
+    if(chk){ chk.style.display='none'; }
+  });
+  // Select this one
+  var el = document.getElementById(id);
+  var chk = document.getElementById('wc-'+id);
+  if(el){ el.style.borderColor='var(--accent)'; el.style.borderWidth='2px'; }
+  if(chk){ chk.style.display='flex'; }
+  selectedPost = id;
+  var names = {wp1:'클렌징 루틴 공유',wp2:'신제품 출시 이벤트',wp3:'스킨케어 루틴 영상',wp4:'MILLIMILLI 언박싱',wp5:'공동구매 오픈 안내',wp6:'500달톤 성분 설명'};
+  var lbl = document.getElementById('post-selected-label');
+  if(lbl) lbl.textContent = '"' + (names[id]||id) + '" 선택됨';
+}
+
+function resetWizard(){
+  selectedPost = null;
+  gotoWizard(1);
+  ['wp1','wp2','wp3','wp4','wp5','wp6'].forEach(function(p){
+    var el = document.getElementById(p); if(el) el.style.borderColor='var(--border)';
+    var chk = document.getElementById('wc-'+p); if(chk) chk.style.display='none';
+  });
+  var lbl = document.getElementById('post-selected-label');
+  if(lbl) lbl.textContent='아직 선택하지 않았어요';
+}
+</script>
+</body>
+</html>

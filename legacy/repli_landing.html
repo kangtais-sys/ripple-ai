@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repli. | 나처럼 관리하는 내 SNS 비서</title>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --mint:#00C896;--mint-d:#00A87E;--mint-l:#ECFDF8;
+  --dark:#0F1319;--ink:#111827;--ink2:#374151;--ink3:#9CA3AF;
+  --bg:#fff;--soft:#F8FAFC;--line:#E8ECF0;
+}
+html{scroll-behavior:smooth}
+body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes scrollUp{0%{transform:translateY(0)}100%{transform:translateY(-50%)}}
+@keyframes glow{0%,100%{box-shadow:0 0 0 0 rgba(0,200,150,.2)}50%{box-shadow:0 0 0 12px rgba(0,200,150,0)}}50%{transform:scale(1.03)}}
+.fade-in{opacity:0;transform:translateY(20px);transition:opacity .6s ease,transform .6s ease}
+.fade-in.visible{opacity:1;transform:none}
+
+/* ── LAYOUT ── */
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+.wrap-narrow{max-width:720px;margin:0 auto;padding:0 24px}
+
+/* ── URGENCY ── */
+.urgency{background:var(--dark);color:#fff;text-align:center;padding:9px 20px;font-size:12px;font-weight:600;position:sticky;top:0;z-index:102}
+.urgency em{color:var(--mint);font-style:normal;font-weight:800}
+
+/* ── NAV ── */
+.nav{position:sticky;top:36px;left:0;right:0;z-index:101;transition:.3s;background:transparent}.nav-inner{max-width:1080px;margin:0 auto;padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
+.nav.scrolled{background:rgba(255,255,255,.95);backdrop-filter:blur(20px);box-shadow:0 1px 12px rgba(0,0,0,.06)}
+.nav-logo{font-size:20px;font-weight:800;letter-spacing:-.8px;color:var(--ink)}
+.nav-logo em{color:var(--mint);font-style:normal}
+.nav-links{display:flex;align-items:center;gap:28px}
+.nav-links a{font-size:13px;font-weight:500;color:var(--ink3);text-decoration:none;transition:color .15s}
+.nav-links a:hover{color:var(--mint)}
+.nav-btn{padding:10px 20px;background:var(--dark);color:#fff;border-radius:100px;font-size:13px;font-weight:700;border:none;cursor:pointer;transition:background .15s}
+.nav-btn:hover{background:var(--mint)}
+
+/* ── HERO ── */
+.hero{min-height:auto;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:100px 24px 64px;background:linear-gradient(180deg,var(--mint-l) 0%,var(--bg) 60%)}
+.hero-eye{display:inline-flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--line);padding:6px 16px;border-radius:100px;font-size:12px;font-weight:600;color:var(--ink2);margin-bottom:20px;box-shadow:0 2px 8px rgba(0,0,0,.04);animation:fadeUp .5s ease both}
+.hero-title{font-size:clamp(34px,5.5vw,62px);font-weight:700;line-height:1.18;letter-spacing:-1.5px;margin-bottom:8px;color:var(--dark);animation:fadeUp .5s .08s ease both;word-break:keep-all}
+.hero-title em{font-style:normal;color:var(--mint)}
+.hero-title strong{display:block;font-weight:800}
+.hero-sub{font-size:clamp(14px,2vw,18px);color:var(--ink2);line-height:1.75;margin:14px auto 24px;max-width:520px;animation:fadeUp .5s .16s ease both;word-break:keep-all;font-weight:500}
+.hero-sub strong{color:var(--mint);font-weight:700}
+.hero-cta{animation:fadeUp .5s .22s ease both;display:flex;flex-direction:column;align-items:center;gap:12px}
+.btn-main{padding:18px 48px;background:var(--mint);color:#fff;border-radius:16px;font-size:17px;font-weight:700;border:none;cursor:pointer;box-shadow:0 6px 24px rgba(0,200,150,.3);transition:transform .15s,box-shadow .15s;animation:glow 3s infinite}
+.btn-main:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(0,200,150,.4)}
+.btn-main:active{transform:scale(.97)}
+.hero-trust{display:flex;align-items:center;gap:20px;font-size:12px;font-weight:600;color:var(--ink3);flex-wrap:wrap;justify-content:center}
+
+/* ── PROOF ── */
+.proof{padding:44px 24px;display:flex;justify-content:center;gap:clamp(32px,6vw,80px);border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--soft)}
+.proof-item{text-align:center}
+.proof-val{font-size:clamp(24px,4vw,38px);font-weight:700;color:var(--ink);letter-spacing:-1px}
+.proof-val em{color:var(--mint);font-style:normal}
+.proof-lbl{font-size:12px;font-weight:500;color:var(--ink3);margin-top:4px}
+
+/* ── DASHBOARD ── */
+.dash-bg{background:var(--dark);padding:80px 24px}
+.dash-inner{max-width:960px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:start}
+.dash-left h2{font-size:clamp(28px,4vw,44px);font-weight:700;color:#fff;letter-spacing:-1px;line-height:1.2;margin-bottom:14px}
+.dash-left p{font-size:15px;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:28px}
+.dash-label{font-size:10px;font-weight:700;color:var(--mint);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px;opacity:.8}
+.d-cta-link{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:var(--mint);cursor:pointer;margin-top:16px}
+.d-card{background:rgba(255,255,255,.06);border-radius:20px;border:1px solid rgba(255,255,255,.08);padding:20px;margin-bottom:10px}
+.d-card-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.d-card-name{font-size:11px;font-weight:600;color:rgba(255,255,255,.5)}
+.ai-badge{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--mint);background:rgba(0,200,150,.15);padding:3px 9px;border-radius:100px}
+.ai-dot{width:5px;height:5px;border-radius:50%;background:var(--mint);animation:pulse 2s infinite}
+.d-amount{font-size:30px;font-weight:700;color:#fff;letter-spacing:-1px;line-height:1;margin-bottom:3px}
+.d-amount-note{font-size:11px;color:rgba(255,255,255,.4);margin-bottom:14px}
+.d-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.d-stat{text-align:center}
+.d-stat-v{font-size:15px;font-weight:700;color:#fff}
+.d-stat-l{font-size:10px;color:rgba(255,255,255,.4);margin-top:2px}
+.d-feed{background:rgba(255,255,255,.04);border-radius:12px;border:1px solid rgba(255,255,255,.06);overflow:hidden;height:76px;position:relative;margin-top:8px}
+.d-feed-inner{animation:scrollUp 9s linear infinite}
+.d-row{display:flex;align-items:center;gap:8px;padding:5px 12px;font-size:11px;color:rgba(255,255,255,.4)}
+.d-tick{width:1px;height:7px;background:rgba(255,255,255,.12);flex-shrink:0}
+.d-fade{position:absolute;left:0;right:0;height:14px;z-index:2;pointer-events:none}
+.d-fade.t{top:0;background:linear-gradient(to bottom,rgba(15,19,25,1),transparent)}
+.d-fade.b{bottom:0;background:linear-gradient(to top,rgba(15,19,25,1),transparent)}
+.d-urgent{display:flex;align-items:center;gap:10px;background:rgba(255,77,77,.12);border:1px solid rgba(255,77,77,.18);border-radius:12px;padding:12px 14px;margin-top:8px}
+.d-urgent-dot{width:7px;height:7px;border-radius:50%;background:#FF4D4D;flex-shrink:0;animation:pulse 1.5s infinite}
+.d-urgent-t{font-size:12px;font-weight:700;color:#fff}
+.d-urgent-s{font-size:11px;color:rgba(255,255,255,.4);margin-top:1px}
+
+/* ── SECTIONS ── */
+.sec{padding:80px 24px}
+.sec-eye{font-size:10px;font-weight:700;color:var(--mint);letter-spacing:1.5px;text-transform:uppercase;text-align:center;margin-bottom:12px;display:block}
+.sec-title{font-size:clamp(24px,3.5vw,38px);font-weight:700;line-height:1.2;letter-spacing:-.8px;text-align:center;margin-bottom:8px;word-break:keep-all}
+.sec-sub{font-size:15px;color:var(--ink3);text-align:center;line-height:1.6;margin-bottom:48px;font-weight:500}
+
+/* ── HOW IT WORKS ── */
+.step-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:32px;max-width:860px;margin:0 auto}
+.step-card{text-align:center}
+.step-num{width:36px;height:36px;border-radius:10px;background:var(--dark);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;margin:0 auto 16px}
+.step-t{font-size:16px;font-weight:700;color:var(--ink);margin-bottom:8px}
+.step-d{font-size:13px;color:var(--ink2);line-height:1.65}
+.step-tag{display:inline-block;margin-top:8px;font-size:11px;font-weight:700;padding:3px 10px;border-radius:5px;background:var(--mint-l);color:var(--mint-d)}
+.step-divider{display:none}
+
+/* ── FEATURES ── */
+.feat-bg{background:var(--soft)}
+.feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:960px;margin:0 auto}
+.feat-card{background:var(--bg);border-radius:20px;border:1px solid var(--line);padding:24px;transition:border-color .2s,transform .2s}
+.feat-card:hover{border-color:var(--mint);transform:translateY(-2px)}
+.feat-ico{width:42px;height:42px;border-radius:12px;background:var(--soft);border:1px solid var(--line);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.feat-ico svg{width:19px;height:19px;stroke:var(--ink2);stroke-width:1.7;fill:none}
+.feat-name{font-size:15px;font-weight:700;color:var(--ink);margin-bottom:6px}
+.feat-desc{font-size:13px;color:var(--ink2);line-height:1.65}
+.feat-card.accent{background:var(--dark);border-color:var(--dark);grid-column:span 3}
+.feat-card.accent .feat-ico{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.1)}
+.feat-card.accent .feat-ico svg{stroke:rgba(255,255,255,.6)}
+.feat-card.accent .feat-name{color:#fff;font-size:18px}
+.feat-card.accent .feat-desc{color:rgba(255,255,255,.55);font-size:14px}
+.feat-card.accent .inner{display:flex;gap:32px;align-items:center}
+.feat-card.accent .inner .feat-ico{width:56px;height:56px;flex-shrink:0}
+.feat-card.accent .inner .feat-ico svg{width:26px;height:26px}
+
+/* ── COMPARISON ── */
+.comp-table{width:100%;border-collapse:separate;border-spacing:0;border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,.08);font-size:13px}
+.comp-table th{background:var(--dark);color:#fff;padding:14px 16px;text-align:center;font-size:12px;font-weight:700}
+.comp-table th:first-child{text-align:left;background:var(--dark)}
+.comp-table th.repli-col{color:var(--mint);background:var(--mint-l);border-radius:8px 8px 0 0}
+.comp-table td{padding:13px 16px;text-align:center;border-bottom:1px solid var(--line);color:var(--ink2);vertical-align:middle}
+.comp-table td:first-child{text-align:left;font-weight:600;color:var(--ink)}
+.repli-td{background:#ECFDF5;font-weight:700;color:#065F46}
+.comp-x{color:#CBD5E1;font-size:14px}
+.comp-partial{color:var(--ink3);font-size:11px}
+
+/* ── PRICING ── */
+.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:900px;margin:0 auto;align-items:start}
+.plan-card{background:var(--bg);border-radius:20px;border:1.5px solid var(--line);padding:28px;position:relative;transition:border-color .2s,transform .2s}
+.plan-card:hover{border-color:var(--mint);transform:translateY(-2px)}
+.plan-card.featured{background:var(--dark);border-color:var(--dark)}
+.plan-badge{position:absolute;top:16px;right:16px;background:var(--mint);color:#fff;font-size:10px;font-weight:800;padding:4px 10px;border-radius:100px}
+.plan-name{font-size:13px;font-weight:700;color:var(--ink3);margin-bottom:6px}
+.plan-card.featured .plan-name{color:rgba(255,255,255,.5)}
+.plan-price{font-size:32px;font-weight:700;color:var(--ink);letter-spacing:-1px;margin-bottom:2px}
+.plan-card.featured .plan-price{color:#fff}
+.plan-price span{font-size:13px;font-weight:500;color:var(--ink3)}
+.plan-card.featured .plan-price span{color:rgba(255,255,255,.4)}
+.plan-desc{font-size:12px;color:var(--ink3);margin-bottom:20px}
+.plan-card.featured .plan-desc{color:rgba(255,255,255,.4)}
+.plan-feats{display:flex;flex-direction:column;gap:8px;margin-bottom:24px}
+.plan-feat{font-size:13px;color:var(--ink2);display:flex;align-items:flex-start;gap:7px}
+.plan-card.featured .plan-feat{color:rgba(255,255,255,.65)}
+.plan-feat::before{content:'✓';color:var(--mint);font-weight:800;font-size:12px;flex-shrink:0;margin-top:1px}
+.plan-btn{width:100%;padding:14px;border-radius:12px;font-size:14px;font-weight:700;border:none;cursor:pointer;transition:opacity .15s}
+.plan-btn:hover{opacity:.85}
+.plan-btn.dark{background:var(--dark);color:#fff}
+.plan-btn.green{background:var(--mint);color:#fff}
+
+/* ── FAQ ── */
+.faq-list{max-width:680px;margin:0 auto;display:flex;flex-direction:column}
+.faq-item{padding:20px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.faq-item:last-child{border:none}
+.faq-q{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.faq-q-text{font-size:15px;font-weight:700;color:var(--ink)}
+.faq-arrow{flex-shrink:0;transition:transform .2s}
+.faq-body{display:none;font-size:14px;color:var(--ink2);line-height:1.7;margin-top:12px;padding-right:24px}
+
+/* ── TESTIMONIALS ── */
+.testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:960px;margin:0 auto}
+.testi-card{background:var(--bg);border-radius:18px;border:1px solid var(--line);padding:24px}
+.testi-text{font-size:14px;color:var(--ink);line-height:1.75;margin-bottom:16px;font-weight:500}
+.testi-text strong{color:var(--mint)}
+.testi-footer{display:flex;align-items:center;gap:10px}
+.testi-av{width:34px;height:34px;border-radius:50%;background:var(--line);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--ink3);flex-shrink:0}
+.testi-name{font-size:13px;font-weight:700;color:var(--ink)}
+.testi-handle{font-size:11px;color:var(--ink3)}
+.stars{color:var(--mint);font-size:11px;margin-bottom:10px}
+
+/* ── FINAL CTA ── */
+.final-sec{padding:100px 24px;text-align:center;background:linear-gradient(180deg,var(--bg) 0%,var(--mint-l) 100%)}
+.final-title{font-size:clamp(28px,4vw,46px);font-weight:700;line-height:1.22;letter-spacing:-.8px;margin-bottom:14px;word-break:keep-all}
+.final-title em{font-style:normal;color:var(--mint)}
+.final-sub{font-size:15px;color:var(--ink3);margin-bottom:36px}
+.btn-final{padding:20px 56px;background:var(--mint);color:#fff;border-radius:16px;font-size:18px;font-weight:700;border:none;cursor:pointer;box-shadow:0 10px 28px rgba(0,200,150,.28);transition:transform .15s;animation:glow 3s infinite}
+.btn-final:hover{transform:translateY(-2px)}
+.cta-note{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:16px;font-size:12px;font-weight:600;color:var(--ink3)}
+.cta-dot{width:3px;height:3px;border-radius:50%;background:var(--line)}
+
+/* ── FOOTER ── */
+.footer{background:var(--soft);border-top:1px solid var(--line);padding:48px 24px}
+.footer-inner{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:32px;flex-wrap:wrap}
+.footer-logo{font-size:18px;font-weight:800;letter-spacing:-.8px;color:var(--ink);margin-bottom:10px}
+.footer-logo em{color:var(--mint);font-style:normal}
+.footer-info{font-size:11px;color:var(--ink3);line-height:2}
+.footer-info strong{color:#64748B;font-weight:600}
+.footer-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px}
+.footer-links{display:flex;gap:14px}
+.footer-links a{font-size:12px;font-weight:600;color:var(--ink3);text-decoration:none}
+.footer-copy{font-size:11px;color:#CBD5E1}
+
+/* ── STICKY (mobile only) ── */
+.sticky-bottom{position:fixed;bottom:0;left:0;right:0;z-index:100;padding:12px 20px calc(12px + env(safe-area-inset-bottom));background:rgba(255,255,255,.95);backdrop-filter:blur(20px);border-top:1px solid rgba(0,0,0,.05);transform:translateY(100%);transition:.3s;display:none}
+.sticky-bottom.show{transform:translateY(0)}
+.btn-sticky{width:100%;padding:15px;background:var(--mint);color:#fff;border-radius:14px;font-size:15px;font-weight:700;border:none;cursor:pointer}
+
+/* ── RESPONSIVE ── */
+.desktop-only{display:block !important}
+@media(max-width:768px){
+  .desktop-only{display:none !important}
+
+  .nav-links{display:none}
+  .dash-inner{grid-template-columns:1fr;gap:24px}
+  .step-grid{grid-template-columns:1fr;gap:0}
+  .step-card{text-align:left;display:flex;gap:16px;padding:20px 0;border-bottom:1px solid var(--line)}
+  .step-card:last-child{border:none}
+  .step-num{margin:0;flex-shrink:0;margin-top:2px}
+  .feat-grid{grid-template-columns:1fr;gap:12px}
+  .feat-card.accent{grid-column:span 1}
+  .feat-card.accent .inner{flex-direction:column;gap:16px}
+  .pricing-grid{grid-template-columns:1fr;gap:12px}
+  .testi-grid{grid-template-columns:1fr;gap:12px}
+  .footer-inner{flex-direction:column;gap:24px}
+  .footer-right{align-items:flex-start}
+  .sticky-bottom{display:block}
+  .sec{padding:60px 20px}
+  .proof{gap:20px;flex-wrap:wrap}
+  .btn-final{padding:18px 36px;font-size:16px;width:100%;max-width:360px}
+}
+
+@media(max-width:480px){
+  .comp-table{font-size:11px}
+  .comp-table th,.comp-table td{padding:9px 6px}
+}
+
+.feat-grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.feat-grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+@media(max-width:768px){
+  .feat-grid-3{grid-template-columns:1fr}
+  .feat-grid-2{grid-template-columns:1fr}
+}
+
+</style>
+</head>
+<body>
+
+<!-- URGENCY -->
+<div class="urgency">🔥 런칭 특가 <em>50% 할인</em> — 잔여 37석</div>
+
+<!-- NAV -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+  <div class="nav-logo">Repli<em>.</em></div>
+  <div class="nav-links">
+    <a href="#how">시작하기</a>
+    <a href="#features">기능</a>
+    <a href="#pricing">요금제</a>
+    <a href="#faq">자주 묻는 질문</a>
+  </div>
+  <button class="nav-btn" onclick="start()">7일 무료 시작</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eye">
+    <svg width="7" height="7" viewBox="0 0 8 8" fill="var(--mint)"><circle cx="4" cy="4" r="4"/></svg>
+    이미 20,231 계정 사용 중
+  </div>
+  <h1 class="hero-title">
+    자고 일어나면<br>
+    <strong><em>댓글 300개가</em> 응대 완료.</strong>
+  </h1>
+  <p class="hero-sub">
+    팔로워가 1만이든 30만이든,<br>
+    단 한 분의 이야기도 놓치고 싶지 않았어요.<br>
+    <strong>실제 30만 인플루언서가 직접 만든 내 SNS 비서.</strong>
+  </p>
+  <div class="hero-cta">
+    <button class="btn-main" onclick="start()">1초 만에 내 SNS 비서 만들기</button>
+    <div class="hero-trust">
+      <span>🔒 카드 등록 없음</span>
+      <span>⚡ 1분 만에 설정</span>
+      <span>✅ 공식 API 연동</span>
+    </div>
+  </div>
+</section>
+
+<!-- PROOF -->
+<div class="proof fade-in">
+  <div class="proof-item"><div class="proof-val">2.1<em>만</em></div><div class="proof-lbl">월 자동 응대건</div></div>
+  <div class="proof-item"><div class="proof-val">98<em>%</em></div><div class="proof-lbl">말투 일치도</div></div>
+  <div class="proof-item"><div class="proof-val">72<em>h</em></div><div class="proof-lbl">월 평균 절약 시간</div></div>
+</div>
+
+<!-- DASHBOARD -->
+<section class="dash-bg fade-in">
+  <div class="dash-inner wrap">
+    <div class="dash-left">
+      <div class="dash-label">지금 이 순간에도</div>
+      <h2>Repli가<br>관리하고 있어요.</h2>
+      <p>내가 자는 동안, 쉬는 동안, 촬영하는 동안.<br>팔로워의 모든 메시지에 Repli가 응답해요.</p>
+      <a class="d-cta-link" onclick="start()">이 대시보드를 내 계정으로 →</a>
+    </div>
+    <div class="dash-right">
+      <div class="d-card">
+        <div class="d-card-hdr">
+          <div class="d-card-name">레플리가 아껴준 내 시간값</div>
+          <div class="ai-badge"><div class="ai-dot"></div>AI ON</div>
+        </div>
+        <div class="d-amount">₩1,254,000</div>
+        <div class="d-amount-note">이번 달 · 절약 시간 72시간</div>
+        <div class="d-stats">
+          <div class="d-stat"><div class="d-stat-v">1,842</div><div class="d-stat-l">자동 응대</div></div>
+          <div class="d-stat"><div class="d-stat-v">98%</div><div class="d-stat-l">말투 일치도</div></div>
+          <div class="d-stat"><div class="d-stat-v">+89</div><div class="d-stat-l">신규 팔로워</div></div>
+        </div>
+      </div>
+      <div class="d-feed">
+        <div class="d-fade t"></div>
+        <div class="d-feed-inner">
+          <div class="d-row"><div class="d-tick"></div>@yuna__daily님 제품 문의 — 말투 98% 응대 완료</div>
+          <div class="d-row"><div class="d-tick"></div>@hazel_skin님 스토리 조회 및 좋아요 완료</div>
+          <div class="d-row"><div class="d-tick"></div>게시물 업로드 감지 → 저장·댓글 자동 실행</div>
+          <div class="d-row"><div class="d-tick"></div>@jjin_beauty님 성분 문의 응대 완료</div>
+          <div class="d-row"><div class="d-tick"></div>@cool_tommi99님 구매 링크 DM 발송 완료</div>
+          <div class="d-row"><div class="d-tick"></div>@yuna__daily님 제품 문의 — 말투 98% 응대 완료</div>
+          <div class="d-row"><div class="d-tick"></div>@hazel_skin님 스토리 조회 및 좋아요 완료</div>
+          <div class="d-row"><div class="d-tick"></div>게시물 업로드 감지 → 저장·댓글 자동 실행</div>
+          <div class="d-row"><div class="d-tick"></div>@jjin_beauty님 성분 문의 응대 완료</div>
+          <div class="d-row"><div class="d-tick"></div>@cool_tommi99님 구매 링크 DM 발송 완료</div>
+        </div>
+        <div class="d-fade b"></div>
+      </div>
+      <div class="d-urgent">
+        <div class="d-urgent-dot"></div>
+        <div><div class="d-urgent-t">수익 제안 2건 · 즉시 확인 필요</div><div class="d-urgent-s">카카오톡으로 알림 발송됨</div></div>
+        <svg style="margin-left:auto;flex-shrink:0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="sec fade-in" id="how">
+  <div class="wrap-narrow">
+    <span class="sec-eye">HOW IT WORKS</span>
+    <h2 class="sec-title">딱 3단계면 오늘부터 시작돼요</h2>
+    <p class="sec-sub">복잡한 설정 없이. 지금 당장.</p>
+  </div>
+  <div class="step-grid">
+    <div class="step-card">
+      <div class="step-num">1</div>
+      <div><div class="step-t">계정 연동</div><div class="step-d">Instagram, TikTok, YouTube를 공식 API로 안전하게 연결해요. 비밀번호를 입력하지 않아요.</div><div class="step-tag">🔒 공식 파트너 API</div></div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">2</div>
+      <div><div class="step-t">AI 말투 학습</div><div class="step-d">내 게시물 250개를 분석해 말투, 이모지, 뉘앙스까지 학습해요. 팬들이 눈치채지 못하는 수준으로.</div><div class="step-tag">🎯 말투 일치도 98%</div></div>
+    </div>
+    <div class="step-card">
+      <div class="step-num">3</div>
+      <div><div class="step-t">내 비서가 시작해요</div><div class="step-d">댓글, DM, 스토리 조회, 선댓글까지 Repli가 대신해요. 중요한 건 카카오톡으로 즉시 알려드려요.</div><div class="step-tag">⚡ 24시간 자동 운영</div></div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:48px;display:none" class="desktop-only">
+    <button class="btn-final" onclick="start()" style="padding:16px 44px;font-size:16px;animation:none;box-shadow:0 6px 20px rgba(0,200,150,.25)">지금 바로 시작하기</button>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="sec feat-bg fade-in" id="features">
+  <div class="wrap">
+    <span class="sec-eye">FEATURES</span>
+    <h2 class="sec-title" style="margin-bottom:8px">그 마음을 현실로 만드는 기능들.</h2>
+    <p class="sec-sub">팔로워 한 명도 빠짐없이, 내 말투 그대로.</p>
+
+    <!-- SNS 스타터 모드 -->
+    <div style="margin-bottom:40px">
+      <div style="display:inline-flex;align-items:center;gap:8px;background:var(--dark);color:#fff;padding:6px 16px;border-radius:100px;font-size:12px;font-weight:700;margin-bottom:16px">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--mint)" stroke-width="2.5"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        SNS 스타터 모드
+      </div>
+      <p style="font-size:13px;color:var(--ink3);margin-bottom:20px">게시물 올리면 알아서 실행. 팔로워를 끌어오는 자동화.</p>
+      <div class="feat-grid feat-grid-3">
+        <div class="feat-card">
+          <div class="feat-ico"><svg viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="feat-name">업로드하면 자동 실행</div>
+          <div class="feat-desc">게시물 올리면 3분 이내 셀프 저장, 공감 댓글, 해시태그 답글 자동 실행. 알고리즘을 타게 해줘요.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-ico"><svg viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="feat-name">타겟 스토리 자동 조회</div>
+          <div class="feat-desc">팔로워로 유도하고 싶은 계정의 스토리를 자연스러운 간격으로 조회·좋아요. 언팔 없는 팔로워 유입.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-ico"><svg viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="feat-name">타겟 댓글 자동 입력</div>
+          <div class="feat-desc">내 타겟 계정의 게시물에 내 말투로 자연스러운 선댓글을 자동 입력해요. 계정 노출을 늘리고 팔로워를 유입해요.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SNS 프로 모드 -->
+    <div>
+      <div style="display:inline-flex;align-items:center;gap:8px;background:var(--mint);color:#fff;padding:6px 16px;border-radius:100px;font-size:12px;font-weight:700;margin-bottom:16px">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><path d="M5 3l14 9-14 9V3z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        SNS 프로 모드
+      </div>
+      <p style="font-size:13px;color:var(--ink3);margin-bottom:20px">팔로워를 관리하고, 수익을 잡고, 중요한 건 놓치지 않는 프로급 기능.</p>
+      <div class="feat-card accent" style="margin-bottom:16px">
+        <div class="inner">
+          <div class="feat-ico"><svg viewBox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div><div class="feat-name">팔로워는 느껴요.<br><span style="font-size:14px;font-weight:600;color:rgba(255,255,255,.6)">진짜 나처럼 댓글/DM 답변</span></div><div class="feat-desc">이 크리에이터는 나를 진짜로 생각한다고. 팔로워 한 명 한 명의 메시지를 놓치기 싫었던 마음에서 태어났어요. 내 말투, 이모지, 뉘앙스 그대로 24시간 응대해요.</div></div>
+        </div>
+      </div>
+      <div class="feat-grid feat-grid-2">
+        <div class="feat-card">
+          <div class="feat-ico"><svg viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="feat-name">댓글 달면 DM 자동 발송</div>
+          <div class="feat-desc">"링크 알려줘" 댓글 하나에 자동 DM. 팬이 원하는 순간 즉시 응답.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-ico"><svg viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="feat-name">팔로워 CRM</div>
+          <div class="feat-desc">VVIP·열성팬·요주의 자동 분류 + 감정분석. 진짜 팬이 누군지 한눈에.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-ico"><svg viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="feat-name">수익 제안 자동 분류</div>
+          <div class="feat-desc">광고, 협찬, 수출, B2B 문의 자동 분류. 기회를 놓치지 않아요.</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-ico"><svg viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="feat-name">카카오톡 즉시 알림</div>
+          <div class="feat-desc">부정 이슈, 중요 협업이 오면 즉시 카카오톡 알림. 중요한 것만 직접 챙기면 돼요.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section class="sec fade-in">
+  <div class="wrap">
+    <span class="sec-eye">VS COMPETITORS</span>
+    <h2 class="sec-title" style="margin-bottom:8px">왜 Repli인지, 비교하면 바로 보여요.</h2>
+    <p class="sec-sub">크리에이터 전용 AI 비서는 Repli가 유일합니다.</p>
+    <table class="comp-table">
+      <thead><tr><th style="text-align:left">기능</th><th class="repli-col">Repli</th><th>소셜비즈</th><th>ManyChat</th><th>키티챗</th></tr></thead>
+      <tbody>
+        <tr><td>AI 말투 학습</td><td class="repli-td">✓ 98%</td><td class="comp-x">✗</td><td class="comp-x">✗</td><td class="comp-x">✗</td></tr>
+        <tr><td>스토리 자동조회</td><td class="repli-td">✓</td><td class="comp-x">✗</td><td class="comp-x">✗</td><td class="comp-x">✗</td></tr>
+        <tr><td>팔로워 CRM</td><td class="repli-td">✓</td><td class="comp-x">✗</td><td class="comp-x">✗</td><td class="comp-x">✗</td></tr>
+        <tr><td>수익제안 분류</td><td class="repli-td">✓</td><td class="comp-x">✗</td><td class="comp-x">✗</td><td class="comp-x">✗</td></tr>
+        <tr><td>멀티 플랫폼</td><td class="repli-td">IG+TK+YT</td><td class="comp-partial">IG+FB</td><td class="comp-partial">IG+FB</td><td class="comp-partial">IG only</td></tr>
+        <tr><td>댓글→DM 자동</td><td class="repli-td">✓</td><td>✓</td><td>✓</td><td class="comp-partial">제한</td></tr>
+        <tr><td>카카오톡 알림</td><td class="repli-td">✓</td><td class="comp-x">✗</td><td class="comp-x">✗</td><td class="comp-x">✗</td></tr>
+        <tr><td>월 가격 (기본)</td><td class="repli-td">₩29,000</td><td>₩29,000</td><td>~₩20,000</td><td>₩9,900~</td></tr>
+      </tbody>
+    </table>
+    <div style="text-align:center;margin-top:36px">
+      <button class="btn-final" onclick="start()" style="padding:16px 44px;font-size:16px;animation:none;box-shadow:0 6px 20px rgba(0,200,150,.25)">지금 바로 시작하기</button>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="sec feat-bg fade-in">
+  <div class="wrap">
+    <span class="sec-eye">REVIEWS</span>
+    <h2 class="sec-title" style="margin-bottom:8px">먼저 써본 크리에이터들의 이야기</h2>
+    <p class="sec-sub">솔직한 후기 그대로</p>
+    <div class="testi-grid">
+      <div class="testi-card"><div class="stars">★★★★★</div><div class="testi-text">"팔로워가 1만일 때도 지금도 한 명 한 명의 댓글이 소중한 마음은 똑같아요. <strong>이제 그 마음을 실제로 지킬 수 있어요.</strong>"</div><div class="testi-footer"><div class="testi-av">유</div><div><div class="testi-name">유민혜 · @yuminhye_beauty</div><div class="testi-handle">뷰티 인플루언서 · 팔로워 31.2만</div></div></div></div>
+      <div class="testi-card"><div class="stars">★★★★★</div><div class="testi-text">"공구할 때마다 DM이 폭발해서 스트레스였는데, 이제 Repli가 다 처리해줘요. <strong>월 매출이 30% 올랐어요.</strong>"</div><div class="testi-footer"><div class="testi-av">지</div><div><div class="testi-name">지수 · @jisu_style</div><div class="testi-handle">패션 크리에이터 · 팔로워 18.4만</div></div></div></div>
+      <div class="testi-card"><div class="stars">★★★★★</div><div class="testi-text">"수출 문의를 놓친 게 얼마나 많았을지... <strong>Repli 쓰고 나서 수출 문의만 4건</strong>을 처리했어요."</div><div class="testi-footer"><div class="testi-av">하</div><div><div class="testi-name">하은 · @hazel_skin</div><div class="testi-handle">스킨케어 유튜버 · 팔로워 24만</div></div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="sec fade-in" id="pricing">
+  <div class="wrap">
+    <span class="sec-eye">PRICING</span>
+    <h2 class="sec-title" style="margin-bottom:8px">커피 한잔 값으로 시작하세요.</h2>
+    <p class="sec-sub">7일 무료 체험 후 결제 · 언제든 취소 가능</p>
+    <div class="pricing-grid">
+      <div class="plan-card">
+        <div class="plan-name">베이직</div>
+        <div class="plan-price">₩29,000<span> / 월</span></div>
+        <div class="plan-desc">개인 크리에이터에 딱 맞아요</div>
+        <div class="plan-feats">
+          <div class="plan-feat">월 3,300건 자동 응대</div>
+          <div class="plan-feat">계정 2개 (IG + TK 또는 YT)</div>
+          <div class="plan-feat">AI 말투 학습</div>
+          <div class="plan-feat">카카오톡 알림</div>
+        </div>
+        <button class="plan-btn dark" onclick="start()">7일 무료로 시작</button>
+      </div>
+      <div class="plan-card featured">
+        <div class="plan-badge">추천</div>
+        <div class="plan-name">프리미엄</div>
+        <div class="plan-price">₩59,000<span> / 월</span></div>
+        <div class="plan-desc">활발히 운영 중인 계정에 추천</div>
+        <div class="plan-feats">
+          <div class="plan-feat">월 6,600건 자동 응대</div>
+          <div class="plan-feat">계정 3개 (IG + TK + YT)</div>
+          <div class="plan-feat">AI 말투 학습</div>
+          <div class="plan-feat">수익 제안 자동 분류</div>
+          <div class="plan-feat">타겟 스토리 조회</div>
+          <div class="plan-feat">팔로워 CRM 전체</div>
+          <div class="plan-feat">카카오톡 알림 전체</div>
+        </div>
+        <button class="plan-btn green" onclick="start()">7일 무료로 시작</button>
+      </div>
+      <div class="plan-card">
+        <div class="plan-name">비즈니스</div>
+        <div class="plan-price">₩129,000<span> / 월</span></div>
+        <div class="plan-desc">브랜드·에이전시 운영에 최적</div>
+        <div class="plan-feats">
+          <div class="plan-feat">월 무제한 자동 응대</div>
+          <div class="plan-feat">계정 10개</div>
+          <div class="plan-feat">전용 AI 말투 세분화</div>
+          <div class="plan-feat">수출·B2B 자동 분류</div>
+          <div class="plan-feat">전담 매니저 지원</div>
+        </div>
+        <button class="plan-btn dark" onclick="start()">문의하기</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section class="sec feat-bg fade-in" id="faq">
+  <div class="wrap">
+    <span class="sec-eye">FAQ</span>
+    <h2 class="sec-title" style="margin-bottom:36px">자주 묻는 질문</h2>
+    <div class="faq-list">
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q"><div class="faq-q-text">내 계정이 정지되거나 제한될 수 있나요?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="faq-body">아니요. Repli는 Meta, TikTok, YouTube의 공식 파트너 API만 사용해요. OAuth 방식으로만 연동되기 때문에 계정 정지 위험이 없어요.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q"><div class="faq-q-text">팔로워들이 AI인지 눈치챌 수 있나요?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="faq-body">게시물 250개 이상을 분석해 말투, 이모지, 자주 쓰는 표현까지 학습해요. 말투 일치도 98% 수준으로 팔로워들은 사실상 구별하지 못해요.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q"><div class="faq-q-text">무료 체험 후 자동으로 결제되나요?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="faq-body">7일 무료 체험 기간 중에는 카드 등록 없이 시작할 수 있어요. 체험 종료 3일 전 카카오톡으로 알림을 드리며, 체험 기간 안에 취소하면 요금이 청구되지 않아요.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q"><div class="faq-q-text">TikTok 댓글도 자동으로 응대해주나요?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="faq-body">현재 TikTok은 공식 API 정책상 댓글 답글 기능을 외부 앱에 제공하지 않아요. TikTok에서는 영상 업로드 자동화와 댓글 모니터링은 가능해요. Instagram과 YouTube는 댓글 자동 응대가 완전히 지원돼요.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q"><div class="faq-q-text">팔로워가 적어도 효과가 있나요?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="faq-body">오히려 팔로워가 적을 때 더 효과적이에요. 빠른 댓글 응대는 알고리즘이 선호하는 지표예요. 팔로워 1만 계정도 응대 속도가 빨라지면 성장 속도가 달라져요.</div>
+      </div>
+      <div class="faq-item" onclick="toggleFaq(this)">
+        <div class="faq-q"><div class="faq-q-text">언제든 취소할 수 있나요?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="faq-body">네. 앱 내 내 정보 → 이용권에서 언제든 취소할 수 있어요. 취소 후에는 현재 결제 기간이 끝날 때까지 서비스를 계속 이용할 수 있어요. 위약금은 없어요.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<section class="final-sec fade-in">
+  <h2 class="final-title">지금 이 순간에도,<br><em>내 팔로워는 기다리고 있어요.</em></h2>
+  <p class="final-sub">7일 무료 체험. 언제든 취소 가능.</p>
+  <button class="btn-final" onclick="start()">7일 무료 체험 시작하기</button>
+  <div class="cta-note">
+    <span>공식 파트너 API</span><div class="cta-dot"></div><span>즉시 시작</span>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div>
+      <div class="footer-logo">Repli<em>.</em></div>
+      <div class="footer-info">
+        <strong>(주)공팔리터글로벌</strong><br>
+        사업자등록번호 411-87-02704<br>
+        서울시 서초구 논현로175 신한빌딩 7F<br>
+        고객센터 카카오채널 <strong>@레플리</strong><br>
+        제휴·제안 <a href="mailto:repli@08liter.com" style="color:#64748B;font-weight:600;text-decoration:none">repli@08liter.com</a>
+      </div>
+    </div>
+    <div class="footer-right">
+      <div class="footer-links">
+        <a href="repli_terms.html">이용약관</a>
+        <a href="repli_terms.html?tab=privacy">개인정보처리방침</a>
+      </div>
+      <div class="footer-copy">© 2026 0.8L Global Co., Ltd. All rights reserved.</div>
+    </div>
+  </div>
+</footer>
+
+<!-- STICKY (mobile) -->
+<div class="sticky-bottom" id="sticky">
+  <button class="btn-sticky" onclick="start()">7일 무료 체험 시작하기</button>
+</div>
+
+<script>
+const nav = document.getElementById('nav');
+const sticky = document.getElementById('sticky');
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  if(y > 60) nav.classList.add('scrolled'); else nav.classList.remove('scrolled');
+  if(y > 400) sticky.classList.add('show'); else sticky.classList.remove('show');
+});
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, {threshold: 0.08});
+document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+function toggleFaq(el) {
+  var body = el.querySelector('.faq-body');
+  var arrow = el.querySelector('.faq-arrow');
+  var isOpen = body.style.display === 'block';
+  body.style.display = isOpen ? 'none' : 'block';
+  arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+function start() { window.location.href = 'https://kangtais-sys.github.io/ripple-ai/repli_v3.html'; }
+</script>
+</body>
+</html>
