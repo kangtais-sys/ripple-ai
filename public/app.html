@@ -383,15 +383,15 @@ input:checked+.tsl::before{transform:translateX(18px)}
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;margin-top:18px">
       <div style="text-align:center;padding:0 4px">
-        <div style="font-size:24px;font-weight:900;color:var(--t1);letter-spacing:-.5px;line-height:1">1,842</div>
+        <div id="stat-replies" style="font-size:24px;font-weight:900;color:var(--t1);letter-spacing:-.5px;line-height:1">1,842</div>
         <div style="font-size:10px;font-weight:500;color:var(--t3);margin-top:4px">자동 응대</div>
       </div>
       <div style="text-align:center;padding:0 4px;border-left:1px solid var(--b);border-right:1px solid var(--b)">
-        <div style="font-size:24px;font-weight:900;color:var(--t1);letter-spacing:-.5px;line-height:1">72h</div>
+        <div id="stat-hours" style="font-size:24px;font-weight:900;color:var(--t1);letter-spacing:-.5px;line-height:1">72h</div>
         <div style="font-size:10px;font-weight:500;color:var(--t3);margin-top:4px">절약 시간</div>
       </div>
       <div style="text-align:center;padding:0 4px">
-        <div style="font-size:24px;font-weight:900;color:var(--mint);letter-spacing:-.5px;line-height:1">+89</div>
+        <div id="stat-followers" style="font-size:24px;font-weight:900;color:var(--mint);letter-spacing:-.5px;line-height:1">+89</div>
         <div style="font-size:10px;font-weight:500;color:var(--t3);margin-top:4px">신규 팔로워</div>
       </div>
     </div>
@@ -1548,6 +1548,48 @@ async function doResetPassword() {
   cm('m-find-account');
 }
 
+// 대시보드 실데이터 로드
+async function loadDashboardData() {
+  try {
+    var res = await fetch('/api/dashboard');
+    if (!res.ok) return;
+    var d = await res.json();
+
+    // ROI 금액 애니메이션
+    var roiEl = document.getElementById('roi-v');
+    if (roiEl) {
+      var target = d.savedWon || 0;
+      var cur = 0;
+      var steps = 55;
+      var tm = setInterval(function() {
+        cur += target / steps;
+        if (cur >= target) { cur = target; clearInterval(tm); }
+        roiEl.textContent = Math.floor(cur).toLocaleString('ko-KR');
+      }, 16);
+    }
+
+    // 진행률 바
+    var fillEl = document.getElementById('roi-fill');
+    if (fillEl) {
+      setTimeout(function() {
+        fillEl.style.width = (d.usage.percent || 0) + '%';
+      }, 400);
+    }
+
+    // 통계 숫자
+    var statReplies = document.getElementById('stat-replies');
+    if (statReplies) statReplies.textContent = (d.usage.total || 0).toLocaleString('ko-KR');
+
+    var statHours = document.getElementById('stat-hours');
+    if (statHours) statHours.textContent = (d.savedHours || 0) + 'h';
+
+    var statFollowers = document.getElementById('stat-followers');
+    if (statFollowers) statFollowers.textContent = '+' + (d.igAccounts ? d.igAccounts.length : 0);
+  } catch (e) {
+    console.error('loadDashboardData error:', e);
+  }
+}
+
 // 페이지 로드 시 세션 확인 + 해시 라우팅
 async function checkAuth() {
   var res = await sb.auth.getSession();
@@ -1555,6 +1597,7 @@ async function checkAuth() {
 
   if (res.data.session) {
     go('home');
+    loadDashboardData();
   } else if (hash === 'signup') {
     go('signup');
   } else if (hash === 'login') {
@@ -1569,21 +1612,6 @@ window.addEventListener('load', function(){
   var qdEl=document.getElementById('q-dm');
   if(qcEl) qcEl.textContent=qc+'건';
   if(qdEl) qdEl.textContent=qd+'건';
-  // ROI 카운터
-  var el=document.getElementById('roi-v');
-  if(el){
-    var t=1254000, cur=0;
-    var tm=setInterval(function(){
-      cur+=t/55;
-      if(cur>=t){ cur=t; clearInterval(tm); }
-      el.textContent=Math.floor(cur).toLocaleString('ko-KR');
-    }, 16);
-  }
-  // 진행률 바
-  setTimeout(function(){
-    var f=document.getElementById('roi-fill');
-    if(f) f.style.width='47%';
-  }, 400);
   checkAuth();
 });
 </script>
