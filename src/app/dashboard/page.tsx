@@ -39,15 +39,15 @@ export default async function DashboardPage() {
 
       {/* 계정 연동 안내 */}
       {!hasIg && (
-        <div className="bg-[#1A1F27] rounded-[20px] p-[18px_20px] mb-3.5 flex justify-between items-center cursor-pointer">
-          <div>
-            <div className="text-[15px] font-extrabold text-white">Instagram 계정을 연동해주세요</div>
-            <div className="text-[11px] text-white/50 mt-[3px]">연동하면 AI가 자동으로 관리를 시작해요</div>
+        <Link href="/dashboard/connect" className="block bg-[#F0FDF9] border border-[#00C896]/20 rounded-[20px] p-[18px_20px] mb-3.5 no-underline">
+          <div className="flex justify-between items-center">
+            <div>
+              <div className="text-[15px] font-extrabold text-[#1A1F27]">Instagram 계정을 연동해주세요</div>
+              <div className="text-[11px] text-[#00C896] mt-[3px]">연동하면 AI가 자동으로 관리를 시작해요</div>
+            </div>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00C896" strokeWidth={2}><path d="M9 5l7 7-7 7" /></svg>
           </div>
-          <Link href="/dashboard/connect">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.35)" strokeWidth={2}><path d="M9 5l7 7-7 7" /></svg>
-          </Link>
-        </div>
+        </Link>
       )}
 
       {/* ROI 카드 */}
