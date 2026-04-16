@@ -102,10 +102,16 @@ CLAUDE.md                           이 파일
 - [x] Instagram OAuth 연동
 - [x] Webhook 엔드포인트 (댓글 감지 → Claude 응대 → Instagram 발송)
 - [x] Webhook 검증 테스트 통과
-- [ ] Claude 말투 학습 파이프라인
-- [ ] DM 응대 구현
-- [ ] 카카오 알림톡 연동
-- [ ] 포트원 구독 결제 연동
+- [x] Claude 말투 학습 파이프라인 (/dashboard/tone + /api/tone/learn)
+- [x] DM 자동 응대 (Webhook → Claude → Instagram Send API)
+- [x] 응대 내역 페이지 (/dashboard/logs)
+- [x] 플랜별 한도 체크 (Webhook에서 자동 스킵)
+- [x] 포트원 구독 결제 API (/api/payment/subscribe + webhook)
+- [x] 이용권 페이지 (/dashboard/plan)
+- [x] 카카오 알림톡 함수 (구독 완료 시 발송)
+- [ ] Meta Webhook 등록 (대시보드에서 수동)
+- [ ] 포트원 가입 + API 키 세팅
+- [ ] 카카오 알림톡 채널 세팅
 
 ### 트랙 C — 마케팅
 - [ ] 포트원 가입
