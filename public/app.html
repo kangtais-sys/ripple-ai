@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Repli</title>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --dark:#1A1F27;--mint:#00C896;--mint-l:#F0FDF9;--mint-d:#00A87E;
+  --red:#FF4D4D;--red-l:#FFF1F3;--amber:#F59E0B;--amber-l:#FFFBEB;
+  --bg:#F9FAFB;--s:#FFFFFF;--b:#F0F2F5;
+  --t1:#1A1F27;--t2:#64748B;--t3:#94A3B8;--nav-h:68px;
+}
+body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--t1);max-width:430px;margin:0 auto;min-height:100vh;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%}
+.vw{display:none;padding:0 20px calc(var(--nav-h) + env(safe-area-inset-bottom) + 40px) 20px}.vw.on{display:block}
+
+/* NAV */
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:calc(var(--nav-h) + env(safe-area-inset-bottom));background:var(--s);border-top:1px solid var(--b);display:flex;padding:0 2px env(safe-area-inset-bottom);z-index:100}
+.nb{flex:1;border:none;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--t3);font-size:10px;font-weight:700;cursor:pointer;transition:color .15s;position:relative}
+.nb.on{color:var(--dark)}.nb svg{width:22px;height:22px;stroke-width:1.8}
+.nb-pip{position:absolute;top:9px;right:calc(50% - 12px);width:5px;height:5px;border-radius:50%;background:var(--red);border:1.5px solid var(--s)}
+
+/* HEADER */
+.hdr{display:flex;justify-content:space-between;align-items:center;padding:20px 0 16px}
+.logo{font-size:26px;font-weight:900;letter-spacing:-1.2px;color:var(--dark)}.logo em{color:var(--mint);font-style:normal}
+.ai-chip{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--mint);cursor:pointer}
+.ai-dot{width:6px;height:6px;background:var(--mint);border-radius:50%;animation:bl 2s ease infinite}
+@keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ROI */
+.roi-card{background:var(--s);border-radius:24px;padding:24px;border:1px solid var(--b);box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.roi-lbl{font-size:13px;font-weight:600;color:var(--t2);margin-bottom:8px}
+.roi-amt{font-size:32px;font-weight:900;letter-spacing:-1px;margin-bottom:12px;line-height:1}
+.roi-track{height:4px;background:var(--b);border-radius:2px;overflow:hidden;margin-bottom:6px}
+.roi-fill{height:100%;width:0;background:var(--mint);border-radius:2px;transition:width 1.2s cubic-bezier(.4,0,.2,1)}
+.roi-note{font-size:12px;color:var(--t3);font-weight:500;text-align:right;margin-bottom:18px}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.stat-box{background:var(--bg);padding:12px;border-radius:14px}
+.stat-lbl{font-size:10px;font-weight:600;color:var(--t3);margin-bottom:4px}
+.stat-val{font-size:16px;font-weight:800;color:var(--t1)}
+
+/* ALERT */
+.alert{background:var(--dark);border-radius:20px;padding:18px 20px;margin:14px 0;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.alert-t{font-size:15px;font-weight:800;color:#fff}.alert-s{font-size:11px;color:rgba(255,255,255,.5);margin-top:3px}
+.alert-arr svg{width:18px;height:18px;stroke:rgba(255,255,255,.35);stroke-width:2}
+
+/* SECTION */
+.sec-t{font-size:15px;font-weight:800;color:var(--t1);margin:20px 0 10px;letter-spacing:-.3px}
+
+/* LIVE */
+.live-box{background:var(--s);border-radius:20px;border:1px solid var(--b);overflow:hidden;height:98px;position:relative;margin-bottom:14px}
+.live-stream{animation:lu 10s linear infinite;padding:6px 0}
+@keyframes lu{0%{transform:translateY(0)}100%{transform:translateY(-50%)}}
+.lrow{display:flex;align-items:center;gap:10px;padding:7px 18px;font-size:12px;color:var(--t2)}
+.ldash{width:12px;height:1px;background:var(--b);flex-shrink:0}
+.lfade{position:absolute;left:0;right:0;height:20px;z-index:2;pointer-events:none}
+.lfade.t{top:0;background:linear-gradient(to bottom,#fff,transparent)}.lfade.b{bottom:0;background:linear-gradient(to top,#fff,transparent)}
+
+/* TASK CARD */
+.task-card{background:var(--s);border-radius:20px;border:1px solid var(--b);overflow:hidden}
+.trow{display:flex;align-items:center;gap:14px;padding:15px 18px;border-bottom:1px solid var(--b);cursor:pointer;transition:background .1s}
+.trow:last-child{border:none}.trow:active{background:var(--bg)}
+.tck{width:19px;height:19px;border-radius:50%;border:1.5px solid var(--b);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.tck.done{background:var(--mint);border-color:var(--mint)}.tck svg{display:none;width:10px;height:10px}.tck.done svg{display:block}
+.tb{flex:1}.tt{font-size:14px;font-weight:700;color:var(--t1)}.ts{font-size:11px;color:var(--t3);margin-top:2px}
+
+/* BADGES */
+.badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:2px 8px;border-radius:5px;white-space:nowrap}
+.bn{background:var(--bg);color:var(--t2)}.br{background:var(--red-l);color:var(--red)}.bg{background:var(--mint-l);color:var(--mint-d)}.ba{background:var(--amber-l);color:var(--amber)}
+
+/* ACCORDION */
+.acc{background:var(--s);border-radius:20px;border:1px solid var(--b);margin-bottom:10px;overflow:hidden}
+.acc-hdr{display:flex;align-items:center;gap:14px;padding:18px;cursor:pointer;transition:background .1s}
+.acc-hdr:active{background:var(--bg)}
+.acc-ico{width:40px;height:40px;border-radius:12px;background:var(--bg);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.acc-ico svg{width:18px;height:18px;stroke:var(--t2);stroke-width:1.8}
+.acc-copy{flex:1}.acc-name{font-size:14px;font-weight:800;color:var(--t1);line-height:1.2}.acc-sub{font-size:12px;color:var(--t2);margin-top:2px}
+.acc-aside{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.acc-chev svg{width:16px;height:16px;stroke:var(--t3);stroke-width:2;transition:transform .2s}
+.acc.open .acc-chev svg{transform:rotate(180deg)}
+.acc-body{display:none;border-top:1px solid var(--b);padding:20px 18px}.acc.open .acc-body{display:block}
+
+/* TOGGLE */
+.tog{position:relative;width:40px;height:22px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0}
+.tsl{position:absolute;cursor:pointer;inset:0;background:#E5E7EB;border-radius:11px;transition:.2s}
+.tsl::before{content:'';position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:#fff;border-radius:50%;transition:.2s;box-shadow:0 1px 2px rgba(0,0,0,.12)}
+input:checked+.tsl{background:var(--mint)}
+input:checked+.tsl::before{transform:translateX(18px)}
+
+/* QUOTA */
+.quota-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--b)}
+.quota-row:last-of-type{border:none}
+.quota-lbl{font-size:13px;font-weight:600;color:var(--t1)}
+.quota-ctrl{display:flex;align-items:center;gap:8px}
+.qbtn{width:28px;height:28px;border-radius:8px;border:1px solid var(--b);background:var(--bg);font-size:16px;font-weight:700;color:var(--t1);cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1}
+.qval{font-size:14px;font-weight:800;color:var(--mint);min-width:36px;text-align:center}
+
+/* AI PREVIEW */
+.ai-preview{background:var(--bg);border-radius:12px;padding:14px;margin:10px 0}
+.ai-prev-hdr{font-size:11px;font-weight:600;color:var(--t3);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between}
+.chat-row{display:flex;gap:8px;margin-bottom:8px;align-items:flex-end}
+.chat-row.me{flex-direction:row-reverse}
+.chat-av{width:26px;height:26px;border-radius:50%;background:var(--b);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--t2);flex-shrink:0}
+.chat-av.ai{background:var(--mint);color:#fff}
+.chat-bub{max-width:72%;padding:8px 11px;border-radius:12px;font-size:12px;line-height:1.55;color:var(--t1);word-break:break-word}
+.chat-bub.user{background:var(--s);border:1px solid var(--b)}.chat-bub.ai-bub{background:var(--mint);color:#fff}
+.chat-who{font-size:10px;font-weight:600;color:var(--t3);margin-bottom:3px}
+
+/* AI STATS */
+.ai-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px}
+.ai-stat{background:var(--bg);border-radius:12px;padding:10px 8px;text-align:center}
+.ai-stat-v{font-size:17px;font-weight:800;color:var(--mint)}.ai-stat-l{font-size:10px;color:var(--t3);font-weight:600;margin-top:2px}
+
+/* TIP */
+.tip{background:var(--mint-l);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--mint-d);font-weight:500;line-height:1.55;margin-top:10px}
+
+/* STEPS */
+.step{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--b)}.step:last-child{border:none;padding-bottom:0}
+.sn{width:22px;height:22px;border-radius:50%;background:var(--bg);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--t2);flex-shrink:0;margin-top:1px}
+.st{font-size:14px;font-weight:700;color:var(--t1)}.sd{font-size:12px;color:var(--t2);margin-top:3px;line-height:1.55}
+.seg{margin-top:7px;background:var(--bg);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--t2);font-style:italic;line-height:1.5}
+
+/* DRAFTS */
+.draft{padding:14px 0;border-bottom:1px solid var(--b)}.draft:last-of-type{border:none;padding-bottom:0}
+.dfrom{font-size:11px;color:var(--t3);font-weight:600;margin-bottom:5px}
+.dtxt{font-size:13px;color:var(--t1);line-height:1.6;margin-bottom:9px}
+.dbtns{display:flex;gap:6px}
+.dbtn{padding:7px 16px;border-radius:100px;font-size:12px;font-weight:700;border:none;cursor:pointer}
+.db-s{background:var(--dark);color:#fff}.db-e{background:var(--bg);color:var(--t2)}.db-x{background:none;color:var(--t3)}
+
+/* STORY STATS */
+.srow{display:flex;align-items:center;padding:11px 0;border-bottom:1px solid var(--b)}.srow:last-child{border:none;padding-bottom:0}
+.slbl{flex:1;font-size:13px;font-weight:500;color:var(--t1)}.sval{font-size:14px;font-weight:800;color:var(--mint)}.sval span{font-size:12px;color:var(--t3);font-weight:400}
+.tgt{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--b)}.tgt:last-child{border:none;padding-bottom:0}
+.tav{width:32px;height:32px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--t2);flex-shrink:0}
+.tname{font-size:13px;font-weight:600;color:var(--t1)}.tsub{font-size:11px;color:var(--t3);margin-top:1px}
+.tstatus{font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px}.ts-d{background:var(--mint-l);color:var(--mint-d)}.ts-w{background:var(--bg);color:var(--t3)}
+
+/* MANAGE TABS */
+.tbar{display:flex;border-bottom:1px solid var(--b);margin-bottom:14px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}.tbar::-webkit-scrollbar{display:none}
+.tab{flex:1;padding:12px 2px;font-size:11px;font-weight:700;color:var(--t3);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;white-space:nowrap}
+.tab.on{color:var(--t1);border-bottom-color:var(--dark);font-weight:800}
+.tc{display:none;padding-top:4px}.tc.on{display:block}
+
+/* MSG CARD */
+.msg-card{background:var(--s);border-radius:20px;border:1px solid var(--b);overflow:hidden;margin-bottom:10px}
+.msg-row{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--b);cursor:pointer;transition:background .1s}
+.msg-row:last-child{border:none}.msg-row:active{background:var(--bg)}
+
+/* CHANNEL AVATAR */
+.ch-av{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900;flex-shrink:0;letter-spacing:-.3px}
+.ch-ig{background:#FFF0F5;color:#E1306C}.ch-tk{background:#F0F0F0;color:#111}.ch-yt{background:#FFF0F0;color:#FF0000}.ch-dm{background:#F0F5FF;color:#3B82F6}
+
+.mbody{flex:1;min-width:0}
+.mname{font-size:13px;font-weight:700;color:var(--t1)}.msub{font-size:12px;color:var(--t2);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mright{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:5px}.mtime{font-size:11px;color:var(--t3)}
+
+/* BULK */
+.bulk-box{background:var(--s);border-radius:16px;border:1px solid var(--b);padding:16px 18px;margin-bottom:12px}
+.bulk-hdr{display:flex;align-items:center;justify-content:space-between}
+.bulk-title{font-size:15px;font-weight:800;color:var(--t1)}
+.bulk-desc{font-size:12px;color:var(--t2);margin-top:6px;line-height:1.5}
+.bulk-preview{margin-top:10px;background:var(--mint-l);border-radius:10px;padding:10px 12px;font-size:12px;color:var(--mint-d);font-style:italic;line-height:1.55}
+.bulk-actions{display:flex;gap:8px;margin-top:10px}
+.bulk-btn{flex:1;padding:9px;border-radius:10px;font-size:12px;font-weight:700;border:none;cursor:pointer;text-align:center}
+.bb-p{background:var(--dark);color:#fff}.bb-s{background:var(--bg);color:var(--t2)}
+
+/* FOLLOWER SECTIONS */
+.follower-section{margin-bottom:14px}
+.fs-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.fs-title{font-size:13px;font-weight:800;color:var(--t1)}
+.fs-count{font-size:12px;font-weight:600;color:var(--t3)}
+.fs-more{font-size:12px;font-weight:700;color:var(--mint);cursor:pointer;background:none;border:none}
+
+/* BAR CHART */
+.bc-card{background:var(--s);border-radius:20px;border:1px solid var(--b);padding:20px;margin-bottom:10px}
+.bc-title{font-size:15px;font-weight:800;color:var(--t1);margin-bottom:16px}
+.bi{margin-bottom:12px}.bi:last-child{margin:0}
+.bi-top{display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px}
+.bi-lbl{font-weight:600;color:var(--t1)}.bi-pct{font-weight:700}
+.bbar{height:4px;background:var(--bg);border-radius:2px;overflow:hidden}
+.bfill{height:4px;border-radius:2px}
+
+/* CHANNEL STAT TABLE */
+.ch-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px}
+.ch-table th{text-align:left;padding:8px 6px;font-size:10px;font-weight:700;color:var(--t3);border-bottom:1px solid var(--b)}
+.ch-table td{padding:10px 6px;border-bottom:1px solid var(--b);font-weight:600;color:var(--t1)}
+.ch-table tr:last-child td{border:none}
+.ch-table .val{font-weight:800;color:var(--mint);text-align:right}
+
+/* CRM */
+.crow{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--b);cursor:pointer;transition:background .1s}
+.crow:last-child{border:none}.crow:active{background:var(--bg)}
+.cbody{flex:1;min-width:0}.cname{font-size:14px;font-weight:700;color:var(--t1)}.csub{font-size:12px;color:var(--t2);margin-top:2px}
+.ctags{display:flex;gap:4px;margin-top:5px}.cscore{font-size:14px;font-weight:800;color:var(--mint)}
+
+/* REVENUE */
+.rev-row{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border-bottom:1px solid var(--b);cursor:pointer;transition:background .1s}
+.rev-row:last-child{border:none}.rev-row:active{background:var(--bg)}
+.rev-body{flex:1;min-width:0}
+.rev-brand{font-size:14px;font-weight:800;color:var(--t1)}
+.rev-product{font-size:12px;color:var(--t2);margin-top:2px}
+.rev-amount{font-size:14px;font-weight:900;color:var(--amber);margin-top:4px}
+.rev-right{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:5px}
+
+/* PROFILE */
+.p-top{padding:16px 0 14px}
+.p-acct-lbl{font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.3px;margin-bottom:6px}
+.p-acct-name{font-size:20px;font-weight:900;color:var(--t1);margin-bottom:3px}
+.p-acct-id{font-size:13px;color:var(--t2)}
+.p-stats{display:grid;grid-template-columns:repeat(3,1fr);background:var(--s);border-radius:20px;border:1px solid var(--b);overflow:hidden;margin-bottom:20px}
+.p-stat{padding:15px 8px;text-align:center;border-right:1px solid var(--b)}.p-stat:last-child{border:none}
+.p-sv{font-size:20px;font-weight:900;color:var(--t1)}.p-sv.g{color:var(--mint)}.p-sl{font-size:11px;color:var(--t3);font-weight:600;margin-top:4px}
+.menu{background:var(--s);border-radius:20px;border:1px solid var(--b);overflow:hidden;margin-bottom:10px}
+.mitem{display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid var(--b);cursor:pointer;transition:background .1s}
+.mitem:last-child{border:none}.mitem:active{background:var(--bg)}
+.mico{width:34px;height:34px;border-radius:10px;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.mico svg{width:16px;height:16px;stroke:var(--t2);stroke-width:1.8}
+.mbd{flex:1}.mname2{font-size:14px;font-weight:700;color:var(--t1)}.msub2{font-size:12px;color:var(--t3);margin-top:1px}
+.marr svg{width:14px;height:14px;stroke:var(--t3);stroke-width:2}
+
+/* MODAL */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:200;align-items:flex-end;justify-content:center;backdrop-filter:blur(4px)}
+.ov.on{display:flex}
+.sheet{background:#fff;border-radius:24px 24px 0 0;width:100%;max-width:430px;padding:22px 20px 40px;max-height:88vh;overflow-y:auto;animation:rise .24s cubic-bezier(.32,1,.32,1)}
+@keyframes rise{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.s-bar{width:32px;height:3px;border-radius:2px;background:var(--b);margin:0 auto 22px}
+.s-title{font-size:18px;font-weight:900;color:var(--t1);margin-bottom:4px}
+.s-sub{font-size:13px;color:var(--t2);margin-bottom:18px;line-height:1.6}
+.bubble{background:var(--bg);border-radius:12px;padding:12px 14px;margin-bottom:8px;font-size:13px;line-height:1.65;color:var(--t1)}
+.bubble.ai{background:var(--mint-l)}
+.b-who{font-size:10px;font-weight:700;color:var(--t3);margin-bottom:5px}.b-who.ai{color:var(--mint-d)}
+.btn-p{width:100%;padding:15px;border-radius:14px;background:var(--dark);color:#fff;font-size:15px;font-weight:800;border:none;cursor:pointer;margin-top:10px}
+.btn-s{width:100%;padding:13px;border-radius:14px;background:var(--bg);color:var(--t2);font-size:14px;font-weight:700;border:none;cursor:pointer;margin-top:6px}
+.btn-d{width:100%;padding:13px;border-radius:14px;background:none;border:1px solid #FCA5A5;color:var(--red);font-size:14px;font-weight:700;cursor:pointer;margin-top:6px}
+.more{display:block;width:100%;padding:12px;text-align:center;font-size:13px;font-weight:600;color:var(--t3);background:none;border:none;cursor:pointer}
+.sheet-ta{width:100%;border:1px solid var(--b);border-radius:12px;padding:12px;font-size:13px;font-family:'Pretendard',sans-serif;color:var(--t1);resize:none;outline:none;background:var(--bg);line-height:1.6;margin-top:8px}
+.sheet-in{width:100%;border:1px solid var(--b);border-radius:12px;padding:12px;font-size:13px;font-family:'Pretendard',sans-serif;color:var(--t1);outline:none;background:var(--bg);margin-top:8px}
+.setting-row{display:flex;align-items:flex-start;gap:14px;padding:14px 0;border-bottom:1px solid var(--b)}.setting-row:last-child{border:none;padding-bottom:0}
+.s-ico{width:36px;height:36px;border-radius:10px;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.s-ico svg{width:17px;height:17px;stroke:var(--t2);stroke-width:1.8}
+.s-body{flex:1}.s-name{font-size:14px;font-weight:700;color:var(--t1)}.s-desc{font-size:12px;color:var(--t3);margin-top:2px;line-height:1.5}
+
+/* ═══ ONBOARDING / AUTH ═══ */
+.onb-wrap{min-height:100vh;display:flex;flex-direction:column}
+.onb-hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 28px 32px;text-align:center}
+.onb-icon{width:72px;height:72px;border-radius:24px;background:var(--dark);display:flex;align-items:center;justify-content:center;margin:0 auto 28px}
+.onb-icon svg{width:34px;height:34px;stroke:#fff;stroke-width:1.6;fill:none}
+.onb-logo{font-size:28px;font-weight:900;letter-spacing:-1px;margin-bottom:6px}
+.onb-logo em{color:var(--mint);font-style:normal}
+.onb-title{font-size:26px;font-weight:900;line-height:1.25;letter-spacing:-1px;margin-bottom:14px;word-break:keep-all}
+.onb-sub{font-size:14px;color:var(--t2);line-height:1.7;font-weight:500;word-break:keep-all}
+
+.onb-steps{display:flex;justify-content:center;gap:6px;margin:32px 0 8px}
+.onb-dot{width:7px;height:7px;border-radius:50%;background:var(--b);transition:.2s}
+.onb-dot.on{background:var(--dark);width:20px;border-radius:4px}
+
+.onb-footer{padding:20px 24px calc(20px + env(safe-area-inset-bottom))}
+.btn-dark{width:100%;padding:18px;background:var(--dark);color:#fff;border-radius:16px;font-size:16px;font-weight:800;border:none;cursor:pointer;letter-spacing:-.3px}
+.btn-outline{width:100%;padding:16px;background:none;color:var(--t2);border-radius:16px;font-size:14px;font-weight:700;border:1.5px solid var(--b);cursor:pointer;margin-top:8px}
+.btn-mint-full{width:100%;padding:18px;background:var(--mint);color:#fff;border-radius:16px;font-size:16px;font-weight:800;border:none;cursor:pointer;letter-spacing:-.3px}
+
+/* ── Feature slide ── */
+.feat-slide{display:none}.feat-slide.on{display:flex}
+.feat-visual{width:100%;aspect-ratio:1;background:var(--bg);border-radius:28px;border:1px solid var(--b);display:flex;align-items:center;justify-content:center;margin-bottom:28px;overflow:hidden;position:relative}
+
+/* ── LOGIN ── */
+.auth-wrap{padding:0 24px}
+.auth-title{font-size:24px;font-weight:900;letter-spacing:-1px;margin-bottom:6px}
+.auth-sub{font-size:14px;color:var(--t2);margin-bottom:32px;line-height:1.6}
+.input-group{margin-bottom:14px}
+.input-lbl{font-size:12px;font-weight:700;color:var(--t2);margin-bottom:6px}
+.inp{width:100%;padding:15px 16px;border:1.5px solid var(--b);border-radius:14px;font-size:15px;font-family:'Pretendard',sans-serif;color:var(--t1);background:var(--bg);outline:none;transition:border-color .15s}
+.inp:focus{border-color:var(--mint)}
+.inp-pw{position:relative}
+.inp-pw .inp{padding-right:48px}
+.inp-eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);cursor:pointer;color:var(--t3)}
+.inp-eye svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.8;fill:none}
+.divider{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--t3);font-size:12px;font-weight:600}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--b)}
+.social-btn{width:100%;padding:15px;border-radius:14px;border:1.5px solid var(--b);background:#fff;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;color:var(--t1)}
+.auth-switch{text-align:center;margin-top:20px;font-size:13px;color:var(--t2)}
+.auth-switch a{color:var(--mint);font-weight:700;cursor:pointer;text-decoration:none}
+
+/* ── AI LEARNING ── */
+.learn-hero{padding:40px 24px 28px;text-align:center}
+.learn-ring{width:140px;height:140px;position:relative;margin:0 auto 28px}
+.learn-ring svg{width:140px;height:140px;transform:rotate(-90deg)}
+.learn-ring-track{fill:none;stroke:var(--b);stroke-width:10}
+.learn-ring-fill{fill:none;stroke:var(--mint);stroke-width:10;stroke-linecap:round;stroke-dasharray:376;stroke-dashoffset:376;transition:stroke-dashoffset 2s ease}
+.learn-pct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.learn-pct-num{font-size:34px;font-weight:900;color:var(--t1);letter-spacing:-1px}
+.learn-pct-lbl{font-size:11px;font-weight:600;color:var(--t3);margin-top:2px}
+.learn-status{font-size:15px;font-weight:700;color:var(--t1);margin-bottom:8px}
+.learn-detail{font-size:13px;color:var(--t2);line-height:1.6}
+
+.learn-log{background:var(--bg);border-radius:16px;margin:16px 24px;padding:14px;overflow:hidden;height:110px;position:relative;border:1px solid var(--b)}
+.learn-log-inner{animation:lu 8s linear infinite}
+.learn-log-row{padding:6px 2px;font-size:12px;color:var(--t2);display:flex;align-items:center;gap:8px}
+.learn-log-dot{width:5px;height:5px;border-radius:50%;background:var(--mint);flex-shrink:0}
+.llfade{position:absolute;left:0;right:0;height:20px;z-index:2;pointer-events:none}
+.llfade.t{top:0;background:linear-gradient(to bottom,var(--bg),transparent)}
+.llfade.b{bottom:0;background:linear-gradient(to top,var(--bg),transparent)}
+
+.learn-tags{display:flex;flex-wrap:wrap;gap:8px;padding:0 24px;margin-bottom:24px}
+.learn-tag{padding:7px 14px;border-radius:100px;background:var(--mint-l);color:var(--mint-d);font-size:12px;font-weight:700;opacity:0;animation:tagpop .3s ease forwards}
+@keyframes tagpop{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+
+/* ── TARGET ACCOUNTS ── */
+.target-page{padding:0 20px}
+.add-target-row{display:flex;gap:8px;margin-bottom:16px}
+.add-target-row .inp{flex:1;padding:12px 14px;font-size:14px}
+.add-target-row button{padding:12px 16px;border-radius:14px;background:var(--dark);color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap}
+.target-card{background:var(--s);border-radius:18px;border:1px solid var(--b);overflow:hidden;margin-bottom:10px}
+.target-item{display:flex;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--b)}
+.target-item:last-child{border:none}
+.target-av2{width:38px;height:38px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--t2);flex-shrink:0;border:1px solid var(--b)}
+.target-info2{flex:1;min-width:0}
+.target-name2{font-size:13px;font-weight:700;color:var(--t1)}
+.target-meta{font-size:11px;color:var(--t3);margin-top:2px}
+.target-del{width:28px;height:28px;border-radius:8px;border:none;background:var(--red-l);color:var(--red);font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── NOTIFICATION HISTORY ── */
+.notif-card{background:var(--s);border-radius:18px;border:1px solid var(--b);overflow:hidden;margin-bottom:10px}
+.notif-row{display:flex;align-items:flex-start;gap:12px;padding:15px 16px;border-bottom:1px solid var(--b)}
+.notif-row:last-child{border:none}
+.notif-ico{width:36px;height:36px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.notif-ico svg{width:17px;height:17px;stroke-width:1.8;fill:none}
+.notif-body{flex:1;min-width:0}
+.notif-title{font-size:13px;font-weight:700;color:var(--t1)}
+.notif-sub{font-size:12px;color:var(--t2);margin-top:2px;line-height:1.5}
+.notif-time{font-size:11px;color:var(--t3);flex-shrink:0;margin-top:2px}
+.notif-unread{width:7px;height:7px;border-radius:50%;background:var(--mint);margin-top:6px;flex-shrink:0}
+
+/* ── PLAN / PAYMENT ── */
+.plan-hero{padding:32px 24px 16px;text-align:center}
+.plan-badge{display:inline-block;background:var(--amber-l);color:var(--amber);font-size:11px;font-weight:800;padding:5px 12px;border-radius:100px;margin-bottom:16px}
+.plan-title{font-size:24px;font-weight:900;letter-spacing:-1px;margin-bottom:8px}
+.plan-sub{font-size:13px;color:var(--t2);line-height:1.6}
+.plan-cards{padding:0 24px;display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.plan-card{border-radius:20px;border:2px solid var(--b);padding:20px;cursor:pointer;transition:border-color .15s;position:relative;overflow:hidden}
+.plan-card.selected{border-color:var(--dark);background:var(--bg)}
+.plan-card.recommended{border-color:var(--mint);background:var(--mint-l)}
+.plan-rec-badge{position:absolute;top:12px;right:12px;background:var(--mint);color:#fff;font-size:10px;font-weight:800;padding:3px 9px;border-radius:100px}
+.plan-name{font-size:16px;font-weight:800;margin-bottom:4px}
+.plan-price{font-size:26px;font-weight:900;letter-spacing:-1px;margin-bottom:4px}
+.plan-price span{font-size:13px;font-weight:600;color:var(--t2)}
+.plan-desc{font-size:12px;color:var(--t2);line-height:1.6}
+.plan-features{margin-top:12px;display:flex;flex-direction:column;gap:5px}
+.plan-feat{font-size:12px;color:var(--t1);display:flex;align-items:center;gap:6px;font-weight:500}
+.plan-feat::before{content:'✓';color:var(--mint);font-weight:800;font-size:11px}
+.plan-footer{padding:0 24px calc(20px + env(safe-area-inset-bottom))}
+.pay-note{text-align:center;font-size:12px;color:var(--t3);margin-top:12px;line-height:1.6}
+
+/* ── EMPTY STATE ── */
+.empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 32px;text-align:center;min-height:240px}
+.empty-ico{width:60px;height:60px;border-radius:20px;background:var(--bg);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;margin:0 auto 18px}
+.empty-ico svg{width:26px;height:26px;stroke:var(--t3);stroke-width:1.6;fill:none}
+.empty-title{font-size:16px;font-weight:800;color:var(--t1);margin-bottom:6px}
+.empty-sub{font-size:13px;color:var(--t3);line-height:1.6;font-weight:500}
+
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div class="vw on" id="v-home">
+  <div class="hdr">
+    <div class="logo" onclick="go('onb1')" style="cursor:pointer">Repli<em>.</em></div>
+    <div class="ai-chip" onclick="toggleAI()"><div class="ai-dot" id="ai-dot"></div><span id="ai-txt">AI 작동 중</span></div>
+  </div>
+  <div class="roi-card">
+    <div class="roi-lbl">레플리가 아껴준 내 시간값</div>
+    <div class="roi-amt">₩<span id="roi-v">0</span></div>
+    <div class="roi-track"><div class="roi-fill" id="roi-fill"></div></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+      <div style="font-size:11px;font-weight:400;color:var(--t3)">이번 달 진행률</div>
+      <div style="font-size:11px;font-weight:400;color:var(--t3)">2026년 4월 14일</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;margin-top:18px">
+      <div style="text-align:center;padding:0 4px">
+        <div style="font-size:24px;font-weight:900;color:var(--t1);letter-spacing:-.5px;line-height:1">1,842</div>
+        <div style="font-size:10px;font-weight:500;color:var(--t3);margin-top:4px">자동 응대</div>
+      </div>
+      <div style="text-align:center;padding:0 4px;border-left:1px solid var(--b);border-right:1px solid var(--b)">
+        <div style="font-size:24px;font-weight:900;color:var(--t1);letter-spacing:-.5px;line-height:1">72h</div>
+        <div style="font-size:10px;font-weight:500;color:var(--t3);margin-top:4px">절약 시간</div>
+      </div>
+      <div style="text-align:center;padding:0 4px">
+        <div style="font-size:24px;font-weight:900;color:var(--mint);letter-spacing:-.5px;line-height:1">+89</div>
+        <div style="font-size:10px;font-weight:500;color:var(--t3);margin-top:4px">신규 팔로워</div>
+      </div>
+    </div>
+  </div>
+  <div class="alert" onclick="go('manage');setTab('urgent')">
+    <div><div class="alert-t">중요 확인 필요 메시지 3건</div><div class="alert-s">결제 오류 · 부정 이슈 · 협업 문의</div></div>
+    <div class="alert-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  <div class="sec-t">Repli AI 실시간 활동</div>
+  <div class="live-box">
+    <div class="lfade t"></div>
+    <div class="live-stream">
+      <div class="lrow"><div class="ldash"></div>@yuna__daily님 제품 문의 — 말투 98% 댓글 응대 완료</div>
+      <div class="lrow"><div class="ldash"></div>@hazel_skin님 스토리 조회 및 좋아요 완료</div>
+      <div class="lrow"><div class="ldash"></div>게시물 업로드 감지 → 저장·댓글 자동 실행</div>
+      <div class="lrow"><div class="ldash"></div>@collab_brand_k DM — 협업 문의 응대 완료</div>
+      <div class="lrow"><div class="ldash"></div>@morning_k님 스토리 조회 완료</div>
+      <div class="lrow"><div class="ldash"></div>@cool_tommi99님 구매 링크 DM 발송 완료</div>
+      <div class="lrow"><div class="ldash"></div>@yuna__daily님 제품 문의 — 말투 98% 댓글 응대 완료</div>
+      <div class="lrow"><div class="ldash"></div>@hazel_skin님 스토리 조회 및 좋아요 완료</div>
+      <div class="lrow"><div class="ldash"></div>게시물 업로드 감지 → 저장·댓글 자동 실행</div>
+      <div class="lrow"><div class="ldash"></div>@collab_brand_k DM — 협업 문의 응대 완료</div>
+      <div class="lrow"><div class="ldash"></div>@morning_k님 스토리 조회 완료</div>
+      <div class="lrow"><div class="ldash"></div>@cool_tommi99님 구매 링크 DM 발송 완료</div>
+    </div>
+    <div class="lfade b"></div>
+  </div>
+  <div class="sec-t">오늘 할 일</div>
+  <div class="task-card">
+    <div class="trow"><div class="tck done"><svg viewBox="0 0 10 10" fill="none" stroke="#fff" stroke-width="1.8"><path d="M2 5l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="tb"><div class="tt">댓글·DM 자동 응대 10건</div><div class="ts">완료 — Repli AI가 처리했어요</div></div></div>
+    <div class="trow" onclick="go('activity');openAcc('acc-draft')"><div class="tck"></div><div class="tb"><div class="tt">선댓글 초안 검토 · 전송</div><div class="ts">AI가 준비한 댓글 8개 대기 중</div></div><span class="badge bn">8건</span></div>
+    <div class="trow" onclick="go('manage');setTab('urgent')"><div class="tck"></div><div class="tb"><div class="tt">긴급 메시지 처리</div><div class="ts">미확인 3건 포함</div></div><span class="badge br">긴급</span></div>
+  </div>
+</div>
+
+<!-- ACTIVITY -->
+<div class="vw" id="v-activity">
+  <div class="hdr"><div style="font-size:16px;font-weight:800">소셜 활동</div></div>
+
+  <!-- SNS 키우기 -->
+  <div class="sec-t" style="margin-top:4px">SNS 키우기</div>
+  <div class="acc" id="acc-upload">
+    <div class="acc-hdr" onclick="toggleAcc('acc-upload')">
+      <div class="acc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="acc-copy"><div class="acc-name">업로드 즉시 자동 액션</div><div class="acc-sub">저장 · 공감 댓글 · 해시태그 3단계</div></div>
+      <div class="acc-aside"><label class="tog" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="tsl"></span></label><div class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    </div>
+    <div class="acc-body">
+      <div class="step"><div class="sn">1</div><div><div class="st">셀프 저장</div><div class="sd">업로드 직후 내 계정에서 게시물 저장 — 알고리즘 초기 신호 부스트</div></div></div>
+      <div class="step"><div class="sn">2</div><div><div class="st">공감 댓글 등록</div><div class="sd">내 말투로 게시물에 어울리는 댓글 1개 자동 작성</div><div class="seg">오늘도 너무 예쁘게 나왔다, 이 무드 너무 좋아!</div></div></div>
+      <div class="step"><div class="sn">3</div><div><div class="st">해시태그 답글</div><div class="sd">공감 댓글의 답글로 연관 해시태그 자동 추가</div><div class="seg">#스킨케어루틴 #데일리뷰티 #MILLIMILLI #500달톤</div></div></div>
+      <div class="tip">업로드 후 3~7분 이내 랜덤 간격으로 자연스럽게 실행돼요</div>
+    </div>
+  </div>
+
+  <div class="acc" id="acc-story">
+    <div class="acc-hdr" onclick="toggleAcc('acc-story')">
+      <div class="acc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="acc-copy"><div class="acc-name">타겟 스토리 자동 조회</div><div class="acc-sub">오늘 23개 완료</div></div>
+      <div class="acc-aside"><label class="tog" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="tsl"></span></label><div class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    </div>
+    <div class="acc-body">
+      <div class="srow"><div class="slbl">오늘 스토리 조회</div><div class="sval">23 <span>/ 50</span></div></div>
+      <div class="srow"><div class="slbl">좋아요 누른 게시물</div><div class="sval">11 <span>/ 30</span></div></div>
+      <div class="srow"><div class="slbl">반응 팔로우 유입</div><div class="sval" style="color:var(--t1)">6명</div></div>
+      <div style="font-size:11px;font-weight:600;color:var(--t3);margin:14px 0 8px">오늘 조회한 계정</div>
+      <div class="tgt"><div class="tav">H</div><div style="flex:1"><div class="tname">@hazel_skin</div><div class="tsub">#스킨케어 · 2.4만</div></div><div class="tstatus ts-d">조회완료</div></div>
+      <div class="tgt"><div class="tav">M</div><div style="flex:1"><div class="tname">@morning_glow_kr</div><div class="tsub">#뷰티루틴 · 1.1만</div></div><div class="tstatus ts-d">좋아요완료</div></div>
+      <div class="tgt"><div class="tav">K</div><div style="flex:1"><div class="tname">@kbeauty_daily</div><div class="tsub">#케이뷰티 · 5.8만</div></div><div class="tstatus ts-w">대기 중</div></div>
+      <div class="tip">2~8분 랜덤 간격으로 자연스럽게 실행돼요</div>
+    </div>
+  </div>
+
+  <div class="acc" id="acc-draft-grow">
+    <div class="acc-hdr" onclick="toggleAcc('acc-draft-grow')">
+      <div class="acc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="acc-copy"><div class="acc-name">AI 선댓글 초안</div><div class="acc-sub">전송 대기 8개 · 탭하면 바로 발송</div></div>
+      <div class="acc-aside"><span class="badge bn">8건</span><div class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    </div>
+    <div class="acc-body">
+      <div class="draft"><div class="dfrom">@hazel_skin · 스킨케어 루틴</div><div class="dtxt">루틴 너무 좋아요! 저도 이 순서 따라해봐야겠어요</div><div class="dbtns"><button class="dbtn db-s" onclick="markSent(this)">전송</button><button class="dbtn db-e">수정</button><button class="dbtn db-x" onclick="this.closest('.draft').style.opacity='.3'">건너뛰기</button></div></div>
+      <div class="draft"><div class="dfrom">@morning_glow_kr · 모닝 뷰티</div><div class="dtxt">아침부터 이렇게 빛나다니! 저도 따라해봤어요</div><div class="dbtns"><button class="dbtn db-s" onclick="markSent(this)">전송</button><button class="dbtn db-e">수정</button><button class="dbtn db-x" onclick="this.closest('.draft').style.opacity='.3'">건너뛰기</button></div></div>
+      <div class="draft"><div class="dfrom">@kbeauty_daily · 쿠션 리뷰</div><div class="dtxt">이 쿠션 커버력 진짜 좋아 보여요! 어디 제품인가요?</div><div class="dbtns"><button class="dbtn db-s" onclick="markSent(this)">전송</button><button class="dbtn db-e">수정</button><button class="dbtn db-x" onclick="this.closest('.draft').style.opacity='.3'">건너뛰기</button></div></div>
+      <button class="more">더보기 (5개)</button>
+    </div>
+  </div>
+
+  <!-- SNS 관리하기 -->
+  <div class="sec-t">SNS 관리하기</div>
+  <div class="acc" id="acc-auto">
+    <div class="acc-hdr" onclick="toggleAcc('acc-auto')">
+      <div class="acc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="acc-copy"><div class="acc-name">AI가 나 대신 댓글·DM 응대</div><div class="acc-sub">24시간 내 말투로 자동 처리 중</div></div>
+      <div class="acc-aside"><label class="tog" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="tsl"></span></label><div class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    </div>
+    <div class="acc-body">
+      <div class="ai-stats">
+        <div class="ai-stat"><div class="ai-stat-v" id="q-used">284</div><div class="ai-stat-l">오늘 응대</div></div>
+        <div class="ai-stat"><div class="ai-stat-v" id="q-left">716</div><div class="ai-stat-l">남은 응대</div></div>
+        <div class="ai-stat"><div class="ai-stat-v">98%</div><div class="ai-stat-l">말투 일치도</div></div>
+      </div>
+      <div style="background:var(--bg);border-radius:12px;padding:14px;margin-bottom:14px">
+        <div style="font-size:12px;font-weight:700;color:var(--t3);margin-bottom:10px">하루 응대량 설정</div>
+        <div class="quota-row"><div class="quota-lbl">댓글 응대</div><div class="quota-ctrl"><button class="qbtn" onclick="adj('c',-10)">−</button><div class="qval" id="q-comment">200건</div><button class="qbtn" onclick="adj('c',10)">+</button></div></div>
+        <div class="quota-row"><div class="quota-lbl">DM 응대</div><div class="quota-ctrl"><button class="qbtn" onclick="adj('d',-5)">−</button><div class="qval" id="q-dm">100건</div><button class="qbtn" onclick="adj('d',5)">+</button></div></div>
+      </div>
+      <div style="font-size:12px;font-weight:700;color:var(--t3);margin-bottom:8px">방금 Repli AI가 나 대신 응대한 내용</div>
+      <div class="ai-preview">
+        <div class="ai-prev-hdr"><span>@yuna__daily · Instagram 댓글</span><span style="color:var(--mint);font-weight:700">말투 98%</span></div>
+        <div class="chat-row"><div class="chat-av">Y</div><div><div class="chat-who">@yuna__daily</div><div class="chat-bub user">제품 어디서 살 수 있어요?</div></div></div>
+        <div class="chat-row me"><div class="chat-av ai">AI</div><div style="text-align:right"><div class="chat-who" style="text-align:right">Repli AI (나 대신)</div><div class="chat-bub ai-bub">올리브영이랑 스마트스토어에서 구매 가능해요! 프로필 링크에 바로 있어요 :)</div></div></div>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="dbtn db-e" style="flex:1;border-radius:10px;padding:10px;font-size:12px" onclick="go('manage');setTab('comments')">전체 보기</button>
+        <button class="dbtn db-s" style="flex:1;border-radius:10px;padding:10px;background:var(--mint-l);color:var(--mint-d);font-size:12px;font-weight:700" onclick="openModal('m-ai-style')">말투 수정하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 댓글 감지 DM -->
+  <div class="acc" id="acc-dm-manage">
+    <div class="acc-hdr" onclick="toggleAcc('acc-dm-manage')">
+      <div class="acc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="acc-copy"><div class="acc-name">댓글 감지 → DM 자동 발송</div><div class="acc-sub">진행 중 2개</div></div>
+      <div class="acc-aside">
+        <label class="tog" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="tsl"></span></label>
+        <div class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+    </div>
+    <div class="acc-body">
+      <div style="margin-bottom:16px">
+        <div style="font-size:12px;font-weight:700;color:var(--t3);margin-bottom:8px">대상 게시물 선택</div>
+        <div style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;-webkit-overflow-scrolling:touch">
+          <div style="flex-shrink:0;width:68px;height:68px;border-radius:12px;background:var(--bg);border:1.5px dashed var(--b);cursor:pointer;display:flex;align-items:center;justify-content:center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+          </div>
+          <div onclick="selectPost(this)" class="post-thumb" style="flex-shrink:0;width:68px;height:68px;border-radius:12px;background:linear-gradient(135deg,#f8c8d4,#fde8b0);border:2px solid var(--mint);cursor:pointer;position:relative">
+            <div style="position:absolute;bottom:3px;left:3px;font-size:9px;font-weight:700;color:#fff;background:rgba(0,0,0,.45);padding:1px 5px;border-radius:3px">최근</div>
+          </div>
+          <div onclick="selectPost(this)" class="post-thumb" style="flex-shrink:0;width:68px;height:68px;border-radius:12px;background:linear-gradient(135deg,#c8e6f8,#d4f8e8);border:2px solid transparent;cursor:pointer"></div>
+          <div onclick="selectPost(this)" class="post-thumb" style="flex-shrink:0;width:68px;height:68px;border-radius:12px;background:linear-gradient(135deg,#f8d4c8,#f8e8fd);border:2px solid transparent;cursor:pointer"></div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:12px;font-weight:700;color:var(--t3)">진행 중인 DM 발송</div>
+        <div style="font-size:11px;font-weight:700;color:var(--mint)">2개 활성</div>
+      </div>
+      <div id="dm-active-list" style="background:var(--bg);border-radius:12px;overflow:hidden;margin-bottom:14px;max-height:160px;overflow-y:auto">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--b)">
+          <div style="width:7px;height:7px;border-radius:50%;background:var(--mint);flex-shrink:0"></div>
+          <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:var(--t1)">컨텐츠 1</div><div style="font-size:11px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">전체 댓글 · 오늘 14건</div></div>
+          <label class="tog" style="transform:scale(.85)"><input type="checkbox" checked><span class="tsl"></span></label>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px 14px">
+          <div style="width:7px;height:7px;border-radius:50%;background:var(--mint);flex-shrink:0"></div>
+          <div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:700;color:var(--t1)">컨텐츠 2</div><div style="font-size:11px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">키워드: 링크, 구매 · 오늘 6건</div></div>
+          <label class="tog" style="transform:scale(.85)"><input type="checkbox" checked><span class="tsl"></span></label>
+        </div>
+      </div>
+      <button onclick="addDmRule()" style="width:100%;padding:11px;border-radius:12px;border:1.5px dashed var(--b);background:none;font-size:13px;font-weight:700;color:var(--t3);cursor:pointer">+ 컨텐츠 추가</button>
+      <div class="tip" style="margin-top:10px">댓글이 달리면 조건 확인 후 즉시 DM을 보내요. 하루 최대 200건.</div>
+    </div>
+  </div>
+
+</div>
+
+<!-- MANAGE -->
+<div class="vw" id="v-manage">
+  <div class="hdr"><div class="logo" style="font-size:18px">관리</div></div>
+  <div class="tbar">
+    <button class="tab on" id="tab-urgent"   onclick="setTab('urgent')">긴급</button>
+    <button class="tab"    id="tab-comments" onclick="setTab('comments')">댓글·DM</button>
+    <button class="tab"    id="tab-crm"      onclick="setTab('crm')">주요 팔로워</button>
+    <button class="tab"    id="tab-revenue"  onclick="setTab('revenue')">수익제안</button>
+    <button class="tab"    id="tab-insight"  onclick="setTab('insight')">분석</button>
+  </div>
+
+  <!-- 긴급 -->
+  <div class="tc on" id="tc-urgent">
+    <div style="background:var(--dark);border-radius:16px;padding:16px 18px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div><div style="font-size:14px;font-weight:800;color:#fff">긴급 한번에 응답하기</div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:3px">긴급 3건 전체에 안내 메시지 일괄 발송</div></div>
+        <label class="tog" style="margin-left:12px" onclick="toggleBulk(this)"><input type="checkbox" id="bulk-toggle"><span class="tsl" style="background:rgba(255,255,255,.2)"></span></label>
+      </div>
+      <div id="bulk-content" style="display:none;margin-top:12px">
+        <div style="background:rgba(255,255,255,.1);border-radius:10px;padding:10px 12px;font-size:12px;color:rgba(255,255,255,.75);font-style:italic;line-height:1.55;margin-bottom:10px" id="bulk-preview">"안녕하세요! 소중한 말씀 감사해요. 자세한 확인을 위해 카카오 @millimilli 로 연락 주시면 빠르게 도와드릴게요 :)"</div>
+        <div style="display:flex;gap:8px">
+          <button style="flex:1;padding:9px;border-radius:10px;font-size:12px;font-weight:700;border:1px solid rgba(255,255,255,.2);background:transparent;color:rgba(255,255,255,.8);cursor:pointer" onclick="openModal('m-bulk-setting')">메시지 설정</button>
+          <button style="flex:1;padding:9px;border-radius:10px;font-size:12px;font-weight:700;border:none;background:var(--mint);color:var(--dark);cursor:pointer" onclick="sendBulk()">3건 전체 발송</button>
+        </div>
+      </div>
+    </div>
+    <div class="msg-card">
+      <div class="msg-row" onclick="openModal('m-u1')"><div class="ch-av ch-ig">IG</div><div class="mbody"><div class="mname">@beauty_lover99</div><div class="msub">"공동구매 결제 오류가 나는데 환불 어떻게요?"</div></div><div class="mright"><div class="mtime">2분 전</div><span class="badge br">결제문제</span></div></div>
+      <div class="msg-row" onclick="openModal('m-u2')"><div class="ch-av ch-ig">IG</div><div class="mbody"><div class="mname">@skin_trouble_k</div><div class="msub">"이거 쓰고 트러블 났어요 신고 어떻게 해요"</div></div><div class="mright"><div class="mtime">18분 전</div><span class="badge br">부정이슈</span></div></div>
+      <div class="msg-row" onclick="openModal('m-biz')"><div class="ch-av ch-dm">DM</div><div class="mbody"><div class="mname">@collab_brand_k</div><div class="msub">"OEM 협업 및 견적 문의드립니다"</div></div><div class="mright"><div class="mtime">1시간</div><span class="badge bn">협업문의</span></div></div>
+    </div>
+    <div style="height:8px"></div>
+  </div>
+
+  <!-- 댓글·DM -->
+  <div class="tc" id="tc-comments">
+    <div class="msg-card">
+      <div class="msg-row" onclick="openModal('m-c1')"><div class="ch-av ch-ig">IG</div><div class="mbody"><div class="mname">@yuna__daily <span class="badge bg" style="margin-left:4px">VVIP</span></div><div class="msub">"제품 어디서 구매해요? 올리브영에서 못 찾겠어요"</div></div><div class="mright"><div class="mtime">35분</div><span class="badge bn">완료</span></div></div>
+      <div class="msg-row" onclick="openModal('m-c1')"><div class="ch-av ch-tk">TK</div><div class="mbody"><div class="mname">@cool_tommi99</div><div class="msub">"이 제품 진짜 최고!! 주변에 다 추천했어요"</div></div><div class="mright"><div class="mtime">1시간</div><span class="badge bn">완료</span></div></div>
+      <div class="msg-row" onclick="openModal('m-c1')"><div class="ch-av ch-yt">YT</div><div class="mbody"><div class="mname">@jjin_beauty</div><div class="msub">"500달톤 성분 민감성 피부에도 괜찮을까요?"</div></div><div class="mright"><div class="mtime">2시간</div><span class="badge bn">완료</span></div></div>
+      <div class="msg-row" onclick="openModal('m-c1')"><div class="ch-av ch-ig">IG</div><div class="mbody"><div class="mname">@seoulnista</div><div class="msub">"이번 콘텐츠 너무 예뻐요 피부 빛나는 거 실화냐"</div></div><div class="mright"><div class="mtime">3시간</div><span class="badge bn">완료</span></div></div>
+      <div class="msg-row" onclick="openModal('m-c1')"><div class="ch-av ch-tk">TK</div><div class="mbody"><div class="mname">@morning_glow_kr</div><div class="msub">"공구 다음엔 언제 해요? 꼭 참여하고 싶어요!"</div></div><div class="mright"><div class="mtime">4시간</div><span class="badge bn">완료</span></div></div>
+      <div class="msg-row" onclick="openModal('m-c1')"><div class="ch-av ch-ig">IG</div><div class="mbody"><div class="mname">@hazel_skin</div><div class="msub">"DM 드렸어요! 확인 부탁드려요 :)"</div></div><div class="mright"><div class="mtime">5시간</div><span class="badge bn">완료</span></div></div>
+      <div class="msg-row" onclick="openModal('m-c1')"><div class="ch-av ch-yt">YT</div><div class="mbody"><div class="mname">@kbeauty_daily <span class="badge bg" style="margin-left:4px">열성팬</span></div><div class="msub">"항상 잘 보고 있어요 성분 설명이 너무 좋아요"</div></div><div class="mright"><div class="mtime">6시간</div><span class="badge bn">완료</span></div></div>
+    </div>
+    <button class="more">더보기 (1,271건)</button>
+  </div>
+
+  <!-- 주요 팔로워 -->
+  <div class="tc" id="tc-crm">
+    <!-- 긍정 팔로워 -->
+    <div class="follower-section">
+      <div class="fs-header"><div class="fs-title">긍정 팔로워</div><div class="fs-count">142명</div></div>
+      <div class="msg-card">
+        <div class="crow" onclick="openModal('m-crm1')">
+          <div class="ch-av ch-ig" style="border-radius:50%">IG</div>
+          <div class="cbody"><div class="cname">@yuna__daily</div><div class="csub">댓글 38회 · 후기 2개 · 구매 3회</div><div class="ctags"><span class="badge bg">VVIP</span></div></div>
+          <div class="cscore">92점</div>
+        </div>
+        <div class="crow" onclick="openModal('m-crm1')">
+          <div class="ch-av ch-tk" style="border-radius:50%">TK</div>
+          <div class="cbody"><div class="cname">@cool_tommi99</div><div class="csub">구매 문의 12회 · 공유 5회</div><div class="ctags"><span class="badge bn">구매의향</span></div></div>
+          <div class="cscore">78점</div>
+        </div>
+        <div class="crow" onclick="openModal('m-crm1')">
+          <div class="ch-av ch-yt" style="border-radius:50%">YT</div>
+          <div class="cbody"><div class="cname">@hazel_skin</div><div class="csub">댓글 22회 · 좋아요 다수</div><div class="ctags"><span class="badge bg">열성팬</span></div></div>
+          <div class="cscore">71점</div>
+        </div>
+      </div>
+      <button class="more" onclick="openModal('m-pos-more')">긍정 팔로워 더보기 (139명)</button>
+    </div>
+
+    <!-- 부정 팔로워 -->
+    <div class="follower-section">
+      <div class="fs-header"><div class="fs-title">부정 팔로워</div><div class="fs-count" style="color:var(--red)">11명</div></div>
+      <div class="msg-card">
+        <div class="crow" onclick="openModal('m-crm2')">
+          <div class="ch-av ch-ig" style="border-radius:50%;background:var(--red-l);color:var(--red)">IG</div>
+          <div class="cbody"><div class="cname">@skin_trouble_k</div><div class="csub">부정 댓글 4회 · 트러블 클레임</div><div class="ctags"><span class="badge br">요주의</span></div></div>
+          <div class="cscore" style="color:var(--red)">!</div>
+        </div>
+        <div class="crow" onclick="openModal('m-crm2')">
+          <div class="ch-av ch-ig" style="border-radius:50%;background:var(--red-l);color:var(--red)">IG</div>
+          <div class="cbody"><div class="cname">@peeve_user22</div><div class="csub">부정 댓글 2회 · 배송 불만</div><div class="ctags"><span class="badge br">요주의</span></div></div>
+          <div class="cscore" style="color:var(--red)">!</div>
+        </div>
+      </div>
+      <button class="more" onclick="openModal('m-neg-more')">부정 팔로워 더보기 (9명)</button>
+    </div>
+  </div>
+
+  <div class="tc" id="tc-revenue" style="padding-top:10px">
+
+  <div style="background:var(--s);border-radius:20px;border:1px solid var(--b);padding:18px;margin-bottom:12px">
+    <div style="font-size:12px;font-weight:600;color:var(--t3);margin-bottom:4px">이번 달 수익 제안 합계</div>
+    <div style="font-size:30px;font-weight:900;color:var(--t1);letter-spacing:-1px;margin-bottom:14px">9,400만원</div>
+    <div style="display:flex;gap:8px">
+      <div style="flex:1;background:var(--bg);border-radius:12px;padding:11px 12px"><div style="font-size:10px;color:var(--t3);font-weight:600">협찬·광고</div><div style="font-size:15px;font-weight:800;color:var(--t1);margin-top:3px">700만원</div></div>
+      <div style="flex:1;background:var(--bg);border-radius:12px;padding:11px 12px"><div style="font-size:10px;color:var(--t3);font-weight:600">수출·B2B</div><div style="font-size:15px;font-weight:800;color:var(--t1);margin-top:3px">8,700만원</div></div>
+    </div>
+  </div>
+
+  <!-- 한번에 응답하기 -->
+  <div style="background:var(--dark);border-radius:16px;padding:16px 18px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="openModal('m-rev-bulk')">
+    <div><div style="font-size:14px;font-weight:800;color:#fff">한번에 응답하기</div><div style="font-size:11px;color:rgba(255,255,255,.5);margin-top:3px">4건 전체에 담당자 연락처 일괄 발송</div></div>
+    <div style="color:rgba(255,255,255,.4)"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+
+  <div class="msg-card">
+    <div class="rev-row" onclick="openModal('m-rev1')">
+      <div class="ch-av ch-ig">IG</div>
+      <div class="rev-body">
+        <div class="rev-brand">케이뷰티코 <span class="badge ba" style="margin-left:4px">협찬·광고</span></div>
+        <div class="rev-product">신제품 쿠션 광고 협업 제안</div>
+        <div class="rev-amount">200만원</div>
+      </div>
+      <div class="rev-right"><div class="mtime">1.15</div></div>
+    </div>
+    <div class="rev-row" onclick="openModal('m-rev2')">
+      <div class="ch-av ch-dm">DM</div>
+      <div class="rev-body">
+        <div class="rev-brand">재팬뷰티 <span class="badge ba" style="margin-left:4px">수출문의</span></div>
+        <div class="rev-product">MILLIMILLI 전체 라인 수출</div>
+        <div class="rev-amount">~4,500만원</div>
+      </div>
+      <div class="rev-right"><div class="mtime">1.14</div></div>
+    </div>
+    <div class="rev-row" onclick="openModal('m-rev3')">
+      <div class="ch-av ch-dm">DM</div>
+      <div class="rev-body">
+        <div class="rev-brand">US K-Beauty <span class="badge ba" style="margin-left:4px">판매제안</span></div>
+        <div class="rev-product">Amazon US 재판매 2,000개</div>
+        <div class="rev-amount">~4,200만원</div>
+      </div>
+      <div class="rev-right"><div class="mtime">1.13</div></div>
+    </div>
+    <div class="rev-row" onclick="openModal('m-rev1')" style="border:none">
+      <div class="ch-av ch-yt">YT</div>
+      <div class="rev-body">
+        <div class="rev-brand">스킨케어TV <span class="badge ba" style="margin-left:4px">유튜브광고</span></div>
+        <div class="rev-product">MILLIMILLI 크림 공식 리뷰 광고</div>
+        <div class="rev-amount">500만원↑</div>
+      </div>
+      <div class="rev-right"><div class="mtime">1.12</div></div>
+    </div>
+  </div>
+  </div>
+
+  <!-- 분석 -->
+  <div class="tc" id="tc-insight">
+    <!-- 채널별 수신율 -->
+    <div class="bc-card">
+      <div class="bc-title">채널별 수신 현황</div>
+      <table class="ch-table">
+        <thead><tr><th>채널</th><th style="text-align:right">댓글</th><th style="text-align:right">DM</th><th style="text-align:right">응대율</th></tr></thead>
+        <tbody>
+          <tr><td style="display:flex;align-items:center;gap:6px"><div class="ch-av ch-ig" style="width:24px;height:24px;border-radius:6px;font-size:9px">IG</div>Instagram</td><td class="val">156건</td><td class="val">42건</td><td class="val" style="color:var(--mint)">90%</td></tr>
+          <tr><td style="display:flex;align-items:center;gap:6px"><div class="ch-av ch-tk" style="width:24px;height:24px;border-radius:6px;font-size:9px">TK</div>TikTok</td><td class="val">84건</td><td class="val">31건</td><td class="val" style="color:var(--mint)">88%</td></tr>
+          <tr><td style="display:flex;align-items:center;gap:6px"><div class="ch-av ch-yt" style="width:24px;height:24px;border-radius:6px;font-size:9px">YT</div>YouTube</td><td class="val">44건</td><td class="val">14건</td><td class="val" style="color:var(--mint)">84%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="bc-card">
+      <div class="bc-title">댓글 유형 분석</div>
+      <div class="bi"><div class="bi-top"><span class="bi-lbl">제품 문의</span><span class="bi-pct" style="color:var(--mint)">45%</span></div><div class="bbar"><div class="bfill" style="width:45%;background:var(--mint)"></div></div></div>
+      <div class="bi"><div class="bi-top"><span class="bi-lbl">후기·공감</span><span class="bi-pct" style="color:#6366F1">28%</span></div><div class="bbar"><div class="bfill" style="width:28%;background:#6366F1"></div></div></div>
+      <div class="bi"><div class="bi-top"><span class="bi-lbl">구매 링크</span><span class="bi-pct" style="color:var(--amber)">15%</span></div><div class="bbar"><div class="bfill" style="width:15%;background:var(--amber)"></div></div></div>
+      <div class="bi"><div class="bi-top"><span class="bi-lbl">협찬·협업</span><span class="bi-pct" style="color:#8B5CF6">7%</span></div><div class="bbar"><div class="bfill" style="width:7%;background:#8B5CF6"></div></div></div>
+      <div class="bi"><div class="bi-top"><span class="bi-lbl" style="color:var(--red)">부정 댓글</span><span class="bi-pct" style="color:var(--red)">3%</span></div><div class="bbar"><div class="bfill" style="width:3%;background:var(--red)"></div></div></div>
+    </div>
+    <div class="bc-card">
+      <div class="bc-title">감정 분석</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px">
+        <div style="background:var(--mint-l);border-radius:12px;padding:14px 8px;text-align:center"><div style="font-size:20px;font-weight:900;color:var(--mint)">68%</div><div style="font-size:10px;color:var(--mint-d);font-weight:600;margin-top:4px">긍정</div></div>
+        <div style="background:var(--bg);border-radius:12px;padding:14px 8px;text-align:center"><div style="font-size:20px;font-weight:900;color:var(--t2)">26%</div><div style="font-size:10px;color:var(--t3);font-weight:600;margin-top:4px">중립</div></div>
+        <div style="background:var(--red-l);border-radius:12px;padding:14px 8px;text-align:center"><div style="font-size:20px;font-weight:900;color:var(--red)">6%</div><div style="font-size:10px;color:var(--red);font-weight:600;margin-top:4px">부정</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- 내 정보 -->
+<div class="vw" id="v-profile">
+  <div class="hdr"><div class="logo" style="font-size:18px">내 정보</div></div>
+
+  <div class="p-top">
+    <div style="font-size:22px;font-weight:900;color:var(--t1);letter-spacing:-.5px">유민혜</div>
+    <div style="font-size:13px;color:var(--t3);margin-top:5px">yuminhye@gmail.com</div>
+  </div>
+
+  <div class="p-stats">
+    <div class="p-stat"><div class="p-sv g">125만원</div><div class="p-sl">이번 달 절감</div></div>
+    <div class="p-stat"><div class="p-sv">1,842</div><div class="p-sl">응대건</div></div>
+    <div class="p-stat"><div class="p-sv g">+89</div><div class="p-sl">신규 팔로워</div></div>
+  </div>
+
+  <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.3px;margin-bottom:8px">설정</div>
+  <div class="menu">
+    <div class="mitem" onclick="openModal('m-account')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><div class="mbd"><div class="mname2">계정 연동</div><div class="msub2">Instagram · TikTok · YouTube</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    <div class="mitem" onclick="go('targets')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mbd"><div class="mname2">타겟 계정 관리</div><div class="msub2">스토리 조회·좋아요 대상 계정</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    <div class="mitem" onclick="openModal('m-ai-style')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div><div class="mbd"><div class="mname2">AI 말투 학습</div><div class="msub2">일치도 98% · 게시물 250개 분석</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    <div class="mitem" onclick="openModal('m-kakao')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mbd"><div class="mname2">카카오 알림</div><div class="msub2">요주의 즉시 · 일일 리포트 <span class="badge bg" style="margin-left:4px">무료</span></div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    <div class="mitem" onclick="go('plan')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="mbd"><div class="mname2">이용권</div><div class="msub2">프리미엄 · 무료체험 D-4</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+  </div>
+  <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.3px;margin:16px 0 8px">계정</div>
+  <div class="menu">
+    <div class="mitem" onclick="openModal('m-find-account')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mbd"><div class="mname2">아이디 · 비밀번호 찾기</div><div class="msub2">가입 이메일로 재설정 링크 발송</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    <div class="mitem" onclick="go('login')">
+      <div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="mbd"><div class="mname2">다른 계정으로 로그인</div><div class="msub2">계정 전환</div></div>
+      <div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="mitem" onclick="if(confirm('로그아웃 하시겠어요?')) go('login')" style="border:none">
+      <div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="mbd"><div class="mname2" style="color:var(--red)">로그아웃</div></div>
+    </div>
+  </div>
+  <div style="height:20px"></div>
+</div>
+
+
+<!-- ════ ONBOARDING ════ -->
+<div class="vw" id="v-onb1">
+  <div class="onb-wrap">
+    <div class="onb-hero">
+      <div class="onb-icon">
+        <svg viewBox="0 0 24 24"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="onb-logo">Repli<em>.</em></div>
+      <h1 class="onb-title" style="margin-top:24px">나처럼 관리하는<br>내 SNS 비서</h1>
+      <p class="onb-sub" style="margin-top:12px">단 3단계로 설정하면<br>AI가 24시간 나 대신 댓글과 DM을 관리해요.</p>
+      <div style="margin-top:40px;display:flex;flex-direction:column;gap:16px;width:100%">
+        <div style="display:flex;align-items:center;gap:14px;text-align:left">
+          <div style="width:36px;height:36px;border-radius:10px;background:var(--mint-l);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--mint-d)" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          </div>
+          <div><div style="font-size:14px;font-weight:700;color:var(--t1)">계정 연동</div><div style="font-size:12px;color:var(--t3);margin-top:1px">Instagram, TikTok, YouTube 공식 API</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;text-align:left">
+          <div style="width:36px;height:36px;border-radius:10px;background:var(--mint-l);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--mint-d)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+          </div>
+          <div><div style="font-size:14px;font-weight:700;color:var(--t1)">AI 말투 학습</div><div style="font-size:12px;color:var(--t3);margin-top:1px">내 게시물로 말투·뉘앙스 자동 학습</div></div>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px;text-align:left">
+          <div style="width:36px;height:36px;border-radius:10px;background:var(--mint-l);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--mint-d)" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div><div style="font-size:14px;font-weight:700;color:var(--t1)">자동 운영 시작</div><div style="font-size:12px;color:var(--t3);margin-top:1px">24시간 댓글·DM·스토리 자동 관리</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="onb-footer">
+      <button class="btn-dark" onclick="go('signup')">무료로 시작하기</button>
+      <button class="btn-outline" onclick="go('login')">이미 계정이 있어요</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ SIGNUP ════ -->
+<div class="vw" id="v-signup">
+  <div class="hdr">
+    <button onclick="go('onb1')" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:13px;font-weight:700;display:flex;align-items:center;gap:4px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      뒤로
+    </button>
+    <div style="font-size:15px;font-weight:800;color:var(--t1)">회원가입</div>
+    <div style="width:40px"></div>
+  </div>
+  <div class="auth-wrap">
+    <div class="auth-title">7일 무료 체험<br>시작하기</div>
+    <div class="auth-sub">신용카드 없이 바로 시작해요</div>
+    <div class="input-group">
+      <div class="input-lbl">이름</div>
+      <input class="inp" type="text" placeholder="홍길동">
+    </div>
+    <div class="input-group">
+      <div class="input-lbl">이메일</div>
+      <input class="inp" type="email" placeholder="hello@example.com">
+    </div>
+    <div class="input-group">
+      <div class="input-lbl">비밀번호</div>
+      <div class="inp-pw">
+        <input class="inp" type="password" placeholder="8자 이상" id="signup-pw">
+        <div class="inp-eye" onclick="togglePw('signup-pw')">
+          <svg viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </div>
+    <div id="signup-error" style="color:var(--red);font-size:12px;margin-top:8px;display:none"></div>
+    <button class="btn-dark" style="margin-top:8px" onclick="doSignup()">계속하기</button>
+    <div class="divider">또는</div>
+    <button class="social-btn" onclick="doGoogleLogin()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 11H20.5C20.8 11.9 21 12.9 21 14C21 18.4 17.4 22 13 22C8.6 22 5 18.4 5 14C5 9.6 8.6 6 13 6C15.1 6 17 6.8 18.4 8.1L16.9 9.5C15.9 8.6 14.5 8 13 8C9.7 8 7 10.7 7 14C7 17.3 9.7 20 13 20C16 20 18.5 17.8 18.9 15H13V13L12 11Z" fill="#4285F4"/></svg>
+      Google로 계속하기
+    </button>
+    <div class="auth-switch">이미 계정이 있나요? <a onclick="go('login')">로그인</a></div>
+    <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:20px;line-height:1.7">가입하면 <a href="repli_terms.html" style="color:var(--mint-d);font-weight:700;text-decoration:none">이용약관</a>과 <a href="repli_terms.html?tab=privacy" style="color:var(--mint-d);font-weight:700;text-decoration:none">개인정보처리방침</a>에<br>동의하는 것으로 간주돼요</div>
+  </div>
+</div>
+
+<!-- ════ LOGIN ════ -->
+<div class="vw" id="v-login">
+  <div class="hdr">
+    <button onclick="go('onb1')" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:13px;font-weight:700;display:flex;align-items:center;gap:4px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      뒤로
+    </button>
+    <div style="font-size:15px;font-weight:800;color:var(--t1)">로그인</div>
+    <div style="width:40px"></div>
+  </div>
+  <div class="auth-wrap">
+    <div class="auth-title">돌아오셨군요!</div>
+    <div class="auth-sub">계속 관리해드릴게요</div>
+    <div class="input-group">
+      <div class="input-lbl">이메일</div>
+      <input class="inp" type="email" placeholder="hello@example.com">
+    </div>
+    <div class="input-group">
+      <div class="input-lbl">비밀번호</div>
+      <div class="inp-pw">
+        <input class="inp" type="password" placeholder="비밀번호 입력" id="login-pw">
+        <div class="inp-eye" onclick="togglePw('login-pw')">
+          <svg viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:right;margin-top:-6px;margin-bottom:20px"><a style="font-size:12px;font-weight:700;color:var(--mint);cursor:pointer">비밀번호를 잊으셨나요?</a></div>
+    <div id="login-error" style="color:var(--red);font-size:12px;margin-bottom:8px;display:none"></div>
+    <button class="btn-dark" onclick="doLogin()">로그인</button>
+    <div class="divider">또는</div>
+    <button class="social-btn" onclick="doGoogleLogin()">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M12 11H20.5C20.8 11.9 21 12.9 21 14C21 18.4 17.4 22 13 22C8.6 22 5 18.4 5 14C5 9.6 8.6 6 13 6C15.1 6 17 6.8 18.4 8.1L16.9 9.5C15.9 8.6 14.5 8 13 8C9.7 8 7 10.7 7 14C7 17.3 9.7 20 13 20C16 20 18.5 17.8 18.9 15H13V13L12 11Z" fill="#4285F4"/></svg>
+      Google로 로그인
+    </button>
+    <div class="auth-switch">계정이 없으신가요? <a onclick="go('signup')">무료로 시작하기</a></div>
+  </div>
+</div>
+
+<!-- ════ ACCOUNT CONNECT (온보딩용) ════ -->
+<div class="vw" id="v-connect-account-onb">
+  <div class="hdr">
+    <button onclick="go('signup')" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:13px;font-weight:700;display:flex;align-items:center;gap:4px">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      뒤로
+    </button>
+    <div style="font-size:15px;font-weight:800">계정 연동</div>
+    <div style="font-size:12px;font-weight:700;color:var(--t3)">1/3</div>
+  </div>
+  <div style="padding:0 20px">
+    <div style="display:flex;gap:4px;margin-bottom:24px">
+      <div style="flex:1;height:3px;border-radius:2px;background:var(--dark)"></div>
+      <div style="flex:1;height:3px;border-radius:2px;background:var(--b)"></div>
+      <div style="flex:1;height:3px;border-radius:2px;background:var(--b)"></div>
+    </div>
+    <div style="font-size:22px;font-weight:900;letter-spacing:-.8px;margin-bottom:6px">SNS 계정 연결하기</div>
+    <div style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:28px">공식 API로만 연동돼요. 비밀번호를 입력하지 않아요.</div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:center;gap:12px;padding:16px;background:var(--mint-l);border-radius:16px;border:1px solid #A7F3D0;cursor:pointer" id="ig-btn" onclick="connectIG()">
+        <div class="ch-av ch-ig" style="flex-shrink:0;border-radius:12px;width:42px;height:42px;font-size:11px">IG</div>
+        <div style="flex:1"><div style="font-size:14px;font-weight:700">Instagram</div><div style="font-size:12px;color:var(--mint-d);margin-top:1px" id="ig-status">탭해서 연동하기</div></div>
+        <div id="ig-check" style="display:none">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--mint)" stroke-width="2.5"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:16px;background:var(--bg);border-radius:16px;border:1px solid var(--b);cursor:pointer" id="tk-btn" onclick="connectTK()">
+        <div class="ch-av ch-tk" style="flex-shrink:0;border-radius:12px;width:42px;height:42px;font-size:11px">TK</div>
+        <div style="flex:1"><div style="font-size:14px;font-weight:700">TikTok</div><div style="font-size:12px;color:var(--t3);margin-top:1px" id="tk-status">탭해서 연동하기</div></div>
+        <div id="tk-check" style="display:none">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--mint)" stroke-width="2.5"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:12px;padding:16px;background:var(--bg);border-radius:16px;border:1px solid var(--b);cursor:pointer" id="yt-btn" onclick="connectYT()">
+        <div class="ch-av ch-yt" style="flex-shrink:0;border-radius:12px;width:42px;height:42px;font-size:11px">YT</div>
+        <div style="flex:1"><div style="font-size:14px;font-weight:700">YouTube</div><div style="font-size:12px;color:var(--t3);margin-top:1px" id="yt-status">탭해서 연동하기</div></div>
+        <div id="yt-check" style="display:none">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--mint)" stroke-width="2.5"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+    </div>
+    <div style="background:var(--mint-l);border-radius:12px;padding:12px 14px;margin-top:16px;font-size:12px;color:var(--mint-d);font-weight:500;line-height:1.6">비밀번호는 저장되지 않아요. Meta, TikTok, YouTube 공식 OAuth를 통해 안전하게 연동돼요.</div>
+    <button class="btn-dark" style="margin-top:20px" onclick="go('v-learn')">다음 — AI 말투 학습</button>
+    <button class="btn-outline" onclick="go('v-learn')">나중에 연동하기</button>
+  </div>
+</div>
+
+<!-- ════ AI 말투 학습 진행 ════ -->
+<div class="vw" id="v-learn">
+  <div class="hdr">
+    <div style="font-size:15px;font-weight:800">AI 말투 학습</div>
+    <div style="font-size:12px;font-weight:700;color:var(--t3)">2/3</div>
+  </div>
+  <div style="padding:0 20px">
+    <div style="display:flex;gap:4px;margin-bottom:24px">
+      <div style="flex:1;height:3px;border-radius:2px;background:var(--dark)"></div>
+      <div style="flex:1;height:3px;border-radius:2px;background:var(--dark)"></div>
+      <div style="flex:1;height:3px;border-radius:2px;background:var(--b)"></div>
+    </div>
+  </div>
+  <div class="learn-hero">
+    <div class="learn-ring">
+      <svg viewBox="0 0 140 140">
+        <circle class="learn-ring-track" cx="70" cy="70" r="60"/>
+        <circle class="learn-ring-fill" id="learn-ring-fill" cx="70" cy="70" r="60"/>
+      </svg>
+      <div class="learn-pct">
+        <div class="learn-pct-num" id="learn-num">0</div>
+        <div class="learn-pct-lbl">%</div>
+      </div>
+    </div>
+    <div class="learn-status" id="learn-status">게시물 분석 중...</div>
+    <div class="learn-detail" id="learn-detail">최근 게시물 250개를 읽고 있어요.<br>말투·이모지·뉘앙스를 학습해요.</div>
+  </div>
+
+  <div class="learn-log">
+    <div class="llfade t"></div>
+    <div class="learn-log-inner">
+      <div class="learn-log-row"><div class="learn-log-dot"></div>게시물 #248 분석 완료 · 친근체 감지</div>
+      <div class="learn-log-row"><div class="learn-log-dot"></div>이모지 패턴 학습 중 · :) 🌿 😊</div>
+      <div class="learn-log-row"><div class="learn-log-dot"></div>댓글 응대 패턴 분석 중</div>
+      <div class="learn-log-row"><div class="learn-log-dot"></div>제품 링크 안내 표현 학습</div>
+      <div class="learn-log-row"><div class="learn-log-dot"></div>감사 표현 패턴 추출 완료</div>
+      <div class="learn-log-row"><div class="learn-log-dot"></div>구매 문의 응대 방식 학습</div>
+      <div class="learn-log-row"><div class="learn-log-dot"></div>게시물 #248 분석 완료 · 친근체 감지</div>
+      <div class="learn-log-row"><div class="learn-log-dot"></div>이모지 패턴 학습 중 · :) 🌿 😊</div>
+      <div class="learn-log-row"><div class="learn-log-dot"></div>댓글 응대 패턴 분석 중</div>
+      <div class="learn-log-row"><div class="learn-log-dot"></div>제품 링크 안내 표현 학습</div>
+      <div class="learn-log-row"><div class="learn-log-dot"></div>감사 표현 패턴 추출 완료</div>
+      <div class="learn-log-row"><div class="learn-log-dot"></div>구매 문의 응대 방식 학습</div>
+    </div>
+    <div class="llfade b"></div>
+  </div>
+
+  <div style="padding:0 24px">
+    <div style="font-size:12px;font-weight:700;color:var(--t3);margin-bottom:10px">학습된 말투 특징</div>
+    <div class="learn-tags" id="learn-tags" style="padding:0">
+      <div class="learn-tag" style="animation-delay:.2s">친근한 어투</div>
+      <div class="learn-tag" style="animation-delay:.5s">이모지 적절히</div>
+      <div class="learn-tag" style="animation-delay:.8s">반말 없음</div>
+      <div class="learn-tag" style="animation-delay:1.1s">감사 표현 자주</div>
+      <div class="learn-tag" style="animation-delay:1.4s">플랫폼 직접 안내</div>
+    </div>
+    <button class="btn-dark" id="learn-btn" onclick="go('v-complete')" style="margin-top:20px;opacity:.4;pointer-events:none">학습 완료 대기 중...</button>
+  </div>
+</div>
+
+<!-- ════ 설정 완료 ════ -->
+<div class="vw" id="v-complete">
+  <div style="padding:0 20px">
+    <div style="display:flex;gap:4px;margin:0 0 40px">
+      <div style="flex:1;height:3px;border-radius:2px;background:var(--dark)"></div>
+      <div style="flex:1;height:3px;border-radius:2px;background:var(--dark)"></div>
+      <div style="flex:1;height:3px;border-radius:2px;background:var(--dark)"></div>
+    </div>
+  </div>
+  <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 32px;text-align:center;min-height:60vh">
+    <div style="width:80px;height:80px;border-radius:28px;background:var(--mint-l);border:1px solid #A7F3D0;display:flex;align-items:center;justify-content:center;margin-bottom:24px">
+      <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--mint)" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div style="font-size:26px;font-weight:900;letter-spacing:-1px;margin-bottom:10px">준비 완료!</div>
+    <div style="font-size:15px;color:var(--t2);line-height:1.7;margin-bottom:40px">AI가 말투 학습을 마쳤어요.<br>이제부터 Repli가<br>나 대신 관리해드릴게요.</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;width:100%;margin-bottom:32px">
+      <div style="background:var(--bg);border-radius:14px;padding:14px 8px;text-align:center;border:1px solid var(--b)">
+        <div style="font-size:20px;font-weight:900;color:var(--mint)">98%</div>
+        <div style="font-size:10px;color:var(--t3);font-weight:600;margin-top:3px">말투 일치도</div>
+      </div>
+      <div style="background:var(--bg);border-radius:14px;padding:14px 8px;text-align:center;border:1px solid var(--b)">
+        <div style="font-size:20px;font-weight:900;color:var(--t1)">250</div>
+        <div style="font-size:10px;color:var(--t3);font-weight:600;margin-top:3px">학습 게시물</div>
+      </div>
+      <div style="background:var(--bg);border-radius:14px;padding:14px 8px;text-align:center;border:1px solid var(--b)">
+        <div style="font-size:20px;font-weight:900;color:var(--t1)">24h</div>
+        <div style="font-size:10px;color:var(--t3);font-weight:600;margin-top:3px">자동 운영</div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:0 24px calc(32px + env(safe-area-inset-bottom))">
+    <button class="btn-mint-full" onclick="go('home')">대시보드로 이동하기</button>
+  </div>
+</div>
+
+<!-- ════ 타겟 계정 관리 ════ -->
+<div class="vw" id="v-targets">
+  <div class="hdr">
+    <button onclick="go('profile')" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:13px;font-weight:700;display:flex;align-items:center;gap:4px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>뒤로</button>
+    <div style="font-size:16px;font-weight:800">타겟 계정 관리</div>
+    <div style="width:40px"></div>
+  </div>
+  <div style="padding:0 0 8px">
+    <div style="font-size:13px;color:var(--t2);margin-bottom:14px;line-height:1.6">스토리 조회·좋아요로 팔로워를 유도할 계정을 추가하세요.</div>
+    <div class="add-target-row">
+      <input class="inp" type="text" placeholder="@계정명 입력" id="target-input">
+      <button onclick="addTarget()">추가</button>
+    </div>
+
+    <div style="font-size:12px;font-weight:700;color:var(--t3);margin-bottom:8px">내 타겟 계정 <span style="color:var(--t1);font-weight:800">4</span></div>
+    <div class="target-card" id="target-list">
+      <div class="target-item"><div class="target-av2">H</div><div class="target-info2"><div class="target-name2">@hazel_skin</div><div class="target-meta">#스킨케어 · 팔로워 2.4만</div></div><button class="target-del" onclick="delTarget(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+      <div class="target-item"><div class="target-av2">M</div><div class="target-info2"><div class="target-name2">@morning_glow_kr</div><div class="target-meta">#뷰티루틴 · 팔로워 1.1만</div></div><button class="target-del" onclick="delTarget(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+      <div class="target-item"><div class="target-av2">K</div><div class="target-info2"><div class="target-name2">@kbeauty_daily</div><div class="target-meta">#케이뷰티 · 팔로워 5.8만</div></div><button class="target-del" onclick="delTarget(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+      <div class="target-item"><div class="target-av2">S</div><div class="target-info2"><div class="target-name2">@seoulnista</div><div class="target-meta">#데일리룩 · 팔로워 8.2만</div></div><button class="target-del" onclick="delTarget(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+    </div>
+
+    <div style="font-size:12px;font-weight:700;color:var(--t3);margin:18px 0 8px">유사 타겟 추천 <span style="font-size:10px;font-weight:500;color:var(--mint)">AI 분석</span></div>
+    <div style="font-size:12px;color:var(--t2);margin-bottom:10px;line-height:1.5">내 타겟 계정과 비슷한 계정들이에요. 추가하면 도달 범위가 넓어져요.</div>
+    <div class="target-card">
+      <div class="target-item">
+        <div class="target-av2" style="background:var(--mint-l);color:var(--mint-d)">J</div>
+        <div class="target-info2"><div class="target-name2">@jjin_beauty</div><div class="target-meta">#뷰티리뷰 · 팔로워 3.2만 · 유사도 94%</div></div>
+        <button onclick="addSimilar(this,'@jjin_beauty')" style="padding:5px 12px;border-radius:8px;border:1px solid var(--mint);background:none;color:var(--mint);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0">추가</button>
+      </div>
+      <div class="target-item">
+        <div class="target-av2" style="background:var(--mint-l);color:var(--mint-d)">C</div>
+        <div class="target-info2"><div class="target-name2">@cool_skincare_kr</div><div class="target-meta">#스킨케어 · 팔로워 1.9만 · 유사도 91%</div></div>
+        <button onclick="addSimilar(this,'@cool_skincare_kr')" style="padding:5px 12px;border-radius:8px;border:1px solid var(--mint);background:none;color:var(--mint);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0">추가</button>
+      </div>
+      <div class="target-item">
+        <div class="target-av2" style="background:var(--mint-l);color:var(--mint-d)">B</div>
+        <div class="target-info2"><div class="target-name2">@beauty_log_daily</div><div class="target-meta">#데일리뷰티 · 팔로워 4.7만 · 유사도 88%</div></div>
+        <button onclick="addSimilar(this,'@beauty_log_daily')" style="padding:5px 12px;border-radius:8px;border:1px solid var(--mint);background:none;color:var(--mint);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0">추가</button>
+      </div>
+      <div class="target-item">
+        <div class="target-av2" style="background:var(--mint-l);color:var(--mint-d)">Y</div>
+        <div class="target-info2"><div class="target-name2">@yoon_glow</div><div class="target-meta">#글로우피부 · 팔로워 2.1만 · 유사도 85%</div></div>
+        <button onclick="addSimilar(this,'@yoon_glow')" style="padding:5px 12px;border-radius:8px;border:1px solid var(--mint);background:none;color:var(--mint);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0">추가</button>
+      </div>
+      <div class="target-item">
+        <div class="target-av2" style="background:var(--mint-l);color:var(--mint-d)">P</div>
+        <div class="target-info2"><div class="target-name2">@pink_routine_kr</div><div class="target-meta">#루틴공유 · 팔로워 6.3만 · 유사도 82%</div></div>
+        <button onclick="addSimilar(this,'@pink_routine_kr')" style="padding:5px 12px;border-radius:8px;border:1px solid var(--mint);background:none;color:var(--mint);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0">추가</button>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--t3);text-align:center;margin-top:12px;font-weight:500">하루 최대 50개 계정 · 랜덤 간격 자동 실행</div>
+  </div>
+</div>
+
+
+<!-- ════ 알림 히스토리 ════ -->
+<div class="vw" id="v-notif">
+  <div class="hdr"><div style="font-size:16px;font-weight:800">알림 기록</div></div>
+  <div style="padding:0 20px">
+    <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:8px">오늘</div>
+    <div class="notif-card">
+      <div class="notif-row">
+        <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+          <div class="notif-ico" style="background:var(--red-l)"><svg viewBox="0 0 24 24" stroke="var(--red)" stroke-width="1.8"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="notif-body"><div class="notif-title">결제 문제 긴급 알림</div><div class="notif-sub">@beauty_lover99 · "공동구매 결제 오류..."</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0"><div class="notif-time">2분 전</div><div class="notif-unread"></div></div>
+      </div>
+      <div class="notif-row">
+        <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+          <div class="notif-ico" style="background:var(--amber-l)"><svg viewBox="0 0 24 24" stroke="var(--amber)" stroke-width="1.8"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="notif-body"><div class="notif-title">수익 제안 도착</div><div class="notif-sub">@japan_import_co · 수출 문의 4,500만원</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0"><div class="notif-time">1시간 전</div><div class="notif-unread"></div></div>
+      </div>
+      <div class="notif-row">
+        <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+          <div class="notif-ico" style="background:var(--mint-l)"><svg viewBox="0 0 24 24" stroke="var(--mint)" stroke-width="1.8"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="notif-body"><div class="notif-title">일일 리포트</div><div class="notif-sub">오늘 자동 응대 284건 · 신규 팔로워 +6명</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0"><div class="notif-time">오전 9:00</div></div>
+      </div>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin:16px 0 8px">어제</div>
+    <div class="notif-card">
+      <div class="notif-row">
+        <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+          <div class="notif-ico" style="background:var(--red-l)"><svg viewBox="0 0 24 24" stroke="var(--red)" stroke-width="1.8"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="notif-body"><div class="notif-title">부정 이슈 감지</div><div class="notif-sub">@skin_trouble_k · 트러블 클레임</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0"><div class="notif-time">어제 3:22pm</div></div>
+      </div>
+      <div class="notif-row" style="border:none">
+        <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
+          <div class="notif-ico" style="background:var(--mint-l)"><svg viewBox="0 0 24 24" stroke="var(--mint)" stroke-width="1.8"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+          <div class="notif-body"><div class="notif-title">일일 리포트</div><div class="notif-sub">어제 자동 응대 312건 · 신규 팔로워 +11명</div></div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0"><div class="notif-time">어제 9:00am</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ 이용권 / 결제 ════ -->
+<div class="vw" id="v-plan">
+  <div class="plan-hero">
+    <div class="plan-badge">무료체험 D-4 · 지금 바로 구독하기</div>
+    <div class="plan-title">플랜을 선택하세요</div>
+    <div class="plan-sub">언제든지 취소할 수 있어요. 약정 없음.</div>
+  </div>
+  <div class="plan-cards">
+    <div class="plan-card selected" id="plan-basic" onclick="selectPlan('basic')">
+      <div class="plan-name">베이직</div>
+      <div class="plan-price">₩29,000 <span>/ 월</span></div>
+      <div class="plan-desc">개인 크리에이터에 딱 맞아요</div>
+      <div class="plan-features">
+        <div class="plan-feat">월 3,300건 자동 응대</div>
+        <div class="plan-feat">계정 2개 (IG + TK 또는 YT)</div>
+        <div class="plan-feat">AI 말투 학습 포함</div>
+        <div class="plan-feat">카카오 알림</div>
+      </div>
+    </div>
+    <div class="plan-card recommended" id="plan-pro" onclick="selectPlan('pro')">
+      <div class="plan-rec-badge">추천</div>
+      <div class="plan-name">프리미엄</div>
+      <div class="plan-price">₩59,000 <span>/ 월</span></div>
+      <div class="plan-desc">활발히 운영 중인 계정에 추천</div>
+      <div class="plan-features">
+        <div class="plan-feat">월 6,600건 자동 응대</div>
+        <div class="plan-feat">계정 3개 (IG + TK + YT)</div>
+        <div class="plan-feat">AI 말투 학습 포함</div>
+        <div class="plan-feat">수익 제안 자동 분류</div>
+        <div class="plan-feat">카카오 알림 전체</div>
+        <div class="plan-feat">타겟 스토리 조회</div>
+      </div>
+    </div>
+    <div class="plan-card" id="plan-biz" onclick="selectPlan('biz')">
+      <div class="plan-name">비즈니스</div>
+      <div class="plan-price">₩129,000 <span>/ 월</span></div>
+      <div class="plan-desc">브랜드·에이전시 운영에 최적</div>
+      <div class="plan-features">
+        <div class="plan-feat">월 무제한 자동 응대</div>
+        <div class="plan-feat">계정 10개</div>
+        <div class="plan-feat">전용 AI 말투 세분화</div>
+        <div class="plan-feat">수출·B2B 자동 분류</div>
+        <div class="plan-feat">전담 매니저 지원</div>
+      </div>
+    </div>
+  </div>
+  <div class="plan-footer">
+    <button class="btn-mint-full" onclick="openModal('m-plan-checkout')">프리미엄 구독 시작하기</button>
+    <div class="pay-note">첫 결제는 무료체험 종료 후 진행돼요.<br>언제든 취소·변경 가능해요.</div>
+  </div>
+</div>
+
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nb on" id="nb-home" onclick="go('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round"/></svg>홈</button>
+  <button class="nb" id="nb-activity" onclick="go('activity')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>소셜 활동</button>
+  <button class="nb" id="nb-manage" onclick="go('manage')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" stroke-linecap="round" stroke-linejoin="round"/></svg>관리<div class="nb-pip"></div></button>
+  <button class="nb" id="nb-kakao-notif" onclick="openModal('m-kakao-popup')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round"/></svg>톡으로 받기</button>
+  <button class="nb" id="nb-profile" onclick="go('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>내 정보</button>
+</nav>
+
+<!-- MODALS -->
+<div class="ov" id="m-u1" onclick="co(event,'m-u1')"><div class="sheet"><div class="s-bar"></div><div class="s-title">결제 문제</div><div class="s-sub">@beauty_lover99 · Instagram · 2분 전</div><div class="bubble"><div class="b-who">@beauty_lover99</div>"공동구매 결제가 계속 오류가 나는데 환불은 어떻게 해요?"</div><div class="bubble ai"><div class="b-who ai">Repli AI 초안</div>안녕하세요! 불편을 드려서 정말 죄송해요. 결제 오류 및 중복 결제 문제는 구매하신 플랫폼 고객센터에서 바로 처리해 드릴 수 있어요. 올리브영 1800-0033 / 스마트스토어는 마이페이지 문의하기로 접수해 주세요!</div><button class="btn-p" onclick="cm('m-u1')">승인 · 바로 발송</button><button class="btn-s" onclick="cm('m-u1')">수정하기</button><button class="btn-d" onclick="cm('m-u1')">직접 응대</button></div></div>
+<div class="ov" id="m-u2" onclick="co(event,'m-u2')"><div class="sheet"><div class="s-bar"></div><div class="s-title">부정 이슈</div><div class="s-sub">@skin_trouble_k · Instagram · 18분 전</div><div class="bubble"><div class="b-who">@skin_trouble_k</div>"이거 쓰고 트러블 났어요 신고 어떻게 해요..."</div><div class="bubble ai"><div class="b-who ai">Repli AI 초안</div>안녕하세요, 불편을 드려 정말 죄송해요. DM으로 연락 주시면 교환·환불 빠르게 도와드릴게요!</div><button class="btn-p" onclick="cm('m-u2')">승인 · 바로 발송</button><button class="btn-s" onclick="cm('m-u2')">수정하기</button><button class="btn-d" onclick="cm('m-u2')">직접 응대</button></div></div>
+<div class="ov" id="m-biz" onclick="co(event,'m-biz')"><div class="sheet"><div class="s-bar"></div><div class="s-title">협업 문의</div><div class="s-sub">@collab_brand_k · DM · 1시간 전</div><div class="bubble"><div class="b-who">@collab_brand_k</div>"OEM 협업 및 견적 문의드립니다"</div><div class="bubble ai"><div class="b-who ai">Repli AI 초안</div>안녕하세요! 관심 감사해요. 자세한 협의는 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6f060109002f02060303060206030306410c00">[email&#160;protected]</a> 또는 카카오 @millimilli 로 연락 주시면 빠르게 안내드릴게요</div><button class="btn-p" onclick="cm('m-biz')">승인 · 바로 발송</button><button class="btn-s" onclick="cm('m-biz')">수정하기</button></div></div>
+<div class="ov" id="m-c1" onclick="co(event,'m-c1')"><div class="sheet"><div class="s-bar"></div><div class="s-title">응대 내역</div><div class="bubble"><div class="b-who">@yuna__daily</div>"제품 어디서 구매해요?"</div><div class="bubble ai"><div class="b-who ai">Repli AI · 말투 98%</div>올리브영·스마트스토어·카페24에서 구매 가능해요! 프로필 링크에 바로 있어요</div><div class="bubble"><div class="b-who">@yuna__daily</div>"감사해요!! 바로 주문했어요"</div><button class="btn-s" onclick="cm('m-c1')">닫기</button></div></div>
+<div class="ov" id="m-crm1" onclick="co(event,'m-crm1')"><div class="sheet"><div class="s-bar"></div><div class="s-title">@yuna__daily</div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px"><span class="badge bg">VVIP</span><span class="badge bn">Instagram</span><span class="badge bn">댓글 38회</span></div><div class="bubble">최근: "이 제품 너무 좋아요! 주변에 다 추천했어요"<br>구매 3회 · 공유 5회 · 좋아요 28회</div><button class="btn-p" onclick="cm('m-crm1')">스토리 조회 예약</button><button class="btn-s" onclick="cm('m-crm1')">닫기</button></div></div>
+<div class="ov" id="m-crm2" onclick="co(event,'m-crm2')"><div class="sheet"><div class="s-bar"></div><div class="s-title">요주의 — @skin_trouble_k</div><div class="bubble"><div class="b-who" style="color:var(--red)">Instagram</div>"이 제품 써서 트러블 났어요!! 환불 어떻게 해요"</div><div class="bubble ai"><div class="b-who ai">Repli AI 초안</div>안녕하세요, 불편을 드려 정말 죄송해요. DM으로 연락 주시면 빠르게 도와드릴게요!</div><button class="btn-p" onclick="cm('m-crm2')">승인 · 바로 발송</button><button class="btn-d" onclick="cm('m-crm2')">직접 응대</button></div></div>
+
+<!-- 더보기 모달 -->
+<div class="ov" id="m-pos-more" onclick="co(event,'m-pos-more')"><div class="sheet"><div class="s-bar"></div><div class="s-title">긍정 팔로워 전체 (142명)</div><div style="margin-top:4px"><div class="crow" onclick=""><div class="ch-av ch-ig" style="border-radius:50%">IG</div><div class="cbody"><div class="cname">@seoulnista</div><div class="csub">댓글 29회 · 영상 공유 5회</div><div class="ctags"><span class="badge bg">열성팬</span></div></div><div class="cscore">85점</div></div><div class="crow" onclick=""><div class="ch-av ch-tk" style="border-radius:50%">TK</div><div class="cbody"><div class="cname">@jjin_beauty</div><div class="csub">댓글 22회 · 좋아요 다수</div><div class="ctags"><span class="badge bn">구매의향</span></div></div><div class="cscore">72점</div></div><div class="crow" onclick="" style="border:none"><div class="ch-av ch-yt" style="border-radius:50%">YT</div><div class="cbody"><div class="cname">@morning_k</div><div class="csub">구독자 · 댓글 15회</div><div class="ctags"><span class="badge bn">일반팬</span></div></div><div class="cscore">61점</div></div></div><button class="btn-s" onclick="cm('m-pos-more')">닫기</button></div></div>
+<div class="ov" id="m-neg-more" onclick="co(event,'m-neg-more')"><div class="sheet"><div class="s-bar"></div><div class="s-title">부정 팔로워 전체 (11명)</div><div style="margin-top:4px"><div class="crow" onclick=""><div class="ch-av ch-ig" style="border-radius:50%;background:var(--red-l);color:var(--red)">IG</div><div class="cbody"><div class="cname">@angry_user01</div><div class="csub">부정 댓글 3회 · 배송 클레임</div><div class="ctags"><span class="badge br">요주의</span></div></div><div class="cscore" style="color:var(--red)">!</div></div><div class="crow" onclick="" style="border:none"><div class="ch-av ch-tk" style="border-radius:50%;background:var(--red-l);color:var(--red)">TK</div><div class="cbody"><div class="cname">@negative_k22</div><div class="csub">부정 댓글 1회</div><div class="ctags"><span class="badge br">주의</span></div></div><div class="cscore" style="color:var(--red)">!</div></div></div><button class="btn-s" onclick="cm('m-neg-more')">닫기</button></div></div>
+
+<!-- 수익 한번에 응답 -->
+<div class="ov" id="m-rev-bulk" onclick="co(event,'m-rev-bulk')"><div class="sheet"><div class="s-bar"></div><div class="s-title">한번에 응답하기</div><div class="s-sub">4건 전체에 동일한 응대 메시지를 발송해요</div><div style="font-size:12px;font-weight:600;color:var(--t3);margin-bottom:6px">발송 메시지</div><textarea class="sheet-ta" rows="4">"안녕하세요! 관심 감사드려요. 자세한 협의를 위해 info@millimilli.co 또는 카카오 @millimilli 로 연락 주시면 빠르게 안내드릴게요 :)"</textarea><button class="btn-p" onclick="cm('m-rev-bulk')">4건 전체 발송</button><button class="btn-s" onclick="cm('m-rev-bulk')">닫기</button></div></div>
+
+<!-- 수익 상세 -->
+<div class="ov" id="m-rev1" onclick="co(event,'m-rev1')"><div class="sheet"><div class="s-bar"></div><div class="s-title">협찬·광고 제안</div><div class="s-sub">케이뷰티코 · Instagram DM · 1월 15일 · 200만원</div><div class="bubble"><div class="b-who">@kbeauty_brand1</div>"신제품 쿠션 광고 협업 제안드리고 싶어요. 광고비 200만원 생각 중입니다."</div><div class="bubble ai"><div class="b-who ai">Repli AI 초안</div>안녕하세요! 제안 감사드려요. 자세한 협의는 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ec85828a83ac81858080858185808085c28f83">[email&#160;protected]</a> 또는 카카오 @millimilli 로 연락 주시면 빠르게 안내드릴게요 :)</div><button class="btn-p" onclick="cm('m-rev1')">승인 · 바로 발송</button><button class="btn-s" onclick="cm('m-rev1')">수정하기</button></div></div>
+<div class="ov" id="m-rev2" onclick="co(event,'m-rev2')"><div class="sheet"><div class="s-bar"></div><div class="s-title">수출 문의</div><div class="s-sub">재팬뷰티 · DM · 1월 14일 · ~4,500만원</div><div class="bubble"><div class="b-who">@japan_import_co</div>"K-뷰티 500달톤 제품 수출 가능한지요? 초도 물량 500만엔 규모입니다."</div><div class="bubble ai"><div class="b-who ai">Repli AI 초안</div>안녕하세요! 관심 감사해요. 수출 관련 협의는 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d7beb9b1b897babebbbbbebabebbbbbef9b4b8">[email&#160;protected]</a> 로 연락 주시면 담당자가 빠르게 안내드릴게요.</div><button class="btn-p" onclick="cm('m-rev2')">승인 · 바로 발송</button><button class="btn-s" onclick="cm('m-rev2')">수정하기</button></div></div>
+<div class="ov" id="m-rev3" onclick="co(event,'m-rev3')"><div class="sheet"><div class="s-bar"></div><div class="s-title">Amazon 판매 제안</div><div class="s-sub">US K-Beauty · DM · 1월 13일 · ~4,200만원</div><div class="bubble"><div class="b-who">@us_kbeauty_shop</div>"Interested in reselling MILLIMILLI on Amazon US. 2,000 units, ~$30,000."</div><div class="bubble ai"><div class="b-who ai">Repli AI 초안</div>Hello! Thank you for your interest. Please contact us at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="254c4b434a65484c49494c484c49494c0b464a">[email&#160;protected]</a> for detailed distribution terms.</div><button class="btn-p" onclick="cm('m-rev3')">승인 · 바로 발송</button><button class="btn-s" onclick="cm('m-rev3')">수정하기</button></div></div>
+
+<!-- 긴급 메시지 설정 -->
+<div class="ov" id="m-bulk-setting" onclick="co(event,'m-bulk-setting')"><div class="sheet"><div class="s-bar"></div><div class="s-title">안내 메시지 설정</div><div class="s-sub">긴급 댓글·DM에 일괄 발송할 메시지를 설정하세요</div><div style="font-size:12px;font-weight:600;color:var(--t3);margin-bottom:6px">연락처</div><input class="sheet-in" type="text" value="카카오 @millimilli" placeholder="카카오 @계정 또는 이메일"><div style="font-size:12px;font-weight:600;color:var(--t3);margin-top:14px;margin-bottom:6px">안내 메시지</div><textarea class="sheet-ta" rows="4">"안녕하세요! 소중한 말씀 감사해요. 자세한 확인을 위해 카카오 @millimilli 로 연락 주시면 빠르게 도와드릴게요 :)"</textarea><button class="btn-p" onclick="saveBulk()">저장</button><button class="btn-s" onclick="cm('m-bulk-setting')">닫기</button></div></div>
+
+<!-- AI 말투 학습 -->
+<div class="ov" id="m-ai-style" onclick="co(event,'m-ai-style')"><div class="sheet"><div class="s-bar"></div>
+  <div class="s-title">AI 말투 학습</div>
+  <div class="s-sub">내 게시물과 응대 기록으로 AI가 말투를 학습해요</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">
+    <div style="background:var(--mint-l);border-radius:14px;padding:14px;text-align:center"><div style="font-size:26px;font-weight:900;color:var(--mint)">98%</div><div style="font-size:11px;color:var(--mint-d);font-weight:600;margin-top:4px">말투 일치도</div></div>
+    <div style="background:var(--bg);border-radius:14px;padding:14px;text-align:center"><div style="font-size:26px;font-weight:900;color:var(--t1)">250</div><div style="font-size:11px;color:var(--t3);font-weight:600;margin-top:4px">분석한 게시물</div></div>
+  </div>
+  <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:10px">AI가 학습한 내 말투</div>
+  <div style="background:var(--bg);border-radius:12px;padding:14px;margin-bottom:18px;font-size:12px;color:var(--t2);line-height:1.9">
+    ✓ 친근하고 밝은 어투<br>✓ 이모티콘 적절히 사용 (:) 😊 🌿)<br>✓ 반말 사용 안 함<br>✓ 감사 표현 자주 사용<br>✓ 제품 링크는 "프로필 링크에 있어요" 표현<br>✓ 구매 문의는 플랫폼명 직접 안내
+  </div>
+  <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:6px">추가 설정</div>
+  <div style="font-size:12px;color:var(--t3);margin-bottom:8px">AI가 추가로 반영할 상황별 응대 방식을 입력하세요</div>
+  <textarea class="sheet-ta" rows="3" placeholder="예: 공구 관련 문의는 '다음 공구는 스토리로 먼저 알려드릴게요!' 라고 답해줘&#10;예: 협찬 문의는 무조건 info@millimilli.co 로 안내해줘"></textarea>
+  <div style="font-size:13px;font-weight:700;color:var(--t1);margin-top:14px;margin-bottom:6px">사용하지 않을 표현</div>
+  <input class="sheet-in" type="text" placeholder="예: 고객님, 구매 부탁드립니다 (콤마로 구분)">
+  <button class="btn-p" style="margin-top:16px" onclick="cm('m-ai-style')">저장</button>
+  <button class="btn-s" onclick="cm('m-ai-style')">닫기</button>
+</div></div>
+
+<!-- 카카오 알림 -->
+<div class="ov" id="m-kakao" onclick="co(event,'m-kakao')"><div class="sheet"><div class="s-bar"></div><div class="s-title">카카오 알림 설정</div><div class="s-sub">중요 이벤트 발생 시 카카오톡으로 즉시 알려드려요</div><div class="setting-row"><div class="s-body"><div class="s-name">요주의 댓글 즉시 알림</div><div class="s-desc">부정 이슈, 결제 문제 감지 시 즉시 발송</div></div><label class="tog"><input type="checkbox" checked><span class="tsl"></span></label></div><div class="setting-row"><div class="s-body"><div class="s-name">일일 리포트</div><div class="s-desc">매일 오전 9시 전일 응대 요약 발송</div></div><label class="tog"><input type="checkbox" checked><span class="tsl"></span></label></div><div class="setting-row"><div class="s-body"><div class="s-name">수익 제안 알림</div><div class="s-desc">광고·협업·수출 문의 도착 시 즉시 발송</div></div><label class="tog"><input type="checkbox" checked><span class="tsl"></span></label></div><div style="font-size:13px;font-weight:700;color:var(--t1);margin-top:16px;margin-bottom:8px">카카오톡 연동</div><input class="sheet-in" type="text" placeholder="카카오톡 ID 입력" style="margin-bottom:10px"><button class="btn-p" style="background:#FEE500;color:#3A1D1D;margin-top:0" onclick="cm('m-kakao')">카카오 알림톡 연동하기</button><button class="btn-s" style="margin-top:6px" onclick="cm('m-kakao')">닫기</button></div></div>
+
+<!-- 이용권 -->
+<div class="ov" id="m-plan" onclick="co(event,'m-plan')"><div class="sheet"><div class="s-bar"></div><div class="s-title">이용권</div><div style="background:var(--mint-l);border-radius:16px;padding:20px;margin-bottom:16px;border:1px solid #A7F3D0"><div style="font-size:11px;font-weight:700;color:var(--mint-d);margin-bottom:4px">현재 플랜</div><div style="font-size:22px;font-weight:900;color:var(--t1)">프리미엄</div><div style="font-size:13px;color:var(--t2);margin-top:4px">무료체험 D-4 남음</div><div style="margin-top:12px;font-size:12px;color:var(--mint-d);font-weight:600">월 6,600건 응대 · 3개 채널 · AI 말투 학습 포함</div></div><div class="setting-row"><div class="s-body"><div class="s-name">월 응대 한도</div><div class="s-desc">6,600건 / 이번 달 1,842건 사용 (28%)</div></div></div><div class="setting-row"><div class="s-body"><div class="s-name">연결 채널</div><div class="s-desc">Instagram · TikTok · YouTube</div></div></div><div class="setting-row"><div class="s-body"><div class="s-name">갱신일</div><div class="s-desc">2025년 2월 15일</div></div></div><button class="btn-p" onclick="cm('m-plan')">구독 관리</button><button class="btn-s" onclick="cm('m-plan')">닫기</button></div></div>
+
+<!-- 계정 연동 -->
+<div class="ov" id="m-account" onclick="co(event,'m-account')"><div class="sheet"><div class="s-bar"></div><div class="s-title">계정 연동</div><div style="display:flex;flex-direction:column;gap:8px;margin-top:14px"><div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--mint-l);border-radius:14px;border:1px solid #A7F3D0"><div class="ch-av ch-ig" style="flex-shrink:0;border-radius:10px;width:38px;height:38px">IG</div><div style="flex:1"><div style="font-size:13px;font-weight:700">Instagram</div><div style="font-size:11px;color:var(--mint-d);margin-top:1px">연동 완료 · 팔로워 312,000</div></div><span class="badge bg">연결됨</span></div><div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--mint-l);border-radius:14px;border:1px solid #A7F3D0"><div class="ch-av ch-tk" style="flex-shrink:0;border-radius:10px;width:38px;height:38px">TK</div><div style="flex:1"><div style="font-size:13px;font-weight:700">TikTok</div><div style="font-size:11px;color:var(--mint-d);margin-top:1px">연동 완료 · 팔로워 89,400</div></div><span class="badge bg">연결됨</span></div><div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg);border-radius:14px;border:1px solid var(--b)"><div class="ch-av ch-yt" style="flex-shrink:0;border-radius:10px;width:38px;height:38px">YT</div><div style="flex:1"><div style="font-size:13px;font-weight:700">YouTube</div><div style="font-size:11px;color:var(--t3);margin-top:1px">미연동</div></div><button style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;background:var(--dark);color:#fff;border:none;cursor:pointer">연동하기</button></div></div></div></div>
+
+<script>
+var aiOn=true, bulkOn=false, qc=200, qd=100, learnTimer=null;
+
+function go(v){
+  var id = v.startsWith('v-') ? v.slice(2) : v;
+  document.querySelectorAll('.vw').forEach(function(e){ e.classList.remove('on'); });
+  document.querySelectorAll('.nb').forEach(function(e){ e.classList.remove('on'); });
+  var el = document.getElementById('v-'+id);
+  var nb = document.getElementById('nb-'+id);
+  if(el) el.classList.add('on');
+  if(nb) nb.classList.add('on');
+  if(id === 'learn') setTimeout(startLearnAnim, 400);
+  window.scrollTo(0,0);
+}
+
+function setTab(t){
+  ['urgent','comments','crm','revenue','insight'].forEach(function(x){
+    var tb=document.getElementById('tab-'+x), tc=document.getElementById('tc-'+x);
+    if(tb) tb.classList.remove('on');
+    if(tc) tc.classList.remove('on');
+  });
+  var tb=document.getElementById('tab-'+t), tc=document.getElementById('tc-'+t);
+  if(tb) tb.classList.add('on');
+  if(tc) tc.classList.add('on');
+}
+
+function toggleAcc(id){ document.getElementById(id).classList.toggle('open'); }
+function openAcc(id){ document.getElementById(id).classList.add('open'); }
+function openModal(id){ document.getElementById(id).classList.add('on'); }
+function cm(id){ document.getElementById(id).classList.remove('on'); }
+function co(e,id){ if(e.target===e.currentTarget) cm(id); }
+
+function toggleAI(){
+  aiOn=!aiOn;
+  var d=document.getElementById('ai-dot'), t=document.getElementById('ai-txt');
+  d.style.background=aiOn?'var(--mint)':'#D1D5DB';
+  d.style.animation=aiOn?'bl 2s ease infinite':'none';
+  t.textContent=aiOn?'AI 작동 중':'AI 꺼짐';
+  t.style.color=aiOn?'var(--mint)':'#94A3B8';
+}
+
+function markSent(btn){
+  var d=btn.closest('.draft');
+  d.style.opacity='.3';
+  btn.textContent='전송완료';
+  btn.style.background='#D1D5DB';
+  btn.disabled=true;
+}
+
+function toggleBulk(){
+  var cb=document.getElementById('bulk-toggle');
+  bulkOn=cb.checked;
+  document.getElementById('bulk-content').style.display=bulkOn?'block':'none';
+}
+
+function sendBulk(){
+  var t=document.getElementById('bulk-toggle');
+  if(t) t.checked=false;
+  bulkOn=false;
+  document.getElementById('bulk-content').style.display='none';
+  alert('긴급 메시지 3건에 안내 메시지를 발송했어요');
+}
+
+function saveBulk(){
+  var ta=document.querySelector('#m-bulk-setting textarea');
+  if(ta) document.getElementById('bulk-preview').textContent=ta.value;
+  cm('m-bulk-setting');
+}
+
+function adj(type,delta){
+  if(type==='c'){ qc=Math.max(10,Math.min(500,qc+delta)); document.getElementById('q-comment').textContent=qc+'건'; }
+  else{ qd=Math.max(5,Math.min(200,qd+delta)); document.getElementById('q-dm').textContent=qd+'건'; }
+}
+
+function togglePw(id){
+  var inp=document.getElementById(id);
+  inp.type=inp.type==='password'?'text':'password';
+}
+
+function connectIG(){
+  document.getElementById('ig-status').textContent='연동 완료 · 팔로워 312,000';
+  document.getElementById('ig-status').style.color='var(--mint-d)';
+  document.getElementById('ig-btn').style.background='var(--mint-l)';
+  document.getElementById('ig-btn').style.borderColor='#A7F3D0';
+  document.getElementById('ig-check').style.display='block';
+}
+function connectTK(){
+  document.getElementById('tk-status').textContent='연동 완료 · 팔로워 89,400';
+  document.getElementById('tk-status').style.color='var(--mint-d)';
+  document.getElementById('tk-btn').style.background='var(--mint-l)';
+  document.getElementById('tk-btn').style.borderColor='#A7F3D0';
+  document.getElementById('tk-check').style.display='block';
+}
+function connectYT(){
+  document.getElementById('yt-status').textContent='연동 완료 · 구독자 12,400';
+  document.getElementById('yt-status').style.color='var(--mint-d)';
+  document.getElementById('yt-btn').style.background='var(--mint-l)';
+  document.getElementById('yt-btn').style.borderColor='#A7F3D0';
+  document.getElementById('yt-check').style.display='block';
+}
+
+function startLearnAnim(){
+  var pct=0;
+  var ring=document.getElementById('learn-ring-fill');
+  var num=document.getElementById('learn-num');
+  var status=document.getElementById('learn-status');
+  var btn=document.getElementById('learn-btn');
+  var C=376;
+  if(learnTimer) clearInterval(learnTimer);
+  pct=0;
+  learnTimer=setInterval(function(){
+    pct+=1;
+    if(pct>100){ pct=100; clearInterval(learnTimer); }
+    if(num) num.textContent=pct;
+    if(ring) ring.style.strokeDashoffset=C-(C*pct/100);
+    if(status){
+      if(pct<30) status.textContent='게시물 분석 중...';
+      else if(pct<60) status.textContent='말투 패턴 추출 중...';
+      else if(pct<90) status.textContent='AI 모델 구축 중...';
+      else status.textContent='학습 완료!';
+    }
+    if(pct>=100 && btn){
+      btn.style.opacity='1';
+      btn.style.pointerEvents='auto';
+      btn.textContent='완료 — 다음 단계로';
+    }
+  }, 60);
+}
+
+function selectPlan(plan){
+  document.querySelectorAll('.plan-card').forEach(function(c){ c.classList.remove('selected'); });
+  document.getElementById('plan-'+plan).classList.add('selected');
+  var names={basic:'베이직', pro:'프리미엄', biz:'비즈니스'};
+  var btn=document.querySelector('.plan-footer .btn-mint-full');
+  if(btn) btn.textContent=names[plan]+' 구독 시작하기';
+}
+
+function addTarget(){
+  var inp=document.getElementById('target-input');
+  var val=inp.value.trim();
+  if(!val) return;
+  var handle=val.startsWith('@')?val:'@'+val;
+  var list=document.getElementById('target-list');
+  var item=document.createElement('div');
+  item.className='target-item';
+  item.innerHTML='<div class="target-av2">'+handle[1].toUpperCase()+'</div><div class="target-info2"><div class="target-name2">'+handle+'</div><div class="target-meta">방금 추가됨</div></div><button class="target-del" onclick="delTarget(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
+  list.appendChild(item);
+  inp.value='';
+}
+function delTarget(btn){ btn.closest('.target-item').remove(); }
+
+
+
+function switchSubTab(tab) {
+  var tabs = ['draft','dm'];
+  tabs.forEach(function(t) {
+    var btn = document.getElementById('sub-tab-'+t);
+    var content = document.getElementById('sub-content-'+t);
+    if (btn) {
+      btn.style.background = t===tab ? 'var(--s)' : 'none';
+      btn.style.fontWeight = t===tab ? '700' : '600';
+      btn.style.color = t===tab ? 'var(--t1)' : 'var(--t3)';
+      btn.style.boxShadow = t===tab ? '0 1px 4px rgba(0,0,0,.06)' : 'none';
+    }
+    if (content) content.style.display = t===tab ? 'block' : 'none';
+  });
+}
+function selectPost(el) {
+  document.querySelectorAll('.post-thumb').forEach(function(p) {
+    p.style.borderColor = 'transparent';
+  });
+  el.style.borderColor = 'var(--mint)';
+}
+function addSimilar(btn, handle) {
+  btn.textContent = '추가됨';
+  btn.style.background = 'var(--mint-l)';
+  btn.style.color = 'var(--mint-d)';
+  btn.style.borderColor = 'var(--mint)';
+  btn.disabled = true;
+  // 타겟 리스트에 추가
+  var list = document.getElementById('target-list');
+  if (list) {
+    var item = document.createElement('div');
+    item.className = 'target-item';
+    item.innerHTML = '<div class="target-av2">'+handle[1].toUpperCase()+'</div><div class="target-info2"><div class="target-name2">'+handle+'</div><div class="target-meta">방금 추가됨</div></div><button class="target-del" onclick="delTarget(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
+    list.appendChild(item);
+  }
+}
+
+function setDmCond(el, type) {
+  var rule = el.closest('.dm-rule');
+  rule.querySelectorAll('.dm-cond').forEach(function(d) {
+    d.style.background = '#fff';
+    d.style.color = 'var(--t2)';
+    d.style.borderColor = 'var(--b)';
+  });
+  el.style.background = 'var(--dark)';
+  el.style.color = '#fff';
+  el.style.borderColor = 'var(--dark)';
+  var kwInput = rule.querySelector('.dm-kw-input');
+  if (kwInput) kwInput.style.display = type === 'kw' ? 'block' : 'none';
+}
+function addDmRule() {
+  var container = document.getElementById('dm-rules');
+  var count = container.querySelectorAll('.dm-rule').length + 1;
+  var div = document.createElement('div');
+  div.className = 'dm-rule';
+  div.style.cssText = 'background:var(--bg);border-radius:14px;padding:14px;margin-bottom:10px;position:relative';
+  div.innerHTML = '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><div style="font-size:12px;font-weight:700;color:var(--t1)">규칙 '+count+'</div><button onclick="this.closest(\'.dm-rule\').remove()" style="background:none;border:none;cursor:pointer;font-size:11px;font-weight:700;color:var(--red)">삭제</button></div><div style="font-size:11px;font-weight:600;color:var(--t3);margin-bottom:5px">대상 게시물</div><select style="width:100%;padding:10px 12px;border:1.5px solid var(--b);border-radius:10px;font-size:13px;font-family:Pretendard,sans-serif;background:#fff;color:var(--t1);outline:none;margin-bottom:10px"><option>모든 게시물</option><option>최근 게시물 (최신 1개)</option><option>특정 게시물 선택</option></select><div style="font-size:11px;font-weight:600;color:var(--t3);margin-bottom:5px">댓글 조건</div><div style="display:flex;gap:6px;margin-bottom:8px"><div onclick="setDmCond(this,\'all\')" class="dm-cond on" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid var(--dark);background:var(--dark);color:#fff;font-size:12px;font-weight:700;text-align:center;cursor:pointer">전체 댓글</div><div onclick="setDmCond(this,\'kw\')" class="dm-cond" style="flex:1;padding:9px;border-radius:10px;border:1.5px solid var(--b);background:#fff;color:var(--t2);font-size:12px;font-weight:700;text-align:center;cursor:pointer">특정 단어</div></div><input class="inp dm-kw-input" type="text" placeholder="링크, 구매, 어디서 (쉼표로 구분)" style="display:none;margin-bottom:10px"><div style="font-size:11px;font-weight:600;color:var(--t3);margin-bottom:5px">발송할 DM 내용</div><textarea class="sheet-ta" rows="3" placeholder="DM 내용 입력" style="margin-top:0;font-size:13px"></textarea>';
+  container.appendChild(div);
+}
+
+// ═══ SUPABASE AUTH ═══
+var SUPABASE_URL = 'https://ffozahaztbudvsnnkvep.supabase.co';
+var SUPABASE_ANON = 'sb_publishable_wA6kdCZagrloe_45mvTPRg_g5-UkQJs';
+var sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON);
+
+async function doSignup() {
+  var nameEl = document.querySelector('#v-signup .inp[type="text"]');
+  var emailEl = document.querySelector('#v-signup .inp[type="email"]');
+  var pwEl = document.getElementById('signup-pw');
+  var errEl = document.getElementById('signup-error');
+  errEl.style.display = 'none';
+
+  var res = await sb.auth.signUp({
+    email: emailEl.value,
+    password: pwEl.value,
+    options: { data: { display_name: nameEl.value } }
+  });
+
+  if (res.error) {
+    errEl.textContent = res.error.message;
+    errEl.style.display = 'block';
+    return;
+  }
+
+  // 이메일 인증 비활성화 시 바로 세션 생성됨
+  if (res.data.session) {
+    go('home');
+  } else {
+    go('v-connect-account-onb');
+  }
+}
+
+async function doLogin() {
+  var emailEl = document.querySelector('#v-login .inp[type="email"]');
+  var pwEl = document.getElementById('login-pw');
+  var errEl = document.getElementById('login-error');
+  errEl.style.display = 'none';
+
+  var res = await sb.auth.signInWithPassword({
+    email: emailEl.value,
+    password: pwEl.value
+  });
+
+  if (res.error) {
+    errEl.textContent = res.error.message;
+    errEl.style.display = 'block';
+    return;
+  }
+
+  go('home');
+}
+
+async function doGoogleLogin() {
+  await sb.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: window.location.origin + '/app.html' }
+  });
+}
+
+async function doLogout() {
+  await sb.auth.signOut();
+  go('onb1');
+}
+
+// 페이지 로드 시 세션 확인
+async function checkAuth() {
+  var res = await sb.auth.getSession();
+  if (res.data.session) {
+    go('home');
+  }
+}
+
+window.addEventListener('load', function(){
+  // 응대량 초기값
+  var qcEl=document.getElementById('q-comment');
+  var qdEl=document.getElementById('q-dm');
+  if(qcEl) qcEl.textContent=qc+'건';
+  if(qdEl) qdEl.textContent=qd+'건';
+  // ROI 카운터
+  var el=document.getElementById('roi-v');
+  if(el){
+    var t=1254000, cur=0;
+    var tm=setInterval(function(){
+      cur+=t/55;
+      if(cur>=t){ cur=t; clearInterval(tm); }
+      el.textContent=Math.floor(cur).toLocaleString('ko-KR');
+    }, 16);
+  }
+  // 진행률 바
+  setTimeout(function(){
+    var f=document.getElementById('roi-fill');
+    if(f) f.style.width='47%';
+  }, 400);
+  checkAuth();
+});
+</script>
+
+<!-- 톡으로 받기 팝업 -->
+<div class="ov" id="m-kakao-popup" onclick="co(event,'m-kakao-popup')"><div class="sheet"><div class="s-bar"></div>
+  <div style="text-align:center;margin-bottom:20px">
+    <div style="width:56px;height:56px;border-radius:16px;background:#FEE500;display:flex;align-items:center;justify-content:center;margin:0 auto 12px">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#3A1D1D" stroke-width="1.8"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div style="font-size:18px;font-weight:900;color:var(--t1)">카카오톡으로 받기</div>
+    <div style="font-size:13px;color:var(--t2);margin-top:6px;line-height:1.6">중요 알림을 카카오톡으로 바로 받아요.<br>요주의 댓글, 수익 제안, 일일 리포트.</div>
+  </div>
+  <div style="background:var(--bg);border-radius:16px;padding:16px;margin-bottom:16px">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b)"><div><div style="font-size:13px;font-weight:700;color:var(--t1)">요주의 즉시 알림</div><div style="font-size:11px;color:var(--t3);margin-top:2px">결제 오류, 부정 이슈 감지 시</div></div><label class="tog"><input type="checkbox" checked><span class="tsl"></span></label></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b)"><div><div style="font-size:13px;font-weight:700;color:var(--t1)">수익 제안 알림</div><div style="font-size:11px;color:var(--t3);margin-top:2px">광고·협업·수출 문의 도착 시</div></div><label class="tog"><input type="checkbox" checked><span class="tsl"></span></label></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0"><div><div style="font-size:13px;font-weight:700;color:var(--t1)">일일 리포트</div><div style="font-size:11px;color:var(--t3);margin-top:2px">매일 오전 9시 응대 요약</div></div><label class="tog"><input type="checkbox" checked><span class="tsl"></span></label></div>
+  </div>
+  <div style="font-size:13px;font-weight:700;color:var(--t1);margin-top:4px;margin-bottom:8px">카카오톡 연동</div>
+  <input class="sheet-in" type="text" placeholder="카카오톡 ID 입력" style="margin-bottom:10px">
+  <button class="btn-p" style="background:#FEE500;color:#3A1D1D;margin-top:0" onclick="cm('m-kakao-popup')">카카오 알림톡 연동하기</button>
+  <button class="btn-s" onclick="cm('m-kakao-popup')">닫기</button>
+</div></div>
+
+
+<!-- 결제 모달 -->
+<div class="ov" id="m-plan-checkout" onclick="co(event,'m-plan-checkout')"><div class="sheet"><div class="s-bar"></div>
+  <div class="s-title">프리미엄 구독</div>
+  <div class="s-sub">무료체험 종료 후 첫 결제 · 언제든 취소 가능</div>
+  <div style="background:var(--mint-l);border-radius:16px;padding:16px 18px;margin-bottom:18px;border:1px solid #A7F3D0">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="font-size:14px;font-weight:700">프리미엄 플랜</div>
+      <div style="font-size:16px;font-weight:900;color:var(--mint-d)">₩59,000/월</div>
+    </div>
+    <div style="font-size:12px;color:var(--mint-d);line-height:1.7">월 6,600건 응대 · 3채널 · 수익제안 분류<br>타겟 스토리 · 카카오알림 전체</div>
+  </div>
+  <div style="font-size:13px;font-weight:700;margin-bottom:10px">결제 수단</div>
+  <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+    <div style="display:flex;align-items:center;gap:12px;padding:14px;border:1.5px solid var(--dark);border-radius:14px;cursor:pointer;background:var(--bg)">
+      <div style="width:32px;height:20px;background:linear-gradient(135deg,#1a1f60,#00adef);border-radius:4px;flex-shrink:0"></div>
+      <div style="font-size:13px;font-weight:600">신용카드 / 체크카드</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;padding:14px;border:1.5px solid var(--b);border-radius:14px;cursor:pointer">
+      <div style="width:32px;height:20px;background:#FEE500;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;font-weight:900;color:#3A1D1D">KAO</div>
+      <div style="font-size:13px;font-weight:600">카카오페이</div>
+    </div>
+  </div>
+  <button class="btn-p" onclick="cm('m-plan-checkout');go('v-complete')">무료체험 후 결제 예약하기</button>
+  <button class="btn-s" onclick="cm('m-plan-checkout')">닫기</button>
+</div></div>
+
+
+<!-- 아이디/비밀번호 찾기 모달 -->
+<div class="ov" id="m-find-account" onclick="co(event,'m-find-account')"><div class="sheet"><div class="s-bar"></div>
+  <div class="s-title">아이디 · 비밀번호 찾기</div>
+  <div class="s-sub">가입 시 등록한 이메일로 재설정 링크를 보내드려요</div>
+  <div class="input-group">
+    <div class="input-lbl">가입 이메일</div>
+    <input class="inp" type="email" placeholder="hello@example.com">
+  </div>
+  <button class="btn-p" onclick="alert('입력하신 이메일로 재설정 링크를 발송했어요');cm('m-find-account')">재설정 링크 보내기</button>
+  <button class="btn-s" onclick="cm('m-find-account')">닫기</button>
+</div></div>
+
+</body>
+</html>
