@@ -122,3 +122,22 @@ CLAUDE.md                           이 파일
 - env 변수 추가 시 `printf` 사용 (`echo`는 \n 포함됨)
 - Webhook은 production env에서만 동작
 - RLS가 켜져 있으므로 webhook에서는 service_role_key 사용
+
+## Claude Code 작업 원칙 (필수 준수)
+
+### UI/디자인 작업 규칙
+- **절대 새로 디자인하지 말 것**
+- `/legacy/repli_v3.html` 이 파일이 최종 확정 디자인
+- HTML/CSS 수정 시 반드시 이 파일을 직접 읽어서 복사
+- "참고해서 만들어줘" = 틀림 / "이 파일 그대로 복사해줘" = 맞음
+
+### Claude Code에 지시할 때 원칙
+- 디자인: "파일을 직접 읽어서 HTML/CSS 100% 그대로 복사"
+- 기능: "Supabase/API 연동만 붙이고 나머지는 HTML 그대로"
+- 탭바: 홈/소셜 활동/관리/톡으로 받기/내 정보 (5개, 원본 그대로)
+- 새로 만들지 말 것, 재해석하지 말 것
+
+### 파일 위치
+- 최종 앱 디자인: ~/ripple-ai/legacy/repli_v3.html
+- 랜딩페이지: ~/ripple-ai/legacy/repli_landing.html
+- 약관: ~/ripple-ai/legacy/repli_terms.html
