@@ -1273,6 +1273,10 @@ function go(v){
   if(el) el.classList.add('on');
   if(nb) nb.classList.add('on');
   if(id === 'learn') setTimeout(startLearnAnim, 400);
+  // 온보딩/가입/로그인/연동/학습/완료 화면에서 탭바 숨기기
+  var hideNav = ['onb1','signup','login','connect-account-onb','learn','complete'];
+  var nav = document.querySelector('.nav');
+  if(nav) nav.style.display = hideNav.indexOf(id) >= 0 ? 'none' : 'flex';
   window.scrollTo(0,0);
 }
 
