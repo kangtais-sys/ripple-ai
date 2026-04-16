@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/refresh-ig-token",
+      "schedule": "0 3 * * 1"
+    }
+  ]
+}
