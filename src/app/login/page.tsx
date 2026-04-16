@@ -41,7 +41,7 @@ export default function LoginPage() {
     <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#00C896] text-white font-bold text-xl mb-3">R</div>
+          <div className="text-[32px] font-black tracking-[-1.2px] text-[#1A1F27] mb-1">Repli<span className="text-[#00C896]">.</span></div>
           <h1 className="text-2xl font-bold text-[#1A1F27]">Repli. 로그인</h1>
         </div>
 

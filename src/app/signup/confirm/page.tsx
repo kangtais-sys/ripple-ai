@@ -11,9 +11,7 @@ function ConfirmContent() {
   return (
     <div className="min-h-screen bg-[#F9FAFB] flex items-center justify-center px-4">
       <div className="w-full max-w-sm text-center">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#00C896]/10 text-[#00C896] text-3xl mb-6">
-          ✉
-        </div>
+        <div className="text-[32px] font-black tracking-[-1.2px] text-[#1A1F27] mb-4">Repli<span className="text-[#00C896]">.</span></div>
         <h1 className="text-2xl font-bold text-[#1A1F27] mb-2">이메일을 확인해주세요</h1>
         <p className="text-sm text-gray-500 mb-1">
           <span className="font-medium text-[#1A1F27]">{email}</span>

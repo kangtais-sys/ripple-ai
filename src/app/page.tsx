@@ -11,8 +11,7 @@ export default async function Home() {
   return (
     <div className="min-h-screen bg-[#F9FAFB] flex flex-col items-center justify-center px-4">
       <div className="text-center max-w-md">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-[#00C896] text-white font-bold text-2xl mb-6">R</div>
-        <h1 className="text-3xl font-bold text-[#1A1F27] mb-2">Repli.</h1>
+        <div className="text-[40px] font-black tracking-[-1.5px] text-[#1A1F27] mb-2">Repli<span className="text-[#00C896]">.</span></div>
         <p className="text-gray-500 mb-8">K-뷰티 인플루언서를 위한 SNS 자동 관리</p>
         <div className="space-y-3">
           <Link href="/signup" className="block w-full py-3 rounded-xl bg-[#00C896] text-white font-semibold text-sm hover:bg-[#00B386] transition text-center">

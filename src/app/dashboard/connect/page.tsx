@@ -53,7 +53,7 @@ export default function ConnectPage() {
       <button
         onClick={startInstagramOAuth}
         disabled={loading}
-        className="w-full py-3 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold text-sm hover:opacity-90 transition disabled:opacity-50"
+        className="w-full py-3 rounded-xl bg-[#00C896] text-white font-semibold text-sm hover:bg-[#00A87E] transition disabled:opacity-50"
       >
         Instagram 비즈니스 계정 연동하기
       </button>
