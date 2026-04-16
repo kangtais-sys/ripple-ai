@@ -39,8 +39,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
       {/* 하단 탭바 (모바일) */}
       <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 flex md:hidden">
         <NavTab href="/dashboard" label="홈" />
-        <NavTab href="/dashboard/activity" label="소셜활동" />
-        <NavTab href="/dashboard/manage" label="관리" />
+        <NavTab href="/dashboard/tone" label="말투학습" />
+        <NavTab href="/dashboard/logs" label="응대내역" />
         <NavTab href="/dashboard/connect" label="계정연동" />
         <NavTab href="/dashboard/profile" label="내정보" />
       </nav>

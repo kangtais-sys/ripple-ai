@@ -118,14 +118,75 @@ async function handleComment(supabase: AdminClient, value: any) {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 async function handleMessage(supabase: AdminClient, value: any) {
-  // DM 처리 - 다음 단계에서 구현
-  console.log('[Webhook] DM received:', JSON.stringify(value).substring(0, 200))
+  const senderId = value.sender?.id
+  const text = value.message?.text
+  const messageId = value.message?.mid
+
+  if (!senderId || !text || !messageId) return
+
+  // 연동된 계정 중 이 메시지의 수신자 찾기
+  const { data: accounts } = await supabase
+    .from('ig_accounts')
+    .select('id, user_id, ig_user_id, access_token')
+
+  if (!accounts?.length) return
+
+  for (const account of accounts) {
+    // 자기 자신이 보낸 DM이면 스킵
+    if (account.ig_user_id === senderId) continue
+
+    try {
+      const reply = await generateReply(account.user_id, text, supabase, 'dm')
+      if (!reply || reply === 'SKIP') continue
+
+      // Instagram Send API로 DM 발송 (24시간 윈도우 내)
+      const igRes = await fetch(
+        `https://graph.instagram.com/v21.0/me/messages`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${account.access_token}`,
+          },
+          body: JSON.stringify({
+            recipient: { id: senderId },
+            message: { text: reply },
+          }),
+        }
+      )
+
+      const igData = await igRes.json()
+      const status = igRes.ok ? 'sent' : `error:${igData.error?.message || igRes.status}`
+
+      await supabase.from('reply_logs').insert({
+        user_id: account.user_id,
+        ig_account_id: account.id,
+        type: 'dm',
+        original_text: text,
+        reply_text: reply,
+        platform_id: igData.message_id || messageId,
+      })
+
+      const month = new Date().toISOString().slice(0, 7)
+      await supabase.rpc('increment_usage', {
+        p_user_id: account.user_id,
+        p_month: month,
+        p_type: 'dm',
+      })
+
+      console.log(`[Webhook] DM reply to ${senderId}: "${reply.substring(0, 40)}" → ${status}`)
+      break
+    } catch (e) {
+      console.error(`[Webhook] DM reply error:`, e)
+    }
+  }
 }
 
 async function generateReply(
   userId: string,
   text: string,
-  supabase: AdminClient
+  supabase: AdminClient,
+  type: 'comment' | 'dm' = 'comment'
 ): Promise<string> {
   // 유저의 말투 프로필 가져오기
   const { data: tone } = await supabase
@@ -148,13 +209,22 @@ async function generateReply(
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 200,
-      system: `당신은 K-뷰티 인플루언서의 SNS 댓글 응대를 대신합니다.
+      system: type === 'dm'
+        ? `당신은 K-뷰티 인플루언서의 Instagram DM 응대를 대신합니다.
+규칙:
+- 친근하고 따뜻한 1:1 대화 말투
+- 이모지 1-2개, 3문장 이내
+- 제품 문의 → 자세한 안내 가능, 구매 링크는 "프로필 링크" 안내
+- 악성/스팸이면 "SKIP"만 반환
+- 가격 직접 언급 금지
+- 개인정보 요청 금지${toneGuide}`
+        : `당신은 K-뷰티 인플루언서의 SNS 댓글 응대를 대신합니다.
 규칙:
 - 친근하고 따뜻한 말투
 - 이모지 1-2개, 2문장 이내
 - 악성/스팸이면 "SKIP"만 반환
 - 가격 직접 언급 금지${toneGuide}`,
-      messages: [{ role: 'user', content: `댓글: "${text}"` }],
+      messages: [{ role: 'user', content: type === 'dm' ? `DM: "${text}"` : `댓글: "${text}"` }],
     }),
   })
 
