@@ -1342,7 +1342,7 @@ function togglePw(id){
 
 function connectIG(){
   var appId = '973683215179192';
-  var redirectUri = window.location.origin + '/api/auth/callback/instagram';
+  var redirectUri = window.location.origin + '/api/auth/instagram/callback';
   var scope = 'instagram_business_basic,instagram_manage_comments,instagram_business_manage_messages';
   var url = 'https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=' + appId + '&redirect_uri=' + encodeURIComponent(redirectUri) + '&response_type=code&scope=' + scope;
   window.location.href = url;
@@ -1590,10 +1590,22 @@ async function loadDashboardData() {
   }
 }
 
-// 페이지 로드 시 세션 확인 + 해시 라우팅
+// 페이지 로드 시 세션 확인 + 해시 라우팅 + IG 연동 결과
 async function checkAuth() {
   var res = await sb.auth.getSession();
   var hash = window.location.hash.replace('#', '');
+  var params = new URLSearchParams(window.location.search);
+
+  // IG 연동 결과 표시
+  if (params.get('ig_connected')) {
+    alert('@' + params.get('ig_connected') + ' 연동 완료! AI 응대가 시작됩니다.');
+    window.history.replaceState({}, '', '/app.html');
+  }
+  if (params.get('ig_error')) {
+    var errors = { no_code:'인증 코드 없음', token_failed:'토큰 발급 실패', profile_failed:'프로필 조회 실패', not_logged_in:'로그인 필요', db_failed:'저장 실패', unknown:'알 수 없는 오류' };
+    alert('Instagram 연동 실패: ' + (errors[params.get('ig_error')] || params.get('ig_error')));
+    window.history.replaceState({}, '', '/app.html');
+  }
 
   if (res.data.session) {
     go('home');
@@ -1603,7 +1615,6 @@ async function checkAuth() {
   } else if (hash === 'login') {
     go('login');
   }
-  // 해시 없고 세션 없으면 기본 온보딩(v-onb1) 유지
 }
 
 window.addEventListener('load', function(){
