@@ -11,27 +11,41 @@
 
 ## 파일 구조
 ```
-src/
-├── app/
-│   ├── page.tsx                    루트 (로그인 리다이렉트)
-│   ├── login/page.tsx              이메일 로그인
-│   ├── signup/page.tsx             이메일 가입
-│   ├── dashboard/
-│   │   ├── layout.tsx              대시보드 레이아웃 (헤더+탭바)
-│   │   ├── page.tsx                홈 (통계)
-│   │   └── connect/page.tsx        Instagram 계정 연동
-│   └── api/
-│       ├── auth/callback/instagram/route.ts   IG OAuth 콜백
-│       ├── auth/signout/route.ts              로그아웃
-│       └── webhook/instagram/route.ts         Webhook (댓글→Claude→발송)
-├── lib/supabase/
-│   ├── client.ts                   브라우저용
-│   ├── server.ts                   서버용
-│   └── middleware.ts               세션 갱신
-└── middleware.ts                   인증 가드
-supabase/migrations/                DB 마이그레이션
-legacy/                             기존 HTML 프로토타입
-CLAUDE.md                           이 파일
+public/
+└── app.html                        메인 앱 (repli_v3.html + Supabase 인증)
+src/app/
+├── page.tsx                        루트 → /app.html 리다이렉트
+├── login/page.tsx                  → /app.html#login 리다이렉트
+├── signup/page.tsx                 → /app.html#signup 리다이렉트
+├── dashboard/
+│   ├── layout.tsx                  빈 레이아웃 (app.html이 메인)
+│   ├── page.tsx                    세션 체크 → app.html 이동
+│   ├── connect/page.tsx            (Next.js 버전, 현재 미사용)
+│   ├── tone/page.tsx               (Next.js 버전, 현재 미사용)
+│   ├── logs/page.tsx               (Next.js 버전, 현재 미사용)
+│   ├── plan/page.tsx               (Next.js 버전, 현재 미사용)
+│   └── profile/page.tsx            (Next.js 버전, 현재 미사용)
+└── api/
+    ├── auth/callback/route.ts      Supabase 이메일인증 + Google OAuth 콜백
+    ├── auth/instagram/callback/route.ts   IG OAuth 콜백 (토큰→저장)
+    ├── auth/signout/route.ts       로그아웃
+    ├── dashboard/route.ts          홈 실데이터 (플랜/사용량/ROI)
+    ├── replies/route.ts            응대 내역 페이지네이션
+    ├── tone/learn/route.ts         Claude 말투 분석 + Supabase 저장
+    ├── tone/fetch-posts/route.ts   IG 게시물 캡션 자동 수집
+    ├── webhook/instagram/route.ts  Webhook (댓글/DM→Claude→발송)
+    ├── payment/subscribe/route.ts  포트원 결제 + 플랜 업그레이드
+    ├── payment/webhook/route.ts    결제 실패→다운그레이드
+    ├── notify/route.ts             한도 임박 알림
+    └── cron/refresh-ig-token/route.ts  IG 토큰 자동 갱신 (매주)
+src/lib/
+├── supabase/client.ts              브라우저용
+├── supabase/server.ts              서버용
+├── supabase/middleware.ts          세션 갱신
+└── plans.ts                        플랜별 한도/가격 정의
+supabase/migrations/                DB 마이그레이션 (001~003)
+legacy/                             HTML 원본 (절대 수정 금지)
+vercel.json                         cron 설정
 ```
 
 ## 기술 스택
@@ -60,6 +74,21 @@ CLAUDE.md                           이 파일
 - **권한**: instagram_business_basic / instagram_manage_comments / instagram_business_manage_messages
 - **Webhook URL**: https://ripple-ai-umber.vercel.app/api/webhook/instagram
 - **Webhook Verify Token**: repli_webhook_2026
+- **IG OAuth Redirect URI**: https://ripple-ai-umber.vercel.app/api/auth/instagram/callback
+- **Webhook 등록 완료**: comments, messages 구독
+
+## Google OAuth
+- **Client ID**: 998424366713-vfl2264fvi0oeuijisjm0ji2v3i5cc09.apps.googleusercontent.com
+- **Redirect URI**: https://ffozahaztbudvsnnkvep.supabase.co/auth/v1/callback
+- **Supabase Google Provider**: 활성화 완료
+
+## 앱 구조 (public/app.html)
+- repli_v3.html 100% 이식 + Supabase JS CDN 주입
+- 인증: doSignup(), doLogin(), doGoogleLogin(), doLogout(), doResetPassword()
+- 해시 라우팅: /app.html#signup, #login
+- 말투 학습: startLearnAnim() → /api/tone/fetch-posts → /api/tone/learn (실제 Claude 분석)
+- IG 연동: connectIG() → Meta OAuth → /api/auth/instagram/callback
+- 탭바: 홈/소셜활동/관리/톡으로받기/내정보 (온보딩/가입/로그인 시 자동 숨김)
 
 ## Vercel 환경변수
 - NEXT_PUBLIC_SUPABASE_URL ✅
@@ -71,6 +100,10 @@ CLAUDE.md                           이 파일
 - ANTHROPIC_API_KEY ✅
 - NEXT_PUBLIC_APP_URL ✅
 - WEBHOOK_VERIFY_TOKEN ✅
+- GOOGLE_OAUTH_CLIENT_ID ✅
+- GOOGLE_OAUTH_CLIENT_SECRET ✅
+- YOUTUBE_API_KEY ✅
+- CRON_SECRET ✅
 
 ## API 검증 결과 (2026년 4월 기준)
 | 기능 | Instagram | TikTok | YouTube |
@@ -98,20 +131,24 @@ CLAUDE.md                           이 파일
 ### 트랙 B — 백엔드 개발
 - [x] Next.js 프로젝트 생성 + Vercel 배포
 - [x] Supabase 프로젝트 생성 + DB 스키마 (5테이블 + RLS + 트리거)
-- [x] 이메일 가입/로그인
-- [x] Instagram OAuth 연동
-- [x] Webhook 엔드포인트 (댓글 감지 → Claude 응대 → Instagram 발송)
+- [x] 이메일 가입/로그인 + Google OAuth
+- [x] Instagram OAuth 연동 (/api/auth/instagram/callback)
+- [x] Webhook 엔드포인트 (댓글/DM 감지 → Claude 응대 → Instagram 발송)
 - [x] Webhook 검증 테스트 통과
-- [x] Claude 말투 학습 파이프라인 (/dashboard/tone + /api/tone/learn)
+- [x] Meta Webhook 등록 완료 (comments, messages 구독)
+- [x] Claude 말투 학습 — IG 게시물 자동 수집 + Claude 분석 + 수동 입력 fallback
 - [x] DM 자동 응대 (Webhook → Claude → Instagram Send API)
-- [x] 응대 내역 페이지 (/dashboard/logs)
+- [x] 대시보드 실데이터 API (/api/dashboard, /api/replies)
 - [x] 플랜별 한도 체크 (Webhook에서 자동 스킵)
 - [x] 포트원 구독 결제 API (/api/payment/subscribe + webhook)
-- [x] 이용권 페이지 (/dashboard/plan)
 - [x] 카카오 알림톡 함수 (구독 완료 시 발송)
-- [ ] Meta Webhook 등록 (대시보드에서 수동)
+- [x] IG 토큰 자동 갱신 cron (매주 월요일)
+- [x] repli_v3.html 100% Next.js 이식 (public/app.html + Supabase 인증)
+- [x] 전체 플로우 테스트 (Playwright): 홈/탭바/로그아웃/온보딩 정상 확인
+- [x] 온보딩/로그인/가입 화면에서 탭바 자동 숨김
 - [ ] 포트원 가입 + API 키 세팅
-- [ ] 카카오 알림톡 채널 세팅
+- [ ] 카카오 알림톡 채널 세팅 (솔라피 추천)
+- [ ] 베타 유저 초대 (이메일 수집)
 
 ### 트랙 C — 마케팅
 - [ ] 포트원 가입
