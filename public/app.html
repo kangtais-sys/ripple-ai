@@ -1907,7 +1907,7 @@ input:checked+.tsl::before{transform:translateX(18px)}
   </div>
 
   <div class="p-stats">
-    <div class="p-stat" onclick="go('plan')" style="cursor:pointer">
+    <div class="p-stat" onclick="openModal('m-plan')" style="cursor:pointer">
       <div class="p-sv" style="font-size:15px">프리미엄</div>
       <div class="p-sl">이용권 · D-4</div>
     </div>
@@ -1937,7 +1937,7 @@ input:checked+.tsl::before{transform:translateX(18px)}
   </div>
 
   <!-- 프리미엄 업셀링 -->
-  <div onclick="go('plan')" style="margin-top:10px;margin-bottom:20px;padding:12px 14px;border-radius:14px;background:linear-gradient(90deg,#FFF8E1,#FEE9E5);display:flex;align-items:center;gap:10px;cursor:pointer;border:1px solid #FFD233">
+  <div onclick="openModal('m-plan')" style="margin-top:10px;margin-bottom:20px;padding:12px 14px;border-radius:14px;background:linear-gradient(90deg,#FFF8E1,#FEE9E5);display:flex;align-items:center;gap:10px;cursor:pointer;border:1px solid #FFD233">
     <div style="font-size:18px">💎</div>
     <div style="flex:1;font-size:12px;color:var(--t1);line-height:1.5"><b style="color:#E11D48">프리미엄 전환 시</b> 포인트 계산 없이 <b>모든 기능 무제한</b></div>
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -1949,7 +1949,7 @@ input:checked+.tsl::before{transform:translateX(18px)}
     <div class="mitem" onclick="go('targets')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mbd"><div class="mname2">참고 계정 분석</div><div class="msub2">경쟁 계정 해시태그 · 게시 패턴 분석</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
     <div class="mitem" onclick="openModal('m-ai-style')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div><div class="mbd"><div class="mname2">AI 말투 학습</div><div class="msub2">일치도 98% · 게시물 250개 분석</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
     <div class="mitem" onclick="openModal('m-kakao')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mbd"><div class="mname2">카카오 알림</div><div class="msub2">요주의 즉시 · 일일 리포트 <span class="badge bg" style="margin-left:4px">무료</span></div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-    <div class="mitem" onclick="go('plan')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="mbd"><div class="mname2">이용권</div><div class="msub2">프리미엄 · 무료체험 D-4</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    <div class="mitem" onclick="openModal('m-plan')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="mbd"><div class="mname2">이용권</div><div class="msub2">프리미엄 · 무료체험 D-4</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
   </div>
   <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.3px;margin:16px 0 8px">계정</div>
   <div class="menu">
@@ -2301,6 +2301,8 @@ input:checked+.tsl::before{transform:translateX(18px)}
       </div>
     </div>
     <div style="font-size:12px;color:var(--t3);text-align:center;margin-top:12px;font-weight:500">공식 Graph API 기반 분석 · 계정 추적 없음</div>
+    <button class="btn-p" style="margin-top:16px" onclick="finalizeTargets()">확인 완료 · 적용하기</button>
+    <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:8px">추가 안 해도 괜찮아요. 추천 리스트만 확인해도 돼요.</div>
   </div>
 </div>
 
@@ -2354,54 +2356,58 @@ input:checked+.tsl::before{transform:translateX(18px)}
 </div>
 
 <!-- ════ 이용권 / 결제 ════ -->
-<div class="vw" id="v-plan">
-  <div class="plan-hero">
-    <div class="plan-badge">무료체험 D-4 · 지금 바로 구독하기</div>
-    <div class="plan-title">플랜을 선택하세요</div>
-    <div class="plan-sub">언제든지 취소할 수 있어요. 약정 없음.</div>
-  </div>
-  <div class="plan-cards">
-    <div class="plan-card selected" id="plan-basic" onclick="selectPlan('basic')">
-      <div class="plan-name">베이직</div>
-      <div class="plan-price">₩29,000 <span>/ 월</span></div>
-      <div class="plan-desc">개인 크리에이터에 딱 맞아요</div>
-      <div class="plan-features">
-        <div class="plan-feat">월 3,300건 자동 응대</div>
-        <div class="plan-feat">계정 2개 (IG + TK 또는 YT)</div>
-        <div class="plan-feat">AI 말투 학습 포함</div>
-        <div class="plan-feat">카카오 알림</div>
+<div class="ov" id="m-plan" onclick="co(event,'m-plan')">
+  <div class="sheet" style="padding:14px 20px 28px">
+    <div class="s-bar"></div>
+    <div class="plan-hero" style="padding:4px 0 16px">
+      <div class="plan-badge">무료체험 D-4 · 지금 바로 구독하기</div>
+      <div class="plan-title">플랜을 선택하세요</div>
+      <div class="plan-sub">언제든지 취소할 수 있어요. 약정 없음.</div>
+    </div>
+    <div class="plan-cards" style="padding:0">
+      <div class="plan-card" id="plan-basic" onclick="selectPlan('basic')">
+        <div class="plan-name">베이직</div>
+        <div class="plan-price">₩0 <span>/ 월</span></div>
+        <div class="plan-desc">그냥 쓰세요. 평생 무료.</div>
+        <div class="plan-features">
+          <div class="plan-feat">월 300건 자동 응대</div>
+          <div class="plan-feat">계정 1개</div>
+          <div class="plan-feat">AI 말투 학습 (기본)</div>
+          <div class="plan-feat">1초 카드뉴스 월 3회</div>
+          <div class="plan-feat">카카오톡 알림 (기본)</div>
+        </div>
+      </div>
+      <div class="plan-card selected recommended" id="plan-pro" onclick="selectPlan('pro')">
+        <div class="plan-rec-badge">추천</div>
+        <div class="plan-name">프리미엄</div>
+        <div class="plan-price">₩29,800 <span>/ 월</span></div>
+        <div class="plan-desc">키우기·만들기·돈벌기 전부</div>
+        <div class="plan-features">
+          <div class="plan-feat">월 6,600건 자동 응대 · 계정 3개</div>
+          <div class="plan-feat">1초 카드뉴스 무제한</div>
+          <div class="plan-feat">대화형 루프 + 업로드 자동 실행</div>
+          <div class="plan-feat">Ssobi 협업 제안 전체 참여</div>
+          <div class="plan-feat">수익 제안 분류 + 팔로워 CRM</div>
+          <div class="plan-feat">카카오톡 알림 전체</div>
+        </div>
+      </div>
+      <div class="plan-card" id="plan-biz" onclick="selectPlan('biz')">
+        <div class="plan-name">프로페셔널</div>
+        <div class="plan-price">₩69,800 <span>/ 월</span></div>
+        <div class="plan-desc">브랜드·에이전시 운영에 최적</div>
+        <div class="plan-features">
+          <div class="plan-feat">월 무제한 자동 응대</div>
+          <div class="plan-feat">계정 10개</div>
+          <div class="plan-feat">전용 AI 말투 세분화</div>
+          <div class="plan-feat">수출·B2B 자동 분류</div>
+          <div class="plan-feat">전담 매니저 지원</div>
+        </div>
       </div>
     </div>
-    <div class="plan-card recommended" id="plan-pro" onclick="selectPlan('pro')">
-      <div class="plan-rec-badge">추천</div>
-      <div class="plan-name">프리미엄</div>
-      <div class="plan-price">₩59,000 <span>/ 월</span></div>
-      <div class="plan-desc">활발히 운영 중인 계정에 추천</div>
-      <div class="plan-features">
-        <div class="plan-feat">월 6,600건 자동 응대</div>
-        <div class="plan-feat">계정 3개 (IG + TK + YT)</div>
-        <div class="plan-feat">AI 말투 학습 포함</div>
-        <div class="plan-feat">수익 제안 자동 분류</div>
-        <div class="plan-feat">카카오 알림 전체</div>
-        <div class="plan-feat">해시태그·시간 AI 분석</div>
-      </div>
+    <div class="plan-footer" style="padding:16px 0 0">
+      <button class="btn-mint-full" onclick="cm('m-plan');openModal('m-plan-checkout')">프리미엄 구독 시작하기</button>
+      <div class="pay-note">첫 결제는 무료체험 종료 후 진행돼요.<br>언제든 취소·변경 가능해요.</div>
     </div>
-    <div class="plan-card" id="plan-biz" onclick="selectPlan('biz')">
-      <div class="plan-name">비즈니스</div>
-      <div class="plan-price">₩129,000 <span>/ 월</span></div>
-      <div class="plan-desc">브랜드·에이전시 운영에 최적</div>
-      <div class="plan-features">
-        <div class="plan-feat">월 무제한 자동 응대</div>
-        <div class="plan-feat">계정 10개</div>
-        <div class="plan-feat">전용 AI 말투 세분화</div>
-        <div class="plan-feat">수출·B2B 자동 분류</div>
-        <div class="plan-feat">전담 매니저 지원</div>
-      </div>
-    </div>
-  </div>
-  <div class="plan-footer">
-    <button class="btn-mint-full" onclick="openModal('m-plan-checkout')">프리미엄 구독 시작하기</button>
-    <div class="pay-note">첫 결제는 무료체험 종료 후 진행돼요.<br>언제든 취소·변경 가능해요.</div>
   </div>
 </div>
 
@@ -3086,7 +3092,7 @@ input:checked+.tsl::before{transform:translateX(18px)}
     <div style="font-size:20px;font-weight:900;color:var(--t1);letter-spacing:-.5px;margin-bottom:8px">포인트가 부족해요</div>
     <div style="font-size:13px;color:var(--t2);line-height:1.65;margin-bottom:20px">무료체험이 끝나서 포인트로만 기능을 쓸 수 있어요.<br><strong style="color:var(--t1)">친구에게 공유</strong>하거나 <strong style="color:var(--mint-d)">프리미엄</strong>으로 바꿔보세요.</div>
     <div style="display:flex;flex-direction:column;gap:8px">
-      <button class="btn-p" style="margin-top:0;background:var(--mint)" onclick="cm('m-pt-empty');go('plan')">프리미엄 시작하기</button>
+      <button class="btn-p" style="margin-top:0;background:var(--mint)" onclick="cm('m-pt-empty');openModal('m-plan')">프리미엄 시작하기</button>
       <button class="btn-s" onclick="cm('m-pt-empty');openModal('m-invite-share')">친구에게 공유하고 포인트 받기</button>
       <button class="btn-s" style="margin-top:0;background:none;color:var(--t3)" onclick="cm('m-pt-empty')">닫기</button>
     </div>
@@ -3330,9 +3336,7 @@ function startProcessStep(key){
     },
     target: function(){
       go('targets');
-      // v-targets 화면에서 사용자가 계정 추가/확인 후 뒤로 오면 완료 처리
-      // 데모: 300ms 후 자동 체크
-      setTimeout(function(){ checkNewbie('target'); }, 600);
+      // v-targets 페이지에서 사용자가 "확인 완료" 버튼을 눌러야 완료 처리됨
     },
     kakao: function(){
       openModal('m-kakao-popup');
@@ -3384,6 +3388,8 @@ function celebrateNewbie(){
     if(newbieMode) toggleNewbie();
     // ROI 카운트업 다시
     applyDashboard(demoDashboard);
+    // 홈으로 이동 (어느 화면에서 완료했든)
+    go('home');
   });
   card.appendChild(emo); card.appendChild(t); card.appendChild(s); card.appendChild(btn);
   overlay.appendChild(card);
@@ -4968,10 +4974,10 @@ function doLearnFromManual(){
 }
 
 function selectPlan(plan){
-  document.querySelectorAll('.plan-card').forEach(function(c){ c.classList.remove('selected'); });
+  document.querySelectorAll('#m-plan .plan-card').forEach(function(c){ c.classList.remove('selected'); });
   document.getElementById('plan-'+plan).classList.add('selected');
-  var names={basic:'베이직', pro:'프리미엄', biz:'비즈니스'};
-  var btn=document.querySelector('.plan-footer .btn-mint-full');
+  var names={basic:'베이직', pro:'프리미엄', biz:'프로페셔널'};
+  var btn=document.querySelector('#m-plan .plan-footer .btn-mint-full');
   if(btn) btn.textContent=names[plan]+' 구독 시작하기';
 }
 
@@ -4988,6 +4994,12 @@ function addTarget(){
   inp.value='';
 }
 function delTarget(btn){ btn.closest('.target-item').remove(); }
+function finalizeTargets(){
+  checkNewbie('target');
+  // 필수 3단계 완료 시 celebrate에서 홈 이동 처리. 아니면 수동으로 홈으로
+  var allDone = newbieRequired.every(function(k){ return newbieChecks[k]; });
+  if(!allDone) go('home');
+}
 
 
 
