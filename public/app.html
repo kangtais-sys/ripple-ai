@@ -637,25 +637,23 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .ch-pick-check svg{width:10px;height:10px;stroke:#fff;stroke-width:3}
 .ch-pick-nm{font-size:12px;font-weight:800;margin-top:6px;color:var(--t1)}
 
-/* ── 즉시 돈벌기 (MISSION, SLIM) ── */
-.flash{background:linear-gradient(135deg,#991B1B 0%,#7F1D1D 50%,#450A0A 100%);border-radius:16px;padding:14px 16px;color:#fff;margin-bottom:10px;position:relative;overflow:hidden;box-shadow:0 6px 20px rgba(127,29,29,.45),0 0 0 1px rgba(239,68,68,.35)}
-.flash::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 90% 0%,rgba(255,210,51,.35),transparent 55%),radial-gradient(circle at 0% 100%,rgba(239,68,68,.5),transparent 60%);pointer-events:none}
-.flash::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);animation:flash-shine 3s ease-in-out infinite;pointer-events:none}
-@keyframes flash-shine{0%{left:-100%}60%,100%{left:100%}}
-.flash-pulse{position:absolute;top:12px;right:12px;display:flex;align-items:center;gap:4px;background:rgba(0,0,0,.45);backdrop-filter:blur(8px);border-radius:100px;padding:3px 9px;font-size:9px;font-weight:800;letter-spacing:.3px;z-index:2;border:1px solid rgba(255,210,51,.5)}
-.flash-pulse-dot{width:6px;height:6px;border-radius:50%;background:#FFD233;animation:flash-pulse 1s ease infinite}
-@keyframes flash-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.7)}}
-.flash-badge{display:inline-block;background:rgba(0,0,0,.28);backdrop-filter:blur(8px);font-size:9px;font-weight:800;padding:2px 8px;border-radius:5px;margin-bottom:6px;letter-spacing:.3px;position:relative;z-index:1}
-.flash-title{font-size:18px;font-weight:900;letter-spacing:-.5px;line-height:1.2;margin-bottom:6px;position:relative;z-index:1}
-.flash-meta-line{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;opacity:.9;margin-bottom:10px;position:relative;z-index:1}
-.flash-meta-line .dot{width:2px;height:2px;border-radius:50%;background:rgba(255,255,255,.5)}
-.flash-timer{font-variant-numeric:tabular-nums;color:#FFD233}
-.flash-bar{height:3px;background:rgba(0,0,0,.25);border-radius:2px;overflow:hidden;margin-bottom:10px;position:relative;z-index:1}
-.flash-bar-fill{height:100%;background:#FFD233;border-radius:2px;box-shadow:0 0 6px rgba(255,210,51,.6)}
-.flash-cta{width:100%;padding:10px;border-radius:10px;background:#FFD233;color:#7F1D1D;border:none;font-size:13px;font-weight:900;cursor:pointer;position:relative;z-index:1;letter-spacing:-.2px;box-shadow:0 2px 0 rgba(0,0,0,.22),0 0 16px rgba(255,210,51,.45);animation:flash-cta-pulse 2s ease infinite}
-.flash-cta-sub{padding:10px 14px;border-radius:10px;background:rgba(0,0,0,.35);color:#fff;border:1px solid rgba(255,255,255,.18);font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;backdrop-filter:blur(8px)}
+/* ── Repli 협업 제안 (심플) ── */
+.flash{background:linear-gradient(160deg,#1A1F27,#0F1319);border-radius:16px;padding:16px;color:#fff;margin-bottom:10px;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,.06);box-shadow:0 12px 32px rgba(15,19,25,.18)}
+.flash::before{content:'';position:absolute;top:-30px;right:-20px;width:140px;height:140px;background:radial-gradient(circle,rgba(0,200,150,.2),transparent 65%);border-radius:50%;pointer-events:none}
+.flash-pulse{position:absolute;top:12px;right:12px;display:inline-flex;align-items:center;gap:5px;background:rgba(0,200,150,.14);border:1px solid rgba(0,200,150,.25);border-radius:100px;padding:3px 9px;font-size:9px;font-weight:800;letter-spacing:.3px;z-index:2;color:#6EE7B7}
+.flash-pulse-dot{width:5px;height:5px;border-radius:50%;background:#6EE7B7;animation:bl 1.5s ease infinite;box-shadow:0 0 6px rgba(110,231,183,.6)}
+.flash-badge{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);font-size:10px;font-weight:700;padding:4px 10px;border-radius:100px;margin-bottom:10px;color:rgba(255,255,255,.75);letter-spacing:-.1px;position:relative;z-index:1}
+.flash-title{font-size:22px;font-weight:900;letter-spacing:-.6px;line-height:1.15;margin-bottom:8px;position:relative;z-index:1;color:#fff}
+.flash-meta-line{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;color:rgba(255,255,255,.6);margin-bottom:12px;position:relative;z-index:1}
+.flash-meta-line b{color:#fff;font-weight:800}
+.flash-meta-line .dot{width:2px;height:2px;border-radius:50%;background:rgba(255,255,255,.3)}
+.flash-timer{font-variant-numeric:tabular-nums;color:var(--mint);font-weight:800}
+.flash-bar{height:3px;background:rgba(255,255,255,.06);border-radius:2px;overflow:hidden;margin-bottom:12px;position:relative;z-index:1}
+.flash-bar-fill{height:100%;background:linear-gradient(90deg,var(--mint),#6EE7B7);border-radius:2px}
+.flash-cta{width:100%;padding:11px;border-radius:10px;background:linear-gradient(135deg,var(--mint),var(--mint-d));color:#fff;border:none;font-size:13px;font-weight:800;cursor:pointer;position:relative;z-index:1;letter-spacing:-.2px;box-shadow:0 4px 14px rgba(0,200,150,.28),inset 0 1px 0 rgba(255,255,255,.15);transition:transform .15s}
+.flash-cta:active{transform:scale(.98)}
+.flash-cta-sub{padding:11px 14px;border-radius:10px;background:rgba(255,255,255,.06);color:#fff;border:1px solid rgba(255,255,255,.12);font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0}
 .flash-cta-sub:active{transform:scale(.97)}
-@keyframes flash-cta-pulse{0%,100%{box-shadow:0 3px 0 rgba(0,0,0,.22),0 0 18px rgba(255,210,51,.5)}50%{box-shadow:0 3px 0 rgba(0,0,0,.22),0 0 28px rgba(255,210,51,.9)}}
 .flash-cta:active{transform:translateY(1px);box-shadow:none}
 .flash-notice{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;opacity:.9;margin-top:10px;position:relative;z-index:1}
 .flash-notice svg{width:12px;height:12px;stroke:currentColor;stroke-width:2}
@@ -1384,7 +1382,7 @@ input:checked+.tsl::before{transform:translateX(18px)}
         <div style="font-size:13px;font-weight:800;color:var(--t1)">직접 입력하기</div>
       </div>
       <textarea class="direct-ta" id="direct-topic" placeholder="예: 토너 패드 추천" oninput="toggleDirectBtn()" onkeyup="toggleDirectBtn()" oncompositionupdate="toggleDirectBtn()" oncompositionend="toggleDirectBtn()" onchange="toggleDirectBtn()"></textarea>
-      <button class="direct-gen" id="direct-gen-btn" disabled onclick="generatePrompt()">딸깍 한 번이면 끝</button>
+      <button class="direct-gen" id="direct-gen-btn" disabled onclick="generatePrompt()">생성하기</button>
     </div>
   </div>
 
@@ -3550,7 +3548,7 @@ function generatePrompt(){
     document.getElementById('cs2-body').textContent = generated.body;
     document.getElementById('cs2-caption').textContent = generated.caption;
     createData._lastSource = 'direct:'+topic;
-    btn.textContent = '딸깍 한 번이면 끝 ✨';
+    btn.textContent = '생성하기';
     btn.disabled = false;
     goStep(2);
   }, 1200);
