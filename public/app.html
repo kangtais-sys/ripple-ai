@@ -1252,6 +1252,89 @@ input:checked+.tsl::before{transform:translateX(18px)}
       </div>
     </div>
 
+    <!-- 처음이면 여기부터 (접힘) -->
+    <div class="discover-box" id="discover-box" style="margin-top:0;margin-bottom:14px">
+      <div class="discover-h" onclick="toggleDiscover()">
+        <div class="discover-h-ico">
+          <svg viewBox="0 0 24 24"><path d="M12 18v-6M9 15l3 3 3-3M12 3a9 9 0 100 18 9 9 0 000-18z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="discover-h-body">
+          <div class="discover-t">처음이면 여기부터</div>
+          <div class="discover-s">프로필·주제 3단계 세팅</div>
+        </div>
+        <div class="discover-chev"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="discover-body">
+
+      <div class="disc-step" id="ds-1">
+        <div class="disc-step-lbl">① 관심 주제 선택</div>
+        <div class="disc-chips" id="disc-chips">
+          <button class="disc-chip" onclick="pickTopic('beauty',this)">뷰티</button>
+          <button class="disc-chip" onclick="pickTopic('fashion',this)">패션</button>
+          <button class="disc-chip" onclick="pickTopic('food',this)">푸드</button>
+          <button class="disc-chip" onclick="pickTopic('life',this)">라이프</button>
+          <button class="disc-chip" onclick="pickTopic('home',this)">홈·인테리어</button>
+          <button class="disc-chip" onclick="pickTopic('fit',this)">피트니스</button>
+          <button class="disc-chip" onclick="pickTopic('sports',this)">스포츠</button>
+          <button class="disc-chip" onclick="pickTopic('baby',this)">육아</button>
+          <button class="disc-chip" onclick="pickTopic('pet',this)">반려</button>
+          <button class="disc-chip" onclick="pickTopic('money',this)">재테크</button>
+          <button class="disc-chip" onclick="pickTopic('tech',this)">테크</button>
+          <button class="disc-chip" onclick="pickTopic('book',this)">책·독서</button>
+          <button class="disc-chip" onclick="pickTopic('music',this)">음악</button>
+          <button class="disc-chip" onclick="pickTopic('travel',this)">여행</button>
+        </div>
+      </div>
+
+      <div class="disc-step" id="ds-2" style="display:none">
+        <div class="disc-step-lbl">② <span id="ds2-topic">뷰티</span> — 잘 크고 있는 계정</div>
+        <div class="disc-refs" id="disc-refs"></div>
+        <button class="disc-next" onclick="discGoto(3)">다음 — 프로필 설정
+          <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+      <div class="disc-step" id="ds-3" style="display:none">
+        <div class="disc-step-lbl">③ 팔로우를 부르는 프로필 만들기</div>
+        <div class="prof-bio-box">
+          <div class="prof-bio-wrap">
+            <textarea class="prof-bio-ta" id="prof-bio" rows="5" oninput="updateBioPreview()" placeholder="신상만 밝히는 코덕 사생활&#10;됐어, 신상 대신 사보고 돈 아껴줄게&#10;협업제안 DM"></textarea>
+          </div>
+          <div class="prof-bio-hint" style="display:flex;flex-direction:column;gap:4px;margin-top:10px">
+            <div><strong style="color:var(--mint-d)">1줄</strong> · 나와 내 컨텐츠 소개 <span style="color:var(--t3)">(예: 신상만 밝히는 코덕 사생활)</span></div>
+            <div><strong style="color:var(--mint-d)">2줄</strong> · 팔로우하면 얻을 정보 <span style="color:var(--t3)">(예: 됐어, 신상 대신 사보고 돈 아껴줄게)</span></div>
+            <div><strong style="color:var(--mint-d)">3줄</strong> · 연락처 <span style="color:var(--t3)">(예: 협업제안 DM)</span></div>
+          </div>
+        </div>
+        <div class="prof-preview">
+          <div class="prof-preview-lbl">인스타 프로필 미리보기</div>
+          <div class="prof-preview-top">
+            <div class="prof-preview-av"><div class="prof-preview-av-inner" id="preview-initial">M</div></div>
+            <div class="prof-preview-meta">
+              <div class="prof-preview-name" id="preview-name">내 계정</div>
+              <div class="prof-preview-stats">게시물 <b style="color:var(--t1)">0</b> · 팔로워 <b style="color:var(--t1)">0</b> · 팔로잉 <b style="color:var(--t1)">0</b></div>
+            </div>
+          </div>
+          <div class="prof-preview-bio" id="preview-bio"></div>
+        </div>
+        <div style="font-size:11px;font-weight:800;color:var(--t3);letter-spacing:.3px;margin-bottom:8px">적용할 채널 선택</div>
+        <div style="display:flex;gap:8px;margin-bottom:14px" id="prof-channel-pick">
+          <button type="button" onclick="toggleProfCh(this,'ig')" class="prof-ch on">IG</button>
+          <button type="button" onclick="toggleProfCh(this,'tk')" class="prof-ch">TK</button>
+          <button type="button" onclick="toggleProfCh(this,'yt')" class="prof-ch">YT</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:10px">
+          <button class="disc-next" onclick="copyBio()" style="flex:1;background:var(--s);color:var(--t1);border:1px solid var(--b)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-linecap="round" stroke-linejoin="round"/></svg>복사</button>
+          <button class="disc-next" onclick="applyProfile()" style="flex:1;background:var(--dark)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>설정하기</button>
+        </div>
+        <button class="disc-next mint" onclick="discFinish()">카드뉴스 만들기
+          <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+
+      </div><!-- /discover-body -->
+    </div>
+
     <div class="sec-t" style="margin-top:0">오늘 핫한 주제 TOP 3</div>
 
     <div class="trend-card" onclick="useTrend(1)">
@@ -1302,96 +1385,6 @@ input:checked+.tsl::before{transform:translateX(18px)}
       </div>
       <textarea class="direct-ta" id="direct-topic" placeholder="예: 토너 패드 추천" oninput="toggleDirectBtn()" onkeyup="toggleDirectBtn()" oncompositionupdate="toggleDirectBtn()" oncompositionend="toggleDirectBtn()" onchange="toggleDirectBtn()"></textarea>
       <button class="direct-gen" id="direct-gen-btn" disabled onclick="generatePrompt()">딸깍 한 번이면 끝</button>
-    </div>
-
-    <!-- 뭘 만들어야 할지 모를 때 (접힘, 강조) -->
-    <div class="discover-box" id="discover-box">
-      <div class="discover-h" onclick="toggleDiscover()">
-        <div class="discover-h-ico">
-          <svg viewBox="0 0 24 24"><path d="M12 18v-6M9 15l3 3 3-3M12 3a9 9 0 100 18 9 9 0 000-18z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <div class="discover-h-body">
-          <div class="discover-t">처음이면 여기부터</div>
-          <div class="discover-s">프로필·주제 3단계 세팅</div>
-        </div>
-        <div class="discover-chev"><svg viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      </div>
-      <div class="discover-body">
-
-      <!-- STEP 1: 관심 주제 선택 -->
-      <div class="disc-step" id="ds-1">
-        <div class="disc-step-lbl">① 관심 주제 선택</div>
-        <div class="disc-chips" id="disc-chips">
-          <button class="disc-chip" onclick="pickTopic('beauty',this)">뷰티</button>
-          <button class="disc-chip" onclick="pickTopic('fashion',this)">패션</button>
-          <button class="disc-chip" onclick="pickTopic('food',this)">푸드</button>
-          <button class="disc-chip" onclick="pickTopic('life',this)">라이프</button>
-          <button class="disc-chip" onclick="pickTopic('home',this)">홈·인테리어</button>
-          <button class="disc-chip" onclick="pickTopic('fit',this)">피트니스</button>
-          <button class="disc-chip" onclick="pickTopic('sports',this)">스포츠</button>
-          <button class="disc-chip" onclick="pickTopic('baby',this)">육아</button>
-          <button class="disc-chip" onclick="pickTopic('pet',this)">반려</button>
-          <button class="disc-chip" onclick="pickTopic('money',this)">재테크</button>
-          <button class="disc-chip" onclick="pickTopic('tech',this)">테크</button>
-          <button class="disc-chip" onclick="pickTopic('book',this)">책·독서</button>
-          <button class="disc-chip" onclick="pickTopic('music',this)">음악</button>
-          <button class="disc-chip" onclick="pickTopic('travel',this)">여행</button>
-        </div>
-      </div>
-
-      <!-- STEP 2: 레퍼런스 계정 -->
-      <div class="disc-step" id="ds-2" style="display:none">
-        <div class="disc-step-lbl">② <span id="ds2-topic">뷰티</span> — 잘 크고 있는 계정</div>
-        <div class="disc-refs" id="disc-refs"></div>
-        <button class="disc-next" onclick="discGoto(3)">다음 — 프로필 설정
-          <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-      </div>
-
-      <!-- STEP 3: 팔로우를 부르는 프로필 -->
-      <div class="disc-step" id="ds-3" style="display:none">
-        <div class="disc-step-lbl">③ 팔로우를 부르는 프로필 만들기</div>
-
-        <div class="prof-bio-box">
-          <div class="prof-bio-wrap">
-            <textarea class="prof-bio-ta" id="prof-bio" rows="5" oninput="updateBioPreview()" placeholder="신상만 밝히는 코덕 사생활&#10;됐어, 신상 대신 사보고 돈 아껴줄게&#10;협업제안 DM"></textarea>
-          </div>
-          <div class="prof-bio-hint" style="display:flex;flex-direction:column;gap:4px;margin-top:10px">
-            <div><strong style="color:var(--mint-d)">1줄</strong> · 나와 내 컨텐츠 소개 <span style="color:var(--t3)">(예: 신상만 밝히는 코덕 사생활)</span></div>
-            <div><strong style="color:var(--mint-d)">2줄</strong> · 팔로우하면 얻을 정보 <span style="color:var(--t3)">(예: 됐어, 신상 대신 사보고 돈 아껴줄게)</span></div>
-            <div><strong style="color:var(--mint-d)">3줄</strong> · 연락처 <span style="color:var(--t3)">(예: 협업제안 DM)</span></div>
-          </div>
-        </div>
-
-        <div class="prof-preview">
-          <div class="prof-preview-lbl">인스타 프로필 미리보기</div>
-          <div class="prof-preview-top">
-            <div class="prof-preview-av"><div class="prof-preview-av-inner" id="preview-initial">M</div></div>
-            <div class="prof-preview-meta">
-              <div class="prof-preview-name" id="preview-name">내 계정</div>
-              <div class="prof-preview-stats">게시물 <b style="color:var(--t1)">0</b> · 팔로워 <b style="color:var(--t1)">0</b> · 팔로잉 <b style="color:var(--t1)">0</b></div>
-            </div>
-          </div>
-          <div class="prof-preview-bio" id="preview-bio"></div>
-        </div>
-
-        <div style="font-size:11px;font-weight:800;color:var(--t3);letter-spacing:.3px;margin-bottom:8px">적용할 채널 선택</div>
-        <div style="display:flex;gap:8px;margin-bottom:14px" id="prof-channel-pick">
-          <button type="button" onclick="toggleProfCh(this,'ig')" class="prof-ch on">IG</button>
-          <button type="button" onclick="toggleProfCh(this,'tk')" class="prof-ch">TK</button>
-          <button type="button" onclick="toggleProfCh(this,'yt')" class="prof-ch">YT</button>
-        </div>
-
-        <div style="display:flex;gap:8px;margin-bottom:10px">
-          <button class="disc-next" onclick="copyBio()" style="flex:1;background:var(--s);color:var(--t1);border:1px solid var(--b)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" stroke-linecap="round" stroke-linejoin="round"/></svg>복사</button>
-          <button class="disc-next" onclick="applyProfile()" style="flex:1;background:var(--dark)"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>설정하기</button>
-        </div>
-
-        <button class="disc-next mint" onclick="discFinish()">카드뉴스 만들기
-          <svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </button>
-      </div>
-      </div><!-- /discover-body -->
     </div>
   </div>
 
