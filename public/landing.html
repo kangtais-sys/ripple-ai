@@ -15,9 +15,7 @@
   --amber:#F59E0B;--amber-l:#FFFBEB;
   --red:#FF4D4D;--red-l:#FFF1F3;
 }
-html{scroll-behavior:smooth;scroll-snap-type:y proximity;scroll-padding-top:64px}
-section,.hero,.dash-bg,.final-sec,.footer,.snap-target{scroll-snap-align:start;scroll-snap-stop:normal;scroll-margin-top:64px}
-.hero{scroll-snap-align:start;scroll-margin-top:0}
+html{scroll-behavior:smooth;scroll-padding-top:64px}
 body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--ink);overflow-x:hidden;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;position:relative}
 body::before{content:'';position:fixed;inset:0;background:radial-gradient(1200px circle at 15% 8%,rgba(0,200,150,.06),transparent 45%),radial-gradient(900px circle at 85% 35%,rgba(6,182,212,.05),transparent 50%),radial-gradient(800px circle at 50% 90%,rgba(139,92,246,.04),transparent 50%);pointer-events:none;z-index:0}
 body > *{position:relative;z-index:1}
@@ -285,6 +283,35 @@ body > *{position:relative;z-index:1}
 .flash-bar-fill{height:100%;width:35%;background:linear-gradient(90deg,var(--mint),#6EE7B7);border-radius:2px;box-shadow:0 0 8px rgba(0,200,150,.5)}
 .flash-cta{width:100%;padding:15px;border-radius:12px;background:linear-gradient(135deg,var(--mint),var(--mint-d));color:#fff;border:none;font-size:14.5px;font-weight:800;position:relative;z-index:1;letter-spacing:-.3px;box-shadow:0 10px 28px rgba(0,200,150,.32),inset 0 1px 0 rgba(255,255,255,.18);cursor:pointer;transition:transform .2s cubic-bezier(.32,1,.32,1)}
 .flash-cta:hover{transform:translateY(-1px)}
+
+/* ── SAFETY (아쉬운 것 vs Ssobi) ── */
+.safety-bg{background:linear-gradient(180deg,#F5F7FA 0%,#FFFFFF 100%);padding:100px 24px;position:relative;overflow:hidden}
+.safety-bg::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:80%;max-width:600px;height:1px;background:linear-gradient(90deg,transparent,var(--line),transparent)}
+.safety-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:960px;margin:0 auto}
+.safety-col{background:var(--bg);border-radius:20px;padding:28px;border:1px solid rgba(15,19,25,.06);box-shadow:0 2px 8px rgba(15,19,25,.03)}
+.safety-col.bad{background:#FFF1F3;border-color:rgba(255,77,77,.18)}
+.safety-col.good{background:linear-gradient(160deg,#F0FDF9 0%,#ECFDF8 100%);border-color:rgba(0,200,150,.2);box-shadow:0 12px 32px rgba(0,200,150,.1)}
+.safety-col-label{display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border-radius:100px;font-size:10.5px;font-weight:800;letter-spacing:.3px;margin-bottom:14px}
+.safety-col.bad .safety-col-label{background:rgba(255,77,77,.15);color:var(--red)}
+.safety-col.good .safety-col-label{background:rgba(0,200,150,.15);color:var(--mint-d)}
+.safety-col-t{font-size:18px;font-weight:800;color:var(--ink);letter-spacing:-.4px;line-height:1.3;margin-bottom:16px;word-break:keep-all}
+.safety-col.bad .safety-col-t{color:#991B1B}
+.safety-col.good .safety-col-t{color:var(--mint-d)}
+.safety-list{display:flex;flex-direction:column;gap:11px}
+.safety-item{display:flex;gap:10px;align-items:flex-start;font-size:13px;line-height:1.55;color:var(--ink2)}
+.safety-item-ico{flex-shrink:0;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:1px;font-weight:800;font-size:11px}
+.safety-col.bad .safety-item-ico{background:#FECACA;color:var(--red)}
+.safety-col.good .safety-item-ico{background:var(--mint);color:#fff}
+.safety-col.good .safety-item-ico svg{width:10px;height:10px;stroke:#fff;stroke-width:3;fill:none}
+.safety-item b{color:var(--ink);font-weight:800}
+.safety-col.good .safety-item b{color:var(--ink)}
+@media(max-width:768px){
+  .safety-bg{padding:72px 20px}
+  .safety-grid{grid-template-columns:1fr;gap:12px}
+  .safety-col{padding:22px}
+  .safety-col-t{font-size:16px}
+  .safety-item{font-size:12.5px}
+}
 
 /* ── COMPARISON ── */
 .comp-table{width:100%;border-collapse:separate;border-spacing:0;border-radius:16px;overflow:hidden;background:#fff;box-shadow:0 8px 32px rgba(15,19,25,.06),0 2px 8px rgba(15,19,25,.03);border:1px solid rgba(15,19,25,.04);font-size:13px}
@@ -638,7 +665,7 @@ body > *{position:relative;z-index:1}
     </div>
 
     <!-- 팔로워 0명 가이드 -->
-    <div class="snap-target" style="margin-top:48px;background:linear-gradient(135deg,var(--dark),#1F2937);border-radius:24px;padding:28px;color:#fff;position:relative;overflow:hidden;scroll-margin-top:64px">
+    <div style="margin-top:48px;background:linear-gradient(135deg,var(--dark),#1F2937);border-radius:24px;padding:28px;color:#fff;position:relative;overflow:hidden">
       <div style="position:absolute;top:-40px;right:-30px;width:180px;height:180px;background:radial-gradient(circle,rgba(0,200,150,.3),transparent 60%);border-radius:50%;pointer-events:none"></div>
       <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,200,150,.15);border:1px solid rgba(0,200,150,.4);border-radius:100px;padding:5px 12px;font-size:11px;font-weight:800;color:#6EE7B7;margin-bottom:14px;position:relative;z-index:1">
         <span style="width:6px;height:6px;border-radius:50%;background:#6EE7B7;animation:pulse 1.5s infinite"></span>
@@ -874,6 +901,39 @@ body > *{position:relative;z-index:1}
         <div class="feat-ico a"><svg viewBox="0 0 24 24"><path d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a3 3 0 11-2.684-5.368 3 3 0 012.684 5.368zm0-5.368a3 3 0 10-2.684-5.368 3 3 0 002.684 5.368z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="feat-name">친구 초대 포인트</div>
         <div class="feat-desc">친구가 가입하면 5,000P, 구독하면 20,000P. 포인트는 카드뉴스 만들기·키우기 활동에 바로 써요.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SAFETY: 아쉬운 것 vs Ssobi -->
+<section class="safety-bg fade-in">
+  <div class="wrap-narrow" style="text-align:center;margin-bottom:40px">
+    <span class="sec-eye">SAFE &amp; LEGAL</span>
+    <h2 class="sec-title" style="margin-bottom:8px">봇 돌렸다가<br><em>계정 날린 적 있나요?</em></h2>
+    <p class="sec-sub">Ssobi는 단순 자동화가 아닙니다.<br>공식 API 위에 노하우를 얹어 <b>안전하게</b> 키워요.</p>
+  </div>
+  <div class="safety-grid">
+    <div class="safety-col bad">
+      <div class="safety-col-label">기존 봇의 아쉬움</div>
+      <div class="safety-col-t">계정을 키우려다<br>계정이 막혀요.</div>
+      <div class="safety-list">
+        <div class="safety-item"><div class="safety-item-ico">✕</div><div>자동 팔로우·좋아요·스토리 조회로 <b>계정 정지</b> 위험</div></div>
+        <div class="safety-item"><div class="safety-item-ico">✕</div><div>"감사해요" 수준의 <b>단순 봇 답변</b>만 반복</div></div>
+        <div class="safety-item"><div class="safety-item-ico">✕</div><div>주제·말투 학습 없이 모든 계정에 <b>같은 스크립트</b></div></div>
+        <div class="safety-item"><div class="safety-item-ico">✕</div><div>하루 한도·시간대 조절 없음 → <b>스팸 감지</b></div></div>
+        <div class="safety-item"><div class="safety-item-ico">✕</div><div>AI 생성 콘텐츠를 그대로 업로드 → <b>플랫폼 제재</b></div></div>
+      </div>
+    </div>
+    <div class="safety-col good">
+      <div class="safety-col-label">Ssobi의 해결</div>
+      <div class="safety-col-t">공식 API + 노하우로<br>안전하게 키워요.</div>
+      <div class="safety-list">
+        <div class="safety-item"><div class="safety-item-ico"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div>Meta·TikTok·YouTube <b>공식 파트너 API</b> 전용</div></div>
+        <div class="safety-item"><div class="safety-item-ico"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div>내 게시물 250개 분석 → <b>말투 98% 일치</b> 응대</div></div>
+        <div class="safety-item"><div class="safety-item-ico"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div>질문형 대댓글로 <b>대화가 이어지는</b> 맞춤 응대</div></div>
+        <div class="safety-item"><div class="safety-item-ico"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div>하루 한도·시간대 설정 · <b>비정상 신호 시 자동 감속</b></div></div>
+        <div class="safety-item"><div class="safety-item-ico"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><b>AI 작성 스탬프</b>로 투명한 생성 콘텐츠 표기 (옵션)</div></div>
       </div>
     </div>
   </div>
