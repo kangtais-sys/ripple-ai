@@ -408,8 +408,10 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .cal-day.today:active{background:#000}
 .cal-dots{display:flex;gap:2px;margin-top:auto;margin-bottom:2px;flex-wrap:wrap;justify-content:center;max-width:100%}
 .cal-dot{width:4px;height:4px;border-radius:50%}
-.cal-dot.r{background:var(--mint)}       /* 응대 */
-.cal-dot.u{background:var(--amber)}      /* 업로드 */
+.cal-dot.c{background:var(--mint)}       /* AI 댓글 */
+.cal-dot.d{background:#06B6D4}           /* AI DM */
+.cal-dot.f{background:#F59E0B}           /* 팔로워 증가 */
+.cal-dot.u{background:#3B82F6}           /* 업로드 */
 .cal-dot.s{background:#8B5CF6}           /* 예약 */
 .cal-legend{display:flex;gap:10px;margin-top:12px;padding:10px 4px 0;border-top:1px solid var(--b);flex-wrap:wrap}
 .cal-lg{display:flex;align-items:center;gap:5px;font-size:10px;font-weight:600;color:var(--t2)}
@@ -878,10 +880,10 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .sdet-hero-t{font-size:17px;font-weight:900;letter-spacing:-.3px;line-height:1.3}
 .sdet-hero-count{position:absolute;top:14px;right:14px;display:flex;gap:4px}
 .sdet-hero-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.9)}
-.sdet-stat-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px}
-.sdet-stat{background:var(--bg);border-radius:12px;padding:10px 8px;text-align:center}
-.sdet-stat-v{font-size:17px;font-weight:900;color:var(--t1)}
-.sdet-stat-l{font-size:10px;color:var(--t3);font-weight:600;margin-top:2px}
+.sdet-stat-row{display:grid;grid-template-columns:repeat(5,1fr);gap:5px;margin-bottom:16px}
+.sdet-stat{background:var(--bg);border-radius:10px;padding:9px 4px;text-align:center}
+.sdet-stat-v{font-size:15px;font-weight:900;color:var(--t1);letter-spacing:-.3px}
+.sdet-stat-l{font-size:9px;color:var(--t3);font-weight:700;margin-top:3px;line-height:1.2}
 
 .sdet-post-card{background:var(--s);border-radius:14px;border:1px solid var(--b);padding:12px;margin-bottom:8px;display:flex;gap:10px;align-items:stretch}
 .sdet-post-img{width:78px;aspect-ratio:1;border-radius:10px;background:linear-gradient(135deg,#FDE68A,#FCA5A5);flex-shrink:0;position:relative;overflow:hidden}
@@ -1100,9 +1102,11 @@ input:checked+.tsl::before{transform:translateX(18px)}
     </div>
     <div class="cal-grid" id="cal-grid"></div>
     <div class="cal-legend">
-      <div class="cal-lg"><div class="cal-lg-dot" style="background:var(--mint)"></div>AI 응대</div>
-      <div class="cal-lg"><div class="cal-lg-dot" style="background:var(--amber)"></div>게시물 업로드</div>
-      <div class="cal-lg"><div class="cal-lg-dot" style="background:#8B5CF6"></div>예약 게시물</div>
+      <div class="cal-lg"><div class="cal-lg-dot" style="background:var(--mint)"></div>AI 댓글</div>
+      <div class="cal-lg"><div class="cal-lg-dot" style="background:#06B6D4"></div>AI DM</div>
+      <div class="cal-lg"><div class="cal-lg-dot" style="background:#F59E0B"></div>팔로워 증가</div>
+      <div class="cal-lg"><div class="cal-lg-dot" style="background:#3B82F6"></div>업로드</div>
+      <div class="cal-lg"><div class="cal-lg-dot" style="background:#8B5CF6"></div>예약</div>
     </div>
   </div>
   </div><!-- /home-real -->
@@ -3139,9 +3143,11 @@ input:checked+.tsl::before{transform:translateX(18px)}
     </div>
     <div class="s-bar" style="margin:-10px auto 16px"></div>
     <div class="sdet-stat-row">
-      <div class="sdet-stat"><div class="sdet-stat-v" id="sdet-r">0</div><div class="sdet-stat-l">AI 응대</div></div>
+      <div class="sdet-stat"><div class="sdet-stat-v" id="sdet-c">0</div><div class="sdet-stat-l">AI 댓글</div></div>
+      <div class="sdet-stat"><div class="sdet-stat-v" id="sdet-d">0</div><div class="sdet-stat-l">AI DM</div></div>
+      <div class="sdet-stat"><div class="sdet-stat-v" id="sdet-f">0</div><div class="sdet-stat-l">팔로워 +</div></div>
       <div class="sdet-stat"><div class="sdet-stat-v" id="sdet-u">0</div><div class="sdet-stat-l">업로드</div></div>
-      <div class="sdet-stat"><div class="sdet-stat-v" id="sdet-s">0</div><div class="sdet-stat-l">예약 게시물</div></div>
+      <div class="sdet-stat"><div class="sdet-stat-v" id="sdet-s">0</div><div class="sdet-stat-l">예약</div></div>
     </div>
     <div style="font-size:13px;font-weight:800;color:var(--t1);margin-bottom:10px">예약된 게시물</div>
     <div id="sdet-posts"></div>
@@ -3384,12 +3390,15 @@ function celebrateNewbie(){
 // ═══════════════ MINI CALENDAR ═══════════════
 var calDate = new Date(2026, 3, 1);
 var calEvents = {
-  '2026-04-01':{r:210}, '2026-04-02':{r:284,u:1}, '2026-04-03':{r:191},
-  '2026-04-04':{r:312,u:1}, '2026-04-05':{r:178}, '2026-04-06':{r:244},
-  '2026-04-07':{r:266,u:1}, '2026-04-08':{r:198}, '2026-04-09':{r:223},
-  '2026-04-10':{r:289,u:1}, '2026-04-11':{r:312,u:1}, '2026-04-12':{r:198},
-  '2026-04-13':{r:176}, '2026-04-14':{r:234,u:1}, '2026-04-15':{r:261},
-  '2026-04-16':{r:298}, '2026-04-17':{r:284},
+  '2026-04-01':{c:142,d:68,f:18},      '2026-04-02':{c:198,d:86,f:24,u:1},
+  '2026-04-03':{c:124,d:67,f:12},      '2026-04-04':{c:221,d:91,f:31,u:1},
+  '2026-04-05':{c:118,d:60,f:14},      '2026-04-06':{c:170,d:74,f:20},
+  '2026-04-07':{c:184,d:82,f:26,u:1},  '2026-04-08':{c:131,d:67,f:17},
+  '2026-04-09':{c:156,d:67,f:19},      '2026-04-10':{c:203,d:86,f:28,u:1},
+  '2026-04-11':{c:224,d:88,f:32,u:1},  '2026-04-12':{c:131,d:67,f:16},
+  '2026-04-13':{c:117,d:59,f:13},      '2026-04-14':{c:163,d:71,f:22,u:1},
+  '2026-04-15':{c:182,d:79,f:25},      '2026-04-16':{c:209,d:89,f:29},
+  '2026-04-17':{c:198,d:86,f:27},
   '2026-04-19':{s:1}, '2026-04-21':{s:1}, '2026-04-25':{s:1}
 };
 function keyOf(y,m,d){ return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'); }
@@ -3420,7 +3429,9 @@ function renderCalendar(){
     var day = makeEl('div','cal-day'+(isToday?' today':''));
     day.appendChild(document.createTextNode(d));
     var dotsWrap = makeEl('div','cal-dots');
-    if(ev.r) dotsWrap.appendChild(makeEl('div','cal-dot r'));
+    if(ev.c) dotsWrap.appendChild(makeEl('div','cal-dot c'));
+    if(ev.d) dotsWrap.appendChild(makeEl('div','cal-dot d'));
+    if(ev.f) dotsWrap.appendChild(makeEl('div','cal-dot f'));
     if(ev.u) dotsWrap.appendChild(makeEl('div','cal-dot u'));
     if(ev.s) dotsWrap.appendChild(makeEl('div','cal-dot s'));
     day.appendChild(dotsWrap);
@@ -3466,7 +3477,9 @@ function showDay(k){
   }
 
   // stats
-  document.getElementById('sdet-r').textContent = ev.r||0;
+  document.getElementById('sdet-c').textContent = ev.c||0;
+  document.getElementById('sdet-d').textContent = ev.d||0;
+  document.getElementById('sdet-f').textContent = ev.f?'+'+ev.f:'0';
   document.getElementById('sdet-u').textContent = ev.u||0;
   document.getElementById('sdet-s').textContent = (ev.s||0) || posts.length;
 
