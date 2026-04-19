@@ -188,8 +188,8 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .tstatus{font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px}.ts-d{background:var(--mint-l);color:var(--mint-d)}.ts-w{background:var(--bg);color:var(--t3)}
 
 /* MANAGE TABS */
-.tbar{display:flex;border-bottom:1px solid var(--b);margin-bottom:14px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}.tbar::-webkit-scrollbar{display:none}
-.tab{flex:1;padding:12px 2px;font-size:11px;font-weight:700;color:var(--t3);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;white-space:nowrap}
+.tbar{display:flex;border-bottom:1px solid var(--b);margin-bottom:14px;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;gap:2px}.tbar::-webkit-scrollbar{display:none}
+.tab{flex:1;padding:12px 8px;font-size:12px;font-weight:700;color:var(--t3);border:none;background:none;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;white-space:nowrap;letter-spacing:-.3px;text-align:center}
 .tab.on{color:var(--t1);border-bottom-color:var(--dark);font-weight:800}
 .tc{display:none;padding-top:4px}.tc.on{display:block}
 
@@ -2407,8 +2407,23 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
           <div class="cbody"><div class="cname">@hazel_skin</div><div class="csub">댓글 22회 · 좋아요 다수</div><div class="ctags"><span class="badge bg">열성팬</span></div></div>
           <div class="cscore">71점</div>
         </div>
+        <div class="crow" onclick="openModal('m-crm1')">
+          <div class="ch-av ch-ig">IG</div>
+          <div class="cbody"><div class="cname">@seoulnista</div><div class="csub">댓글 29회 · 영상 공유 5회</div><div class="ctags"><span class="badge bg">열성팬</span></div></div>
+          <div class="cscore">85점</div>
+        </div>
+        <div class="crow" onclick="openModal('m-crm1')">
+          <div class="ch-av ch-tk">TK</div>
+          <div class="cbody"><div class="cname">@morning_glow_kr</div><div class="csub">공구 참여 3회 · 후기 1개</div><div class="ctags"><span class="badge bn">구매의향</span></div></div>
+          <div class="cscore">68점</div>
+        </div>
+        <div class="crow" onclick="openModal('m-crm1')">
+          <div class="ch-av ch-ig">IG</div>
+          <div class="cbody"><div class="cname">@kbeauty_daily</div><div class="csub">댓글 18회 · 좋아요 다수</div><div class="ctags"><span class="badge bg">VVIP</span></div></div>
+          <div class="cscore">65점</div>
+        </div>
       </div>
-      <button class="more" onclick="openModal('m-pos-more')">긍정 팔로워 더보기 (139명)</button>
+      <button class="more" onclick="openModal('m-pos-more')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;margin-right:6px;vertical-align:-2px"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13" stroke-linecap="round" stroke-linejoin="round"/></svg>긍정 팔로워 전체 공유 (142명)</button>
     </div>
 
     <!-- 부정 팔로워 -->
@@ -2425,8 +2440,23 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
           <div class="cbody"><div class="cname">@peeve_user22</div><div class="csub">부정 댓글 2회 · 배송 불만</div><div class="ctags"><span class="badge br">요주의</span></div></div>
           <div class="cscore" style="color:var(--red)">!</div>
         </div>
+        <div class="crow" onclick="openModal('m-crm2')">
+          <div class="ch-av ch-tk">TK</div>
+          <div class="cbody"><div class="cname">@angry_user01</div><div class="csub">부정 댓글 3회 · 환불 요청</div><div class="ctags"><span class="badge br">요주의</span></div></div>
+          <div class="cscore" style="color:var(--red)">!</div>
+        </div>
+        <div class="crow" onclick="openModal('m-crm2')">
+          <div class="ch-av ch-ig">IG</div>
+          <div class="cbody"><div class="cname">@negative_k22</div><div class="csub">부정 댓글 1회 · 성분 의혹</div><div class="ctags"><span class="badge br">주의</span></div></div>
+          <div class="cscore" style="color:var(--red)">!</div>
+        </div>
+        <div class="crow" onclick="openModal('m-crm2')">
+          <div class="ch-av ch-yt">YT</div>
+          <div class="cbody"><div class="cname">@complaint_m</div><div class="csub">부정 댓글 2회 · 반복 클레임</div><div class="ctags"><span class="badge br">요주의</span></div></div>
+          <div class="cscore" style="color:var(--red)">!</div>
+        </div>
       </div>
-      <button class="more" onclick="openModal('m-neg-more')">부정 팔로워 더보기 (9명)</button>
+      <button class="more" onclick="openModal('m-neg-more')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;margin-right:6px;vertical-align:-2px"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13" stroke-linecap="round" stroke-linejoin="round"/></svg>부정 팔로워 전체 공유 (11명)</button>
     </div>
   </div>
 
@@ -3434,12 +3464,40 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 <div class="ov" id="m-u2" onclick="co(event,'m-u2')"><div class="sheet"><div class="s-bar"></div><div class="s-title">부정 이슈</div><div class="s-sub">@skin_trouble_k · Instagram · 18분 전</div><div class="bubble"><div class="b-who">@skin_trouble_k</div>"이거 쓰고 트러블 났어요 신고 어떻게 해요..."</div><div class="bubble ai"><div class="b-who ai">Ssobi AI 초안</div>안녕하세요, 불편을 드려 정말 죄송해요. DM으로 연락 주시면 교환·환불 빠르게 도와드릴게요!</div><button class="btn-p" onclick="cm('m-u2')">승인 · 바로 발송</button><button class="btn-s" onclick="cm('m-u2')">수정하기</button><button class="btn-d" onclick="cm('m-u2')">직접 응대</button></div></div>
 <div class="ov" id="m-biz" onclick="co(event,'m-biz')"><div class="sheet"><div class="s-bar"></div><div class="s-title">협업 문의</div><div class="s-sub">@collab_brand_k · DM · 1시간 전</div><div class="bubble"><div class="b-who">@collab_brand_k</div>"OEM 협업 및 견적 문의드립니다"</div><div class="bubble ai"><div class="b-who ai">Ssobi AI 초안</div>안녕하세요! 관심 감사해요. 자세한 협의는 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6f060109002f02060303060206030306410c00">[email&#160;protected]</a> 또는 카카오 @millimilli 로 연락 주시면 빠르게 안내드릴게요</div><button class="btn-p" onclick="cm('m-biz')">승인 · 바로 발송</button><button class="btn-s" onclick="cm('m-biz')">수정하기</button></div></div>
 <div class="ov" id="m-c1" onclick="co(event,'m-c1')"><div class="sheet"><div class="s-bar"></div><div class="s-title">응대 내역</div><div class="bubble"><div class="b-who">@yuna__daily</div>"제품 어디서 구매해요?"</div><div class="bubble ai"><div class="b-who ai">Ssobi AI · 말투 98%</div>올리브영·스마트스토어·카페24에서 구매 가능해요! 프로필 링크에 바로 있어요</div><div class="bubble"><div class="b-who">@yuna__daily</div>"감사해요!! 바로 주문했어요"</div><button class="btn-s" onclick="cm('m-c1')">닫기</button></div></div>
-<div class="ov" id="m-crm1" onclick="co(event,'m-crm1')"><div class="sheet"><div class="s-bar"></div><div class="s-title">@yuna__daily</div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px"><span class="badge bg">VVIP</span><span class="badge bn">Instagram</span><span class="badge bn">댓글 38회</span></div><div class="bubble">최근: "이 제품 너무 좋아요! 주변에 다 추천했어요"<br>구매 3회 · 공유 5회 · 좋아요 28회</div><button class="btn-p" onclick="cm('m-crm1')">스토리 조회 예약</button><button class="btn-s" onclick="cm('m-crm1')">닫기</button></div></div>
-<div class="ov" id="m-crm2" onclick="co(event,'m-crm2')"><div class="sheet"><div class="s-bar"></div><div class="s-title">요주의 — @skin_trouble_k</div><div class="bubble"><div class="b-who" style="color:var(--red)">Instagram</div>"이 제품 써서 트러블 났어요!! 환불 어떻게 해요"</div><div class="bubble ai"><div class="b-who ai">Ssobi AI 초안</div>안녕하세요, 불편을 드려 정말 죄송해요. DM으로 연락 주시면 빠르게 도와드릴게요!</div><button class="btn-p" onclick="cm('m-crm2')">승인 · 바로 발송</button><button class="btn-d" onclick="cm('m-crm2')">직접 응대</button></div></div>
+<div class="ov" id="m-crm1" onclick="co(event,'m-crm1')"><div class="sheet"><div class="s-bar"></div><div class="s-title">@yuna__daily</div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px"><span class="badge bg">VVIP</span><span class="badge bn">Instagram</span><span class="badge bn">댓글 38회</span></div><div style="font-size:11px;font-weight:800;color:var(--t3);letter-spacing:.3px;margin-bottom:6px">최근 댓글 3건</div><div class="bubble"><div class="b-who">3일 전</div>"이 제품 너무 좋아요! 주변에 다 추천했어요 ✨"</div><div class="bubble"><div class="b-who">1주 전</div>"공구 열리자마자 바로 샀어요 ㅎㅎ 다음 공구도 기다릴게요!"</div><div class="bubble"><div class="b-who">2주 전</div>"성분 설명 너무 꼼꼼해서 믿고 구매해요 😊"</div><div style="font-size:11px;color:var(--t2);margin:10px 2px 14px">구매 3회 · 공유 5회 · 좋아요 28회</div><button class="btn-p" onclick="cm('m-crm1')">스토리 조회 예약</button><button class="btn-s" onclick="cm('m-crm1')">닫기</button></div></div>
+<div class="ov" id="m-crm2" onclick="co(event,'m-crm2')"><div class="sheet"><div class="s-bar"></div><div class="s-title">요주의 — @skin_trouble_k</div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px"><span class="badge br">요주의</span><span class="badge bn">Instagram</span><span class="badge br">부정 4회</span></div><div style="font-size:11px;font-weight:800;color:var(--t3);letter-spacing:.3px;margin-bottom:6px">최근 댓글 3건</div><div class="bubble"><div class="b-who" style="color:var(--red)">어제</div>"이 제품 써서 트러블 났어요!! 환불 어떻게 해요"</div><div class="bubble"><div class="b-who" style="color:var(--red)">3일 전</div>"성분 믿고 샀는데 알러지 반응. 환불 부탁드려요"</div><div class="bubble"><div class="b-who" style="color:var(--red)">1주 전</div>"배송도 늦고 포장도 별로네요 ㅠㅠ"</div><div class="bubble ai"><div class="b-who ai">Ssobi AI 초안</div>안녕하세요, 불편을 드려 정말 죄송해요. DM으로 연락 주시면 빠르게 도와드릴게요!</div><button class="btn-p" onclick="cm('m-crm2')">승인 · 바로 발송</button><button class="btn-d" onclick="cm('m-crm2')">직접 응대</button></div></div>
 
-<!-- 더보기 모달 -->
-<div class="ov" id="m-pos-more" onclick="co(event,'m-pos-more')"><div class="sheet"><div class="s-bar"></div><div class="s-title">긍정 팔로워 전체 (142명)</div><div style="margin-top:4px"><div class="crow" onclick=""><div class="ch-av ch-ig" style="border-radius:50%">IG</div><div class="cbody"><div class="cname">@seoulnista</div><div class="csub">댓글 29회 · 영상 공유 5회</div><div class="ctags"><span class="badge bg">열성팬</span></div></div><div class="cscore">85점</div></div><div class="crow" onclick=""><div class="ch-av ch-tk" style="border-radius:50%">TK</div><div class="cbody"><div class="cname">@jjin_beauty</div><div class="csub">댓글 22회 · 좋아요 다수</div><div class="ctags"><span class="badge bn">구매의향</span></div></div><div class="cscore">72점</div></div><div class="crow" onclick="" style="border:none"><div class="ch-av ch-yt" style="border-radius:50%">YT</div><div class="cbody"><div class="cname">@morning_k</div><div class="csub">구독자 · 댓글 15회</div><div class="ctags"><span class="badge bn">일반팬</span></div></div><div class="cscore">61점</div></div></div><button class="btn-s" onclick="cm('m-pos-more')">닫기</button></div></div>
-<div class="ov" id="m-neg-more" onclick="co(event,'m-neg-more')"><div class="sheet"><div class="s-bar"></div><div class="s-title">부정 팔로워 전체 (11명)</div><div style="margin-top:4px"><div class="crow" onclick=""><div class="ch-av ch-ig" style="border-radius:50%;background:var(--red-l);color:var(--red)">IG</div><div class="cbody"><div class="cname">@angry_user01</div><div class="csub">부정 댓글 3회 · 배송 클레임</div><div class="ctags"><span class="badge br">요주의</span></div></div><div class="cscore" style="color:var(--red)">!</div></div><div class="crow" onclick="" style="border:none"><div class="ch-av ch-tk" style="border-radius:50%;background:var(--red-l);color:var(--red)">TK</div><div class="cbody"><div class="cname">@negative_k22</div><div class="csub">부정 댓글 1회</div><div class="ctags"><span class="badge br">주의</span></div></div><div class="cscore" style="color:var(--red)">!</div></div></div><button class="btn-s" onclick="cm('m-neg-more')">닫기</button></div></div>
+<!-- 긍정 팔로워 공유 모달 -->
+<div class="ov" id="m-pos-more" onclick="co(event,'m-pos-more')"><div class="sheet" style="max-height:88vh;overflow-y:auto"><div class="s-bar"></div>
+  <div class="s-title">긍정 팔로워 전체 (142명)</div>
+  <div class="s-sub">아이디 전체를 복사해서 공유할 수 있어요</div>
+  <div style="background:var(--bg);border-radius:12px;padding:12px 14px;margin:4px 0 14px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--t1);line-height:1.7;max-height:120px;overflow-y:auto;letter-spacing:-.2px" id="pos-ids-text">@yuna__daily, @cool_tommi99, @hazel_skin, @seoulnista, @morning_glow_kr, @kbeauty_daily, @jjin_beauty, @morning_k, @skincare_lover, @daily_beauty_log … 외 132명</div>
+  <div style="display:flex;gap:8px;margin-bottom:16px"><button class="btn-p" style="flex:1;margin:0" onclick="copyFollowerIds('pos')">✓ 전체 ID 복사</button><button class="btn-s" style="flex:1;margin:0" onclick="shareFollowerIds('pos')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13" stroke-linecap="round" stroke-linejoin="round"/></svg>공유</button></div>
+  <div style="margin-top:4px">
+    <div class="crow"><div class="ch-av ch-ig" style="border-radius:50%">IG</div><div class="cbody"><div class="cname">@seoulnista</div><div class="csub">댓글 29회 · 영상 공유 5회</div><div class="ctags"><span class="badge bg">열성팬</span></div></div><div class="cscore">85점</div></div>
+    <div class="crow"><div class="ch-av ch-tk" style="border-radius:50%">TK</div><div class="cbody"><div class="cname">@jjin_beauty</div><div class="csub">댓글 22회 · 좋아요 다수</div><div class="ctags"><span class="badge bn">구매의향</span></div></div><div class="cscore">72점</div></div>
+    <div class="crow"><div class="ch-av ch-yt" style="border-radius:50%">YT</div><div class="cbody"><div class="cname">@morning_k</div><div class="csub">구독자 · 댓글 15회</div><div class="ctags"><span class="badge bn">일반팬</span></div></div><div class="cscore">61점</div></div>
+    <div class="crow"><div class="ch-av ch-ig" style="border-radius:50%">IG</div><div class="cbody"><div class="cname">@skincare_lover</div><div class="csub">댓글 12회 · 저장 8회</div><div class="ctags"><span class="badge bn">일반팬</span></div></div><div class="cscore">55점</div></div>
+    <div class="crow" style="border:none"><div class="ch-av ch-tk" style="border-radius:50%">TK</div><div class="cbody"><div class="cname">@daily_beauty_log</div><div class="csub">구매 2회 · 리뷰 1개</div><div class="ctags"><span class="badge bn">구매의향</span></div></div><div class="cscore">52점</div></div>
+  </div>
+  <button class="btn-s" onclick="cm('m-pos-more')">닫기</button>
+</div></div>
+
+<!-- 부정 팔로워 공유 모달 -->
+<div class="ov" id="m-neg-more" onclick="co(event,'m-neg-more')"><div class="sheet" style="max-height:88vh;overflow-y:auto"><div class="s-bar"></div>
+  <div class="s-title">부정 팔로워 전체 (11명)</div>
+  <div class="s-sub">아이디 전체를 복사해서 관리용으로 공유할 수 있어요</div>
+  <div style="background:var(--red-l);border-radius:12px;padding:12px 14px;margin:4px 0 14px;font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--red);line-height:1.7;max-height:120px;overflow-y:auto;letter-spacing:-.2px" id="neg-ids-text">@skin_trouble_k, @peeve_user22, @angry_user01, @negative_k22, @complaint_m, @bad_review_k, @refund_xxx, @troll_user77, @spam_beauty, @angry_k, @peeve_daily</div>
+  <div style="display:flex;gap:8px;margin-bottom:16px"><button class="btn-p" style="flex:1;margin:0;background:var(--red)" onclick="copyFollowerIds('neg')">✓ 전체 ID 복사</button><button class="btn-s" style="flex:1;margin:0" onclick="shareFollowerIds('neg')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-2px;margin-right:4px"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13" stroke-linecap="round" stroke-linejoin="round"/></svg>공유</button></div>
+  <div style="margin-top:4px">
+    <div class="crow"><div class="ch-av ch-ig" style="border-radius:50%;background:var(--red-l);color:var(--red)">IG</div><div class="cbody"><div class="cname">@angry_user01</div><div class="csub">부정 댓글 3회 · 배송 클레임</div><div class="ctags"><span class="badge br">요주의</span></div></div><div class="cscore" style="color:var(--red)">!</div></div>
+    <div class="crow"><div class="ch-av ch-tk" style="border-radius:50%;background:var(--red-l);color:var(--red)">TK</div><div class="cbody"><div class="cname">@negative_k22</div><div class="csub">부정 댓글 1회</div><div class="ctags"><span class="badge br">주의</span></div></div><div class="cscore" style="color:var(--red)">!</div></div>
+    <div class="crow"><div class="ch-av ch-yt" style="border-radius:50%;background:var(--red-l);color:var(--red)">YT</div><div class="cbody"><div class="cname">@complaint_m</div><div class="csub">부정 댓글 2회 · 반복 클레임</div><div class="ctags"><span class="badge br">요주의</span></div></div><div class="cscore" style="color:var(--red)">!</div></div>
+    <div class="crow"><div class="ch-av ch-ig" style="border-radius:50%;background:var(--red-l);color:var(--red)">IG</div><div class="cbody"><div class="cname">@bad_review_k</div><div class="csub">부정 댓글 2회 · 성분 의혹</div><div class="ctags"><span class="badge br">주의</span></div></div><div class="cscore" style="color:var(--red)">!</div></div>
+    <div class="crow" style="border:none"><div class="ch-av ch-ig" style="border-radius:50%;background:var(--red-l);color:var(--red)">IG</div><div class="cbody"><div class="cname">@refund_xxx</div><div class="csub">환불 요청 · 반복</div><div class="ctags"><span class="badge br">요주의</span></div></div><div class="cscore" style="color:var(--red)">!</div></div>
+  </div>
+  <button class="btn-s" onclick="cm('m-neg-more')">닫기</button>
+</div></div>
 
 <!-- 수익 한번에 응답 -->
 <div class="ov" id="m-rev-bulk" onclick="co(event,'m-rev-bulk')"><div class="sheet"><div class="s-bar"></div><div class="s-title">한번에 응답하기</div><div class="s-sub">4건 전체에 동일한 응대 메시지를 발송해요</div><div style="font-size:12px;font-weight:600;color:var(--t3);margin-bottom:6px">발송 메시지</div><textarea class="sheet-ta" rows="4">"안녕하세요! 관심 감사드려요. 자세한 협의를 위해 info@millimilli.co 또는 카카오 @millimilli 로 연락 주시면 빠르게 안내드릴게요 :)"</textarea><button class="btn-p" onclick="cm('m-rev-bulk')">4건 전체 발송</button><button class="btn-s" onclick="cm('m-rev-bulk')">닫기</button></div></div>
@@ -5514,6 +5572,27 @@ function copyLinkUrl(){
   var url = 'https://ssobi.ai/u/'+linkState.handle;
   if(navigator.clipboard) navigator.clipboard.writeText(url);
   alert('복사됐어요!\n'+url);
+}
+
+// 팔로워 ID 일괄 복사/공유
+function copyFollowerIds(kind){
+  var el = document.getElementById(kind+'-ids-text');
+  if(!el) return;
+  var ids = (el.textContent||'').trim();
+  if(navigator.clipboard) navigator.clipboard.writeText(ids);
+  var label = kind==='pos' ? '긍정' : '부정';
+  alert('✓ '+label+' 팔로워 전체 ID가 복사됐어요!\n메모·카톡 등에 붙여넣기 하세요.');
+}
+function shareFollowerIds(kind){
+  var el = document.getElementById(kind+'-ids-text');
+  if(!el) return;
+  var ids = (el.textContent||'').trim();
+  var label = kind==='pos' ? '긍정 팔로워' : '부정 팔로워';
+  if(navigator.share){
+    navigator.share({title:'Ssobi · '+label, text:label+'\n\n'+ids}).catch(function(){});
+  } else {
+    copyFollowerIds(kind);
+  }
 }
 function saveLink(){
   try{ localStorage.setItem('ssobi_link_state', JSON.stringify(linkState)); }catch(e){}
