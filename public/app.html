@@ -19,7 +19,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--t1);ma
 .vw{display:none;padding:0 20px calc(var(--nav-h) + env(safe-area-inset-bottom) + 40px) 20px}.vw.on{display:block}
 
 /* NAV */
-.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:calc(var(--nav-h) + env(safe-area-inset-bottom));background:var(--s);border-top:1px solid var(--b);display:flex;padding:0 2px env(safe-area-inset-bottom);z-index:100}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:calc(var(--nav-h) + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);backdrop-filter:saturate(180%) blur(14px);-webkit-backdrop-filter:saturate(180%) blur(14px);border-top:1px solid rgba(15,19,25,.05);display:flex;padding:0 2px env(safe-area-inset-bottom);z-index:100}
 .nb{flex:1;border:none;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--t3);font-size:10px;font-weight:700;cursor:pointer;transition:color .15s;position:relative}
 .nb.on{color:var(--dark)}.nb svg{width:22px;height:22px;stroke-width:1.8}
 .nb-pip{position:absolute;top:9px;right:calc(50% - 12px);width:5px;height:5px;border-radius:50%;background:var(--red);border:1.5px solid var(--s)}
@@ -28,7 +28,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--t1);ma
 .vw.preview-locked{position:relative}
 .vw.preview-locked > *:not(.hdr):not(.preview-shade){filter:blur(3px);pointer-events:none;user-select:none;opacity:.7;transition:filter .2s,opacity .2s}
 .vw.preview-locked .hdr{position:relative;z-index:2}
-.preview-shade{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 16px);width:calc(100% - 32px);max-width:398px;background:linear-gradient(135deg,#0F1319,#1F2937);border-radius:18px;padding:16px 18px;color:#fff;box-shadow:0 12px 40px rgba(0,0,0,.3),0 0 0 1px rgba(0,200,150,.3);z-index:99;display:flex;align-items:center;gap:12px;animation:preview-rise .3s cubic-bezier(.32,1,.32,1)}
+.preview-shade{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 14px);width:calc(100% - 32px);max-width:398px;background:linear-gradient(135deg,#0F1319,#1F2937);border-radius:18px;padding:14px 16px;color:#fff;box-shadow:0 6px 20px rgba(15,19,25,.12),0 0 0 1px rgba(0,200,150,.25);z-index:99;display:flex;align-items:center;gap:12px;animation:preview-rise .3s cubic-bezier(.32,1,.32,1)}
 @keyframes preview-rise{from{opacity:0;transform:translate(-50%,20px)}to{opacity:1;transform:translate(-50%,0)}}
 .preview-shade-ico{width:36px;height:36px;border-radius:10px;background:var(--mint);display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .preview-shade-ico svg{width:18px;height:18px;stroke:#fff;stroke-width:2.2;fill:none}
@@ -791,7 +791,10 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .disc-next.mint{background:var(--mint);box-shadow:0 4px 14px rgba(0,200,150,.3)}
 
 /* 인스타 프로필 미리보기 모달 */
-.ig-sheet{padding:0 !important;overflow:hidden}
+.ig-sheet{padding:0 !important;overflow:hidden;position:relative}
+.ig-pv-close{position:absolute;top:10px;right:12px;width:32px;height:32px;border-radius:50%;border:none;background:rgba(15,19,25,.06);color:var(--t1);cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5;transition:background .15s}
+.ig-pv-close:active{background:rgba(15,19,25,.12);transform:scale(.94)}
+.ig-pv-close svg{width:14px;height:14px;stroke:currentColor;fill:none}
 .ig-header{padding:20px 20px 14px;display:flex;gap:14px;align-items:flex-start}
 .ig-avatar-big{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#FEDA75,#FA7E1E 30%,#D62976 60%,#962FBF 90%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:28px;font-weight:900;flex-shrink:0;padding:3px;position:relative}
 .ig-avatar-big::before{content:'';position:absolute;inset:3px;border-radius:50%;background:linear-gradient(135deg,#FEDA75,#FA7E1E 30%,#D62976 60%,#962FBF 90%)}
@@ -1233,13 +1236,28 @@ input:checked+.tsl::before{transform:translateX(18px)}
 /* ═══════════════════════════════════════════════════
    내 링크 에디토리얼 블록 (Ssobi 무드 · mint/dark/Pretendard)
    ═══════════════════════════════════════════════════ */
-#v-link{background:var(--bg);color:var(--t1);font-family:'Pretendard',-apple-system,sans-serif;padding:0 0 calc(var(--nav-h) + env(safe-area-inset-bottom) + 100px) 0;min-height:100vh;position:relative;overflow-x:hidden}
+#v-link{background:var(--bg);color:var(--t1);font-family:'Pretendard',-apple-system,sans-serif;padding:0 0 calc(var(--nav-h) + env(safe-area-inset-bottom) + 20px) 0;min-height:100vh;position:relative;overflow-x:hidden}
 
-/* Top bar — Ssobi 스타일 (얇고 심플) */
-#v-link .lke-topbar{position:sticky;top:0;z-index:40;padding:10px 16px;background:rgba(249,250,251,.92);backdrop-filter:blur(18px);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--b)}
-#v-link .lke-topbar-left,#v-link .lke-topbar-actions{display:flex;align-items:center;gap:6px}
-#v-link .lke-back-btn{width:34px;height:34px;border-radius:10px;background:#fff;border:1px solid var(--b);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t1);padding:0}
+/* Top bar — 2단 sticky 액션 바 (통합형) */
+#v-link .lke-topbar{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.88);backdrop-filter:saturate(180%) blur(22px);-webkit-backdrop-filter:saturate(180%) blur(22px);border-bottom:1px solid rgba(15,19,25,.06);touch-action:pan-y;box-shadow:0 1px 0 rgba(15,19,25,.02),0 4px 16px rgba(15,19,25,.04)}
+#v-link .lke-topbar-row1{display:flex;justify-content:space-between;align-items:center;padding:9px 14px 7px;gap:8px}
+#v-link .lke-topbar-row2{display:flex;align-items:center;padding:0 10px 9px;gap:4px}
+#v-link .lke-topbar-row2 .lke-act-sep{width:1px;height:18px;background:rgba(15,19,25,.08);margin:0 3px}
+#v-link .lke-back-btn{width:34px;height:34px;border-radius:10px;background:#fff;border:1px solid rgba(15,19,25,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t1);padding:0;flex-shrink:0}
+#v-link .lke-back-btn:active{transform:scale(.95);background:var(--bg)}
 #v-link .lke-back-btn svg{width:15px;height:15px;stroke:currentColor;fill:none}
+#v-link .lke-mini-url{flex:1;min-width:0;display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:10px;background:var(--bg);font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--t3);letter-spacing:-.2px;cursor:pointer;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+#v-link .lke-mini-url strong{color:var(--t1);font-weight:700}
+#v-link .lke-mini-url:active{background:#EFEBE6}
+#v-link .lke-share-btn{width:34px;height:34px;border-radius:10px;background:var(--mint);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;padding:0;flex-shrink:0;box-shadow:0 3px 10px rgba(0,200,150,.2)}
+#v-link .lke-share-btn:active{transform:scale(.95);background:var(--mint-d)}
+#v-link .lke-share-btn svg{width:14px;height:14px;stroke:currentColor;fill:none}
+#v-link .lke-act-btn{flex:1;padding:8px 4px;border:none;background:transparent;color:var(--t2);border-radius:9px;font-family:'Pretendard',sans-serif;font-size:11.5px;font-weight:700;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;letter-spacing:-.2px;transition:all .15s;min-height:44px;justify-content:center}
+#v-link .lke-act-btn:active{background:rgba(15,19,25,.05);transform:scale(.96)}
+#v-link .lke-act-btn svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.9;fill:none}
+#v-link .lke-act-btn.primary{color:var(--mint-d);font-weight:800}
+#v-link .lke-act-btn.primary svg{stroke-width:2.2}
+#v-link .lke-act-btn.on{color:var(--dark);font-weight:800;background:rgba(15,19,25,.04)}
 .lke-top-btn{padding:10px 14px;border-radius:10px;font-size:12.5px;font-weight:800;border:1px solid var(--b);background:#fff;color:var(--t1);cursor:pointer;transition:transform .1s,background .1s;letter-spacing:-.2px;display:inline-flex;align-items:center;justify-content:center;gap:4px;font-family:'Pretendard',sans-serif;line-height:1.2}
 .lke-top-btn:active{transform:scale(.97);background:var(--bg)}
 .lke-top-btn.primary{background:var(--mint);color:#fff;border-color:var(--mint)}
@@ -1247,10 +1265,6 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .lke-top-btn.danger{background:#fff;color:var(--red);border:1px solid #FCA5A5}
 .lke-top-btn.danger:active{background:var(--red-l);transform:scale(.97)}
 
-/* URL 바 */
-#v-link .lke-url-bar{padding:10px 18px;background:var(--s);display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--t3);border-bottom:1px solid var(--b);cursor:pointer}
-#v-link .lke-url-bar strong{color:var(--t1);font-weight:600}
-#v-link .lke-url-copy{margin-left:auto;padding:4px 10px;background:var(--dark);color:#fff;border:none;border-radius:100px;font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:.05em}
 
 /* Editor / Block 공통 */
 #v-link .lke-editor{padding-bottom:20px}
@@ -1371,13 +1385,6 @@ input:checked+.tsl::before{transform:translateX(18px)}
 #v-link .lke-footer-text{font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.48;letter-spacing:.1em}
 
 /* Floating Toolbar — Ssobi nav 위로 */
-#v-link .lke-floating-toolbar{position:fixed;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 10px);left:50%;transform:translateX(-50%);max-width:420px;width:calc(100% - 32px);background:var(--dark);border-radius:100px;padding:7px;display:flex;align-items:center;gap:3px;box-shadow:0 14px 38px rgba(15,19,25,.25);z-index:30}
-#v-link .lke-fl-btn{flex:1;padding:9px 6px;border:none;background:transparent;color:#fff;border-radius:100px;font-family:'Pretendard',sans-serif;font-size:11px;font-weight:500;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all .2s}
-#v-link .lke-fl-btn:active{background:rgba(255,255,255,.1);transform:scale(.95)}
-#v-link .lke-fl-btn .icon{font-family:'Pretendard',sans-serif;font-size:13px;font-weight:800}
-#v-link .lke-fl-btn .label{font-size:9.5px;opacity:.82}
-#v-link .lke-fl-btn.primary{background:var(--mint)}
-#v-link .lke-fl-divider{width:1px;height:24px;background:rgba(255,255,255,.15)}
 
 /* Edit Sheet */
 .lke-edit-sheet{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -18px 50px rgba(15,19,25,.14);z-index:310;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);max-height:82vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom);max-width:430px;margin:0 auto;left:0;right:0}
@@ -1433,7 +1440,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 .lke-backdrop.show{opacity:1;pointer-events:all}
 
 /* Preview mode */
-#v-link.lke-preview .lke-topbar,#v-link.lke-preview .lke-url-bar,#v-link.lke-preview .lke-floating-toolbar,#v-link.lke-preview .lke-add-zone{display:none!important}
+#v-link.lke-preview .lke-topbar,#v-link.lke-preview .lke-add-zone{display:none!important}
 #v-link.lke-preview .lke-block{cursor:default}
 #v-link.lke-preview .lke-block:hover{background:transparent}
 #v-link.lke-preview .lke-block.selected{outline:none;background:transparent}
@@ -1453,7 +1460,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 #v-link .lke-block{position:relative}
 #v-link .lke-drag{position:absolute;top:8px;left:8px;z-index:11;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border:1px solid var(--b);display:none;align-items:center;justify-content:center;cursor:grab;color:var(--t2);font-size:14px;font-weight:900;letter-spacing:-2px}
 #v-link .lke-block:hover .lke-drag,#v-link .lke-block.selected .lke-drag{display:flex}
-#v-link .lke-block.dragging{opacity:.35}
+#v-link .lke-block.dragging{opacity:.4;transform:scale(.98);transition:transform .15s}
+#v-link .lke-block.lke-ready{outline:2px solid var(--mint);outline-offset:3px;transform:scale(1.01);transition:transform .15s,outline .15s;box-shadow:0 8px 22px rgba(0,200,150,.22)}
 #v-link .lke-drop-target{border-top:3px solid var(--mint)}
 
 /* 히어로 캐러셀 */
@@ -1557,7 +1565,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 .lke-handle-status.checking{color:var(--t3)}
 
 /* 서브뷰 (See all) */
-#v-link.subview > .lke-editor,#v-link.subview > .lke-floating-toolbar,#v-link.subview > .lke-topbar,#v-link.subview > .lke-url-bar{display:none!important}
+#v-link.subview > .lke-editor,#v-link.subview > .lke-topbar{display:none!important}
 #lke-subview-root{background:var(--bg);min-height:100vh;padding-bottom:40px}
 #lke-subview-root .lke-topbar{position:sticky;top:0;z-index:20}
 .lke-subview-body{padding:20px 18px 40px}
@@ -2881,32 +2889,24 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 <!-- ════ 내 링크 (에디토리얼 · 드래그앤드롭 · Ssobi 무드) ════ -->
 <div class="vw" id="v-link">
   <div class="lke-topbar">
-    <div class="lke-topbar-left">
+    <div class="lke-topbar-row1">
       <button class="lke-back-btn" onclick="go('create')" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="lke-mini-url" onclick="editHandle()">ssobi.ai/u/<strong id="lk-handle-disp">yuminhye</strong></div>
+      <button class="lke-share-btn" onclick="openModal('m-link-share')" aria-label="공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
-    <div class="lke-topbar-actions">
-      <button class="lke-top-btn" onclick="lkeTogglePreview()">미리보기</button>
-      <button class="lke-top-btn primary" onclick="lkeOpenSheet('add-block')">+ 블록</button>
-      <button class="lke-top-btn" onclick="openModal('m-link-share')" aria-label="공유"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    <div class="lke-topbar-row2">
+      <button class="lke-act-btn" onclick="lkeTogglePreview()" id="lke-act-preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3"/></svg>미리보기</button>
+      <div class="lke-act-sep"></div>
+      <button class="lke-act-btn" onclick="lkeOpenSheet('theme')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M8 10h8M10 8v8" stroke-linecap="round"/></svg>테마</button>
+      <div class="lke-act-sep"></div>
+      <button class="lke-act-btn primary" onclick="lkeOpenSheet('add-block')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>블록 추가</button>
+      <div class="lke-act-sep"></div>
+      <button class="lke-act-btn" onclick="lkeOpenSheet('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33h.01a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v.01a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke-linecap="round" stroke-linejoin="round"/></svg>설정</button>
     </div>
-  </div>
-
-  <div class="lke-url-bar" onclick="editHandle()">
-    <span>ssobi.ai/u/</span><strong id="lk-handle-disp">yuminhye</strong>
-    <button class="lke-url-copy" onclick="event.stopPropagation();copyLinkUrl()">COPY</button>
   </div>
 
   <!-- 편집기 본체 - 동적 렌더 -->
   <div class="lke-editor" id="lke-editor"></div>
-
-  <!-- 플로팅 툴바 -->
-  <div class="lke-floating-toolbar">
-    <button class="lke-fl-btn" onclick="lkeOpenSheet('theme')"><span class="icon">T</span><span class="label">테마</span></button>
-    <div class="lke-fl-divider"></div>
-    <button class="lke-fl-btn primary" onclick="lkeOpenSheet('add-block')"><span class="icon" style="font-size:18px">+</span><span class="label">블록 추가</span></button>
-    <div class="lke-fl-divider"></div>
-    <button class="lke-fl-btn" onclick="lkeOpenSheet('settings')"><span class="icon">⚙</span><span class="label">설정</span></button>
-  </div>
 
   <button class="lke-preview-exit" onclick="lkeTogglePreview()">✕ 편집으로</button>
 
@@ -2951,7 +2951,6 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div class="lke-field-group">
       <div class="lke-field-label">기능 설정</div>
       <div class="lke-toggle-row"><div class="lke-toggle-info"><strong>다국어 자동 전환</strong><span>영어 방문자엔 Amazon</span></div><div class="lke-toggle on" onclick="this.classList.toggle('on')"></div></div>
-      <div class="lke-toggle-row"><div class="lke-toggle-info"><strong>클릭 분석</strong><span>어떤 링크가 많이 눌리나</span></div><div class="lke-toggle on" onclick="this.classList.toggle('on')"></div></div>
       <div class="lke-toggle-row"><div class="lke-toggle-info"><strong>숏링크 자동 생성</strong><span>ssobi.ai/s/a1b2c3</span></div><div class="lke-toggle on" onclick="this.classList.toggle('on')"></div></div>
       <div class="lke-toggle-row"><div class="lke-toggle-info"><strong>Powered by Ssobi</strong><span>푸터 로고 표시</span></div><div class="lke-toggle on" onclick="this.classList.toggle('on')"></div></div>
     </div>
@@ -3437,7 +3436,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 <!-- 인스타 프로필 미리보기 -->
 <div class="ov" id="m-ig-preview" onclick="co(event,'m-ig-preview')">
   <div class="sheet ig-sheet">
-    <div class="s-bar" style="margin:12px auto"></div>
+    <div class="s-bar" style="margin:12px auto" onclick="cm('m-ig-preview')"></div>
+    <button class="ig-pv-close" onclick="cm('m-ig-preview')" aria-label="닫기"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     <div class="ig-header">
       <div class="ig-avatar-big"><div class="ig-avatar-inner" id="ig-pv-initial">M</div></div>
       <div class="ig-meta">
@@ -6144,10 +6144,11 @@ function lkeRenderSubView(){
   topbarNew.className = 'lke-topbar';
   topbarNew.id = 'lke-subview-topbar';
   topbarNew.innerHTML =
-    '<div class="lke-topbar-left">'+
+    '<div class="lke-topbar-row1">'+
       '<button class="lke-back-btn" onclick="lkeExitSubView()" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'+
-    '</div>'+
-    '<button class="lke-top-btn" onclick="go(\'home\')" aria-label="홈"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round"/></svg>홈</button>';
+      '<div style="flex:1"></div>'+
+      '<button class="lke-top-btn" onclick="go(\'home\')" aria-label="홈" style="padding:8px 14px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round"/></svg>홈</button>'+
+    '</div>';
   root.appendChild(topbarNew);
   // 이벤트 바 유지 (첫 event 블록 복제)
   var eventBlock = lkeState.blocks.find(function(b){ return b.type==='event'; });
@@ -6268,11 +6269,26 @@ function lkeAddBlock(kind){
   lkeRender();
 }
 
-// DnD
+// DnD — 길게 누르면 드래그 모드 활성화 (모바일·데스크탑 공통)
 var lkeDragIdx = null;
+var _lkPressTimer = null;
+var _lkPressEl = null;
+var _lkDragArmed = false;
+var _lkTouchStartY = 0;
+var _lkTouchStartX = 0;
+
 function lkeAttachDnD(el){
-  el.setAttribute('draggable','true');
-  el.addEventListener('dragstart',function(e){ lkeDragIdx=+this.dataset.idx; this.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+  // 기본적으로 draggable=false. 롱프레스 후에만 draggable=true
+  el.setAttribute('draggable','false');
+
+  // HTML5 DnD 핸들러 (데스크탑 + armed 상태 모바일)
+  el.addEventListener('dragstart',function(e){
+    if(!_lkDragArmed){ e.preventDefault(); return; }
+    lkeDragIdx=+this.dataset.idx;
+    this.classList.add('dragging');
+    e.dataTransfer.effectAllowed='move';
+    try{ e.dataTransfer.setData('text/plain', this.dataset.idx); }catch(_){}
+  });
   el.addEventListener('dragover',function(e){ e.preventDefault(); e.dataTransfer.dropEffect='move'; });
   el.addEventListener('dragenter',function(){ this.classList.add('lke-drop-target'); });
   el.addEventListener('dragleave',function(){ this.classList.remove('lke-drop-target'); });
@@ -6283,7 +6299,101 @@ function lkeAttachDnD(el){
     lkeState.blocks.splice(to,0,moved);
     lkeRender();
   });
-  el.addEventListener('dragend',function(){ this.classList.remove('dragging'); lkeDragIdx=null; });
+  el.addEventListener('dragend',function(){
+    this.classList.remove('dragging');
+    this.setAttribute('draggable','false');
+    _lkDragArmed=false;
+    lkeDragIdx=null;
+  });
+
+  // 마우스 롱프레스 (데스크탑) — 450ms
+  el.addEventListener('mousedown', function(e){
+    if(e.target.closest('button,input,textarea,select,a,[contenteditable="true"],.lke-editable-text,.lke-hero-stat,.lke-hero-cta-wrap')) return;
+    var self=this;
+    _lkPressEl=self;
+    clearTimeout(_lkPressTimer);
+    _lkPressTimer = setTimeout(function(){
+      self.setAttribute('draggable','true');
+      _lkDragArmed=true;
+      self.classList.add('lke-ready');
+      if(navigator.vibrate) try{ navigator.vibrate(12); }catch(_){}
+    }, 450);
+  });
+  el.addEventListener('mouseup', function(){
+    clearTimeout(_lkPressTimer);
+    if(!_lkDragArmed){ this.setAttribute('draggable','false'); }
+    this.classList.remove('lke-ready');
+  });
+  el.addEventListener('mouseleave', function(){
+    clearTimeout(_lkPressTimer);
+  });
+
+  // 터치 롱프레스 (모바일) — 450ms, 손가락 움직이면 취소 (스크롤 허용)
+  el.addEventListener('touchstart', function(e){
+    if(e.target.closest('button,input,textarea,select,a,[contenteditable="true"],.lke-editable-text,.lke-hero-stat,.lke-hero-cta-wrap')) return;
+    var self=this;
+    var t=e.touches[0];
+    _lkTouchStartX=t.clientX; _lkTouchStartY=t.clientY;
+    _lkPressEl=self;
+    clearTimeout(_lkPressTimer);
+    _lkPressTimer = setTimeout(function(){
+      self.classList.add('lke-ready');
+      _lkDragArmed=true;
+      lkeTouchDragStart(self);
+      if(navigator.vibrate) try{ navigator.vibrate(18); }catch(_){}
+    }, 450);
+  }, {passive:true});
+  el.addEventListener('touchmove', function(e){
+    if(!_lkDragArmed){
+      var t=e.touches[0];
+      var dx=Math.abs(t.clientX-_lkTouchStartX);
+      var dy=Math.abs(t.clientY-_lkTouchStartY);
+      if(dx>6 || dy>6){ clearTimeout(_lkPressTimer); }
+      return;
+    }
+    e.preventDefault();
+    lkeTouchDragMove(e.touches[0]);
+  }, {passive:false});
+  el.addEventListener('touchend', function(){
+    clearTimeout(_lkPressTimer);
+    this.classList.remove('lke-ready');
+    if(_lkDragArmed){ lkeTouchDragEnd(); }
+    _lkDragArmed=false;
+  });
+  el.addEventListener('touchcancel', function(){
+    clearTimeout(_lkPressTimer);
+    this.classList.remove('lke-ready');
+    if(_lkDragArmed){ lkeTouchDragEnd(); }
+    _lkDragArmed=false;
+  });
+}
+
+// 터치 드래그 구현 (iOS Safari는 HTML5 드래그 미지원)
+var _lkTouchGhost=null, _lkTouchOverIdx=null;
+function lkeTouchDragStart(el){
+  lkeDragIdx=+el.dataset.idx;
+  el.classList.add('dragging');
+}
+function lkeTouchDragMove(t){
+  var under = document.elementFromPoint(t.clientX, t.clientY);
+  var block = under && under.closest ? under.closest('.lke-block[data-idx]') : null;
+  document.querySelectorAll('.lke-block.lke-drop-target').forEach(function(x){ x.classList.remove('lke-drop-target'); });
+  if(block && +block.dataset.idx !== lkeDragIdx){
+    block.classList.add('lke-drop-target');
+    _lkTouchOverIdx = +block.dataset.idx;
+  } else {
+    _lkTouchOverIdx = null;
+  }
+}
+function lkeTouchDragEnd(){
+  document.querySelectorAll('.lke-block.lke-drop-target').forEach(function(x){ x.classList.remove('lke-drop-target'); });
+  document.querySelectorAll('.lke-block.dragging').forEach(function(x){ x.classList.remove('dragging'); });
+  if(_lkTouchOverIdx != null && lkeDragIdx != null && _lkTouchOverIdx !== lkeDragIdx){
+    var moved=lkeState.blocks.splice(lkeDragIdx,1)[0];
+    lkeState.blocks.splice(_lkTouchOverIdx,0,moved);
+    lkeRender();
+  }
+  lkeDragIdx=null; _lkTouchOverIdx=null;
 }
 
 // Sheets open/close
@@ -6579,7 +6689,7 @@ function lkeEditGridCard(blockIdx, cardIdx){
   var it = b.items[cardIdx];
   var title=document.getElementById('lke-edit-title');
   var body=document.getElementById('lke-edit-body');
-  title.textContent='제품 카드 '+(cardIdx+1)+' 편집';
+  title.textContent='카드 '+(cardIdx+1)+' 편집';
   var html='<div class="lke-field-label">종류</div>'+
     '<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">'+
       ['product','channel','content','service'].map(function(k){
@@ -6588,7 +6698,7 @@ function lkeEditGridCard(blockIdx, cardIdx){
       }).join('')+
     '</div>'+
     lkeField('제목','text','ci-title',it.title)+
-    lkeField('날짜/메타','text','ci-date',it.date);
+    lkeField('시간','text','ci-date',it.date);
   if(it.kind==='product'||!it.kind){
     html += lkeField('판매가','text','ci-price',it.price)+lkeField('원가 (취소선)','text','ci-orig',it.origPrice);
   }
