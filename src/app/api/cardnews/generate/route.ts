@@ -5,6 +5,7 @@
 // 유저의 tone_profiles.learned_style을 읽어 그 말투로 캐러셀 프롬프트 생성
 
 import { createClient } from '@/lib/supabase/server'
+import { logAIUsage } from '@/lib/ai-usage'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
@@ -112,6 +113,16 @@ export async function POST(req: NextRequest) {
       })
       .select('id')
       .single()
+
+    // AI 토큰·비용 로그 (가격 책정 근거)
+    await logAIUsage({
+      userId: user.id,
+      feature: 'cardnews',
+      model: 'claude-sonnet-4-20250514',
+      usage: data.usage || {},
+      refType: 'card_news_jobs',
+      refId: job?.id,
+    })
 
     return NextResponse.json({
       hook: parsed.hook || '',

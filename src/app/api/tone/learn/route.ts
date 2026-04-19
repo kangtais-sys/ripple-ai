@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { logAIUsage } from '@/lib/ai-usage'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
@@ -59,6 +60,16 @@ ${samples.map((s: string, i: number) => `${i + 1}. "${s}"`).join('\n')}
     learned_style: learnedStyle,
     updated_at: new Date().toISOString(),
   }, { onConflict: 'user_id' })
+
+  // AI 토큰·비용 로그
+  await logAIUsage({
+    userId: user.id,
+    feature: 'tone_learn',
+    model: 'claude-sonnet-4-20250514',
+    usage: data.usage || {},
+    refType: 'tone_profiles',
+    refId: user.id,
+  })
 
   return NextResponse.json({ success: true, style: learnedStyle })
 }

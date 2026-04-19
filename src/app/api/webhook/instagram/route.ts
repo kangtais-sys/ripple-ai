@@ -1,6 +1,7 @@
 import { createClient as createAdminClient, type SupabaseClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
 import { isOverLimit } from '@/lib/plans'
+import { logAIUsage } from '@/lib/ai-usage'
 
 type AdminClient = SupabaseClient
 
@@ -252,5 +253,15 @@ async function generateReply(
   })
 
   const data = await res.json()
+
+  // AI 토큰·비용 로그 (webhook은 건당 비용이므로 가장 중요)
+  await logAIUsage({
+    userId,
+    feature: type === 'dm' ? 'dm_gen' : 'reply_gen',
+    model: 'claude-sonnet-4-20250514',
+    usage: data.usage || {},
+    refType: 'reply_logs',
+  })
+
   return data.content?.[0]?.text?.trim() || ''
 }
