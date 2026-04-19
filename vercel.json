@@ -8,5 +8,9 @@
       "path": "/api/cron/publish-scheduled",
       "schedule": "*/5 * * * *"
     }
+  ],
+  "rewrites": [
+    { "source": "/terms", "destination": "/terms.html" },
+    { "source": "/privacy", "destination": "/terms.html?tab=privacy" }
   ]
 }
