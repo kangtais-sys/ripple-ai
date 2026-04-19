@@ -19,7 +19,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--t1);ma
 .vw{display:none;padding:0 20px calc(var(--nav-h) + env(safe-area-inset-bottom) + 40px) 20px}.vw.on{display:block}
 
 /* NAV */
-.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:calc(var(--nav-h) + env(safe-area-inset-bottom));background:rgba(255,255,255,.96);backdrop-filter:saturate(180%) blur(14px);-webkit-backdrop-filter:saturate(180%) blur(14px);border-top:1px solid rgba(15,19,25,.05);display:flex;padding:0 2px env(safe-area-inset-bottom);z-index:100}
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:calc(var(--nav-h) + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #ECECEC;display:flex;padding:0 2px env(safe-area-inset-bottom);z-index:100}
 .nb{flex:1;border:none;background:none;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--t3);font-size:10px;font-weight:700;cursor:pointer;transition:color .15s;position:relative}
 .nb.on{color:var(--dark)}.nb svg{width:22px;height:22px;stroke-width:1.8}
 .nb-pip{position:absolute;top:9px;right:calc(50% - 12px);width:5px;height:5px;border-radius:50%;background:var(--red);border:1.5px solid var(--s)}
@@ -1238,8 +1238,8 @@ input:checked+.tsl::before{transform:translateX(18px)}
    ═══════════════════════════════════════════════════ */
 #v-link{background:var(--bg);color:var(--t1);font-family:'Pretendard',-apple-system,sans-serif;padding:0 0 calc(var(--nav-h) + env(safe-area-inset-bottom) + 20px) 0;min-height:100vh;position:relative;overflow-x:hidden}
 
-/* Top bar — 2단 sticky 액션 바 (통합형) */
-#v-link .lke-topbar{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.88);backdrop-filter:saturate(180%) blur(22px);-webkit-backdrop-filter:saturate(180%) blur(22px);border-bottom:1px solid rgba(15,19,25,.06);touch-action:pan-y;box-shadow:0 1px 0 rgba(15,19,25,.02),0 4px 16px rgba(15,19,25,.04)}
+/* Top bar — 2단 고정 액션 바 (통합형) */
+#v-link .lke-topbar{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;z-index:40;background:rgba(255,255,255,.92);backdrop-filter:saturate(180%) blur(22px);-webkit-backdrop-filter:saturate(180%) blur(22px);border-bottom:1px solid rgba(15,19,25,.06);touch-action:pan-y;box-shadow:0 1px 0 rgba(15,19,25,.02),0 4px 16px rgba(15,19,25,.04)}
 #v-link .lke-topbar-row1{display:flex;justify-content:space-between;align-items:center;padding:9px 14px 7px;gap:8px}
 #v-link .lke-topbar-row2{display:flex;align-items:center;padding:0 10px 9px;gap:4px}
 #v-link .lke-topbar-row2 .lke-act-sep{width:1px;height:18px;background:rgba(15,19,25,.08);margin:0 3px}
@@ -1267,7 +1267,7 @@ input:checked+.tsl::before{transform:translateX(18px)}
 
 
 /* Editor / Block 공통 */
-#v-link .lke-editor{padding-bottom:20px}
+#v-link .lke-editor{padding-top:104px;padding-bottom:20px}
 #v-link .lke-block{position:relative;cursor:pointer;transition:filter .15s}
 #v-link .lke-block:not(.selected):hover{outline:1.5px dashed rgba(0,200,150,.5);outline-offset:-2px}
 #v-link .lke-block.selected{outline:2px dashed var(--mint);outline-offset:2px}
@@ -1466,7 +1466,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
 /* 히어로 캐러셀 */
 #v-link .lke-hero-carousel{position:relative}
-#v-link .lke-hero-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;touch-action:pan-x}
+#v-link .lke-hero-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;touch-action:pan-x pan-y}
+#v-link .lke-hero-nav,#v-link .lke-hero-tool,#v-link .lke-hero-cta{touch-action:manipulation}
 #v-link .lke-hero-track::-webkit-scrollbar{display:none}
 #v-link .lke-hero-track > .lke-hero-banner{flex:0 0 100%;scroll-snap-align:start;aspect-ratio:4/5}
 #v-link .lke-hero-dots{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:3}
