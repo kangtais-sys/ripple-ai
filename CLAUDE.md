@@ -281,3 +281,101 @@ public/
 ├─ u/yuminhye.html    공개 링크 샘플
 └─ s/a1b2c3.html      숏링크 샘플
 ```
+
+---
+
+## 2026-04-19 세션 후속 업데이트 (Ssobi v2.1)
+
+### 내 링크 (app.html)
+- 하단 플로팅 툴바(테마/블록추가/설정) 제거, 상단 2단 고정 액션바에 통합
+  - Row1: [뒤로] [ssobi.ai/u/핸들] [공유]
+  - Row2: [미리보기] [테마] [블록 추가] [설정]
+  - `position:fixed` 으로 교체 (sticky가 overflow:hidden 부모에서 안 잡혀서)
+  - editor `padding-top:104px`, preview 모드에선 0
+- 블록 이동: 좌상단 드래그 핸들(⋮⋮) 상시 노출 → 누르는 즉시 드래그 모드
+  + 블록 본체 롱프레스 350ms도 지원 (백업)
+  + 드래그 중 click 캡처 차단으로 편집팝업 안 뜸
+  + 히어로 블록에는 핸들 숨김 (이동 불가)
+- 블록 선택: 호버 효과 제거, 솔리드 1.5px mint 보더 + 은은한 mint 글로우
+- 히어로 캐러셀: `touch-action:pan-x pan-y` → 세로 스크롤 통과
+- 잘하는 계정 프로필 미리보기 모달: 우상단 ✕ 버튼 + 핸들바 탭 닫힘 추가
+- 카드 편집: "제품 카드 N 편집" → "카드 N 편집"
+- "날짜/메타" 라벨 → "시간"
+- 설정 시트: 클릭 분석 토글 제거
+
+### 탭바·시트 그림자 이슈
+- `.nav`: 플랫 디자인 (솔리드 #fff + 1px 라인만)
+- `.lke-edit-sheet`: 닫힌 상태에서도 box-shadow가 위로 퍼져 탭바 위 영역을
+  어둡게 만들던 버그 → `.open`일 때만 그림자 적용
+
+### 만들기
+- "처음이신가요?" → "처음 SNS를 시작한다면?"
+- placeholder 예시 교체: "우울할 때 책 속 글귀 추천(출처 포함) / 아이돌
+  메이크업 트렌드 Best 3 / 민감 피부 봄철 루틴 / 이번주 공구 정리"
+- textarea 폰트 14 → 15.5px
+- 카드뉴스 수정/적용/다시 생성 버튼 아이콘형으로 리파인
+- cs-4 에 [편집][미리보기] 탭 추가 (미리보기 모드 = 핸들·툴바 숨김)
+- 슬라이드 구조 MINE AI 크리에이터 스타일로 재구성
+  - 1장 = 표지 (28px 큰 후킹 + 페이지 번호 + 서브)
+  - 2장 = 프리뷰 ("오늘 알려드릴 N가지" 리스트)
+  - 중간장 = 번호 + 제목(18px) + 본문
+  - 마지막장 = CTA (💬 댓글 · 🔖 저장 · ➕ 팔로우)
+- 모던 템플릿 3종 추가:
+  - `editorial` · 크림 + Fraunces italic 세리프
+  - `mono` · 다크 #0F1319 + mint accent bar
+  - `pastel` · 핑크→라벤더 그라디 + 소프트 다트
+- 참고 계정 "반영 중..." alert → `lkeShowToast`로 변경
+
+### 관리 (키우기 하위)
+- 긍정 팔로워 3 → 6명, 부정 2 → 5명 노출
+- 더보기 → **공유 아이콘 + 전체 ID 복사/공유** 버튼
+  - `copyFollowerIds('pos'|'neg')` · `shareFollowerIds()` (Web Share API)
+  - 모노스페이스 코드 블록에 ID 전체 렌더
+- 팔로워 탭 시 최근 댓글 1개 → 3개 (m-crm1/m-crm2)
+- 상단 탭바(.tbar) 간격 정리: padding 2→8px, font 11→12px, gap 2px
+
+### 홈 · 튜토리얼
+- 첫날 모드 진입 시 다크 오버레이 튜토리얼 추가 (최초 1회만)
+  - 5개 탭 한줄 설명 카드 + 건너뛰기/시작하기
+  - `localStorage.ssobi_tut_seen`
+
+### 예약 게시물
+- 날짜 클릭 시 예약 카드뉴스 "미리보기" 버튼 → alert 대신 실제 모달
+  - 캐러셀 슬라이드(첫장 후킹/중간 포인트/마지막 CTA) + 채널 칩 + 캡션
+  - `openSchedPreview(p)` · `m-sched-preview`
+
+### 로그인
+- **카카오로 시작하기** 노란 버튼 추가 (가입/로그인 양쪽)
+- `doKakaoLogin()` = `sb.auth.signInWithOAuth({provider:'kakao'})`
+- Supabase에서 Kakao OAuth provider 설정 필요
+
+### 랜딩 (landing.html)
+- 히어로 카피 "키우고, 만들고, 돈벌고." → "키우고, 만들고."
+- 모바일 히어로 44 → 62px 대폭 확대, 모바일에서 3줄 나뉨
+- 만들기 섹션: 좌측 텍스트 블록 제거, 폰 mock만 중앙 정렬
+- TRACK 04 · LINK 배지 → "내 링크" + sec-eye "MY LINK" 패턴 통일
+- 다국어 스위처: Google Translate 기반 KO/EN/JA/ZH
+  - 자동 감지 배너 (navigator.language 체크)
+
+---
+
+## 도메인 · 다음 단계 (2026-04-19 이후)
+
+### 구매 완료
+- **ssobi.ai** 도메인 확보
+
+### Vercel 환경변수 (Repli → Ssobi 리네이밍 필요)
+- 다음 env 값의 도메인 참조 확인·수정 필요:
+  - `NEXT_PUBLIC_APP_URL` = https://ripple-ai-umber.vercel.app
+    → `https://ssobi.ai` 로 교체
+  - 각 OAuth provider의 redirect URI (Supabase, Meta, Google, Kakao)
+    모두 ssobi.ai 기반으로 추가 등록 필요
+
+### 서비스 개요 (갱신)
+- **서비스명**: Ssobi. (쏘비)
+- **회사**: (주)공팔리터글로벌
+- **도메인**: https://ssobi.ai
+- **구 도메인**: https://ripple-ai-umber.vercel.app (당분간 유지)
+- **포지셔닝**: 소셜 비서 SaaS (키우기·만들기·수익화)
+- **타겟**: K-뷰티 인플루언서 → 확장 중
+
