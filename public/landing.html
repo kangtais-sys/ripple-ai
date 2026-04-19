@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Ssobi. | 키우고 · 만들고 · 돈벌고 — 내 SNS 비서</title>
 <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,500;1,9..144,700;1,9..144,900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
 :root{
@@ -37,7 +38,8 @@ body > *{position:relative;z-index:1}
 .nav.visible{transform:translateY(0);opacity:1;pointer-events:auto}
 .nav-inner{max-width:1080px;margin:0 auto;padding:14px 32px;display:flex;align-items:center;justify-content:space-between}
 .nav.scrolled{background:rgba(255,255,255,.72);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);box-shadow:0 1px 0 rgba(15,19,25,.06),0 8px 24px rgba(15,19,25,.04)}
-.nav-logo{font-size:26px;font-weight:900;letter-spacing:-1.2px;color:var(--ink);line-height:1}
+.nav-logo{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-style:italic;font-size:26px;font-weight:900;letter-spacing:-1px;color:var(--ink);line-height:1}
+.nav-logo em{color:var(--mint);font-style:italic}
 .nav-logo em{color:var(--mint);font-style:normal}
 .nav-links{display:flex;align-items:center;gap:28px}
 .nav-links a{font-size:13px;font-weight:500;color:var(--ink3);text-decoration:none;transition:color .15s}
@@ -387,7 +389,8 @@ body > *{position:relative;z-index:1}
 /* ── FOOTER (컴팩트) ── */
 .footer{background:var(--soft);border-top:1px solid var(--line);padding:28px 24px}
 .footer-inner{max-width:960px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
-.footer-logo{font-size:14px;font-weight:800;letter-spacing:-.5px;color:var(--ink3);margin-bottom:0}
+.footer-logo{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-style:italic;font-size:16px;font-weight:900;letter-spacing:-.5px;color:var(--ink3);margin-bottom:0}
+.footer-logo em{color:var(--mint);font-style:italic}
 .footer-logo em{color:var(--mint);font-style:normal}
 .footer-info{font-size:10.5px;color:var(--ink3);line-height:1.7}
 .footer-info strong{color:var(--ink3);font-weight:600}

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Ssobi</title>
 <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,400;1,9..144,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -40,6 +41,8 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--t1);ma
 /* HEADER */
 .hdr{display:flex;justify-content:space-between;align-items:center;padding:20px 0 16px}
 .logo{font-size:26px;font-weight:900;letter-spacing:-1.2px;color:var(--dark)}.logo em{color:var(--mint);font-style:normal}
+.logo.brand{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-style:italic;letter-spacing:-1px}
+.logo.brand em{font-style:italic}
 .ai-chip{display:flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:var(--mint);cursor:pointer}
 .ai-dot{width:6px;height:6px;background:var(--mint);border-radius:50%;animation:bl 2s ease infinite}
 @keyframes bl{0%,100%{opacity:1}50%{opacity:.3}}
@@ -288,8 +291,8 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .onb-hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 28px 32px;text-align:center}
 .onb-icon{width:72px;height:72px;border-radius:24px;background:var(--dark);display:flex;align-items:center;justify-content:center;margin:0 auto 28px}
 .onb-icon svg{width:34px;height:34px;stroke:#fff;stroke-width:1.6;fill:none}
-.onb-logo{font-size:28px;font-weight:900;letter-spacing:-1px;margin-bottom:6px}
-.onb-logo em{color:var(--mint);font-style:normal}
+.onb-logo{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-style:italic;font-size:34px;font-weight:900;letter-spacing:-1.2px;margin-bottom:6px}
+.onb-logo em{color:var(--mint);font-style:italic}
 .onb-title{font-size:26px;font-weight:900;line-height:1.25;letter-spacing:-1px;margin-bottom:14px;word-break:keep-all}
 .onb-sub{font-size:14px;color:var(--t2);line-height:1.7;font-weight:500;word-break:keep-all}
 
@@ -310,7 +313,8 @@ input:checked+.tsl::before{transform:translateX(18px)}
 #v-signup,#v-login{background:radial-gradient(900px circle at 50% -10%,rgba(0,200,150,.22),transparent 55%),radial-gradient(600px circle at 20% 30%,rgba(6,182,212,.14),transparent 55%),radial-gradient(500px circle at 85% 70%,rgba(139,92,246,.1),transparent 55%),linear-gradient(180deg,var(--mint-l) 0%,var(--bg) 60%);min-height:100vh}
 .auth-wrap{padding:12px 24px 40px;max-width:420px;margin:0 auto}
 .auth-hero{display:flex;flex-direction:column;align-items:center;text-align:center;margin:24px 0 32px}
-.auth-logo{font-size:36px;font-weight:900;letter-spacing:-1.5px;color:var(--t1);line-height:1;margin-bottom:14px}
+.auth-logo{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-style:italic;font-size:42px;font-weight:900;letter-spacing:-1.2px;color:var(--t1);line-height:1;margin-bottom:14px}
+.auth-logo em{color:var(--mint);font-style:italic}
 .auth-logo em{color:var(--mint);font-style:normal}
 .auth-title{font-size:22px;font-weight:800;letter-spacing:-.7px;margin-bottom:6px;line-height:1.3;color:var(--t1)}
 .auth-sub{font-size:13px;color:var(--t2);line-height:1.6}
@@ -439,9 +443,15 @@ input:checked+.tsl::before{transform:translateX(18px)}
 
 /* ── CREATE (만들기) ── */
 .create-step{display:none}.create-step.on{display:block}
-.trend-carousel{display:flex;gap:10px;overflow-x:scroll;overflow-y:hidden;-webkit-overflow-scrolling:touch;scroll-snap-type:x mandatory;scroll-padding:0 20px;padding:2px 20px 10px;margin:0 -20px;scrollbar-width:none}
-.trend-carousel::-webkit-scrollbar{display:none}
-.trend-carousel > .trend-card{flex:0 0 85%;scroll-snap-align:center;margin-bottom:0}
+.trend-list{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.trend-list > .trend-card{width:100%;margin-bottom:0}
+/* 얇은 1줄 "처음이면" 바 */
+.first-bar{width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:16px;border:1px solid var(--b);background:linear-gradient(90deg,#F0FDF9,#EEF2FF);color:var(--t1);cursor:pointer;margin-bottom:14px;font-family:'Pretendard',sans-serif;transition:transform .1s,border-color .15s}
+.first-bar:active{transform:scale(.99);border-color:var(--mint)}
+.first-bar-ico{font-size:15px;flex-shrink:0}
+.first-bar-txt{flex:1;text-align:left;font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px}
+.first-bar-txt strong{color:var(--t1);font-weight:800}
+.first-bar-arr{color:var(--mint-d);font-size:15px;font-weight:800;flex-shrink:0}
 .trend-dots{display:flex;justify-content:center;gap:6px;margin:6px 0 14px}
 .trend-dots span{width:6px;height:6px;border-radius:50%;background:var(--b);transition:all .2s}
 .trend-dots span.on{background:var(--dark);width:18px;border-radius:3px}
@@ -480,19 +490,15 @@ input:checked+.tsl::before{transform:translateX(18px)}
 /* discover-body는 이제 m-discover 모달 안에서 렌더링됨 */
 #m-discover .discover-body{padding:0;background:none}
 
-/* ═══ 키우기 서브탭 (2카드) ═══ */
-.act-switch{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 18px}
-.act-card{padding:14px 14px 12px;border-radius:16px;border:1.5px solid rgba(15,19,25,.06);background:rgba(255,255,255,.65);backdrop-filter:saturate(180%) blur(14px);cursor:pointer;text-align:left;transition:all .15s;position:relative;overflow:hidden;display:flex;flex-direction:column;gap:5px}
-.act-card::before{content:"";position:absolute;inset:0;background:radial-gradient(120% 80% at 100% 0%,rgba(0,200,150,.12),transparent 55%);opacity:0;transition:opacity .2s;pointer-events:none}
-.act-card.on{border-color:var(--dark);background:rgba(255,255,255,.92);box-shadow:0 10px 28px rgba(15,19,25,.08)}
-.act-card.on::before{opacity:1}
-.act-card:active{transform:scale(.985)}
-.act-eye{font-size:9.5px;font-weight:800;color:var(--mint-d);letter-spacing:1.3px;text-transform:uppercase}
-.act-card:not(.on) .act-eye{color:var(--t3)}
-.act-ttl{font-size:16px;font-weight:900;color:var(--t1);letter-spacing:-.5px}
-.act-meta{font-size:10.5px;color:var(--t3);font-weight:600;display:flex;align-items:center;gap:5px;margin-top:1px}
-.act-dot{width:6px;height:6px;border-radius:50%;background:var(--mint);box-shadow:0 0 0 3px rgba(0,200,150,.15)}
-.act-dot.red{background:var(--red);box-shadow:0 0 0 3px rgba(255,77,77,.18)}
+/* ═══ 키우기 서브탭 (underline 밑줄 탭) ═══ */
+.act-tabs{display:flex;gap:24px;border-bottom:1px solid var(--b);margin:4px 0 18px;padding:0 2px}
+.act-tabs button{padding:12px 0;border:none;background:none;font-size:15px;font-weight:700;color:var(--t3);cursor:pointer;position:relative;display:flex;align-items:center;gap:7px;letter-spacing:-.3px;font-family:'Pretendard',sans-serif;transition:color .15s}
+.act-tabs button.on{color:var(--t1);font-weight:900}
+.act-tabs button.on::after{content:'';position:absolute;left:0;right:0;bottom:-1px;height:2.5px;background:var(--dark);border-radius:2px}
+.act-tabs button:active{transform:scale(.97)}
+.act-tabs .act-badge{background:var(--red);color:#fff;font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:100px;min-width:20px;line-height:1.35}
+.act-tabs .act-dot{width:6px;height:6px;border-radius:50%;background:var(--mint)}
+.act-tabs .act-dot.red{background:var(--red);animation:lke-pulse 2s infinite}
 
 /* ═══ 만들기 탭 허브 카드 ═══ */
 .create-hub{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 18px}
@@ -678,7 +684,7 @@ input:checked+.tsl::before{transform:translateX(18px)}
 
 /* 테마 config CSS vars (lk-phone-screen 에 theme 클래스 덧붙여 동작) */
 .lk-theme-minimal{--lk-bg:linear-gradient(180deg,#FAF7F2 0%,#F0EADF 100%);--lk-text:#1F1B16;--lk-title-color:#1F1B16;--lk-title-size:20px;--lk-title-weight:800;--lk-title-spacing:-.5px;--lk-sub-color:rgba(31,27,22,.62);--lk-block-bg:#fff;--lk-block-color:#1F1B16;--lk-block-border:1px solid rgba(31,27,22,.12);--lk-radius:4px;--lk-block-shadow:none;--lk-cta-bg:#1F1B16;--lk-cta-color:#fff;--lk-divider:rgba(31,27,22,.16);--lk-align:left}
-.lk-theme-editorial{--lk-bg:linear-gradient(160deg,#F2EDE4 0%,#E6DBC8 100%);--lk-text:#2A1F14;--lk-title-color:#2A1F14;--lk-title-size:26px;--lk-title-weight:700;--lk-title-spacing:-.8px;--lk-title-font:'Fraunces',serif;--lk-sub-color:rgba(42,31,20,.65);--lk-block-bg:transparent;--lk-block-color:#2A1F14;--lk-block-border:none;--lk-radius:0px;--lk-block-shadow:none;--lk-cta-bg:#2A1F14;--lk-cta-color:#F2EDE4;--lk-divider:rgba(42,31,20,.25);--lk-align:center}
+.lk-theme-editorial{--lk-bg:linear-gradient(160deg,#F2EDE4 0%,#E6DBC8 100%);--lk-text:#2A1F14;--lk-title-color:#2A1F14;--lk-title-size:26px;--lk-title-weight:700;--lk-title-spacing:-.8px;--lk-title-font:'Fraunces','Pretendard','Noto Sans KR',sans-serif;--lk-sub-color:rgba(42,31,20,.65);--lk-block-bg:transparent;--lk-block-color:#2A1F14;--lk-block-border:none;--lk-radius:0px;--lk-block-shadow:none;--lk-cta-bg:#2A1F14;--lk-cta-color:#F2EDE4;--lk-divider:rgba(42,31,20,.25);--lk-align:center}
 .lk-theme-editorial .lk-pb{border-bottom:1px solid rgba(42,31,20,.18)!important;padding:10px 0}
 .lk-theme-bold{--lk-bg:#0F1319;--lk-text:#fff;--lk-title-color:#fff;--lk-title-size:22px;--lk-title-weight:900;--lk-title-spacing:-.6px;--lk-sub-color:rgba(255,255,255,.65);--lk-block-bg:#FF6B6B;--lk-block-color:#fff;--lk-block-border:none;--lk-radius:2px;--lk-block-shadow:none;--lk-cta-bg:#fff;--lk-cta-color:#0F1319;--lk-divider:rgba(255,255,255,.2);--lk-align:left}
 .lk-theme-beauty{--lk-bg:linear-gradient(160deg,#FEF3F2 0%,#FCE7E4 50%,#F5DEDA 100%);--lk-text:#1F1317;--lk-title-color:#1F1317;--lk-title-size:22px;--lk-title-weight:900;--lk-title-spacing:-.5px;--lk-sub-color:rgba(31,19,23,.66);--lk-block-bg:rgba(255,255,255,.72);--lk-block-color:#1F1317;--lk-block-border:1px solid rgba(255,255,255,.8);--lk-radius:14px;--lk-block-shadow:0 4px 14px rgba(232,93,117,.1);--lk-cta-bg:#E85D75;--lk-cta-color:#fff;--lk-divider:rgba(31,19,23,.14);--lk-align:center}
@@ -1057,6 +1063,22 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .proof-num-slim{color:#fff;font-weight:900;font-size:16px;letter-spacing:-.3px;position:relative;z-index:1}
 .proof-num-slim span{font-weight:600;opacity:.7;margin-left:3px;font-size:13px}
 .proof-tag{color:rgba(255,255,255,.6);font-weight:600;font-size:11px;white-space:nowrap;margin-left:auto;position:relative;z-index:1}
+.proof-banner.proof-slim{padding:11px 14px}
+.proof-slim .proof-live-dot{width:6px;height:6px}
+.proof-slim-body{color:#fff;font-weight:700;font-size:12.5px;letter-spacing:-.2px;position:relative;z-index:1;display:flex;align-items:center;gap:6px}
+.proof-slim-body b{font-weight:800}
+.proof-slim-body span{color:rgba(255,255,255,.6);font-weight:500;font-size:11.5px}
+.proof-slim .proof-tag{font-size:10.5px;color:var(--mint);font-weight:700}
+
+/* Upsell bar — proof-banner와 비슷하지만 변형 */
+.upsell-bar{display:flex;align-items:center;gap:10px;padding:10px 12px 10px 14px;border-radius:14px;background:linear-gradient(135deg,#1A1F27 0%,#2A3544 100%);color:#fff;cursor:pointer;position:relative;overflow:hidden;margin-top:10px;margin-bottom:20px;transition:transform .1s}
+.upsell-bar::before{content:'';position:absolute;top:-40px;right:-30px;width:140px;height:140px;background:radial-gradient(circle,rgba(245,158,11,.25),transparent 70%);pointer-events:none}
+.upsell-bar:active{transform:scale(.98)}
+.upsell-spark{position:relative;z-index:1;font-size:16px;color:var(--amber);filter:drop-shadow(0 0 8px rgba(245,158,11,.5));animation:lke-pulse 2s infinite;flex-shrink:0}
+.upsell-body{position:relative;z-index:1;display:flex;align-items:center;gap:6px;flex:1;min-width:0;overflow:hidden}
+.upsell-body b{font-size:12.5px;font-weight:800;letter-spacing:-.2px}
+.upsell-body span{color:rgba(255,255,255,.62);font-size:11.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.upsell-arr{position:relative;z-index:1;color:var(--amber);font-size:16px;font-weight:800;flex-shrink:0}
 
 /* ── 신규 팔로워 환영 DM ── */
 .welcome-card{background:var(--mint-l);border-radius:14px;padding:12px 14px;font-size:13px;color:var(--mint-d);font-style:italic;line-height:1.65;margin:10px 0}
@@ -1202,6 +1224,372 @@ input:checked+.tsl::before{transform:translateX(18px)}
 
 .sdet-empty{text-align:center;padding:30px 16px;color:var(--t3);font-size:13px;line-height:1.6}
 
+/* cs2 프롬프트 편집 */
+.cs2-edit-field{transition:background .15s,outline .15s;outline:0 solid transparent}
+.cs2-edit-field:hover:not(.editing){background:rgba(0,200,150,.08)}
+.cs2-edit-field.editing{background:#fff!important;outline:2px solid var(--mint);cursor:text;box-shadow:0 2px 8px rgba(0,200,150,.15)}
+.cs2-edit-field:focus{outline:2px solid var(--mint)}
+
+/* ═══════════════════════════════════════════════════
+   내 링크 에디토리얼 블록 (Ssobi 무드 · mint/dark/Pretendard)
+   ═══════════════════════════════════════════════════ */
+#v-link{background:var(--bg);color:var(--t1);font-family:'Pretendard',-apple-system,sans-serif;padding:0 0 calc(var(--nav-h) + env(safe-area-inset-bottom) + 100px) 0;min-height:100vh;position:relative;overflow-x:hidden}
+
+/* Top bar — Ssobi 스타일 (얇고 심플) */
+#v-link .lke-topbar{position:sticky;top:0;z-index:40;padding:10px 16px;background:rgba(249,250,251,.92);backdrop-filter:blur(18px);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--b)}
+#v-link .lke-topbar-left,#v-link .lke-topbar-actions{display:flex;align-items:center;gap:6px}
+#v-link .lke-back-btn{width:34px;height:34px;border-radius:10px;background:#fff;border:1px solid var(--b);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t1);padding:0}
+#v-link .lke-back-btn svg{width:15px;height:15px;stroke:currentColor;fill:none}
+.lke-top-btn{padding:10px 14px;border-radius:10px;font-size:12.5px;font-weight:800;border:1px solid var(--b);background:#fff;color:var(--t1);cursor:pointer;transition:transform .1s,background .1s;letter-spacing:-.2px;display:inline-flex;align-items:center;justify-content:center;gap:4px;font-family:'Pretendard',sans-serif;line-height:1.2}
+.lke-top-btn:active{transform:scale(.97);background:var(--bg)}
+.lke-top-btn.primary{background:var(--mint);color:#fff;border-color:var(--mint)}
+.lke-top-btn.primary:active{background:var(--mint-d);transform:scale(.97)}
+.lke-top-btn.danger{background:#fff;color:var(--red);border:1px solid #FCA5A5}
+.lke-top-btn.danger:active{background:var(--red-l);transform:scale(.97)}
+
+/* URL 바 */
+#v-link .lke-url-bar{padding:10px 18px;background:var(--s);display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--t3);border-bottom:1px solid var(--b);cursor:pointer}
+#v-link .lke-url-bar strong{color:var(--t1);font-weight:600}
+#v-link .lke-url-copy{margin-left:auto;padding:4px 10px;background:var(--dark);color:#fff;border:none;border-radius:100px;font-family:'JetBrains Mono',monospace;font-size:10px;cursor:pointer;letter-spacing:.05em}
+
+/* Editor / Block 공통 */
+#v-link .lke-editor{padding-bottom:20px}
+#v-link .lke-block{position:relative;cursor:pointer;transition:filter .15s}
+#v-link .lke-block:not(.selected):hover{outline:1.5px dashed rgba(0,200,150,.5);outline-offset:-2px}
+#v-link .lke-block.selected{outline:2px dashed var(--mint);outline-offset:2px}
+#v-link .lke-block.selected::before{content:attr(data-type);position:absolute;top:-26px;left:8px;padding:4px 10px;background:var(--mint);color:#fff;border-radius:100px 100px 100px 0;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;z-index:10}
+
+#v-link .lke-add-zone{height:12px;position:relative;cursor:pointer}
+#v-link .lke-add-zone::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:1px;background:var(--mint);transition:width .3s}
+#v-link .lke-add-zone:hover::before{width:80%}
+#v-link .lke-add-zone::after{content:'+';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);width:26px;height:26px;background:var(--mint);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:500;transition:transform .3s;z-index:5}
+#v-link .lke-add-zone:hover::after{transform:translate(-50%,-50%) scale(1)}
+
+/* Hero Banner — 다크 + 민트 */
+#v-link .lke-hero-banner{aspect-ratio:4/5;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff;position:relative;overflow:hidden;padding:28px 22px;display:flex;flex-direction:column;justify-content:space-between}
+#v-link .lke-hero-banner::before{content:'';position:absolute;top:-100px;right:-100px;width:380px;height:380px;background:radial-gradient(circle,rgba(0,200,150,.35),transparent 70%)}
+#v-link .lke-hero-banner-top{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:flex-start}
+#v-link .lke-hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--mint);display:inline-flex;align-items:center;gap:10px}
+#v-link .lke-hero-eyebrow::before{content:'';width:24px;height:1px;background:var(--mint);animation:lke-pulse 2s infinite}
+@keyframes lke-pulse{0%,100%{opacity:1}50%{opacity:.4}}
+#v-link .lke-hero-avatar-mini{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#A7F3D0,#00A87E);display:flex;align-items:center;justify-content:center;font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-style:italic;font-weight:500;font-size:17px;color:#fff}
+#v-link .lke-hero-banner-main{position:relative;z-index:2}
+#v-link .lke-hero-brand{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;opacity:.65;margin-bottom:14px}
+#v-link .lke-hero-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:52px;font-weight:300;line-height:.98;letter-spacing:-.04em;margin-bottom:10px;color:#fff}
+#v-link .lke-hero-title em{font-style:italic;color:var(--mint);font-weight:500}
+#v-link .lke-hero-subtitle{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:15px;font-style:italic;opacity:.88;margin-bottom:20px;max-width:240px;line-height:1.4;color:#fff}
+#v-link .lke-hero-banner-bottom{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:flex-end}
+#v-link .lke-hero-stats{display:flex;gap:18px}
+#v-link .lke-hero-stat .num{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:20px;font-weight:500;letter-spacing:-.02em;line-height:1}
+#v-link .lke-hero-stat .lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;opacity:.58;margin-top:3px}
+#v-link .lke-hero-cta{padding:11px 18px;background:var(--mint);color:#fff;border-radius:100px;font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;gap:6px;border:none;font-family:'Pretendard',sans-serif;cursor:pointer;letter-spacing:-.2px}
+
+/* Event Bar */
+#v-link .lke-block-event{padding:12px 18px;background:var(--dark);color:#fff;display:flex;justify-content:space-between;align-items:center;gap:14px}
+#v-link .lke-event-left{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+#v-link .lke-event-dot{width:7px;height:7px;background:var(--mint);border-radius:50%;animation:lke-pulse 2s infinite;box-shadow:0 0 8px var(--mint);flex-shrink:0}
+#v-link .lke-event-text{font-size:12.5px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#v-link .lke-event-text strong{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-style:italic;color:var(--mint);font-weight:500;font-size:14px;margin-right:4px}
+#v-link .lke-event-arrow{color:var(--mint);font-size:15px;flex-shrink:0}
+
+/* Countdown */
+#v-link .lke-block-countdown{margin:14px 18px;padding:24px 22px;background:var(--mint);color:#fff;border-radius:18px;text-align:center;position:relative;overflow:hidden}
+#v-link .lke-block-countdown::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;background:radial-gradient(circle,rgba(255,255,255,.18),transparent 70%)}
+#v-link .lke-cd-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;opacity:.9;margin-bottom:8px;position:relative}
+#v-link .lke-cd-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:26px;font-weight:500;margin-bottom:5px;letter-spacing:-.02em;position:relative}
+#v-link .lke-cd-title em{font-style:italic}
+#v-link .lke-cd-subtitle{font-size:11.5px;opacity:.88;margin-bottom:16px;position:relative}
+#v-link .lke-cd-timer{display:flex;justify-content:center;gap:8px;margin-bottom:16px;position:relative}
+#v-link .lke-cd-unit{background:rgba(15,19,25,.28);padding:10px 8px;border-radius:10px;min-width:60px;backdrop-filter:blur(8px)}
+#v-link .lke-cd-num{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:26px;font-weight:500;line-height:1;letter-spacing:-.02em}
+#v-link .lke-cd-lbl{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:.1em;opacity:.8;margin-top:3px;text-transform:uppercase}
+#v-link .lke-cd-slots{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.1em;position:relative}
+
+/* Section title */
+#v-link .lke-block-section-title{padding:36px 18px 12px;display:flex;justify-content:space-between;align-items:flex-end}
+#v-link .lke-section-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:28px;font-weight:300;line-height:1;letter-spacing:-.03em;color:var(--t1)}
+#v-link .lke-section-title em{font-style:italic;color:var(--mint);font-weight:400}
+#v-link .lke-section-see-all{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--t3);letter-spacing:.15em;text-transform:uppercase;padding-bottom:4px}
+
+/* Product Grid */
+#v-link .lke-block-grid{padding:0 18px;display:grid;grid-template-columns:1fr 1fr;gap:14px 10px}
+#v-link .lke-product-card{cursor:pointer}
+#v-link .lke-product-img{aspect-ratio:1/1;border-radius:12px;margin-bottom:9px;position:relative;overflow:hidden;display:flex;align-items:flex-start;padding:10px}
+#v-link .lke-product-img.cream{background:linear-gradient(135deg,#FEF3C7 0%,#D4B896 100%)}
+#v-link .lke-product-img.coral{background:linear-gradient(135deg,#A7F3D0 0%,#00C896 100%)}
+#v-link .lke-product-img.pink{background:linear-gradient(135deg,#FFE8DC 0%,#FFB098 100%)}
+#v-link .lke-product-img.dark{background:linear-gradient(135deg,#374151 0%,#1A1F27 100%);color:#fff}
+#v-link .lke-product-tag{font-family:'JetBrains Mono',monospace;font-size:9px;background:rgba(255,255,255,.92);color:var(--t1);padding:3px 8px;border-radius:100px;letter-spacing:.05em;font-weight:500;text-transform:uppercase}
+#v-link .lke-product-tag.hot{background:var(--mint);color:#fff}
+#v-link .lke-product-tag.dark{background:var(--dark);color:#fff}
+#v-link .lke-product-info-date{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--t3);margin-bottom:3px;letter-spacing:.05em}
+#v-link .lke-product-info-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:14px;font-weight:500;line-height:1.3;letter-spacing:-.01em;margin-bottom:5px;color:var(--t1)}
+#v-link .lke-product-info-price{display:flex;gap:6px;align-items:baseline}
+#v-link .lke-price-sale{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:14px;font-weight:500;color:var(--mint-d);letter-spacing:-.01em}
+#v-link .lke-price-orig{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--t3);text-decoration:line-through}
+
+/* Magazine */
+#v-link .lke-block-mag{margin:14px 18px;border-radius:18px;overflow:hidden;aspect-ratio:4/3;position:relative;cursor:pointer;display:flex;align-items:flex-end;padding:22px}
+#v-link .lke-block-mag.m1{background:linear-gradient(135deg,#A7F3D0 0%,#00A87E 100%)}
+#v-link .lke-block-mag.m2{background:linear-gradient(135deg,#67E8F9 0%,#06B6D4 100%)}
+#v-link .lke-block-mag.m3{background:linear-gradient(135deg,#C4B5FD 0%,#8B5CF6 100%)}
+#v-link .lke-block-mag::before{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(15,19,25,.45) 0%,transparent 60%)}
+#v-link .lke-mag-label{position:absolute;top:18px;left:18px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#fff;background:rgba(15,19,25,.35);padding:4px 11px;border-radius:100px;letter-spacing:.15em;text-transform:uppercase;backdrop-filter:blur(10px)}
+#v-link .lke-mag-title{position:relative;z-index:2;font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:24px;font-weight:500;color:#fff;line-height:1.1;letter-spacing:-.02em;max-width:82%}
+#v-link .lke-mag-title em{font-style:italic}
+
+/* Big Banner */
+#v-link .lke-block-bigbanner{margin:14px 18px;border-radius:18px;overflow:hidden;aspect-ratio:2/1;position:relative;cursor:pointer;display:flex;align-items:flex-end;padding:22px;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff}
+#v-link .lke-block-bigbanner::before{content:'';position:absolute;top:-100px;right:-100px;width:280px;height:280px;background:radial-gradient(circle,rgba(0,200,150,.3),transparent 70%)}
+#v-link .lke-bigbanner-content{position:relative;z-index:2}
+#v-link .lke-bigbanner-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mint);letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
+#v-link .lke-bigbanner-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:26px;font-weight:400;line-height:1.05;letter-spacing:-.02em;color:#fff}
+#v-link .lke-bigbanner-title em{font-style:italic;color:var(--mint);font-weight:500}
+#v-link .lke-bigbanner-arrow{position:absolute;top:22px;right:22px;width:42px;height:42px;border:1px solid rgba(255,255,255,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;z-index:2;color:#fff;background:rgba(255,255,255,.08);backdrop-filter:blur(6px)}
+#v-link .lke-bigbanner-arrow svg{width:17px;height:17px;stroke:currentColor;fill:none}
+
+/* Quick Links */
+#v-link .lke-block-quicklinks{padding:0 18px}
+#v-link .lke-quicklink-item{padding:16px 0;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;align-items:center;gap:12px}
+#v-link .lke-quicklink-item:last-child{border-bottom:none}
+#v-link .lke-quicklink-label{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:17px;font-weight:500;letter-spacing:-.01em;color:var(--t1)}
+#v-link .lke-quicklink-sub{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--t3);margin-top:2px;letter-spacing:.05em}
+#v-link .lke-quicklink-arrow{font-family:'JetBrains Mono',monospace;color:var(--t3);font-size:15px}
+
+/* Socials */
+#v-link .lke-block-socials{padding:16px;display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+#v-link .lke-social-icon{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Pretendard',sans-serif;font-size:11px;font-weight:700;color:#fff}
+#v-link .lke-social-icon.ig{background:linear-gradient(135deg,#E1306C,#F77737)}
+#v-link .lke-social-icon.tk{background:#000}
+#v-link .lke-social-icon.yt{background:#FF0000}
+#v-link .lke-social-icon.email{background:var(--dark)}
+
+/* Footer */
+#v-link .lke-block-footer{padding:32px 18px 28px;text-align:center;background:var(--dark);color:#fff}
+#v-link .lke-footer-logo{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-style:italic;font-weight:900;font-size:22px;margin-bottom:5px}
+#v-link .lke-footer-logo span{color:var(--mint)}
+#v-link .lke-footer-text{font-family:'JetBrains Mono',monospace;font-size:10px;opacity:.48;letter-spacing:.1em}
+
+/* Floating Toolbar — Ssobi nav 위로 */
+#v-link .lke-floating-toolbar{position:fixed;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 10px);left:50%;transform:translateX(-50%);max-width:420px;width:calc(100% - 32px);background:var(--dark);border-radius:100px;padding:7px;display:flex;align-items:center;gap:3px;box-shadow:0 14px 38px rgba(15,19,25,.25);z-index:30}
+#v-link .lke-fl-btn{flex:1;padding:9px 6px;border:none;background:transparent;color:#fff;border-radius:100px;font-family:'Pretendard',sans-serif;font-size:11px;font-weight:500;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:all .2s}
+#v-link .lke-fl-btn:active{background:rgba(255,255,255,.1);transform:scale(.95)}
+#v-link .lke-fl-btn .icon{font-family:'Pretendard',sans-serif;font-size:13px;font-weight:800}
+#v-link .lke-fl-btn .label{font-size:9.5px;opacity:.82}
+#v-link .lke-fl-btn.primary{background:var(--mint)}
+#v-link .lke-fl-divider{width:1px;height:24px;background:rgba(255,255,255,.15)}
+
+/* Edit Sheet */
+.lke-edit-sheet{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;box-shadow:0 -18px 50px rgba(15,19,25,.14);z-index:310;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);max-height:82vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom);max-width:430px;margin:0 auto;left:0;right:0}
+.lke-edit-sheet.open{transform:translateY(0)}
+.lke-sheet-handle{width:36px;height:4px;background:var(--b);border-radius:100px;margin:12px auto}
+.lke-sheet-header{padding:4px 22px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--b)}
+.lke-sheet-title{font-family:'Pretendard',sans-serif;font-size:17px;font-weight:800;letter-spacing:-.3px;color:var(--t1)}
+.lke-sheet-title em{font-style:normal;color:var(--mint);font-weight:800}
+.lke-sheet-close{width:30px;height:30px;border-radius:50%;background:var(--bg);border:none;font-size:15px;cursor:pointer;color:var(--t1)}
+.lke-sheet-body{padding:20px 22px}
+.lke-field-group{margin-bottom:20px}
+.lke-field-label{font-family:'Pretendard',sans-serif;font-size:11px;color:var(--t3);font-weight:800;letter-spacing:.3px;margin-bottom:9px;display:flex;justify-content:space-between}
+.lke-field-input{width:100%;padding:12px 14px;border:1px solid var(--b);border-radius:10px;font-family:'Pretendard',sans-serif;font-size:14px;background:var(--bg);color:var(--t1);outline:none}
+.lke-field-input:focus{border-color:var(--dark);background:#fff}
+textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;line-height:1.5}
+.lke-color-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:12px}
+.lke-color-swatch{aspect-ratio:1/1;border-radius:8px;cursor:pointer;border:none;transition:transform .12s;position:relative;box-shadow:0 0 0 1px rgba(15,19,25,.06) inset}
+.lke-color-swatch.active{transform:scale(1.05);box-shadow:0 0 0 2.5px var(--mint) inset,0 4px 12px rgba(0,200,150,.25)}
+.lke-color-swatch.active::after{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:10px;height:5px;border-left:2px solid #fff;border-bottom:2px solid #fff;transform-origin:center;transform:translate(-50%,-70%) rotate(-45deg);filter:drop-shadow(0 1px 2px rgba(0,0,0,.4))}
+.lke-block-picker{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.lke-block-option{padding:14px 12px;background:var(--bg);border-radius:12px;cursor:pointer;transition:all .15s;border:1px solid transparent;text-align:left;font-family:'Pretendard',sans-serif}
+.lke-block-option:active{transform:scale(.97)}
+.lke-block-option:hover{border-color:var(--dark);background:#fff}
+.lke-block-option-icon{width:30px;height:30px;background:var(--dark);border-radius:7px;margin-bottom:8px;display:flex;align-items:center;justify-content:center;font-family:'Pretendard',sans-serif;color:#fff;font-size:14px;font-weight:800}
+.lke-block-option.featured .lke-block-option-icon{background:var(--mint)}
+.lke-block-option-name{font-size:12.5px;font-weight:600;margin-bottom:2px;color:var(--t1)}
+.lke-block-option-desc{font-size:10.5px;color:var(--t3);line-height:1.3}
+.lke-layout-select{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.lke-layout-tile{padding:14px 8px 10px;background:var(--bg);border-radius:10px;text-align:center;cursor:pointer;border:none;box-shadow:0 0 0 1px rgba(15,19,25,.06) inset;transition:transform .1s}
+.lke-layout-tile.active{box-shadow:0 0 0 2.5px var(--mint) inset,0 4px 14px rgba(0,200,150,.18);background:#fff;transform:scale(1.02)}
+.lke-layout-viz{height:44px;margin-bottom:8px;display:flex;flex-direction:column;gap:3px;padding:6px;background:#fff;border-radius:7px}
+.lke-layout-tile.active .lke-layout-viz{background:var(--bg)}
+.lke-layout-viz-bar{flex:1;background:var(--b);border-radius:2px}
+.lke-layout-tile.grid .lke-layout-viz{flex-direction:row;flex-wrap:wrap;gap:3px}
+.lke-layout-tile.grid .lke-layout-viz-bar{flex:0 0 calc(50% - 2px);height:calc(50% - 2px)}
+.lke-layout-tile.mag .lke-layout-viz-bar:first-child{flex:2}
+.lke-layout-name{font-family:'Pretendard',sans-serif;font-size:12px;letter-spacing:-.2px;font-weight:800;color:var(--t1)}
+.lke-layout-tile-sub{font-size:9.5px;color:var(--t3);margin-top:2px}
+.lke-font-list{display:flex;flex-wrap:wrap;gap:6px}
+.lke-font-pill{padding:9px 14px;border-radius:100px;font-size:12.5px;background:var(--bg);cursor:pointer;border:1px solid transparent;transition:all .15s;color:var(--t1);font-family:'Pretendard',sans-serif}
+.lke-font-pill.active{background:var(--dark);color:#fff}
+.lke-font-pill.fra{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-style:italic}
+.lke-font-pill.mono{font-family:'JetBrains Mono',monospace}
+.lke-toggle-row{display:flex;justify-content:space-between;align-items:center;padding:13px 0;border-bottom:1px solid var(--b)}
+.lke-toggle-row:last-child{border:none}
+.lke-toggle-info strong{display:block;font-size:14px;font-weight:600;margin-bottom:2px;color:var(--t1)}
+.lke-toggle-info span{font-size:11px;color:var(--t3);font-family:'JetBrains Mono',monospace;letter-spacing:.03em}
+.lke-toggle{width:44px;height:24px;background:var(--b);border-radius:100px;position:relative;cursor:pointer;transition:all .3s;flex-shrink:0}
+.lke-toggle::after{content:'';position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .3s}
+.lke-toggle.on{background:var(--mint)}
+.lke-toggle.on::after{transform:translateX(20px)}
+.lke-backdrop{position:fixed;inset:0;background:rgba(15,19,25,.42);opacity:0;pointer-events:none;transition:opacity .28s;z-index:300}
+.lke-backdrop.show{opacity:1;pointer-events:all}
+
+/* Preview mode */
+#v-link.lke-preview .lke-topbar,#v-link.lke-preview .lke-url-bar,#v-link.lke-preview .lke-floating-toolbar,#v-link.lke-preview .lke-add-zone{display:none!important}
+#v-link.lke-preview .lke-block{cursor:default}
+#v-link.lke-preview .lke-block:hover{background:transparent}
+#v-link.lke-preview .lke-block.selected{outline:none;background:transparent}
+#v-link.lke-preview .lke-block.selected::before{display:none}
+#v-link.lke-preview .lke-preview-exit{display:flex}
+#v-link.lke-preview{padding-bottom:0}
+.lke-preview-exit{display:none;position:fixed;top:14px;right:14px;padding:9px 14px;background:var(--dark);color:#fff;border:none;border-radius:100px;font-family:'Pretendard',sans-serif;font-size:12px;font-weight:700;cursor:pointer;z-index:320;align-items:center;gap:5px}
+
+/* Drag handle & DnD */
+#v-link .lke-block{position:relative}
+#v-link .lke-drag{position:absolute;top:8px;left:8px;z-index:11;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border:1px solid var(--b);display:none;align-items:center;justify-content:center;cursor:grab;color:var(--t2);font-size:14px;font-weight:900;letter-spacing:-2px}
+#v-link .lke-block:hover .lke-drag,#v-link .lke-block.selected .lke-drag{display:flex}
+#v-link .lke-block.dragging{opacity:.35}
+#v-link .lke-drop-target{border-top:3px solid var(--mint)}
+
+/* 히어로 캐러셀 */
+#v-link .lke-hero-carousel{position:relative}
+#v-link .lke-hero-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;touch-action:pan-x}
+#v-link .lke-hero-track::-webkit-scrollbar{display:none}
+#v-link .lke-hero-track > .lke-hero-banner{flex:0 0 100%;scroll-snap-align:start;aspect-ratio:4/5}
+#v-link .lke-hero-dots{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:3}
+#v-link .lke-hero-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.4);transition:all .2s}
+#v-link .lke-hero-dot.on{background:#fff;width:20px;border-radius:3px}
+#v-link .lke-hero-nav{position:absolute;top:50%;transform:translateY(-50%);width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.4);backdrop-filter:blur(8px);border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:3;font-size:18px;font-weight:400}
+#v-link .lke-hero-nav.prev{left:10px}
+#v-link .lke-hero-nav.next{right:10px}
+#v-link .lke-hero-tools{position:absolute;top:12px;right:12px;z-index:3;display:flex;flex-direction:column;gap:6px}
+#v-link .lke-hero-tool{width:32px;height:32px;border:none;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);color:#fff;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#v-link .lke-hero-tool svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2}
+#v-link .lke-hero-stat{position:relative}
+#v-link .lke-hero-stat-x{position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;border:none;background:rgba(255,77,77,.95);color:#fff;font-size:13px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:4;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+#v-link .lke-hero-stat.menu-on .lke-hero-stat-x{display:flex}
+#v-link .lke-hero-stat-menu{position:absolute;top:calc(100% + 6px);left:0;z-index:5;background:#fff;border:1px solid var(--b);border-radius:8px;box-shadow:0 8px 22px rgba(15,19,25,.18);padding:4px;display:none;flex-direction:column;gap:2px;min-width:80px}
+#v-link .lke-hero-stat.menu-on .lke-hero-stat-menu{display:flex}
+#v-link .lke-hero-stat-menu button{border:none;background:none;padding:7px 10px;font-size:11.5px;font-weight:700;text-align:left;color:var(--t1);cursor:pointer;border-radius:4px;font-family:'Pretendard',sans-serif}
+#v-link .lke-hero-stat-menu button:hover{background:var(--bg)}
+#v-link .lke-hero-stat-menu button.del{color:var(--red)}
+#v-link .lke-hero-cta-wrap{position:relative}
+#v-link .lke-hero-cta-wrap.menu-on .lke-hero-stat-menu{display:flex}
+
+/* Hero banner bg 이미지 지원 */
+#v-link .lke-hero-banner.has-bg::before{background:linear-gradient(180deg,rgba(0,0,0,.2) 0%,transparent 30%,rgba(0,0,0,.45) 100%);inset:0;width:auto;height:auto;top:0;right:0}
+#v-link .lke-hero-banner.has-bg{background-size:cover;background-position:center}
+#v-link .lke-hero-title[contenteditable],#v-link .lke-hero-subtitle[contenteditable],#v-link .lke-hero-brand[contenteditable]{outline:none}
+#v-link .lke-hero-title[contenteditable]:focus,#v-link .lke-hero-subtitle[contenteditable]:focus,#v-link .lke-hero-brand[contenteditable]:focus{background:rgba(255,255,255,.14);border-radius:4px;padding:1px 5px;margin-left:-5px}
+
+/* 블록 추가 시트 - 큰 미리보기 카드 */
+.lke-block-picker-v2{display:flex;flex-direction:column;gap:10px;font-family:'Pretendard',sans-serif}
+.lke-bpv-card{background:#fff;border:1px solid var(--b);border-radius:12px;padding:14px;cursor:pointer;transition:all .15s;display:flex;gap:12px;align-items:center;font-family:'Pretendard',sans-serif}
+.lke-bpv-card:active{transform:scale(.98);border-color:var(--mint);background:var(--bg)}
+.lke-bpv-prev{flex-shrink:0;width:72px;height:72px;border-radius:8px;background:var(--bg);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;font-family:'Pretendard',sans-serif}
+.lke-bpv-body{flex:1;min-width:0;font-family:'Pretendard',sans-serif}
+.lke-bpv-name{font-size:14px;font-weight:700;color:var(--t1);margin-bottom:3px;letter-spacing:-.2px}
+.lke-bpv-desc{font-size:11.5px;color:var(--t3);line-height:1.4}
+.lke-bpv-card.locked{opacity:.6;position:relative}
+.lke-bpv-card.locked .lke-bpv-prev{filter:grayscale(.6)}
+.lke-lock{display:inline-block;background:var(--amber-l);color:var(--amber);font-size:9.5px;font-weight:800;padding:2px 6px;border-radius:4px;margin-left:4px;letter-spacing:.2px;vertical-align:1px}
+
+/* 미니 미리보기 스타일 */
+.lke-bpv-prev.hero{background:linear-gradient(135deg,#1A1F27,#374151);color:#fff}
+.lke-bpv-prev.hero::after{content:'';position:absolute;top:-10px;right:-10px;width:30px;height:30px;background:radial-gradient(circle,rgba(0,200,150,.6),transparent 70%)}
+.lke-bpv-prev.hero::before{content:'HERO';position:relative;font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-style:italic;font-size:10px;color:var(--mint);font-weight:500}
+.lke-bpv-prev.event{background:var(--dark);color:#fff}
+.lke-bpv-prev.event::before{content:'30% · LIVE';font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-style:italic;font-size:10px;color:var(--mint);font-weight:500}
+.lke-bpv-prev.countdown{background:var(--mint);color:#fff}
+.lke-bpv-prev.countdown::before{content:'03:42:18';font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:11px;font-weight:500}
+.lke-bpv-prev.grid{background:linear-gradient(135deg,#FFE8DC,#FFB098);display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:6px}
+.lke-bpv-prev.grid::before,.lke-bpv-prev.grid::after{content:'';background:rgba(255,255,255,.8);border-radius:4px}
+.lke-bpv-prev.grid > span{background:rgba(255,255,255,.8);border-radius:4px}
+.lke-bpv-prev.grid{font-size:0}
+.lke-bpv-prev.bigbanner{background:linear-gradient(135deg,#1A1F27,#374151);color:var(--mint)}
+.lke-bpv-prev.bigbanner::before{content:'↗ GLOBAL';font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.15em}
+.lke-bpv-prev.magazine{background:linear-gradient(135deg,#A7F3D0,#00A87E);color:#fff}
+.lke-bpv-prev.magazine::before{content:'Routine';font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-style:italic;font-size:11px;font-weight:500}
+.lke-bpv-prev.link{background:#fff;border:1px solid var(--b);color:var(--t1);flex-direction:column;gap:2px}
+.lke-bpv-prev.link::before{content:'•••';font-size:11px;color:var(--t3);letter-spacing:2px}
+.lke-bpv-prev.link::after{content:'';width:36px;height:4px;background:var(--b);border-radius:2px}
+.lke-bpv-prev.quicklinks{background:#fff;border:1px solid var(--b);flex-direction:column;gap:4px;padding:8px;align-items:stretch}
+.lke-bpv-prev.quicklinks > span{height:4px;background:var(--b);border-radius:2px}
+.lke-bpv-prev.quicklinks{font-size:0}
+.lke-bpv-prev.socials{background:#fff;gap:3px}
+.lke-bpv-prev.socials::before{content:'';width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,#E1306C,#F77737)}
+.lke-bpv-prev.socials::after{content:'';width:10px;height:10px;border-radius:50%;background:#000;margin-left:3px}
+.lke-bpv-prev.section::before{content:'Best';font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-style:italic;font-size:14px;color:var(--t1);font-weight:300}
+.lke-bpv-prev.image{background:linear-gradient(135deg,#FFD4CC,#FF8B7A);color:#fff;display:flex;align-items:flex-end;padding:6px}
+.lke-bpv-prev.image::before{content:'IMG';font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em}
+.lke-bpv-prev.contact{background:linear-gradient(135deg,#1A1F27,#2D2D2D);color:var(--mint)}
+.lke-bpv-prev.contact::before{content:'제안하기';font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-style:italic;font-size:10px;font-weight:500}
+.lke-bpv-prev.spacer{background:#fff;border:1px dashed var(--b);flex-direction:column}
+.lke-bpv-prev.spacer::after{content:'공백';font-size:9px;color:var(--t3);font-weight:700;letter-spacing:.1em}
+.lke-bpv-prev.divider{background:#fff;border:1px solid var(--b);align-items:center;justify-content:center}
+.lke-bpv-prev.divider::before{content:'';width:60%;height:1px;background:var(--t3)}
+
+/* 제품 카드 유형별 */
+#v-link .lke-product-card.type-channel .lke-product-info-title{color:var(--t1)}
+#v-link .lke-product-card.type-channel .lke-product-info-price{display:none}
+#v-link .lke-product-card.type-content .lke-product-info-price{display:none}
+
+/* 기본 블록 간격 (편집 모드) — add-zone 이 12px 추가로 끼어들어 적당함 */
+#v-link .lke-block-countdown,#v-link .lke-block-bigbanner,#v-link .lke-block-mag,#v-link .lke-block-image{margin-top:8px;margin-bottom:8px}
+#v-link .lke-block-section-title{padding-top:32px;padding-bottom:10px}
+/* 미리보기 모드 — add-zone 사라진 공간 보상 */
+#v-link.lke-preview .lke-block-countdown,#v-link.lke-preview .lke-block-bigbanner,#v-link.lke-preview .lke-block-mag,#v-link.lke-preview .lke-block-image,#v-link.lke-preview .lke-block-grid,#v-link.lke-preview .lke-block-quicklinks,#v-link.lke-preview .lke-block-socials{margin-top:16px;margin-bottom:16px}
+#v-link.lke-preview .lke-block-event{margin-top:0;margin-bottom:12px}
+#v-link.lke-preview .lke-block-section-title{padding-top:40px;padding-bottom:12px}
+
+/* 숏링크 핸들 입력 (prefix 고정) */
+.lke-handle-wrap{display:flex;align-items:stretch;border:1px solid var(--b);border-radius:10px;overflow:hidden;background:#fff}
+.lke-handle-prefix{padding:12px 14px;background:var(--bg);color:var(--t3);font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:600;display:flex;align-items:center}
+.lke-handle-input{flex:1;padding:12px 14px;border:none;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;color:var(--t1);font-weight:600}
+.lke-handle-status{padding:0 12px;display:flex;align-items:center;font-size:11px;font-weight:700;flex-shrink:0}
+.lke-handle-status.ok{color:var(--mint-d)}
+.lke-handle-status.bad{color:var(--red)}
+.lke-handle-status.checking{color:var(--t3)}
+
+/* 서브뷰 (See all) */
+#v-link.subview > .lke-editor,#v-link.subview > .lke-floating-toolbar,#v-link.subview > .lke-topbar,#v-link.subview > .lke-url-bar{display:none!important}
+#lke-subview-root{background:var(--bg);min-height:100vh;padding-bottom:40px}
+#lke-subview-root .lke-topbar{position:sticky;top:0;z-index:20}
+.lke-subview-body{padding:20px 18px 40px}
+
+/* Universal appearance panel (심플 — 꾸미기) */
+.lke-appearance{background:var(--bg);border:1px solid var(--b);border-radius:12px;padding:4px 14px;margin:8px 0 12px}
+.lke-app-head{font-size:11px;font-weight:800;color:var(--t3);letter-spacing:.3px;padding:12px 0 6px;text-transform:uppercase}
+.lke-pick-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--b);gap:10px}
+.lke-pick-row:last-child{border:none}
+.lke-pick-row > label{font-size:12.5px;font-weight:700;color:var(--t2);flex:0 0 auto}
+.lke-pick-col{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.lke-color-dot{width:32px;height:32px;border:none;padding:0;background:none;cursor:pointer;border-radius:50%;overflow:hidden;box-shadow:0 0 0 1.5px rgba(15,19,25,.08),0 2px 6px rgba(15,19,25,.06)}
+.lke-color-dot::-webkit-color-swatch-wrapper{padding:0}
+.lke-color-dot::-webkit-color-swatch{border:none;border-radius:50%}
+.lke-color-dot::-moz-color-swatch{border:none;border-radius:50%}
+.lke-color-dot:active{transform:scale(.92)}
+.lke-pick-hex{font-family:'JetBrains Mono',monospace;font-size:10.5px;font-weight:700;color:var(--t3);min-width:60px}
+.lke-grad-sel{padding:6px 10px;border:1px solid var(--b);border-radius:6px;font-size:11px;font-weight:600;background:#fff;cursor:pointer;font-family:'Pretendard',sans-serif;color:var(--t1)}
+.lke-img-btn{padding:7px 12px;border:1px solid var(--b);background:#fff;color:var(--t1);font-size:11.5px;font-weight:700;border-radius:8px;cursor:pointer;font-family:'Pretendard',sans-serif;display:inline-flex;align-items:center;gap:4px}
+.lke-img-btn.has{background:var(--mint-l);color:var(--mint-d);border-color:var(--mint)}
+.lke-img-btn:active{transform:scale(.95)}
+.lke-img-btn.clear{color:var(--red);border-color:#FCA5A5;background:#fff;padding:7px 8px}
+
+/* Rich text field */
+.lke-rich-wrap{background:#fff;border:1px solid var(--b);border-radius:10px;overflow:hidden;margin-bottom:12px}
+.lke-rich-toolbar{display:flex;align-items:center;gap:4px;padding:6px 8px;background:var(--bg);border-bottom:1px solid var(--b);flex-wrap:wrap}
+.lke-rich-btn{width:28px;height:28px;border-radius:6px;border:1px solid var(--b);background:#fff;color:var(--t1);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;font-family:'Pretendard',sans-serif;padding:0}
+.lke-rich-btn:active{background:var(--dark);color:#fff}
+.lke-rich-color{width:22px;height:22px;border-radius:6px;border:1px solid rgba(15,19,25,.08);cursor:pointer;padding:0}
+.lke-rich-color:active{transform:scale(.94)}
+.lke-rich-divider{width:1px;height:20px;background:var(--b);margin:0 2px}
+.lke-rich-input{padding:12px 14px;font-size:14px;font-family:'Pretendard',sans-serif;min-height:52px;outline:none;line-height:1.4;color:var(--t1)}
+.lke-rich-input:focus{background:var(--bg)}
+
+/* 시트 내 Pretendard 강제 (본문, 앱 UI) — font preview pill 제외 */
+.lke-edit-sheet,.lke-edit-sheet *:not(.lke-font-pill.fra):not(.lke-font-pill.mono){font-family:'Pretendard','Noto Sans KR',sans-serif!important}
+.lke-edit-sheet .lke-font-pill.fra{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif!important;font-style:italic}
+.lke-edit-sheet .lke-font-pill.mono{font-family:'JetBrains Mono',monospace!important}
+
 </style>
 </head>
 <body>
@@ -1209,7 +1597,7 @@ input:checked+.tsl::before{transform:translateX(18px)}
 <!-- HOME -->
 <div class="vw on" id="v-home">
   <div class="hdr">
-    <div class="logo" onclick="go('onb1')" style="cursor:pointer">Ssobi<em>.</em></div>
+    <div class="logo brand" onclick="go('onb1')" style="cursor:pointer">Ssobi<em>.</em></div>
     <div style="display:flex;align-items:center">
       <button class="newbie-toggle" id="newbie-toggle" onclick="toggleNewbie()">첫날 모드</button>
       <div class="ai-chip" onclick="toggleAI()"><div class="ai-dot" id="ai-dot"></div><span id="ai-txt">AI 작동 중</span></div>
@@ -1430,18 +1818,10 @@ input:checked+.tsl::before{transform:translateX(18px)}
     <div class="proof-tag">공식 API 기반</div>
   </div>
 
-  <!-- 자동화 / 실시간 관리 (2카드 에디토리얼) -->
-  <div class="act-switch">
-    <button class="act-card on" id="subt-auto" onclick="setActivitySub('auto')">
-      <div class="act-eye">AUTOMATION</div>
-      <div class="act-ttl">SNS 자동화</div>
-      <div class="act-meta"><span class="act-dot"></span>AI 작동 중 · 오늘 284건</div>
-    </button>
-    <button class="act-card" id="subt-live" onclick="setActivitySub('live')">
-      <div class="act-eye">LIVE</div>
-      <div class="act-ttl">실시간 관리</div>
-      <div class="act-meta"><span class="act-dot red"></span>긴급 3건 · 신규 12건</div>
-    </button>
+  <!-- 자동화 / 실시간 관리 (underline 탭) -->
+  <div class="act-tabs">
+    <button class="on"><span class="act-dot"></span>SNS 자동화</button>
+    <button onclick="go('manage')"><span class="act-dot red"></span>실시간 관리 <span class="act-badge">3</span></button>
   </div>
   <div id="sub-auto">
   <div class="sec-eye" style="margin-top:4px">AUTOMATION</div>
@@ -1513,7 +1893,7 @@ input:checked+.tsl::before{transform:translateX(18px)}
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
         <div style="font-size:12px;font-weight:700;color:var(--t3)">진행 중인 DM 발송</div>
-        <div style="font-size:11px;font-weight:700;color:var(--mint)">2개 활성</div>
+        <button onclick="openModal('m-dm-all')" style="background:none;border:none;font-size:11px;font-weight:700;color:var(--mint-d);cursor:pointer;display:flex;align-items:center;gap:3px">목록 더보기 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       </div>
       <div id="dm-active-list" style="background:var(--bg);border-radius:12px;overflow:hidden;margin-bottom:14px;max-height:200px;overflow-y:auto">
         <div class="dm-active-row" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--b)">
@@ -1548,7 +1928,7 @@ input:checked+.tsl::before{transform:translateX(18px)}
     <div class="acc-body">
       <div class="step"><div class="sn">1</div><div><div class="st">셀프 저장</div><div class="sd">업로드 직후 내 계정에서 게시물 저장 — 알고리즘 초기 신호 부스트</div></div></div>
       <div class="step"><div class="sn">2</div><div><div class="st">공감 댓글 등록</div><div class="sd">내 말투로 게시물에 어울리는 댓글 1개 자동 작성</div><div class="seg">오늘도 너무 예쁘게 나왔다, 이 무드 너무 좋아!</div></div></div>
-      <div class="step"><div class="sn">3</div><div><div class="st">해시태그 답글</div><div class="sd">공감 댓글의 답글로 연관 해시태그 자동 추가</div><div class="seg">#스킨케어루틴 #데일리뷰티 #MILLIMILLI #500달톤</div></div></div>
+      <div class="step"><div class="sn">3</div><div><div class="st">해시태그 답글</div><div class="sd">공감 댓글의 답글로 연관 해시태그 자동 추가</div><div class="seg">#스킨케어루틴 #데일리뷰티 #MILLIMILLI #BEST</div></div></div>
       <div class="tip">업로드 후 3~7분 이내 랜덤 간격으로 자연스럽게 실행돼요</div>
     </div>
   </div>
@@ -1575,23 +1955,16 @@ input:checked+.tsl::before{transform:translateX(18px)}
   <!-- STEP 1: 추천 TOP3 + 직접 입력 -->
   <div class="create-step on" id="cs-1">
 
-    <!-- 처음이면 여기부터 (단일 카드, 모달로 열림) -->
-    <div class="discover-box" style="margin-top:0;margin-bottom:14px;cursor:pointer" onclick="openModal('m-discover')">
-      <div class="discover-h">
-        <div class="discover-h-ico">
-          <svg viewBox="0 0 24 24"><path d="M12 18v-6M9 15l3 3 3-3M12 3a9 9 0 100 18 9 9 0 000-18z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </div>
-        <div class="discover-h-body">
-          <div class="discover-t">처음 SNS를 만들었다면?</div>
-          <div class="discover-s">터지는 프로필부터 주제까지 알려드릴게요</div>
-        </div>
-        <div class="discover-chev"><svg viewBox="0 0 24 24"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      </div>
-    </div>
+    <!-- 처음이면 여기부터 (얇은 바) -->
+    <button class="first-bar" onclick="openModal('m-discover')">
+      <span class="first-bar-ico">✨</span>
+      <span class="first-bar-txt">처음이신가요? <strong>프로필·주제 세팅</strong></span>
+      <span class="first-bar-arr">→</span>
+    </button>
 
-    <div class="sec-eye" style="margin-top:4px">TODAY</div>
-    <div class="sec-t xl">오늘의 주제 추천</div>
-    <div class="trend-carousel" id="trend-carousel">
+    <div class="sec-eye" style="margin-top:4px">FOR YOU</div>
+    <div class="sec-t xl">유민혜님께 딱 맞는 오늘 주제</div>
+    <div class="trend-list" id="trend-carousel">
 
     <div class="trend-card" onclick="useTrend(1)">
       <div class="trend-rank r1">1</div>
@@ -1632,8 +2005,7 @@ input:checked+.tsl::before{transform:translateX(18px)}
       <div class="trend-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>
 
-    </div><!-- /trend-carousel -->
-    <div class="trend-dots" id="trend-dots"><span class="on"></span><span></span><span></span></div>
+    </div><!-- /trend-list -->
 
     <div class="trend-divider">또는</div>
 
@@ -1655,14 +2027,18 @@ input:checked+.tsl::before{transform:translateX(18px)}
       <span>내 말투로 작성된 캐러셀 프롬프트</span>
     </div>
     <div style="background:var(--mint-l);border-radius:16px;padding:16px;margin-bottom:14px;border:1px solid #A7F3D0">
-      <div style="font-size:10px;font-weight:800;color:var(--mint-d);margin-bottom:6px;letter-spacing:.3px">✦ 후킹 멘트</div>
-      <div id="cs2-hook" style="font-size:16px;font-weight:800;color:var(--t1);line-height:1.4;margin-bottom:14px;letter-spacing:-.3px">—</div>
-      <div style="font-size:10px;font-weight:800;color:var(--mint-d);margin-bottom:6px;letter-spacing:.3px">✦ 슬라이드별 본문 (내 말투 반영)</div>
-      <div id="cs2-body" style="font-size:12px;color:var(--t1);line-height:1.75;white-space:pre-line;background:#fff;border-radius:10px;padding:12px;max-height:240px;overflow-y:auto;margin-bottom:14px">—</div>
-      <div style="font-size:10px;font-weight:800;color:var(--mint-d);margin-bottom:6px;letter-spacing:.3px">✦ 게시 캡션</div>
-      <div id="cs2-caption" style="font-size:12px;color:var(--t1);line-height:1.7;white-space:pre-line;background:#fff;border-radius:10px;padding:12px">—</div>
+      <div style="font-size:10px;font-weight:800;color:var(--mint-d);margin-bottom:6px;letter-spacing:.3px">✦ 후킹 멘트 <span style="color:var(--t3);font-weight:600;margin-left:4px">탭해서 수정</span></div>
+      <div id="cs2-hook" class="cs2-edit-field" contenteditable="false" style="font-size:16px;font-weight:800;color:var(--t1);line-height:1.4;margin-bottom:14px;letter-spacing:-.3px;padding:4px 6px;margin-left:-6px;margin-right:-6px;border-radius:6px;cursor:pointer">—</div>
+      <div style="font-size:10px;font-weight:800;color:var(--mint-d);margin-bottom:6px;letter-spacing:.3px">✦ 슬라이드별 본문 <span style="color:var(--t3);font-weight:600;margin-left:4px">탭해서 수정</span></div>
+      <div id="cs2-body" class="cs2-edit-field" contenteditable="false" style="font-size:12px;color:var(--t1);line-height:1.75;white-space:pre-line;background:#fff;border-radius:10px;padding:12px;max-height:240px;overflow-y:auto;margin-bottom:14px;cursor:pointer">—</div>
+      <div style="font-size:10px;font-weight:800;color:var(--mint-d);margin-bottom:6px;letter-spacing:.3px">✦ 게시 캡션 <span style="color:var(--t3);font-weight:600;margin-left:4px">탭해서 수정</span></div>
+      <div id="cs2-caption" class="cs2-edit-field" contenteditable="false" style="font-size:12px;color:var(--t1);line-height:1.7;white-space:pre-line;background:#fff;border-radius:10px;padding:12px;cursor:pointer">—</div>
     </div>
-    <button class="btn-s" onclick="regenPrompt()" style="margin-top:0">다시 생성하기</button>
+    <div style="display:flex;gap:8px;margin-top:0">
+      <button class="btn-s" id="cs2-edit-btn" onclick="cs2ToggleEdit()" style="flex:1;margin-top:0">수정</button>
+      <button class="btn-p" id="cs2-apply-btn" onclick="cs2ApplyEdit()" style="flex:2;margin-top:0;display:none">적용</button>
+      <button class="btn-s" onclick="regenPrompt()" style="flex:1;margin-top:0;background:var(--bg);color:var(--t2)">다시 생성</button>
+    </div>
     <div class="sec-t" style="margin-top:8px">카드 장수</div>
     <div class="count-row">
       <div style="font-size:13px;font-weight:700;color:var(--t1)">이미지 장수</div>
@@ -1921,17 +2297,9 @@ input:checked+.tsl::before{transform:translateX(18px)}
     <div class="proof-tag">공식 API 기반</div>
   </div>
 
-  <div class="act-switch">
-    <button class="act-card" onclick="go('activity')">
-      <div class="act-eye">AUTOMATION</div>
-      <div class="act-ttl">SNS 자동화</div>
-      <div class="act-meta"><span class="act-dot"></span>AI 작동 중 · 오늘 284건</div>
-    </button>
-    <button class="act-card on">
-      <div class="act-eye">LIVE</div>
-      <div class="act-ttl">실시간 관리</div>
-      <div class="act-meta"><span class="act-dot red"></span>긴급 3건 · 신규 12건</div>
-    </button>
+  <div class="act-tabs">
+    <button onclick="go('activity')"><span class="act-dot"></span>SNS 자동화</button>
+    <button class="on"><span class="act-dot red"></span>실시간 관리 <span class="act-badge">3</span></button>
   </div>
 
   <div class="tbar">
@@ -1971,7 +2339,7 @@ input:checked+.tsl::before{transform:translateX(18px)}
     <div class="msg-card">
       <div class="msg-row" onclick="openModal('m-c1')"><div class="ch-av ch-ig">IG</div><div class="mbody"><div class="mname">@yuna__daily <span class="badge bg" style="margin-left:4px">VVIP</span></div><div class="msub">"제품 어디서 구매해요? 올리브영에서 못 찾겠어요"</div></div><div class="mright"><div class="mtime">35분</div><span class="badge bn">완료</span></div></div>
       <div class="msg-row" onclick="openModal('m-c1')"><div class="ch-av ch-tk">TK</div><div class="mbody"><div class="mname">@cool_tommi99</div><div class="msub">"이 제품 진짜 최고!! 주변에 다 추천했어요"</div></div><div class="mright"><div class="mtime">1시간</div><span class="badge bn">완료</span></div></div>
-      <div class="msg-row" onclick="openModal('m-c1')"><div class="ch-av ch-yt">YT</div><div class="mbody"><div class="mname">@jjin_beauty</div><div class="msub">"500달톤 성분 민감성 피부에도 괜찮을까요?"</div></div><div class="mright"><div class="mtime">2시간</div><span class="badge bn">완료</span></div></div>
+      <div class="msg-row" onclick="openModal('m-c1')"><div class="ch-av ch-yt">YT</div><div class="mbody"><div class="mname">@jjin_beauty</div><div class="msub">"BEST 성분 민감성 피부에도 괜찮을까요?"</div></div><div class="mright"><div class="mtime">2시간</div><span class="badge bn">완료</span></div></div>
       <div class="msg-row" onclick="openModal('m-c1')"><div class="ch-av ch-ig">IG</div><div class="mbody"><div class="mname">@seoulnista</div><div class="msub">"이번 콘텐츠 너무 예뻐요 피부 빛나는 거 실화냐"</div></div><div class="mright"><div class="mtime">3시간</div><span class="badge bn">완료</span></div></div>
       <div class="msg-row" onclick="openModal('m-c1')"><div class="ch-av ch-tk">TK</div><div class="mbody"><div class="mname">@morning_glow_kr</div><div class="msub">"공구 다음엔 언제 해요? 꼭 참여하고 싶어요!"</div></div><div class="mright"><div class="mtime">4시간</div><span class="badge bn">완료</span></div></div>
       <div class="msg-row" onclick="openModal('m-c1')"><div class="ch-av ch-ig">IG</div><div class="mbody"><div class="mname">@hazel_skin</div><div class="msub">"DM 드렸어요! 확인 부탁드려요 :)"</div></div><div class="mright"><div class="mtime">5시간</div><span class="badge bn">완료</span></div></div>
@@ -2191,12 +2559,10 @@ input:checked+.tsl::before{transform:translateX(18px)}
   </div>
 
   <!-- 프리미엄 업셀링 -->
-  <div onclick="openModal('m-plan')" style="margin-top:10px;margin-bottom:20px;padding:14px 16px;border-radius:14px;background:linear-gradient(135deg,rgba(0,200,150,.10),rgba(139,92,246,.08));display:flex;align-items:center;gap:12px;cursor:pointer;border:1px solid rgba(0,200,150,.2)">
-    <div style="width:34px;height:34px;border-radius:10px;background:var(--dark);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--mint)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-    </div>
-    <div style="flex:1;font-size:12.5px;color:var(--t1);line-height:1.5"><b style="color:var(--mint-d)">프리미엄 전환 시</b> 포인트 계산 없이 <b>모든 기능 무제한</b></div>
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  <div class="upsell-bar" onclick="openModal('m-plan')">
+    <div class="upsell-spark">✦</div>
+    <div class="upsell-body"><b>프리미엄 전환 시</b><span>포인트 계산 없이 무한 혜택</span></div>
+    <div class="upsell-arr">→</div>
   </div>
 
   <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.3px;margin-bottom:8px">설정</div>
@@ -2505,58 +2871,85 @@ input:checked+.tsl::before{transform:translateX(18px)}
   </div>
 </div>
 
-<!-- ════ 참고 계정 분석 ════ -->
-<!-- ════ 내 링크 (carrd 스타일 inline WYSIWYG · v2 복원) ════ -->
+<!-- ════ 내 링크 (에디토리얼 · 드래그앤드롭 · Ssobi 무드) ════ -->
 <div class="vw" id="v-link">
-  <div class="lk-topbar">
-    <button class="lk-tb-btn" onclick="go('create')" aria-label="뒤로" style="padding:0;width:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-    <div class="lk-tb-url" onclick="editHandle()" style="cursor:pointer">ssobi.ai/u/<b id="lk-handle-disp">yuminhye</b></div>
-    <button class="lk-tb-btn" onclick="openModal('m-link-layout')">레이아웃</button>
-    <button class="lk-tb-btn" onclick="openModal('m-link-share')" aria-label="공유" style="padding:0;width:32px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-  </div>
-
-  <div class="lk-event" id="lk-event" style="display:none">
-    <span class="lk-event-text" contenteditable oninput="saveEventText(this)">30% 할인 공구 중 →</span>
-  </div>
-
-  <div class="lk-page" id="lk-page">
-    <div class="lk-hero" id="lk-hero">
-      <button class="lk-bg-edit" onclick="openModal('m-link-bg')" aria-label="배경 변경"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button>
-      <div class="lk-hero-inner">
-        <div class="lk-hero-title" contenteditable onfocus="showTextToolbar(this,'title')" oninput="saveHero('title',this)" onblur="hideTextToolbar()">@유민혜</div>
-        <div class="lk-hero-sub" contenteditable onfocus="showTextToolbar(this,'sub')" oninput="saveHero('sub',this)" onblur="hideTextToolbar()">신상만 밝히는 코덕 사생활</div>
-      </div>
+  <div class="lke-topbar">
+    <div class="lke-topbar-left">
+      <button class="lke-back-btn" onclick="go('create')" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
-
-    <div class="lk-blocks" id="lk-blocks"></div>
-    <button class="lk-add" onclick="openModal('m-link-add')">＋ 블록 추가</button>
-
-    <button class="lk-propose-btn" id="lk-propose-btn" onclick="openModal('m-link-propose')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      제안하기
-    </button>
-
-    <div class="lk-power" id="lk-power">Powered by Ssobi.</div>
+    <div class="lke-topbar-actions">
+      <button class="lke-top-btn" onclick="lkeTogglePreview()">미리보기</button>
+      <button class="lke-top-btn primary" onclick="lkeOpenSheet('add-block')">+ 블록</button>
+      <button class="lke-top-btn" onclick="openModal('m-link-share')" aria-label="공유"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
   </div>
 
-  <!-- 플로팅 텍스트 툴바 -->
-  <div class="lk-text-toolbar" id="lk-text-toolbar" onmousedown="event.preventDefault()">
-    <select id="ltt-font" onchange="applyToolbarFont(this.value)"><option value="Pretendard">Pretendard</option><option value="Noto Sans KR">Noto Sans</option><option value="Noto Serif KR">Noto Serif</option><option value="IBM Plex Sans KR">IBM Plex</option><option value="Nanum Myeongjo">Nanum 명조</option></select>
-    <input type="range" id="ltt-size" min="12" max="56" value="32" oninput="applyToolbarSize(this.value)" style="width:60px">
-    <span id="ltt-size-v" style="font-size:10px;min-width:22px;text-align:center">32</span>
-    <div class="ltt-color on" style="background:#fff" onclick="applyToolbarColor(this,'#fff')"></div>
-    <div class="ltt-color" style="background:#111" onclick="applyToolbarColor(this,'#111')"></div>
-    <div class="ltt-color" style="background:#00C896" onclick="applyToolbarColor(this,'#00C896')"></div>
-    <div class="ltt-color" style="background:#FF4D4D" onclick="applyToolbarColor(this,'#FF4D4D')"></div>
-    <div class="ltt-color" style="background:#F59E0B" onclick="applyToolbarColor(this,'#F59E0B')"></div>
-    <div class="ltt-color" style="background:#8B5CF6" onclick="applyToolbarColor(this,'#8B5CF6')"></div>
+  <div class="lke-url-bar" onclick="editHandle()">
+    <span>ssobi.ai/u/</span><strong id="lk-handle-disp">yuminhye</strong>
+    <button class="lke-url-copy" onclick="event.stopPropagation();copyLinkUrl()">COPY</button>
   </div>
 
-  <!-- 하단 고정 액션바 -->
-  <div class="lk-action-bar">
-    <button class="lk-ab-prev" onclick="openPreview()"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3"/></svg>미리보기</button>
-    <button class="lk-ab-save" onclick="saveLink()"><svg viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>적용하기</button>
+  <!-- 편집기 본체 - 동적 렌더 -->
+  <div class="lke-editor" id="lke-editor"></div>
+
+  <!-- 플로팅 툴바 -->
+  <div class="lke-floating-toolbar">
+    <button class="lke-fl-btn" onclick="lkeOpenSheet('theme')"><span class="icon">T</span><span class="label">테마</span></button>
+    <div class="lke-fl-divider"></div>
+    <button class="lke-fl-btn primary" onclick="lkeOpenSheet('add-block')"><span class="icon" style="font-size:18px">+</span><span class="label">블록 추가</span></button>
+    <div class="lke-fl-divider"></div>
+    <button class="lke-fl-btn" onclick="lkeOpenSheet('settings')"><span class="icon">⚙</span><span class="label">설정</span></button>
   </div>
+
+  <button class="lke-preview-exit" onclick="lkeTogglePreview()">✕ 편집으로</button>
+</div>
+
+<div class="lke-backdrop" id="lke-backdrop" onclick="lkeCloseSheet()"></div>
+
+<!-- Sheet: 블록 추가 (미리보기 카드 큰 버전) -->
+<div class="lke-edit-sheet" id="lke-sheet-add-block">
+  <div class="lke-sheet-handle"></div>
+  <div class="lke-sheet-header"><div class="lke-sheet-title">블록 추가</div><button class="lke-sheet-close" onclick="lkeCloseSheet()">✕</button></div>
+  <div class="lke-sheet-body"><div class="lke-block-picker-v2" id="lke-block-picker"></div></div>
+</div>
+
+<!-- Sheet: 테마 -->
+<div class="lke-edit-sheet" id="lke-sheet-theme">
+  <div class="lke-sheet-handle"></div>
+  <div class="lke-sheet-header"><div class="lke-sheet-title">테마</div><button class="lke-sheet-close" onclick="lkeCloseSheet()">✕</button></div>
+  <div class="lke-sheet-body" id="lke-theme-body"></div>
+</div>
+
+<!-- Sheet: 설정 -->
+<div class="lke-edit-sheet" id="lke-sheet-settings">
+  <div class="lke-sheet-handle"></div>
+  <div class="lke-sheet-header"><div class="lke-sheet-title">설정</div><button class="lke-sheet-close" onclick="lkeCloseSheet()">✕</button></div>
+  <div class="lke-sheet-body">
+    <div class="lke-field-group">
+      <div class="lke-field-label">숏링크 핸들</div>
+      <div class="lke-handle-wrap">
+        <span class="lke-handle-prefix">ssobi.ai/u/</span>
+        <input type="text" class="lke-handle-input" id="lke-settings-handle" value="yuminhye" oninput="lkeHandleCheck(this)" placeholder="영문/숫자/_/-">
+        <span class="lke-handle-status ok" id="lke-handle-status">사용 가능</span>
+      </div>
+      <div style="font-size:11px;color:var(--t3);margin-top:6px">유저 아이디만 수정 가능해요. 중복이면 다른 핸들을 선택하세요.</div>
+    </div>
+    <div class="lke-field-group">
+      <div class="lke-field-label">기능 설정</div>
+      <div class="lke-toggle-row"><div class="lke-toggle-info"><strong>다국어 자동 전환</strong><span>영어 방문자엔 Amazon</span></div><div class="lke-toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="lke-toggle-row"><div class="lke-toggle-info"><strong>클릭 분석</strong><span>어떤 링크가 많이 눌리나</span></div><div class="lke-toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="lke-toggle-row"><div class="lke-toggle-info"><strong>숏링크 자동 생성</strong><span>ssobi.ai/s/a1b2c3</span></div><div class="lke-toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="lke-toggle-row"><div class="lke-toggle-info"><strong>Powered by Ssobi</strong><span>푸터 로고 표시</span></div><div class="lke-toggle on" onclick="this.classList.toggle('on')"></div></div>
+    </div>
+    <button class="lke-top-btn primary" style="width:100%;padding:14px;margin-top:8px" onclick="lkeApplySettings()">적용</button>
+  </div>
+</div>
+
+<!-- Sheet: 블록 편집 (type별 동적 폼) -->
+<div class="lke-edit-sheet" id="lke-sheet-edit">
+  <div class="lke-sheet-handle"></div>
+  <div class="lke-sheet-header"><div class="lke-sheet-title" id="lke-edit-title">블록 편집</div><button class="lke-sheet-close" onclick="lkeCloseSheet()">✕</button></div>
+  <div class="lke-sheet-body" id="lke-edit-body"></div>
 </div>
 
 
@@ -2649,6 +3042,30 @@ input:checked+.tsl::before{transform:translateX(18px)}
 </div>
 
 <!-- m-link-share: 공유 -->
+<!-- See all / Read more 전체 보기 -->
+<!-- 첫날 모드 · 내 링크 welcome -->
+<div class="ov" id="m-link-welcome" onclick="co(event,'m-link-welcome')">
+  <div class="sheet" style="padding:30px 24px 28px;text-align:center">
+    <div style="font-size:44px;margin-bottom:10px;line-height:1">✦</div>
+    <div style="font-family:'Fraunces','Pretendard',serif;font-style:italic;font-size:26px;font-weight:700;color:var(--t1);letter-spacing:-.8px;line-height:1.2;margin-bottom:10px">링크트리가 아니라<br><em style="color:var(--mint-d);font-style:italic">내 사이트처럼.</em></div>
+    <div style="font-size:13.5px;color:var(--t2);line-height:1.6;margin-bottom:20px;letter-spacing:-.2px">다들 똑같이 생긴 링크 페이지 말고,<br><b style="color:var(--t1)">내 스타일대로</b> 자유롭게 꾸미는 <b style="color:var(--mint-d)">나만의 링크 페이지</b>.</div>
+    <div style="background:var(--mint-l);border:1px solid #A7F3D0;border-radius:12px;padding:12px 14px;margin-bottom:18px;font-size:12px;color:var(--mint-d);font-weight:700;letter-spacing:-.2px">🎁 첫날 특별 · <b>모든 디자인 무제한</b>으로 시작하기</div>
+    <button class="btn-p" onclick="cm('m-link-welcome');try{localStorage.setItem('ssobi_link_welcomed','1')}catch(e){}">지금 꾸며볼게요 →</button>
+    <button class="btn-s" onclick="cm('m-link-welcome');try{localStorage.setItem('ssobi_link_welcomed','1')}catch(e){}">다음에 할래요</button>
+  </div>
+</div>
+
+<div class="ov" id="m-link-allview" onclick="co(event,'m-link-allview')">
+  <div class="sheet" style="padding:0 0 28px;max-height:92vh;overflow-y:auto">
+    <div style="position:sticky;top:0;z-index:2;background:#fff;border-bottom:1px solid var(--b);padding:12px 16px;display:flex;align-items:center;gap:10px">
+      <button class="lke-top-btn" onclick="cm('m-link-allview')" style="padding:0;width:32px;height:32px" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div id="lke-all-title" style="flex:1;font-size:15px;font-weight:800;color:var(--t1)">모든 항목</div>
+      <button class="lke-top-btn" onclick="cm('m-link-allview')" style="padding:0;width:32px;height:32px" aria-label="닫기">✕</button>
+    </div>
+    <div style="padding:16px 0" id="lke-all-container"></div>
+  </div>
+</div>
+
 <div class="ov" id="m-link-share" onclick="co(event,'m-link-share')">
   <div class="sheet">
     <div class="s-bar"></div>
@@ -2976,7 +3393,7 @@ input:checked+.tsl::before{transform:translateX(18px)}
 
 <!-- 수익 상세 -->
 <div class="ov" id="m-rev1" onclick="co(event,'m-rev1')"><div class="sheet"><div class="s-bar"></div><div class="s-title">협찬·광고 제안</div><div class="s-sub">케이뷰티코 · Instagram DM · 1월 15일 · 200만원</div><div class="bubble"><div class="b-who">@kbeauty_brand1</div>"신제품 쿠션 광고 협업 제안드리고 싶어요. 광고비 200만원 생각 중입니다."</div><div class="bubble ai"><div class="b-who ai">Ssobi AI 초안</div>안녕하세요! 제안 감사드려요. 자세한 협의는 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ec85828a83ac81858080858185808085c28f83">[email&#160;protected]</a> 또는 카카오 @millimilli 로 연락 주시면 빠르게 안내드릴게요 :)</div><button class="btn-p" onclick="cm('m-rev1')">승인 · 바로 발송</button><button class="btn-s" onclick="cm('m-rev1')">수정하기</button></div></div>
-<div class="ov" id="m-rev2" onclick="co(event,'m-rev2')"><div class="sheet"><div class="s-bar"></div><div class="s-title">수출 문의</div><div class="s-sub">재팬뷰티 · DM · 1월 14일 · ~4,500만원</div><div class="bubble"><div class="b-who">@japan_import_co</div>"K-뷰티 500달톤 제품 수출 가능한지요? 초도 물량 500만엔 규모입니다."</div><div class="bubble ai"><div class="b-who ai">Ssobi AI 초안</div>안녕하세요! 관심 감사해요. 수출 관련 협의는 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d7beb9b1b897babebbbbbebabebbbbbef9b4b8">[email&#160;protected]</a> 로 연락 주시면 담당자가 빠르게 안내드릴게요.</div><button class="btn-p" onclick="cm('m-rev2')">승인 · 바로 발송</button><button class="btn-s" onclick="cm('m-rev2')">수정하기</button></div></div>
+<div class="ov" id="m-rev2" onclick="co(event,'m-rev2')"><div class="sheet"><div class="s-bar"></div><div class="s-title">수출 문의</div><div class="s-sub">재팬뷰티 · DM · 1월 14일 · ~4,500만원</div><div class="bubble"><div class="b-who">@japan_import_co</div>"K-뷰티 BEST 제품 수출 가능한지요? 초도 물량 500만엔 규모입니다."</div><div class="bubble ai"><div class="b-who ai">Ssobi AI 초안</div>안녕하세요! 관심 감사해요. 수출 관련 협의는 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d7beb9b1b897babebbbbbebabebbbbbef9b4b8">[email&#160;protected]</a> 로 연락 주시면 담당자가 빠르게 안내드릴게요.</div><button class="btn-p" onclick="cm('m-rev2')">승인 · 바로 발송</button><button class="btn-s" onclick="cm('m-rev2')">수정하기</button></div></div>
 <div class="ov" id="m-rev3" onclick="co(event,'m-rev3')"><div class="sheet"><div class="s-bar"></div><div class="s-title">Amazon 판매 제안</div><div class="s-sub">US K-Beauty · DM · 1월 13일 · ~4,200만원</div><div class="bubble"><div class="b-who">@us_kbeauty_shop</div>"Interested in reselling MILLIMILLI on Amazon US. 2,000 units, ~$30,000."</div><div class="bubble ai"><div class="b-who ai">Ssobi AI 초안</div>Hello! Thank you for your interest. Please contact us at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="254c4b434a65484c49494c484c49494c0b464a">[email&#160;protected]</a> for detailed distribution terms.</div><button class="btn-p" onclick="cm('m-rev3')">승인 · 바로 발송</button><button class="btn-s" onclick="cm('m-rev3')">수정하기</button></div></div>
 
 <!-- 긴급 메시지 설정 -->
@@ -3546,6 +3963,32 @@ input:checked+.tsl::before{transform:translateX(18px)}
 </div>
 
 <!-- 댓글 감지 DM 규칙 설정 -->
+<!-- DM 발송 목록 전체 보기 -->
+<div class="ov" id="m-dm-all" onclick="co(event,'m-dm-all')">
+  <div class="sheet" style="padding:14px 0 24px;max-height:88vh;overflow:hidden">
+    <div class="s-bar"></div>
+    <div style="padding:0 20px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--b)">
+      <div class="s-title" style="margin:0">진행 중인 DM 발송</div>
+      <button class="lke-top-btn" onclick="cm('m-dm-all')" style="padding:0;width:30px;height:30px">✕</button>
+    </div>
+    <div style="padding:14px 20px;overflow-y:auto;max-height:calc(88vh - 80px)">
+      <div style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:1px solid var(--b);border-radius:10px">
+          <div style="width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,#f8c8d4,#fde8b0);flex-shrink:0"></div>
+          <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:800">컨텐츠 1 · 오늘의 루틴</div><div style="font-size:11px;color:var(--t3);margin-top:2px">전체 댓글 · 오늘 14건 발송</div></div>
+          <label class="tog" style="transform:scale(.85)"><input type="checkbox" checked><span class="tsl"></span></label>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:1px solid var(--b);border-radius:10px">
+          <div style="width:40px;height:40px;border-radius:8px;background:linear-gradient(135deg,#a7f3d0,#67e8f9);flex-shrink:0"></div>
+          <div style="flex:1;min-width:0"><div style="font-size:13px;font-weight:800">컨텐츠 2 · 성분 체크</div><div style="font-size:11px;color:var(--t3);margin-top:2px">"루틴" 키워드 · 어제 8건</div></div>
+          <label class="tog" style="transform:scale(.85)"><input type="checkbox" checked><span class="tsl"></span></label>
+        </div>
+        <div style="text-align:center;padding:18px;color:var(--t3);font-size:12px">다른 DM 발송은 게시물 선택 시 이 목록에 자동으로 쌓입니다.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="ov" id="m-dm-rule" onclick="co(event,'m-dm-rule')">
   <div class="sheet">
     <div class="s-bar"></div>
@@ -3731,7 +4174,15 @@ function go(v){
   if(id === 'learn') setTimeout(startLearnAnim, 400);
   if(id === 'home') setTimeout(renderCalendar, 80);
   if(id === 'create') { goStep(1); }
-  if(id === 'link') { setTimeout(initLinkView, 80); }
+  if(id === 'link') {
+    setTimeout(initLinkView, 80);
+    // 첫날 모드 + 최초 진입 시 안내
+    try {
+      if(newbieMode && !localStorage.getItem('ssobi_link_welcomed')){
+        setTimeout(function(){ openModal('m-link-welcome'); }, 200);
+      }
+    } catch(e){}
+  }
   if(id === 'manage') { var ab=document.getElementById('nb-activity'); if(ab) ab.classList.add('on'); }
   // 온보딩/가입/로그인/연동/학습/완료 화면에서 탭바 숨기기
   var hideNav = ['onb1','signup','login','connect-account-onb','learn','complete'];
@@ -4081,7 +4532,7 @@ var trendPresets = {
   1: {
     hook:'한국인이 절대 안 하는 7가지 스킨케어 실수 🌿',
     body:'[표지 슬라이드]\n한국인이 절대 안 하는\n7가지 스킨케어 실수 🌿\n저장해두고 따라해봐요!\n\n[슬라이드 1] 실수 ① 세안 후 스킨 건너뛰기\n수분 증발이 가장 빠른 타이밍인데\n여기서 스킨을 안 바르면 건조함이 쌓여요 😢\n세안 직후 30초 이내 스킨 필수!\n\n[슬라이드 2] 실수 ② 자외선차단제 덧바르기 안 하기\n2~3시간마다 덧바르는 거 알고 계셨어요?\n한 번 바르고 끝이라고 생각하기 쉬운데\n자외선은 계속 쌓여요 :)\n\n[슬라이드 3] 실수 ③ 매일 각질 제거\n각질층은 우리 피부 방어막이에요!\n주 1~2회면 충분해요. 매일 벗겨내면\n오히려 트러블이 심해져요 🥲\n\n[슬라이드 4] 실수 ④ 이중세안 생략\n선크림·메이크업은 수용성 세안제로\n완전히 안 지워져요. 오일 클렌저 → 폼\n순서로 꼭 이중세안 해주세요!\n\n[슬라이드 5] 실수 ⑤ 수분크림만 바르기\n수분을 잡아주는 "오일 성분"이 꼭 필요해요.\n수분 → 유분 순서로 레이어 해야 촉촉함이 유지돼요 ✨\n\n[슬라이드 6] 실수 ⑥ 시트팩 매일\n팩도 과유불급! 주 2~3회로 충분해요.\n매일 하면 피부 바빠져요 😂\n\n[슬라이드 7] 실수 ⑦ 저자극 케어 건너뛰기\n재생 크림, 시카 라인 꼭 하나쯤 가지고 있으세요.\n트러블 났을 때 하루 만에 진정돼요!\n\n[마지막 슬라이드]\n7가지 중 내가 제일 많이 하는 실수는?\n댓글로 알려주면 맞춤 루틴 답변 해드려요 :)\n\n💬 댓글  ·  🔖 저장  ·  ➕ 팔로우',
-    caption:'오늘의 #스킨케어 실수 체크리스트 7가지 저장 필수 💌\n나도 몇 개나 하고 있었는지 세어봐요!\n#스킨케어루틴 #데일리뷰티 #MILLIMILLI #500달톤'
+    caption:'오늘의 #스킨케어 실수 체크리스트 7가지 저장 필수 💌\n나도 몇 개나 하고 있었는지 세어봐요!\n#스킨케어루틴 #데일리뷰티 #MILLIMILLI #BEST'
   },
   2: {
     hook:'피부과 의사가 절대 안 사는 성분 3가지 ✋',
@@ -4163,6 +4614,7 @@ function buildCustomPrompt(topic){
   return { hook:hook, body:body, caption:caption };
 }
 function regenPrompt(){
+  cs2DisableEdit();
   var src = createData._lastSource||'trend-1';
   if(src.startsWith('trend-')){
     useTrend(parseInt(src.split('-')[1]));
@@ -4174,6 +4626,50 @@ function regenPrompt(){
     document.getElementById('cs2-body').textContent = g.body;
     document.getElementById('cs2-caption').textContent = g.caption;
   }
+}
+// 편집 모드 토글 (cs2 프롬프트)
+function cs2ToggleEdit(){
+  var editing = document.getElementById('cs2-hook').getAttribute('contenteditable')==='true';
+  if(editing){
+    // 편집 중 상태에서 취소 (내용 복원)
+    cs2DisableEdit();
+    document.getElementById('cs2-hook').textContent = createData.hook||'—';
+    document.getElementById('cs2-body').textContent = createData.body||'—';
+    document.getElementById('cs2-caption').textContent = createData.caption||'—';
+  } else {
+    cs2EnableEdit();
+  }
+}
+function cs2EnableEdit(){
+  ['cs2-hook','cs2-body','cs2-caption'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    el.setAttribute('contenteditable','true');
+    el.classList.add('editing');
+  });
+  var eb = document.getElementById('cs2-edit-btn'); if(eb) eb.textContent='취소';
+  var ab = document.getElementById('cs2-apply-btn'); if(ab) ab.style.display='inline-flex';
+  document.getElementById('cs2-hook').focus();
+}
+function cs2DisableEdit(){
+  ['cs2-hook','cs2-body','cs2-caption'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    el.setAttribute('contenteditable','false');
+    el.classList.remove('editing');
+  });
+  var eb = document.getElementById('cs2-edit-btn'); if(eb) eb.textContent='수정';
+  var ab = document.getElementById('cs2-apply-btn'); if(ab) ab.style.display='none';
+}
+function cs2ApplyEdit(){
+  createData.hook = (document.getElementById('cs2-hook').innerText||'').trim();
+  createData.body = (document.getElementById('cs2-body').innerText||'').trim();
+  createData.caption = (document.getElementById('cs2-caption').innerText||'').trim();
+  cs2DisableEdit();
+  // 짧은 피드백
+  var btn = document.getElementById('cs2-apply-btn');
+  var eb = document.getElementById('cs2-edit-btn');
+  if(eb){ eb.textContent='적용됨 ✓'; setTimeout(function(){ eb.textContent='수정'; }, 1200); }
 }
 function adjCount(d){
   createData.slides = Math.max(2, Math.min(10, createData.slides+d));
@@ -4992,20 +5488,1133 @@ function openPreview(){
   cont.appendChild(src);
   openModal('m-link-preview');
 }
-function initLinkView(){
-  applyLinkBg();
-  setLinkFont(linkState.font);
-  var v = document.getElementById('v-link');
-  v.style.setProperty('--lk-title-size', linkState.titleSize+'px');
-  v.style.setProperty('--lk-radius', linkState.blockRadius+'px');
-  document.getElementById('lk-handle-disp').textContent = linkState.handle;
-  var d2=document.getElementById('lk-handle-disp-2'); if(d2) d2.textContent=linkState.handle;
-  var pb=document.getElementById('lk-propose-btn'); if(pb) pb.classList.toggle('on', linkState.showPropose);
-  var pw=document.getElementById('lk-power'); if(pw) pw.style.display = linkState.showPower ? 'block' : 'none';
-  if(linkState.event.on){
-    var ev=document.getElementById('lk-event'); ev.style.display='block'; ev.style.setProperty('--lk-event-bg', linkState.event.color);
+// ═══════════════════════════════════════════════════
+//  내 링크 · 상태 기반 에디터 (DnD · 히어로 캐러셀 · 블록별 편집)
+// ═══════════════════════════════════════════════════
+var lkeState = {
+  handle:'yuminhye',
+  hero:{
+    slides:[
+      {bg:'',eyebrow:'LIVE · 공동구매',brand:'YUMINHYE STUDIO',title:'Glow <em>Drop.</em><br>Spring \'26',sub:'신상만 밝히는 코덕의<br>진짜 효자템 모음.',stat1n:'312K',stat1l:'Followers',stat2n:'7/20',stat2l:'공구남음',cta:'지금 보기 →',ctaUrl:''}
+    ]
+  },
+  blocks:[
+    {type:'event',id:'e'+Date.now(),text:'30% OFF',sub:'글로우 세럼 공동구매 중',url:''},
+    {type:'countdown',id:'c'+Date.now(),title:'글로우 세럼 <em>50ml</em>',sub:'100% 페이백 · 선착순 20명',eyebrow:'공구 마감까지',endsAt:'',slots:'7 / 20명',url:''},
+    {type:'section',id:'s'+Date.now(),title:'Best <em>Drop.</em>',seeAll:'See all →'},
+    {type:'grid',id:'g'+Date.now(),items:[
+      {kind:'product',title:'시그니처 글로우 세럼',price:'₩39,800',origPrice:'₩59,800',date:'4/19 · 바로배송',tag:'HOT',tagStyle:'hot',img:'coral',url:''},
+      {kind:'product',title:'크리미 나이트 크림',price:'₩32,000',origPrice:'₩48,000',date:'4/20 · pm8',tag:'NEW',tagStyle:'',img:'cream',url:''},
+      {kind:'product',title:'프로틴 리페어 앰플',price:'₩45,000',origPrice:'₩68,000',date:'4/21 · am10',tag:'BEST',tagStyle:'dark',img:'pink',url:''},
+      {kind:'product',title:'마일드 클렌징 오일',price:'₩22,000',origPrice:'₩34,000',date:'4/22 · pm8',tag:'공구',tagStyle:'',img:'dark',url:''}
+    ]},
+    {type:'contact',id:'ct'+Date.now(),eyebrow:'문의 · 제안',title:'협업·광고<br><em>문의하기.</em>',arrow:'→',formDesc:'제품·예산·일정을 남겨주세요',fields:['이름 / 브랜드','이메일','내용']},
+    {type:'section',id:'s2'+Date.now(),title:'Magazine',seeAll:'Read more →'},
+    {type:'magazine',id:'m1'+Date.now(),label:'Routine',title:'한국인이 <em>안 하는</em><br>스킨케어 실수 7가지',theme:'m1',url:''},
+    {type:'magazine',id:'m2'+Date.now(),label:'Review',title:'7일 써본 <em>글로우 세럼</em><br>솔직 후기',theme:'m2',url:''},
+    {type:'image',id:'im1'+Date.now(),img:'',title:'이미지 링크',url:''},
+    {type:'section',id:'s3'+Date.now(),title:'Quick <em>Links.</em>',seeAll:''},
+    {type:'quicklinks',id:'q'+Date.now(),items:[
+      {label:'올리브영에서 사기',sub:'oliveyoung.co.kr',url:''},
+      {label:'스마트스토어',sub:'smartstore.naver.com',url:''},
+      {label:'협업·광고 문의',sub:'hello@millimilli.co',url:''},
+      {label:'알림받기 (카카오)',sub:'pf.kakao.com',url:''}
+    ]},
+    {type:'socials',id:'so'+Date.now(),items:[{ch:'ig',url:''},{ch:'tk',url:''},{ch:'yt',url:''},{ch:'email',url:''}]},
+    {type:'footer',id:'f'+Date.now(),logo:'Ssobi<span>.</span>',text:'Powered by Ssobi Links'}
+  ],
+  proposals:[]
+};
+
+var LKE_TYPES = {
+  hero:{name:'히어로 배너 (캐러셀)',desc:'여러 장 좌우 스와이프 · 배경 이미지 + 텍스트 편집',preview:'hero'},
+  event:{name:'이벤트 바',desc:'상단 고정 띠 · 라이브 알림',preview:'event'},
+  countdown:{name:'공구 카운트다운',desc:'마감 시간 · 잔여 수량',preview:'countdown',premium:true},
+  section:{name:'섹션 제목',desc:'큰 세리프 타이틀 + See all',preview:'section'},
+  grid:{name:'제품 그리드',desc:'2열 쇼핑 (상품/채널/컨텐츠)',preview:'grid',premium:true},
+  bigbanner:{name:'빅 배너',desc:'다크 풀 배너 · 외부 링크',preview:'bigbanner',premium:true},
+  contact:{name:'제안/문의 박스',desc:'문의 양식 → 수익제안에 수신',preview:'contact'},
+  magazine:{name:'매거진 카드',desc:'에디토리얼 이미지 타이틀',preview:'magazine',premium:true},
+  link:{name:'기본 링크',desc:'URL만 넣으면 자동 썸네일',preview:'link'},
+  image:{name:'이미지 링크',desc:'이미지 업로드 · 클릭 이동',preview:'image'},
+  quicklinks:{name:'Quick 링크',desc:'각각 다른 링크 리스트',preview:'quicklinks'},
+  socials:{name:'소셜 아이콘',desc:'IG · TK · YT · Email',preview:'socials'},
+  spacer:{name:'여백',desc:'블록 사이 공간',preview:'spacer'},
+  divider:{name:'구분선',desc:'얇은 라인',preview:'divider'}
+};
+// 플랜 상태 (데모: 첫날 모드 = 무료체험 전체 허용 / 이후 기본 무료)
+function lkeIsPremium(){
+  // 첫날/무료체험 중 + 또는 유료 → 모두 허용
+  try { if(newbieMode) return true; } catch(e){}
+  return lkeState._isPremium === true;
+}
+
+function lkeRender(){
+  var root = document.getElementById('lke-editor'); if(!root) return;
+  while(root.firstChild) root.removeChild(root.firstChild);
+  // 맨 위 add zone
+  root.appendChild(lkeAddZone(-1));
+  // 히어로 캐러셀
+  root.appendChild(lkeRenderHero());
+  root.appendChild(lkeAddZone(0));
+  // 블록
+  lkeState.blocks.forEach(function(b, i){
+    var el = lkeRenderBlock(b, i);
+    root.appendChild(el);
+    root.appendChild(lkeAddZone(i+1));
+  });
+}
+
+function lkeAddZone(idx){
+  var z=document.createElement('div');
+  z.className='lke-add-zone';
+  z.onclick=function(e){ e.stopPropagation(); window._lkeInsertAt = idx+1; lkeOpenSheet('add-block'); };
+  return z;
+}
+
+// 히어로 렌더
+function lkeRenderHero(){
+  var wrap=document.createElement('div');
+  wrap.className='lke-block lke-block-hero';
+  wrap.dataset.type='HERO';
+  wrap.dataset.idx='-1';
+  var carousel=document.createElement('div'); carousel.className='lke-hero-carousel';
+  // drag handle
+  var drag=document.createElement('div'); drag.className='lke-drag'; drag.textContent='⋮⋮';
+  wrap.appendChild(drag);
+  var track=document.createElement('div'); track.className='lke-hero-track'; track.id='lke-hero-track';
+  lkeState.hero.slides.forEach(function(s, si){
+    var slide=document.createElement('div'); slide.className='lke-hero-banner';
+    if(s.bg){ slide.classList.add('has-bg'); slide.style.backgroundImage='url('+s.bg+')'; }
+    slide.dataset.si=si;
+    function statHtml(which){
+      var hidden = s['stat'+which+'_hidden'];
+      if(hidden) return '';
+      var n = s['stat'+which+'n']||'';
+      var l = s['stat'+which+'l']||'';
+      return '<div class="lke-hero-stat" onclick="event.stopPropagation();lkeToggleStatMenu(this)">'+
+        '<button class="lke-hero-stat-x" onclick="event.stopPropagation();lkeHeroRemoveStat('+si+','+which+')">×</button>'+
+        '<div class="lke-hero-stat-menu">'+
+          '<button onclick="event.stopPropagation();lkeEditStat('+si+','+which+')">편집</button>'+
+          '<button class="del" onclick="event.stopPropagation();lkeHeroRemoveStat('+si+','+which+')">삭제</button>'+
+        '</div>'+
+        '<div class="num">'+n+'</div><div class="lbl">'+l+'</div>'+
+      '</div>';
+    }
+    var stat1Html = statHtml(1);
+    var stat2Html = statHtml(2);
+    slide.innerHTML =
+      '<div class="lke-hero-tools">'+
+        '<button class="lke-hero-tool" aria-label="배너 추가" onclick="event.stopPropagation();lkeAddHeroSlide()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></button>'+
+        '<button class="lke-hero-tool" aria-label="배경 변경" onclick="event.stopPropagation();lkeHeroUploadBg('+si+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button>'+
+      '</div>'+
+      '<div class="lke-hero-banner-top">'+
+        '<div class="lke-hero-eyebrow" contenteditable onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].eyebrow=this.innerText">'+s.eyebrow+'</div>'+
+      '</div>'+
+      '<div class="lke-hero-banner-main">'+
+        '<div class="lke-hero-brand" contenteditable onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].brand=this.innerText">'+s.brand+'</div>'+
+        '<h1 class="lke-hero-title" contenteditable onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].title=this.innerHTML">'+s.title+'</h1>'+
+        '<div class="lke-hero-subtitle" contenteditable onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].sub=this.innerHTML">'+s.sub+'</div>'+
+      '</div>'+
+      '<div class="lke-hero-banner-bottom">'+
+        '<div class="lke-hero-stats">'+stat1Html+stat2Html+'</div>'+
+        (s.cta_hidden ? '' : '<div class="lke-hero-cta-wrap" onclick="event.stopPropagation();lkeToggleStatMenu(this)"><button class="lke-hero-cta">'+(s.cta||'')+'</button><div class="lke-hero-stat-menu"><button onclick="event.stopPropagation();lkeEditHeroCta('+si+')">편집</button><button class="del" onclick="event.stopPropagation();lkeHeroRemoveCta('+si+')">삭제</button></div></div>')+
+      '</div>';
+    track.appendChild(slide);
+  });
+  carousel.appendChild(track);
+  // dots
+  if(lkeState.hero.slides.length>1){
+    var dots=document.createElement('div'); dots.className='lke-hero-dots';
+    lkeState.hero.slides.forEach(function(_,i){ var d=document.createElement('div'); d.className='lke-hero-dot'+(i===0?' on':''); dots.appendChild(d); });
+    carousel.appendChild(dots);
+    // nav
+    var prev=document.createElement('button'); prev.className='lke-hero-nav prev'; prev.innerHTML='‹'; prev.onclick=function(e){ e.stopPropagation(); track.scrollBy({left:-track.clientWidth,behavior:'smooth'}); };
+    var next=document.createElement('button'); next.className='lke-hero-nav next'; next.innerHTML='›'; next.onclick=function(e){ e.stopPropagation(); track.scrollBy({left:track.clientWidth,behavior:'smooth'}); };
+    carousel.appendChild(prev); carousel.appendChild(next);
+    track.addEventListener('scroll', function(){
+      var i=Math.round(track.scrollLeft/track.clientWidth);
+      dots.querySelectorAll('.lke-hero-dot').forEach(function(d,idx){ d.classList.toggle('on', idx===i); });
+    });
   }
-  renderLinkBlocks();
+  wrap.appendChild(carousel);
+  lkeAttachDnD(wrap);
+  return wrap;
+}
+
+function lkeAddHeroSlide(){
+  var idx=lkeState.hero.slides.length;
+  lkeState.hero.slides.push({bg:'',eyebrow:'NEW · Launch',brand:'YUMINHYE STUDIO',title:'New <em>Drop.</em>',sub:'텍스트를 바꿔주세요',stat1n:'312K',stat1l:'Followers',stat2n:'10/20',stat2l:'남음',cta:'지금 보기 →',ctaUrl:''});
+  lkeRender();
+}
+function lkeHeroUploadBg(si){
+  var inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
+  inp.onchange=function(){ var f=inp.files&&inp.files[0]; if(!f) return; var r=new FileReader(); r.onload=function(e){ lkeState.hero.slides[si].bg=e.target.result; lkeRender(); }; r.readAsDataURL(f); };
+  inp.click();
+}
+function lkeEditHeroCta(si){
+  var s=lkeState.hero.slides[si];
+  var label=prompt('CTA 버튼 텍스트', s.cta); if(label==null) return;
+  var url=prompt('CTA 링크 URL (https://...)', s.ctaUrl||''); if(url==null) return;
+  s.cta=label; s.ctaUrl=url; lkeRender();
+}
+
+// 블록 렌더
+function lkeRenderBlock(b, idx){
+  var el=document.createElement('div');
+  // 블록 타입 → 실제 CSS 클래스명 매핑
+  var cls = 'lke-block ';
+  if(b.type==='section') cls += 'lke-block-section-title';
+  else if(b.type==='magazine') cls += 'lke-block-mag '+(b.theme||'m1');
+  else if(b.type==='contact') cls += 'lke-block-bigbanner';
+  else cls += 'lke-block-'+b.type;
+  el.className = cls;
+  el.dataset.type=(LKE_TYPES[b.type]||{}).name||b.type;
+  el.dataset.idx=idx;
+  var drag=document.createElement('div'); drag.className='lke-drag'; drag.textContent='⋮⋮'; el.appendChild(drag);
+  if(b.type==='event'){
+    if(b.img) el.style.background='url('+b.img+') center/cover';
+    else if(b.bgSolid) el.style.background=b.bgSolid;
+    else if(b.bg) el.style.background=b.bg;
+    else if(b.bgColor) el.style.background=b.bgColor;
+    if(b.textColor) el.style.color = b.textColor;
+    el.innerHTML += '<div class="lke-event-left"><div class="lke-event-dot"></div><div class="lke-event-text"><strong>'+b.text+'</strong>&nbsp;'+b.sub+'</div></div><div class="lke-event-arrow">→</div>';
+  } else if(b.type==='countdown'){
+    if(b.img) el.style.background='url('+b.img+') center/cover';
+    else if(b.bgSolid) el.style.background=b.bgSolid;
+    else if(b.bg) el.style.background=b.bg;
+    else if(b.bgColor) el.style.background=b.bgColor;
+    if(b.textColor) el.style.color=b.textColor;
+    el.innerHTML += '<div class="lke-cd-eyebrow">'+b.eyebrow+'</div><div class="lke-cd-title">'+b.title+'</div><div class="lke-cd-subtitle">'+b.sub+'</div><div class="lke-cd-timer"><div class="lke-cd-unit"><div class="lke-cd-num">03</div><div class="lke-cd-lbl">Hours</div></div><div class="lke-cd-unit"><div class="lke-cd-num">42</div><div class="lke-cd-lbl">Min</div></div><div class="lke-cd-unit"><div class="lke-cd-num">18</div><div class="lke-cd-lbl">Sec</div></div></div><div class="lke-cd-slots">남은 자리 '+b.slots+'</div>';
+  } else if(b.type==='section'){
+    var isMag = /more|매거진|mag/i.test(b.seeAll||'');
+    var kind = isMag ? 'mag' : 'grid';
+    el.innerHTML += '<h2 class="lke-section-title">'+b.title+'</h2>'+
+      (b.seeAll?'<span class="lke-section-see-all" style="cursor:pointer" onclick="event.stopPropagation();lkeOpenAllOfType('+idx+',\''+kind+'\')">'+b.seeAll+'</span>':'');
+  } else if(b.type==='grid'){
+    b.items.forEach(function(it, ci){
+      var card=document.createElement('div');
+      card.className='lke-product-card type-'+(it.kind||'product');
+      card.setAttribute('draggable','true');
+      card.dataset.ci=ci; card.dataset.bi=idx;
+      card.addEventListener('dragstart', function(e){ e.stopPropagation(); window._lkeCardDrag={bi:+this.dataset.bi,ci:+this.dataset.ci}; this.style.opacity='.35'; e.dataTransfer.effectAllowed='move'; });
+      card.addEventListener('dragover', function(e){ e.preventDefault(); e.stopPropagation(); e.dataTransfer.dropEffect='move'; this.style.outline='2px dashed var(--mint)'; });
+      card.addEventListener('dragleave', function(){ this.style.outline=''; });
+      card.addEventListener('drop', function(e){ e.preventDefault(); e.stopPropagation(); this.style.outline=''; var d=window._lkeCardDrag; if(!d||d.bi!==+this.dataset.bi) return; var to=+this.dataset.ci; if(d.ci===to) return; var items=lkeState.blocks[d.bi].items; var m=items.splice(d.ci,1)[0]; items.splice(to,0,m); lkeRender(); });
+      card.addEventListener('dragend', function(){ this.style.opacity=''; window._lkeCardDrag=null; });
+      var imgClass = it.img||'cream';
+      var thumbStyle = '';
+      if(it.thumbImg) thumbStyle = 'background:url('+it.thumbImg+') center/cover';
+      else if(it.thumbBg) thumbStyle = 'background:'+it.thumbBg;
+      var priceHtml = (it.kind==='product' || !it.kind) ? '<div class="lke-product-info-price"><span class="lke-price-sale">'+(it.price||'')+'</span>'+(it.origPrice?'<span class="lke-price-orig">'+it.origPrice+'</span>':'')+'</div>' : '';
+      card.innerHTML =
+        '<div class="lke-product-img '+imgClass+'" style="'+thumbStyle+'">'+(it.tag?'<span class="lke-product-tag '+(it.tagStyle||'')+'">'+it.tag+'</span>':'')+'</div>'+
+        '<div class="lke-product-info-date">'+(it.date||'')+'</div>'+
+        '<div class="lke-product-info-title">'+(it.title||'')+'</div>'+
+        priceHtml;
+      (function(bIdx, cIdx){ card.onclick = function(e){ e.stopPropagation(); lkeEditGridCard(bIdx, cIdx); }; })(idx, ci);
+      el.appendChild(card);
+    });
+  } else if(b.type==='bigbanner'){
+    if(b.img){ el.style.background='url('+b.img+') center/cover'; }
+    else if(b.bgSolid){ el.style.background=b.bgSolid; }
+    else if(b.bg){ el.style.background=b.bg; }
+    if(b.textColor) el.style.color=b.textColor;
+    el.innerHTML += '<div class="lke-bigbanner-arrow">↗</div><div class="lke-bigbanner-content"><div class="lke-bigbanner-eyebrow">'+b.eyebrow+'</div><div class="lke-bigbanner-title">'+b.title+'</div></div>';
+  } else if(b.type==='contact'){
+    if(b.img){ el.style.background='url('+b.img+') center/cover'; }
+    else if(b.bgSolid){ el.style.background=b.bgSolid; }
+    else if(b.bg){ el.style.background=b.bg; }
+    if(b.textColor) el.style.color=b.textColor;
+    el.innerHTML += '<div class="lke-bigbanner-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></div><div class="lke-bigbanner-content"><div class="lke-bigbanner-eyebrow">'+b.eyebrow+'</div><div class="lke-bigbanner-title">'+b.title+'</div></div>';
+  } else if(b.type==='magazine'){
+    if(b.img){ el.style.background='url('+b.img+') center/cover'; }
+    else if(b.bgSolid){ el.style.background=b.bgSolid; }
+    if(b.textColor) el.style.color=b.textColor;
+    el.innerHTML += (b.label?'<span class="lke-mag-label">'+b.label+'</span>':'')+'<div class="lke-mag-title">'+b.title+'</div>';
+  } else if(b.type==='link'){
+    el.style.margin='14px 18px';
+    el.style.borderRadius='12px';
+    el.style.background='#fff';
+    el.style.border='1px solid var(--b)';
+    el.style.padding='14px 16px';
+    el.innerHTML += '<div style="font-family:\'Fraunces\',serif;font-size:15px;font-weight:500;color:var(--t1)">'+b.title+'</div><div style="font-family:\'JetBrains Mono\',monospace;font-size:10px;color:var(--t3);margin-top:2px">'+(b.url||'URL 없음')+'</div>';
+  } else if(b.type==='image'){
+    el.style.margin='14px 18px';
+    el.style.borderRadius='14px';
+    el.style.overflow='hidden';
+    el.style.aspectRatio='16/9';
+    el.style.background = b.img ? 'url('+b.img+') center/cover' : (b.bgSolid || b.bg || 'linear-gradient(135deg,#A7F3D0,#00A87E)');
+    el.style.display='flex';
+    el.style.alignItems='flex-end';
+    el.style.padding='16px';
+    el.style.position='relative';
+    el.innerHTML += '<div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 40%,rgba(0,0,0,.45));pointer-events:none;border-radius:inherit"></div><div style="position:relative;z-index:1;font-family:\'Pretendard\',sans-serif;font-size:17px;font-weight:800;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.3);letter-spacing:-.3px'+(b.italic?';font-style:italic':'')+(b.bold===false?';font-weight:500':'')+(b.textColor?';color:'+b.textColor:'')+'">'+b.title+'</div>';
+  } else if(b.type==='quicklinks'){
+    b.items.forEach(function(q){
+      el.insertAdjacentHTML('beforeend',
+        '<div class="lke-quicklink-item"><div><div class="lke-quicklink-label">'+q.label+'</div><div class="lke-quicklink-sub">'+q.sub+'</div></div><div class="lke-quicklink-arrow">→</div></div>');
+    });
+  } else if(b.type==='socials'){
+    b.items.forEach(function(s){
+      el.insertAdjacentHTML('beforeend','<div class="lke-social-icon '+s.ch+'">'+(s.ch==='email'?'@':s.ch.toUpperCase())+'</div>');
+    });
+  } else if(b.type==='footer'){
+    el.innerHTML += '<div class="lke-footer-logo">'+b.logo+'</div><div class="lke-footer-text">'+b.text+'</div>';
+  }
+  el.onclick=function(e){ e.stopPropagation(); lkeSelectBlock(el, idx); };
+  lkeAttachDnD(el);
+  return el;
+}
+
+// 블록 선택 → 편집 시트 렌더
+var lkeSelected = null;
+function lkeSelectBlock(el, idx){
+  if(document.getElementById('v-link').classList.contains('lke-preview')) return;
+  if(lkeSelected) lkeSelected.classList.remove('selected');
+  lkeSelected = el;
+  el.classList.add('selected');
+  var b = idx===-1 ? null : lkeState.blocks[idx];
+  if(idx===-1){ lkeOpenSheet('add-block'); return; }
+  lkeRenderEditForm(b, idx);
+  lkeOpenSheet('edit');
+}
+
+function lkeRenderEditForm(b, idx){
+  var title=document.getElementById('lke-edit-title');
+  var body=document.getElementById('lke-edit-body');
+  var label=(LKE_TYPES[b.type]||{}).name||b.type;
+  title.textContent=label+' 편집';
+  var html='';
+  var hasAppearance = ['event','countdown','contact','bigbanner','magazine','image'].indexOf(b.type)>=0;
+  if(b.type==='event'){
+    html+=lkeField('굵은 텍스트 (예: 30% OFF)','text','f-text',b.text);
+    html+=lkeField('설명','text','f-sub',b.sub);
+    html+=lkeField('링크 URL','url','f-url',b.url);
+  } else if(b.type==='countdown'){
+    html+=lkeField('상단 라벨','text','f-eyebrow',b.eyebrow);
+    html+=lkeRich('제목','f-title',b.title);
+    html+=lkeField('부제','text','f-sub',b.sub);
+    html+=lkeField('마감 일시','datetime-local','f-ends',b.endsAt);
+    html+=lkeField('잔여 수량 문구','text','f-slots',b.slots);
+    html+=lkeField('이동 URL','url','f-url',b.url);
+  } else if(b.type==='section'){
+    html+=lkeField('제목','text','f-title',b.title);
+    html+=lkeField('See all 문구 (비우면 숨김)','text','f-seeall',b.seeAll);
+  } else if(b.type==='grid'){
+    html+='<div style="font-size:12.5px;color:var(--t2);line-height:1.55;padding:12px;background:var(--bg);border-radius:8px;margin-bottom:12px">제품 카드 <b>'+b.items.length+'개</b> · 각 카드를 <b style="color:var(--mint-d)">직접 탭</b>해서 개별 편집하세요.</div>';
+    html+='<button class="lke-top-btn primary" style="width:100%;padding:14px" onclick="lkeGridAdd('+idx+')">+ 카드 추가</button>';
+  } else if(b.type==='contact'){
+    html+=lkeField('상단 라벨','text','f-eyebrow',b.eyebrow);
+    html+=lkeRich('제목','f-title',b.title);
+    html+=lkeField('문의 양식 안내','text','f-formDesc',b.formDesc||'');
+    html+='<div style="font-size:12px;color:var(--t2);line-height:1.55;padding:12px;background:var(--mint-l);border-radius:8px;margin-top:6px">이 블록에 작성된 문의는 <b>키우기 → 실시간 관리 → 수익제안 탭</b>에 자동 수신돼요.<br>현재 데모: '+lkeState.proposals.length+'건 저장됨</div>';
+  } else if(b.type==='bigbanner'){
+    html+=lkeField('상단 라벨','text','f-eyebrow',b.eyebrow);
+    html+=lkeRich('제목','f-title',b.title);
+    html+=lkeField('이동 URL','url','f-url',b.url);
+  } else if(b.type==='magazine'){
+    html+=lkeField('카테고리 라벨 (비우면 숨김)','text','f-label',b.label);
+    html+=lkeRich('제목','f-title',b.title);
+    html+=lkeField('이동 URL','url','f-url',b.url);
+  } else if(b.type==='image'){
+    html+=lkeField('제목','text','f-title',b.title);
+    html+=lkeTextStyleHtml(b);
+    html+=lkeField('이동 URL','url','f-url',b.url);
+  } else if(b.type==='link'){
+    html+=lkeField('제목 (자동 썸네일은 URL에서 추출)','text','f-title',b.title);
+    html+=lkeField('URL','url','f-url',b.url);
+  } else if(b.type==='quicklinks'){
+    html+='<div class="lke-field-label">링크 항목 ('+b.items.length+')</div>';
+    b.items.forEach(function(q, i){
+      html+='<div style="background:#fff;border:1px solid var(--b);border-radius:10px;padding:10px;margin-bottom:6px">'+
+        '<div style="font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.2px;margin-bottom:6px;display:flex;justify-content:space-between">항목 '+(i+1)+' <a onclick="lkeQlDel('+idx+','+i+')" style="color:var(--red);cursor:pointer">삭제</a></div>'+
+        lkeField('라벨','text','ql_'+idx+'_'+i+'_label',q.label,true)+
+        lkeField('설명','text','ql_'+idx+'_'+i+'_sub',q.sub,true)+
+        lkeField('URL','url','ql_'+idx+'_'+i+'_url',q.url,true)+
+      '</div>';
+    });
+    html+='<button class="lke-top-btn" style="width:100%;margin-top:4px" onclick="lkeQlAdd('+idx+')">+ 링크 추가</button>';
+  } else if(b.type==='socials'){
+    html+='<div class="lke-field-label">소셜 항목 ('+b.items.length+')</div>';
+    b.items.forEach(function(s, i){
+      html+='<div style="display:flex;gap:8px;align-items:center;background:#fff;border:1px solid var(--b);border-radius:8px;padding:8px;margin-bottom:6px">'+
+        '<select onchange="lkeState.blocks['+idx+'].items['+i+'].ch=this.value;lkeRender();lkeRenderEditForm(lkeState.blocks['+idx+'],'+idx+')" style="padding:8px;border:1px solid var(--b);border-radius:6px;font-family:\'Pretendard\',sans-serif;font-size:12px">'+
+          ['ig','tk','yt','email','x','threads'].map(function(c){ return '<option value="'+c+'"'+(s.ch===c?' selected':'')+'>'+c.toUpperCase()+'</option>'; }).join('')+
+        '</select>'+
+        '<input class="lke-field-input" id="so_'+idx+'_'+i+'_url" value="'+((s.url||'')+'').replace(/"/g,'&quot;')+'" placeholder="URL" style="flex:1;padding:8px;font-size:12px">'+
+        '<button class="lke-top-btn danger" onclick="lkeSocialDel('+idx+','+i+')" style="padding:8px 10px;font-size:11px">✕</button>'+
+      '</div>';
+    });
+    html+='<button class="lke-top-btn" style="width:100%;margin-top:6px" onclick="lkeSocialAdd('+idx+')">+ 소셜 추가</button>';
+  } else if(b.type==='footer'){
+    html+='<div style="font-size:12px;color:var(--t2);padding:8px 0">푸터는 Powered by 표시만 설정돼요.</div>';
+  }
+  // 통합 꾸미기 패널 (배경색/그라디/이미지/글자색)
+  if(hasAppearance){
+    html += lkeAppearanceHtml(b, idx);
+  }
+  // 공통: 저장/삭제/이동
+  html+='<div style="display:flex;gap:8px;margin-top:16px">'+
+    '<button class="lke-top-btn danger" onclick="lkeDeleteBlock('+idx+')">삭제</button>'+
+    '<button class="lke-top-btn" style="flex:1" onclick="lkeCloseSheet()">취소</button>'+
+    '<button class="lke-top-btn primary" style="flex:2" onclick="lkeSaveBlock('+idx+')">저장</button>'+
+  '</div>';
+  body.innerHTML=html;
+}
+// 리치 텍스트 필드 (B/I + 줄바꿈 Enter 자동 <br>, 글자색은 꾸미기 패널에서 통일)
+function lkeRich(label, id, val, opts){
+  var safeVal = val || '';
+  return '<div class="lke-field-label">'+label+'</div>'+
+    '<div class="lke-rich-wrap">'+
+      '<div class="lke-rich-toolbar">'+
+        '<button type="button" class="lke-rich-btn" onmousedown="event.preventDefault()" onclick="lkeRichCmd(\''+id+'\',\'bold\')"><b>B</b></button>'+
+        '<button type="button" class="lke-rich-btn" onmousedown="event.preventDefault()" onclick="lkeRichCmd(\''+id+'\',\'italic\')"><i>I</i></button>'+
+      '</div>'+
+      '<div class="lke-rich-input" id="'+id+'" contenteditable="true">'+safeVal+'</div>'+
+    '</div>';
+}
+function lkeRichCmd(id, cmd){
+  var el = document.getElementById(id);
+  if(!el) return;
+  el.focus();
+  try {
+    if(cmd==='bold') document.execCommand('bold');
+    else if(cmd==='italic') document.execCommand('italic');
+  } catch(e){}
+}
+// contenteditable 값을 저장할 때 읽는 helper
+function lkeRichVal(id){
+  var el = document.getElementById(id);
+  if(!el) return '';
+  // innerHTML 정리: <b>→<strong>, <i>→<em>, <span style=...color>→그대로
+  var html = el.innerHTML
+    .replace(/<div><br><\/div>/g, '<br>')
+    .replace(/<div>/g, '<br>')
+    .replace(/<\/div>/g, '')
+    .replace(/<b>/g, '<strong>').replace(/<\/b>/g, '</strong>')
+    .replace(/<i>/g, '<em>').replace(/<\/i>/g, '</em>');
+  return html;
+}
+
+function lkeField(label, type, id, val, noMargin){
+  var typeAttr = type==='textarea' ? '' : 'type="'+type+'"';
+  var tag = type==='textarea' ? 'textarea' : 'input';
+  var inner = type==='textarea' ? (val||'') : '';
+  var attrs = type==='textarea' ? '' : ' value="'+((val||'')+'').replace(/"/g,'&quot;')+'"';
+  return '<div class="lke-field-group"'+(noMargin?' style="margin-bottom:6px"':'')+'>'+
+    '<div class="lke-field-label">'+label+'</div>'+
+    '<'+tag+' '+typeAttr+' class="lke-field-input" id="'+id+'"'+attrs+'>'+inner+'</'+tag+'>'+
+  '</div>';
+}
+function lkeSaveBlock(idx){
+  var b=lkeState.blocks[idx];
+  function v(id){ var el=document.getElementById(id); return el?el.value:undefined; }
+  function pickColor(id){
+    var el = document.getElementById(id);
+    if(!el) return undefined;
+    // 스펙트럼 피커
+    if(el.classList.contains('lke-spectrum')) return el.dataset.custom;
+    // 구 swatch grid
+    if(el.dataset.customColor) return el.dataset.customColor;
+    var sw = el.querySelector('.lke-color-swatch.active');
+    return sw ? sw.dataset.color : undefined;
+  }
+  function pickGrad(id){
+    var el = document.getElementById(id);
+    if(!el) return undefined;
+    if(el.classList.contains('lke-grad-builder')) return lkeReadGrad(id);
+    return undefined;
+  }
+  // 통합 꾸미기 읽기
+  function readAppearance(){
+    var tc=pickColor('f-textColor'); if(tc) b.textColor=tc;
+    var bs=pickColor('f-bgSolid'); if(bs) b.bgSolid=bs;
+    var bg=pickGrad('f-bg'); if(bg) b.bg=bg;
+  }
+  if(b.type==='event'){
+    b.text=v('f-text'); b.sub=v('f-sub'); b.url=v('f-url');
+    readAppearance();
+  }
+  else if(b.type==='countdown'){
+    b.eyebrow=v('f-eyebrow'); b.title=lkeRichVal('f-title'); b.sub=v('f-sub'); b.endsAt=v('f-ends'); b.slots=v('f-slots'); b.url=v('f-url');
+    readAppearance();
+  }
+  else if(b.type==='section'){ b.title=v('f-title'); b.seeAll=v('f-seeall'); }
+  else if(b.type==='grid'){}
+  else if(b.type==='contact'){
+    b.eyebrow=v('f-eyebrow'); b.title=lkeRichVal('f-title'); b.formDesc=v('f-formDesc');
+    readAppearance();
+  }
+  else if(b.type==='bigbanner'){
+    b.eyebrow=v('f-eyebrow'); b.title=lkeRichVal('f-title'); b.url=v('f-url');
+    readAppearance();
+  }
+  else if(b.type==='magazine'){
+    b.label=v('f-label'); b.title=lkeRichVal('f-title'); b.url=v('f-url');
+    readAppearance();
+  }
+  else if(b.type==='image'){
+    b.title=v('f-title'); b.url=v('f-url');
+    readAppearance();
+    if(window._lkeStyleEdit){ b.bold=window._lkeStyleEdit.bold; b.italic=window._lkeStyleEdit.italic; b.textColor=window._lkeStyleEdit.textColor||b.textColor; window._lkeStyleEdit=null; }
+  }
+  else if(b.type==='link'){ b.title=v('f-title'); b.url=v('f-url'); }
+  else if(b.type==='quicklinks'){
+    b.items.forEach(function(q,i){ q.label=v('ql_'+idx+'_'+i+'_label')||q.label; q.sub=v('ql_'+idx+'_'+i+'_sub')||q.sub; q.url=v('ql_'+idx+'_'+i+'_url')||q.url; });
+  }
+  else if(b.type==='socials'){ b.items.forEach(function(s,i){ s.url=v('so_'+idx+'_'+i+'_url')||s.url; }); }
+  lkeRender(); lkeCloseSheet();
+}
+
+// 통합 꾸미기 패널 (모든 블록 공통)
+function lkeAppearanceHtml(b, idx){
+  var text = (b.textColor && b.textColor[0]==='#') ? b.textColor.slice(0,7) : '#FFFFFF';
+  var solid = (b.bgSolid && b.bgSolid[0]==='#') ? b.bgSolid.slice(0,7) : '#FFFFFF';
+  var g = lkeParseGrad(b.bg);
+  return '<div class="lke-appearance">'+
+    '<div class="lke-app-head">꾸미기</div>'+
+    // 글자색
+    '<div class="lke-pick-row">'+
+      '<label>글자색</label>'+
+      '<div class="lke-pick-col">'+
+        '<span class="lke-pick-hex" id="f-textColor-hex">'+text.toUpperCase()+'</span>'+
+        '<input type="color" class="lke-color-dot" id="f-textColor" value="'+text+'" oninput="document.getElementById(\'f-textColor-hex\').textContent=this.value.toUpperCase()">'+
+      '</div>'+
+    '</div>'+
+    // 배경 단색
+    '<div class="lke-pick-row">'+
+      '<label>배경 단색</label>'+
+      '<div class="lke-pick-col">'+
+        '<span class="lke-pick-hex" id="f-bgSolid-hex">'+solid.toUpperCase()+'</span>'+
+        '<input type="color" class="lke-color-dot" id="f-bgSolid" value="'+solid+'" oninput="document.getElementById(\'f-bgSolid-hex\').textContent=this.value.toUpperCase()">'+
+      '</div>'+
+    '</div>'+
+    // 배경 그라디언트 (c1 + dir + c2)
+    '<div class="lke-pick-row">'+
+      '<label>배경 그라디</label>'+
+      '<div class="lke-pick-col" id="f-bg">'+
+        '<input type="color" class="lke-color-dot lke-grad-c1" value="'+g.c1+'">'+
+        '<select class="lke-grad-sel">'+
+          [['135','↘'],['180','↓'],['90','→'],['45','↗'],['radial','⊙']].map(function(d){
+            return '<option value="'+d[0]+'"'+(g.dir===d[0]?' selected':'')+'>'+d[1]+'</option>';
+          }).join('')+
+        '</select>'+
+        '<input type="color" class="lke-color-dot lke-grad-c2" value="'+g.c2+'">'+
+      '</div>'+
+    '</div>'+
+    // 배경 이미지
+    '<div class="lke-pick-row">'+
+      '<label>배경 이미지</label>'+
+      '<div class="lke-pick-col">'+
+        (b.img ? '<button class="lke-img-btn clear" onclick="event.stopPropagation();lkeClearImg('+idx+')">✕ 제거</button>' : '')+
+        '<label class="lke-img-btn'+(b.img?' has':'')+'"><input type="file" accept="image/*" onchange="lkeImageUpload('+idx+',this)" style="display:none">'+(b.img?'변경':'📷 선택')+'</label>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+function lkeClearImg(idx){
+  lkeState.blocks[idx].img = null;
+  lkeRender();
+  lkeRenderEditForm(lkeState.blocks[idx], idx);
+}
+// 폰트호환 유지용 (사용되는 곳)
+function lkeSpectrumHtml(id, current, label){
+  var color = (current && current[0]==='#') ? current.slice(0,7) : '#FFFFFF';
+  return '<div class="lke-pick-row"><label>'+label+'</label><div class="lke-pick-col"><span class="lke-pick-hex" id="'+id+'-hex">'+color.toUpperCase()+'</span><input type="color" class="lke-color-dot" id="'+id+'" value="'+color+'" oninput="document.getElementById(\''+id+'-hex\').textContent=this.value.toUpperCase()"></div></div>';
+}
+function lkeGradBuilderHtml(id, current, label, presets){
+  var g = lkeParseGrad(current);
+  return '<div class="lke-pick-row"><label>'+label+'</label><div class="lke-pick-col" id="'+id+'">'+
+    '<input type="color" class="lke-color-dot lke-grad-c1" value="'+g.c1+'">'+
+    '<select class="lke-grad-sel">'+
+      [['135','↘'],['180','↓'],['90','→'],['45','↗'],['radial','⊙']].map(function(d){
+        return '<option value="'+d[0]+'"'+(g.dir===d[0]?' selected':'')+'>'+d[1]+'</option>';
+      }).join('')+
+    '</select>'+
+    '<input type="color" class="lke-color-dot lke-grad-c2" value="'+g.c2+'">'+
+  '</div></div>';
+}
+function lkeParseGrad(grad){
+  grad = grad || '';
+  var m;
+  if(m = grad.match(/radial-gradient\([^,]+,\s*(#[0-9a-fA-F]+)[^,]*,\s*(#[0-9a-fA-F]+)/)){
+    return {dir:'radial', c1:m[1], c2:m[2]};
+  }
+  if(m = grad.match(/linear-gradient\((\d+)deg,\s*(#[0-9a-fA-F]+)[^,]*,\s*(#[0-9a-fA-F]+)/)){
+    return {dir:m[1], c1:m[2], c2:m[3]};
+  }
+  return {dir:'135', c1:'#A7F3D0', c2:'#00A87E'};
+}
+function lkeReadGrad(id){
+  var w = document.getElementById(id); if(!w) return null;
+  var sel = w.querySelector('.lke-grad-sel');
+  var dir = sel ? sel.value : '135';
+  var c1 = w.querySelector('.lke-grad-c1').value;
+  var c2 = w.querySelector('.lke-grad-c2').value;
+  if(dir==='radial') return 'radial-gradient(circle,'+c1+','+c2+')';
+  return 'linear-gradient('+dir+'deg,'+c1+','+c2+')';
+}
+function lkeApplyGradPreset(id, grad){
+  var parsed = lkeParseGrad(grad);
+  var w = document.getElementById(id); if(!w) return;
+  w.querySelectorAll('.lke-grad-dir').forEach(function(x){ x.classList.toggle('active', x.dataset.dir===parsed.dir); });
+  w.querySelector('.lke-grad-c1').value = parsed.c1;
+  w.querySelector('.lke-grad-c2').value = parsed.c2;
+}
+// 구 API 호환 (이제 단색은 스펙트럼만)
+function lkeColorPickerHtml(id, current, palette, label, opts){
+  return lkeSpectrumHtml(id, current, label);
+}
+function lkeImageUploadHtml(idx, currentImg, label){
+  return '<div class="lke-field-label">'+label+'</div><label style="display:block;margin-bottom:12px"><input type="file" accept="image/*" onchange="lkeImageUpload('+idx+',this)" style="display:none"><div style="padding:12px;border:1.5px dashed #D6D3D1;text-align:center;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;background:#fff;border-radius:8px">'+(currentImg?'이미지 변경 ✓':'사진 선택')+'</div></label>';
+}
+function lkeTextStyleHtml(b){
+  window._lkeStyleEdit = {bold: b.bold!==false, italic: !!b.italic, textColor: b.textColor||'#FFFFFF'};
+  var colors = ['#FFFFFF','#1A1F27','#00C896','#FF4D4D','#F59E0B','#8B5CF6'];
+  return '<div class="lke-field-label">글자 스타일</div>'+
+    '<div style="display:flex;gap:6px;align-items:center;margin-bottom:12px;padding:8px;background:var(--bg);border-radius:8px">'+
+      '<button type="button" onclick="event.stopPropagation();window._lkeStyleEdit.bold=!window._lkeStyleEdit.bold;this.classList.toggle(\'on\')" class="'+(window._lkeStyleEdit.bold?'on':'')+'" style="width:32px;height:32px;border:1px solid var(--b);background:'+(b.bold!==false?'var(--dark)':'#fff')+';color:'+(b.bold!==false?'#fff':'var(--t1)')+';font-weight:900;border-radius:6px;cursor:pointer">B</button>'+
+      '<button type="button" onclick="event.stopPropagation();window._lkeStyleEdit.italic=!window._lkeStyleEdit.italic;this.classList.toggle(\'on\')" class="'+(window._lkeStyleEdit.italic?'on':'')+'" style="width:32px;height:32px;border:1px solid var(--b);background:'+(b.italic?'var(--dark)':'#fff')+';color:'+(b.italic?'#fff':'var(--t1)')+';font-style:italic;font-weight:700;border-radius:6px;cursor:pointer">I</button>'+
+      '<div style="width:1px;height:22px;background:var(--b);margin:0 4px"></div>'+
+      colors.map(function(c){ return '<div onclick="event.stopPropagation();window._lkeStyleEdit.textColor=\''+c+'\';this.parentElement.querySelectorAll(\'.lke-ts-color\').forEach(function(x){x.style.outline=\'none\'});this.style.outline=\'2px solid var(--mint)\';this.style.outlineOffset=\'1px\'" class="lke-ts-color" style="width:24px;height:24px;border-radius:6px;background:'+c+';border:1px solid var(--b);cursor:pointer'+(b.textColor===c?';outline:2px solid var(--mint);outline-offset:1px':'')+'"></div>'; }).join('')+
+    '</div>';
+}
+
+function lkeSocialAdd(idx){
+  lkeState.blocks[idx].items.push({ch:'ig',url:''});
+  lkeRender(); lkeRenderEditForm(lkeState.blocks[idx],idx);
+}
+function lkeSocialDel(idx, i){
+  lkeState.blocks[idx].items.splice(i,1);
+  lkeRender(); lkeRenderEditForm(lkeState.blocks[idx],idx);
+}
+function lkeCardImageUpload(bIdx, cIdx, inp){
+  var f=inp.files&&inp.files[0]; if(!f) return;
+  var r=new FileReader();
+  r.onload=function(e){ lkeState.blocks[bIdx].items[cIdx].thumbImg=e.target.result; lkeRender(); lkeEditGridCard(bIdx,cIdx); };
+  r.readAsDataURL(f);
+}
+function lkeCardImg(bIdx, cIdx, key){
+  lkeState.blocks[bIdx].items[cIdx].img=key;
+  lkeState.blocks[bIdx].items[cIdx].thumbImg=null;
+  lkeRender(); lkeEditGridCard(bIdx,cIdx);
+}
+
+// See all / Read more → 서브뷰 (페이지 내부 전환)
+var lkeSubView = null;
+function lkeOpenAllOfType(blockIdx, kind){
+  lkeSubView = { kind: kind, srcIdx: blockIdx };
+  lkeRenderSubView();
+}
+function lkeExitSubView(){
+  lkeSubView = null;
+  var v = document.getElementById('v-link');
+  v.classList.remove('subview');
+  var old = document.getElementById('lke-subview-root'); if(old) old.remove();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function lkeRenderSubView(){
+  var v = document.getElementById('v-link');
+  v.classList.add('subview');
+  // 기존 서브뷰 제거
+  var old = document.getElementById('lke-subview-root'); if(old) old.remove();
+  // 원본 섹션 블록 (타이틀 가져오기)
+  var srcSection = lkeState.blocks[lkeSubView.srcIdx];
+  var sectionTitle = srcSection && srcSection.title ? srcSection.title : (lkeSubView.kind==='grid'?'All Products':'Magazine');
+  // 서브뷰 컨테이너
+  var root = document.createElement('div');
+  root.id = 'lke-subview-root';
+  root.className = 'lke-subview';
+  // 미니 상단 바 (뒤로 + 홈)
+  var topbarNew = document.createElement('div');
+  topbarNew.className = 'lke-topbar';
+  topbarNew.id = 'lke-subview-topbar';
+  topbarNew.innerHTML =
+    '<div class="lke-topbar-left">'+
+      '<button class="lke-back-btn" onclick="lkeExitSubView()" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>'+
+    '</div>'+
+    '<button class="lke-top-btn" onclick="go(\'home\')" aria-label="홈"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10a1 1 0 001 1h3m10-11v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round"/></svg>홈</button>';
+  root.appendChild(topbarNew);
+  // 이벤트 바 유지 (첫 event 블록 복제)
+  var eventBlock = lkeState.blocks.find(function(b){ return b.type==='event'; });
+  if(eventBlock){
+    var ev = document.createElement('div');
+    ev.className='lke-block lke-block-event';
+    if(eventBlock.bgColor) ev.style.background = eventBlock.bgColor;
+    if(eventBlock.textColor) ev.style.color = eventBlock.textColor;
+    ev.innerHTML = '<div class="lke-event-left"><div class="lke-event-dot"></div><div class="lke-event-text"><strong>'+eventBlock.text+'</strong>&nbsp;'+eventBlock.sub+'</div></div><div class="lke-event-arrow">→</div>';
+    ev.style.cursor='default';
+    root.appendChild(ev);
+  }
+  // 본체
+  var body = document.createElement('div'); body.className='lke-subview-body';
+  // 원본 섹션 제목 동일 디자인으로
+  var titleEl = document.createElement('div');
+  titleEl.className = 'lke-block-section-title';
+  titleEl.style.cssText = 'padding:28px 0 22px;display:flex;justify-content:flex-start';
+  titleEl.innerHTML = '<h2 class="lke-section-title">'+sectionTitle+'</h2>';
+  body.appendChild(titleEl);
+  if(lkeSubView.kind==='grid'){
+    var target = null;
+    for(var i=lkeSubView.srcIdx+1;i<lkeState.blocks.length;i++){
+      if(lkeState.blocks[i].type==='grid'){ target = lkeState.blocks[i]; break; }
+    }
+    if(target){
+      body.innerHTML = '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px 12px">' +
+        target.items.map(function(it){
+          var thumb = it.thumbImg ? 'background:url('+it.thumbImg+') center/cover' : '';
+          return '<div>'+
+            '<div class="lke-product-img '+(it.img||'cream')+'" style="aspect-ratio:1;border-radius:12px;margin-bottom:9px;'+thumb+'">'+(it.tag?'<span class="lke-product-tag '+(it.tagStyle||'')+'">'+it.tag+'</span>':'')+'</div>'+
+            '<div class="lke-product-info-date">'+(it.date||'')+'</div>'+
+            '<div class="lke-product-info-title">'+(it.title||'')+'</div>'+
+            (it.kind==='product'||!it.kind ? '<div class="lke-product-info-price"><span class="lke-price-sale">'+(it.price||'')+'</span>'+(it.origPrice?'<span class="lke-price-orig">'+it.origPrice+'</span>':'')+'</div>':'')+
+          '</div>';
+        }).join('') + '</div>';
+    }
+  } else {
+    var mags = [];
+    for(var j=lkeSubView.srcIdx+1;j<lkeState.blocks.length;j++){
+      var bb = lkeState.blocks[j];
+      if(bb.type==='section') break;
+      if(bb.type==='magazine') mags.push(bb);
+    }
+    body.innerHTML = '<div style="display:flex;flex-direction:column;gap:16px">' +
+      mags.map(function(m){
+        var mbg = m.img ? 'url('+m.img+') center/cover' : ({m1:'linear-gradient(135deg,#A7F3D0,#00A87E)',m2:'linear-gradient(135deg,#67E8F9,#06B6D4)',m3:'linear-gradient(135deg,#C4B5FD,#8B5CF6)'}[m.theme||'m1']);
+        return '<div style="aspect-ratio:16/11;border-radius:18px;overflow:hidden;position:relative;display:flex;align-items:flex-end;padding:24px;background:'+mbg+'">'+
+          '<div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.5),transparent 60%);pointer-events:none"></div>'+
+          (m.label?'<span style="position:absolute;top:18px;left:18px;font-family:\'Pretendard\',sans-serif;font-size:10px;color:#fff;background:rgba(0,0,0,.35);padding:4px 11px;border-radius:100px;letter-spacing:.12em;text-transform:uppercase;font-weight:700">'+m.label+'</span>':'')+
+          '<div style="position:relative;z-index:1;font-family:\'Fraunces\',\'Pretendard\',sans-serif;font-size:26px;font-weight:500;color:#fff;line-height:1.15">'+m.title+'</div>'+
+        '</div>';
+      }).join('') + '</div>';
+  }
+  root.appendChild(body);
+  // v-link 안에 삽입 (sticky topbar 덮도록 최상단)
+  document.getElementById('v-link').appendChild(root);
+  window.scrollTo({top:0, behavior:'instant'});
+}
+function lkeDeleteBlock(idx){
+  if(!confirm('이 블록을 삭제할까요?')) return;
+  lkeState.blocks.splice(idx,1); lkeRender(); lkeCloseSheet();
+}
+function lkeGridDel(idx, i){ lkeState.blocks[idx].items.splice(i,1); lkeRenderEditForm(lkeState.blocks[idx],idx); lkeRender(); }
+function lkeGridAdd(idx){ lkeState.blocks[idx].items.push({kind:'product',title:'새 제품',price:'₩0',date:'',tag:'',img:'cream',url:''}); lkeRenderEditForm(lkeState.blocks[idx],idx); lkeRender(); }
+function lkeGridKind(idx, i, kind){ lkeState.blocks[idx].items[i].kind=kind; lkeRenderEditForm(lkeState.blocks[idx],idx); lkeRender(); }
+function lkeGridTag(idx, i, t){ lkeState.blocks[idx].items[i].tag=t; lkeState.blocks[idx].items[i].tagStyle = t==='HOT'?'hot':(t==='BEST'||t==='공구'?'dark':''); lkeRenderEditForm(lkeState.blocks[idx],idx); lkeRender(); }
+function lkeQlDel(idx, i){ lkeState.blocks[idx].items.splice(i,1); lkeRenderEditForm(lkeState.blocks[idx],idx); lkeRender(); }
+function lkeQlAdd(idx){ lkeState.blocks[idx].items.push({label:'새 링크',sub:'',url:''}); lkeRenderEditForm(lkeState.blocks[idx],idx); lkeRender(); }
+function lkeImageUpload(idx, inp){
+  var f=inp.files&&inp.files[0]; if(!f) return;
+  var r=new FileReader();
+  r.onload=function(e){ lkeState.blocks[idx].img=e.target.result; lkeRender(); lkeRenderEditForm(lkeState.blocks[idx],idx); };
+  r.readAsDataURL(f);
+}
+
+// 블록 추가 picker
+function lkeRenderPicker(){
+  var wrap=document.getElementById('lke-block-picker'); if(!wrap) return;
+  while(wrap.firstChild) wrap.removeChild(wrap.firstChild);
+  var order=['event','countdown','section','grid','bigbanner','contact','magazine','link','image','quicklinks','socials','spacer','divider'];
+  var premium = lkeIsPremium();
+  order.forEach(function(k){
+    var t=LKE_TYPES[k]; if(!t) return;
+    var locked = t.premium && !premium;
+    var card=document.createElement('button'); card.className='lke-bpv-card'+(locked?' locked':'');
+    card.innerHTML='<div class="lke-bpv-prev '+t.preview+'"></div>'+
+      '<div class="lke-bpv-body"><div class="lke-bpv-name">'+t.name+(locked?' <span class="lke-lock">프리미엄</span>':'')+'</div><div class="lke-bpv-desc">'+t.desc+'</div></div>';
+    if(locked){
+      card.onclick = function(){ cm('m-link-add'); openModal('m-plan'); };
+    } else {
+      card.onclick = function(){ lkeAddBlock(k); lkeCloseSheet(); };
+    }
+    wrap.appendChild(card);
+  });
+}
+function lkeAddBlock(kind){
+  var id=kind+Date.now();
+  var defaults = {
+    event:{type:'event',id:id,text:'30% OFF',sub:'새 이벤트',url:''},
+    countdown:{type:'countdown',id:id,title:'새 카운트다운',sub:'설명',eyebrow:'마감까지',endsAt:'',slots:'0/0',url:''},
+    section:{type:'section',id:id,title:'Section <em>Title.</em>',seeAll:'See all →'},
+    grid:{type:'grid',id:id,items:[{kind:'product',title:'새 상품',price:'₩0',date:'',tag:'',img:'cream',url:''}]},
+    bigbanner:{type:'bigbanner',id:id,eyebrow:'LABEL',title:'Banner <em>Title.</em>',arrow:'↗',url:''},
+    contact:{type:'contact',id:id,eyebrow:'문의 · 제안',title:'협업·광고<br><em>문의하기.</em>',arrow:'💌',formDesc:'제품·예산·일정을 남겨주세요',fields:['이름 / 브랜드','이메일','내용']},
+    magazine:{type:'magazine',id:id,label:'Label',title:'매거진 타이틀',theme:'m1',url:''},
+    link:{type:'link',id:id,title:'새 링크',url:''},
+    image:{type:'image',id:id,img:'',title:'이미지 링크',url:''},
+    quicklinks:{type:'quicklinks',id:id,items:[{label:'새 링크',sub:'',url:''}]},
+    socials:{type:'socials',id:id,items:[{ch:'ig',url:''},{ch:'tk',url:''},{ch:'yt',url:''}]},
+    spacer:{type:'spacer',id:id},
+    divider:{type:'divider',id:id}
+  };
+  var b=defaults[kind]; if(!b) return;
+  var at = typeof window._lkeInsertAt === 'number' ? window._lkeInsertAt : lkeState.blocks.length;
+  lkeState.blocks.splice(at,0,b);
+  window._lkeInsertAt=undefined;
+  lkeRender();
+}
+
+// DnD
+var lkeDragIdx = null;
+function lkeAttachDnD(el){
+  el.setAttribute('draggable','true');
+  el.addEventListener('dragstart',function(e){ lkeDragIdx=+this.dataset.idx; this.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+  el.addEventListener('dragover',function(e){ e.preventDefault(); e.dataTransfer.dropEffect='move'; });
+  el.addEventListener('dragenter',function(){ this.classList.add('lke-drop-target'); });
+  el.addEventListener('dragleave',function(){ this.classList.remove('lke-drop-target'); });
+  el.addEventListener('drop',function(e){
+    e.preventDefault(); this.classList.remove('lke-drop-target');
+    var to=+this.dataset.idx; if(lkeDragIdx==null||lkeDragIdx===to||lkeDragIdx===-1||to===-1) return;
+    var moved=lkeState.blocks.splice(lkeDragIdx,1)[0];
+    lkeState.blocks.splice(to,0,moved);
+    lkeRender();
+  });
+  el.addEventListener('dragend',function(){ this.classList.remove('dragging'); lkeDragIdx=null; });
+}
+
+// Sheets open/close
+function lkeOpenSheet(name){
+  document.querySelectorAll('.lke-edit-sheet').forEach(function(s){ s.classList.remove('open'); });
+  var s = document.getElementById('lke-sheet-'+name);
+  if(s) s.classList.add('open');
+  if(name==='add-block') lkeRenderPicker();
+  if(name==='theme') lkeRenderThemeSheet();
+  document.getElementById('lke-backdrop').classList.add('show');
+}
+function lkeCloseSheet(){
+  document.querySelectorAll('.lke-edit-sheet').forEach(function(s){ s.classList.remove('open'); });
+  document.getElementById('lke-backdrop').classList.remove('show');
+  if(lkeSelected){ lkeSelected.classList.remove('selected'); lkeSelected = null; }
+}
+function lkeTogglePreview(){
+  var v = document.getElementById('v-link');
+  v.classList.toggle('lke-preview');
+  if(lkeSelected){ lkeSelected.classList.remove('selected'); lkeSelected = null; }
+  lkeCloseSheet();
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// 테마/레이아웃/설정 적용
+// 3종 레이아웃 시작점 템플릿
+var LKE_TEMPLATES = {
+  minimal: { name:'미니멀', desc:'링크만 심플하게', preview:'m' },
+  shop: { name:'쇼핑몰', desc:'제품 판매 중심', preview:'s', premium:true },
+  editorial: { name:'에디토리얼', desc:'매거진 스타일', preview:'e', premium:true }
+};
+function lkeTemplateBlocks(key){
+  var t = Date.now();
+  if(key==='minimal'){
+    return {
+      hero: { slides:[{bg:'',eyebrow:'LINK IN BIO',brand:'',title:'@유민혜',sub:'신상만 밝히는 코덕 사생활',stat1_hidden:true,stat2_hidden:true,cta_hidden:true}] },
+      blocks:[
+        {type:'link',id:'lm1'+t,title:'올리브영에서 사기',url:''},
+        {type:'link',id:'lm2'+t,title:'유튜브 채널',url:''},
+        {type:'link',id:'lm3'+t,title:'인스타그램',url:''},
+        {type:'socials',id:'sm'+t,items:[{ch:'ig',url:''},{ch:'tk',url:''},{ch:'yt',url:''},{ch:'email',url:''}]},
+        {type:'footer',id:'fm'+t,logo:'Ssobi<span>.</span>',text:'Powered by Ssobi Links'}
+      ]
+    };
+  }
+  if(key==='shop'){
+    return {
+      hero: { slides:[{bg:'',eyebrow:'LIVE · 공동구매',brand:'YUMINHYE STUDIO',title:'Glow <em>Drop.</em><br>Spring \'26',sub:'신상만 밝히는 코덕의<br>진짜 효자템 모음.',stat1n:'312K',stat1l:'Followers',stat2n:'7/20',stat2l:'공구남음',cta:'지금 보기 →'}] },
+      blocks:[
+        {type:'event',id:'es'+t,text:'30% OFF',sub:'글로우 세럼 공동구매 중',url:''},
+        {type:'countdown',id:'cs'+t,title:'글로우 세럼 <em>50ml</em>',sub:'100% 페이백 · 선착순 20명',eyebrow:'공구 마감까지',slots:'7 / 20명',url:''},
+        {type:'section',id:'ss1'+t,title:'Best <em>Drop.</em>',seeAll:'See all →'},
+        {type:'grid',id:'gs'+t,items:[
+          {kind:'product',title:'시그니처 글로우 세럼',price:'₩39,800',origPrice:'₩59,800',date:'4/19 · 바로배송',tag:'HOT',tagStyle:'hot',img:'coral',url:''},
+          {kind:'product',title:'크리미 나이트 크림',price:'₩32,000',origPrice:'₩48,000',date:'4/20 · pm8',tag:'NEW',tagStyle:'',img:'cream',url:''},
+          {kind:'product',title:'프로틴 리페어 앰플',price:'₩45,000',origPrice:'₩68,000',date:'4/21 · am10',tag:'BEST',tagStyle:'dark',img:'pink',url:''},
+          {kind:'product',title:'마일드 클렌징 오일',price:'₩22,000',origPrice:'₩34,000',date:'4/22 · pm8',tag:'공구',tagStyle:'',img:'dark',url:''}
+        ]},
+        {type:'contact',id:'cts'+t,eyebrow:'문의 · 제안',title:'협업·광고<br><em>문의하기.</em>',formDesc:'제품·예산·일정을 남겨주세요'},
+        {type:'footer',id:'fs'+t,logo:'Ssobi<span>.</span>',text:'Powered by Ssobi Links'}
+      ]
+    };
+  }
+  if(key==='editorial'){
+    return {
+      hero: { slides:[{bg:'',eyebrow:'EDITORIAL',brand:'YUMINHYE',title:'Stories <em>&</em><br>Reviews.',sub:'에디토리얼 리뷰 모음',stat1_hidden:true,stat2_hidden:true,cta:'전체 보기 →'}] },
+      blocks:[
+        {type:'section',id:'se1'+t,title:'Magazine',seeAll:'Read more →'},
+        {type:'magazine',id:'me1'+t,label:'Routine',title:'한국인이 <em>안 하는</em><br>스킨케어 실수 7가지',theme:'m1'},
+        {type:'magazine',id:'me2'+t,label:'Review',title:'7일 써본 <em>글로우 세럼</em><br>솔직 후기',theme:'m2'},
+        {type:'magazine',id:'me3'+t,label:'Guide',title:'<em>BEST</em> 라인<br>전부 살펴보기',theme:'m3'},
+        {type:'quicklinks',id:'qe'+t,items:[
+          {label:'올리브영에서 사기',sub:'oliveyoung.co.kr',url:''},
+          {label:'스마트스토어',sub:'smartstore.naver.com',url:''},
+          {label:'협업·광고 문의',sub:'hello@millimilli.co',url:''}
+        ]},
+        {type:'socials',id:'soe'+t,items:[{ch:'ig',url:''},{ch:'tk',url:''},{ch:'yt',url:''},{ch:'email',url:''}]},
+        {type:'footer',id:'fe'+t,logo:'Ssobi<span>.</span>',text:'Powered by Ssobi Links'}
+      ]
+    };
+  }
+}
+function lkeApplyTemplate(key){
+  if(!confirm('현재 편집 내용이 선택한 레이아웃 기본 세팅으로 교체돼요. 계속할까요?')) return;
+  var t = lkeTemplateBlocks(key); if(!t) return;
+  if(t.hero) lkeState.hero = JSON.parse(JSON.stringify(t.hero));
+  lkeState.blocks = JSON.parse(JSON.stringify(t.blocks));
+  lkeRender();
+  lkeCloseSheet();
+}
+
+function lkeRenderThemeSheet(){
+  var body = document.getElementById('lke-theme-body'); if(!body) return;
+  var st = lkeState.theme || (lkeState.theme = {bg:null, bgSolid:null, textColor:'#1A1F27', titleColor:'#1A1F27', titleFont:'Pretendard', bodyFont:'Pretendard'});
+  var g = lkeParseGrad(st.bg);
+  var html = '';
+
+  // 레이아웃 시작점
+  html += '<div class="lke-field-label" style="margin-top:10px">레이아웃 시작점</div>';
+  html += '<div style="font-size:11px;color:var(--t2);line-height:1.5;margin-bottom:10px">선택하면 기본 블록이 자동 세팅돼요. 이후 세부 편집 가능.</div>';
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px">';
+  var premium = lkeIsPremium();
+  Object.keys(LKE_TEMPLATES).forEach(function(k){
+    var t = LKE_TEMPLATES[k];
+    var locked = t.premium && !premium;
+    var viz = {
+      minimal:'<div style="height:4px;width:30px;background:var(--dark);border-radius:2px;margin-bottom:4px"></div><div style="height:2px;width:50%;background:rgba(0,0,0,.15);border-radius:1px;margin-bottom:3px"></div><div style="height:2px;width:60%;background:rgba(0,0,0,.15);border-radius:1px;margin-bottom:3px"></div><div style="height:2px;width:40%;background:rgba(0,0,0,.15);border-radius:1px"></div>',
+      shop:'<div style="display:grid;grid-template-columns:1fr 1fr;gap:2px"><div style="height:14px;background:linear-gradient(135deg,#FFAE9D,#FF4D1F);border-radius:2px"></div><div style="height:14px;background:linear-gradient(135deg,#FEF3C7,#FED7AA);border-radius:2px"></div><div style="height:14px;background:linear-gradient(135deg,#FFE8DC,#FFB098);border-radius:2px"></div><div style="height:14px;background:#1A1F27;border-radius:2px"></div></div>',
+      editorial:'<div style="height:18px;background:linear-gradient(135deg,#A7F3D0,#00A87E);border-radius:2px;margin-bottom:3px"></div><div style="height:14px;background:linear-gradient(135deg,#67E8F9,#06B6D4);border-radius:2px;margin-bottom:3px"></div><div style="height:10px;background:linear-gradient(135deg,#C4B5FD,#8B5CF6);border-radius:2px"></div>'
+    }[k];
+    var onclickFn = locked ? "cm('m-link-theme');cm('lke-sheet-theme');lkeCloseSheet();openModal('m-plan')" : 'lkeApplyTemplate(\''+k+'\')';
+    html += '<button onclick="'+onclickFn+'" style="background:#fff;border:1px solid var(--b);border-radius:10px;padding:10px 10px 12px;cursor:pointer;text-align:left;transition:all .15s;opacity:'+(locked?'.6':'1')+';position:relative" onmouseover="this.style.borderColor=\'var(--mint)\'" onmouseout="this.style.borderColor=\'var(--b)\'">'+
+      '<div style="height:42px;background:var(--bg);border-radius:6px;padding:8px;margin-bottom:8px;display:flex;flex-direction:column;justify-content:center'+(locked?';filter:grayscale(.5)':'')+'">'+viz+'</div>'+
+      '<div style="font-size:12.5px;font-weight:800;color:var(--t1);letter-spacing:-.2px">'+t.name+(locked?' <span class="lke-lock">프리미엄</span>':'')+'</div>'+
+      '<div style="font-size:10px;color:var(--t3);margin-top:2px">'+t.desc+'</div>'+
+    '</button>';
+  });
+  html += '</div>';
+
+  // 페이지 배경 (블록 꾸미기와 동일한 패턴)
+  html += '<div class="lke-appearance"><div class="lke-app-head">페이지 꾸미기</div>';
+  html += '<div class="lke-pick-row"><label>배경 그라디</label><div class="lke-pick-col" id="theme-bg-grad">'+
+    '<input type="color" class="lke-color-dot lke-grad-c1" value="'+g.c1+'">'+
+    '<select class="lke-grad-sel">'+
+      [['135','↘'],['180','↓'],['90','→'],['45','↗'],['radial','⊙']].map(function(d){
+        return '<option value="'+d[0]+'"'+(g.dir===d[0]?' selected':'')+'>'+d[1]+'</option>';
+      }).join('')+
+    '</select>'+
+    '<input type="color" class="lke-color-dot lke-grad-c2" value="'+g.c2+'">'+
+  '</div></div>';
+  html += '<div class="lke-pick-row"><label>배경 단색</label><div class="lke-pick-col"><span class="lke-pick-hex" id="theme-bg-solid-hex">'+((st.bgSolid||'#F9FAFB').toUpperCase())+'</span><input type="color" class="lke-color-dot" id="theme-bg-solid" value="'+(st.bgSolid||'#F9FAFB')+'" oninput="document.getElementById(\'theme-bg-solid-hex\').textContent=this.value.toUpperCase()"></div></div>';
+  html += '<div class="lke-pick-row"><label>기본 글자색</label><div class="lke-pick-col"><span class="lke-pick-hex" id="theme-text-hex">'+((st.textColor||'#1A1F27').toUpperCase())+'</span><input type="color" class="lke-color-dot" id="theme-text" value="'+(st.textColor||'#1A1F27')+'" oninput="document.getElementById(\'theme-text-hex\').textContent=this.value.toUpperCase()"></div></div>';
+  html += '<div class="lke-pick-row"><label>제목 글자색</label><div class="lke-pick-col"><span class="lke-pick-hex" id="theme-title-hex">'+((st.titleColor||'#1A1F27').toUpperCase())+'</span><input type="color" class="lke-color-dot" id="theme-title-c" value="'+(st.titleColor||'#1A1F27')+'" oninput="document.getElementById(\'theme-title-hex\').textContent=this.value.toUpperCase()"></div></div>';
+  html += '</div>';
+
+  // 폰트
+  html += '<div class="lke-field-label" style="margin-top:14px">제목 폰트</div>'+
+    '<div class="lke-font-list" id="theme-title-font">'+
+      [['Pretendard',''],['Fraunces','fra'],['Noto Sans KR',''],['Noto Serif KR','fra']].map(function(f){
+        return '<span class="lke-font-pill '+f[1]+(st.titleFont===f[0]?' active':'')+'" data-font="'+f[0]+'">'+f[0]+'</span>';
+      }).join('')+
+    '</div>';
+  html += '<div class="lke-field-label">본문 폰트</div>'+
+    '<div class="lke-font-list" id="theme-body-font">'+
+      [['Pretendard',''],['Noto Sans KR',''],['Nanum Myeongjo','fra'],['JetBrains Mono','mono']].map(function(f){
+        return '<span class="lke-font-pill '+f[1]+(st.bodyFont===f[0]?' active':'')+'" data-font="'+f[0]+'">'+f[0]+'</span>';
+      }).join('')+
+    '</div>';
+
+  html += '<button class="lke-top-btn primary" style="width:100%;padding:14px;margin-top:14px" onclick="lkeApplyTheme()">적용</button>';
+  body.innerHTML = html;
+  body.querySelectorAll('.lke-font-list').forEach(function(list){
+    list.querySelectorAll('.lke-font-pill').forEach(function(p){
+      p.addEventListener('click', function(e){ e.stopPropagation(); list.querySelectorAll('.lke-font-pill').forEach(function(x){ x.classList.remove('active'); }); p.classList.add('active'); });
+    });
+  });
+}
+
+function lkeApplyTheme(){
+  var st = lkeState.theme || (lkeState.theme = {});
+  var gradBody = document.getElementById('theme-bg-grad');
+  if(gradBody){
+    var sel = gradBody.querySelector('.lke-grad-sel');
+    var dir = sel ? sel.value : '135';
+    var c1 = gradBody.querySelector('.lke-grad-c1').value;
+    var c2 = gradBody.querySelector('.lke-grad-c2').value;
+    if(c1 && c2){
+      st.bg = (dir==='radial'?'radial-gradient(circle,':'linear-gradient('+dir+'deg,')+c1+','+c2+')';
+    }
+  }
+  var solid = document.getElementById('theme-bg-solid');
+  if(solid) st.bgSolid = solid.value;
+  st.textColor = document.getElementById('theme-text').value;
+  st.titleColor = document.getElementById('theme-title-c').value;
+  var tf = document.querySelector('#theme-title-font .lke-font-pill.active'); if(tf) st.titleFont = tf.dataset.font;
+  var bf = document.querySelector('#theme-body-font .lke-font-pill.active'); if(bf) st.bodyFont = bf.dataset.font;
+  lkeApplyThemeToDom();
+  lkeRender();
+  lkeCloseSheet();
+}
+function lkeApplyThemeToDom(){
+  var st = lkeState.theme; if(!st) return;
+  var v = document.getElementById('v-link'); if(!v) return;
+  // 배경 우선: grad(있으면) > solid
+  if(st.bg) v.style.background = st.bg;
+  else if(st.bgSolid) v.style.background = st.bgSolid;
+  if(st.bodyFont) v.style.fontFamily = "'"+st.bodyFont+"','Pretendard',sans-serif";
+  // CSS vars for 블록 디폴트
+  if(st.textColor) v.style.setProperty('--lke-default-text', st.textColor);
+  if(st.titleColor) v.style.setProperty('--lke-default-title', st.titleColor);
+  if(st.titleFont) v.style.setProperty('--lke-default-title-font', "'"+st.titleFont+"','Pretendard',sans-serif");
+}
+// lkeApplyLayout 제거됨 (레이아웃 기능 삭제)
+function lkeApplySettings(){
+  var hi = document.getElementById('lke-settings-handle');
+  var st = document.getElementById('lke-handle-status');
+  if(!hi){ lkeCloseSheet(); return; }
+  var v = (hi.value||'').trim().replace(/[^a-z0-9_\-]/gi,'');
+  if(!v){ alert('핸들을 입력해주세요'); return; }
+  if(st && st.classList.contains('bad')){ alert('중복된 핸들이에요. 다른 핸들을 선택해주세요.'); return; }
+  lkeState.handle = v;
+  var d = document.getElementById('lk-handle-disp'); if(d) d.textContent = v;
+  lkeCloseSheet();
+}
+
+// 핸들 중복 체크 (데모 — 실제로는 API)
+var LKE_TAKEN_HANDLES = ['yuna','jjin_beauty','seoulnista','admin','ssobi','help','test','root'];
+var _lkeHandleDebounce = null;
+function lkeHandleCheck(inp){
+  clearTimeout(_lkeHandleDebounce);
+  var st = document.getElementById('lke-handle-status');
+  var v = (inp.value||'').trim().replace(/[^a-z0-9_\-]/gi,'');
+  if(v!==inp.value) inp.value=v;
+  if(!v){ st.className='lke-handle-status'; st.textContent=''; return; }
+  if(v.length<3){ st.className='lke-handle-status bad'; st.textContent='3자 이상'; return; }
+  st.className='lke-handle-status checking'; st.textContent='확인 중…';
+  _lkeHandleDebounce = setTimeout(function(){
+    if(LKE_TAKEN_HANDLES.indexOf(v.toLowerCase()) >= 0){
+      st.className='lke-handle-status bad'; st.textContent='이미 사용 중';
+    } else {
+      st.className='lke-handle-status ok'; st.textContent='사용 가능';
+    }
+  }, 400);
+}
+
+// 히어로 스탯 삭제
+function lkeHeroRemoveStat(si, which){
+  lkeState.hero.slides[si]['stat'+which+'_hidden'] = true;
+  lkeRender();
+}
+function lkeHeroRemoveCta(si){
+  lkeState.hero.slides[si].cta_hidden = true;
+  lkeRender();
+}
+function lkeToggleStatMenu(el){
+  var wasOn = el.classList.contains('menu-on');
+  document.querySelectorAll('.lke-hero-stat.menu-on,.lke-hero-cta-wrap.menu-on').forEach(function(x){ x.classList.remove('menu-on'); });
+  if(!wasOn) el.classList.add('menu-on');
+}
+function lkeEditStat(si, which){
+  var s = lkeState.hero.slides[si];
+  var newN = prompt('숫자', s['stat'+which+'n']||''); if(newN==null) return;
+  var newL = prompt('라벨', s['stat'+which+'l']||''); if(newL==null) return;
+  s['stat'+which+'n'] = newN;
+  s['stat'+which+'l'] = newL;
+  s['stat'+which+'_hidden'] = false;
+  lkeRender();
+}
+// 빈 화면 클릭 시 메뉴 닫기
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.lke-hero-stat') && !e.target.closest('.lke-hero-cta-wrap')){
+    document.querySelectorAll('.lke-hero-stat.menu-on,.lke-hero-cta-wrap.menu-on').forEach(function(x){ x.classList.remove('menu-on'); });
+  }
+});
+
+// 그리드 카드 개별 편집
+function lkeEditGridCard(blockIdx, cardIdx){
+  var b = lkeState.blocks[blockIdx];
+  var it = b.items[cardIdx];
+  var title=document.getElementById('lke-edit-title');
+  var body=document.getElementById('lke-edit-body');
+  title.textContent='제품 카드 '+(cardIdx+1)+' 편집';
+  var html='<div class="lke-field-label">종류</div>'+
+    '<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">'+
+      ['product','channel','content','service'].map(function(k){
+        var lbl={product:'상품 (가격)',channel:'SNS 채널',content:'유튜브 콘텐츠',service:'서비스'}[k];
+        return '<button onclick="lkeGridKindOnly('+blockIdx+','+cardIdx+',\''+k+'\')" style="flex:1;min-width:80px;padding:9px;border-radius:8px;border:1px solid var(--b);background:'+(it.kind===k||(!it.kind&&k==="product")?'var(--mint)':'#fff')+';color:'+(it.kind===k||(!it.kind&&k==="product")?'#fff':'var(--t2)')+';font-size:12px;font-weight:700;cursor:pointer">'+lbl+'</button>';
+      }).join('')+
+    '</div>'+
+    lkeField('제목','text','ci-title',it.title)+
+    lkeField('날짜/메타','text','ci-date',it.date);
+  if(it.kind==='product'||!it.kind){
+    html += lkeField('판매가','text','ci-price',it.price)+lkeField('원가 (취소선)','text','ci-orig',it.origPrice);
+  }
+  html += '<div class="lke-field-label">태그</div>'+
+    '<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">'+
+      ['','HOT','NEW','BEST','공구'].map(function(t){
+        var active = (it.tag||'')===t;
+        return '<button onclick="lkeGridTagOnly('+blockIdx+','+cardIdx+',\''+t+'\')" style="padding:7px 12px;border-radius:100px;font-size:11px;font-weight:700;border:1px solid var(--b);background:'+(active?'var(--dark)':'#fff')+';color:'+(active?'#fff':'var(--t2)')+';cursor:pointer">'+(t||'없음')+'</button>';
+      }).join('')+
+    '</div>'+
+    lkeField('URL','url','ci-url',it.url)+
+    '<div class="lke-field-label">썸네일 이미지</div><label style="display:block;margin-bottom:10px"><input type="file" accept="image/*" onchange="lkeCardImageUpload('+blockIdx+','+cardIdx+',this)" style="display:none"><div style="padding:10px;border:1.5px dashed #D6D3D1;text-align:center;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;border-radius:6px">'+(it.thumbImg?'이미지 변경 ✓':'사진 선택')+'</div></label>'+
+    '<div class="lke-field-label">썸네일 배경 (이미지 없을 때)</div>'+
+    '<div style="display:flex;gap:6px;margin-bottom:14px">'+
+      [['cream','#F5EDD8→#D4B896'],['coral','#A7F3D0→#00C896'],['pink','#FFE8DC→#FFB098'],['dark','#374151→#1A1F27']].map(function(p){ return '<button onclick="lkeCardImg('+blockIdx+','+cardIdx+',\''+p[0]+'\')" style="flex:1;height:36px;border-radius:6px;border:2px solid '+((it.img||'cream')===p[0]?'var(--mint)':'transparent')+';background:'+({cream:'linear-gradient(135deg,#F5EDD8,#D4B896)',coral:'linear-gradient(135deg,#A7F3D0,#00C896)',pink:'linear-gradient(135deg,#FFE8DC,#FFB098)',dark:'linear-gradient(135deg,#374151,#1A1F27)'}[p[0]])+';cursor:pointer"></button>'; }).join('')+
+    '</div>'+
+    '<div style="display:flex;gap:8px;margin-top:14px">'+
+      '<button class="lke-top-btn danger" onclick="lkeGridDelCard('+blockIdx+','+cardIdx+')">삭제</button>'+
+      '<button class="lke-top-btn" style="flex:1" onclick="lkeCloseSheet()">취소</button>'+
+      '<button class="lke-top-btn primary" style="flex:2" onclick="lkeSaveGridCard('+blockIdx+','+cardIdx+')">저장</button>'+
+    '</div>';
+  body.innerHTML=html;
+  lkeOpenSheet('edit');
+}
+function lkeGridKindOnly(bIdx, cIdx, kind){ lkeState.blocks[bIdx].items[cIdx].kind=kind; lkeEditGridCard(bIdx, cIdx); lkeRender(); }
+function lkeGridTagOnly(bIdx, cIdx, tag){
+  lkeState.blocks[bIdx].items[cIdx].tag = tag;
+  lkeState.blocks[bIdx].items[cIdx].tagStyle = tag==='HOT'?'hot':((tag==='BEST'||tag==='공구')?'dark':'');
+  lkeEditGridCard(bIdx, cIdx);
+  lkeRender();
+}
+function lkeGridDelCard(bIdx, cIdx){
+  if(!confirm('이 카드를 삭제할까요?')) return;
+  lkeState.blocks[bIdx].items.splice(cIdx,1);
+  lkeRender(); lkeCloseSheet();
+}
+function lkeSaveGridCard(bIdx, cIdx){
+  var it = lkeState.blocks[bIdx].items[cIdx];
+  function v(id){ var el=document.getElementById(id); return el?el.value:undefined; }
+  it.title = v('ci-title') ?? it.title;
+  it.date = v('ci-date') ?? it.date;
+  if(it.kind==='product' || !it.kind){ it.price = v('ci-price') ?? it.price; it.origPrice = v('ci-orig') ?? it.origPrice; }
+  it.url = v('ci-url') ?? it.url;
+  lkeRender(); lkeCloseSheet();
+}
+
+// 시트 내 상호작용
+(function(){
+  function bindAll(){
+    document.querySelectorAll('.lke-color-grid').forEach(function(grid){
+      grid.querySelectorAll('.lke-color-swatch').forEach(function(sw){
+        sw.addEventListener('click', function(e){ e.stopPropagation(); grid.querySelectorAll('.lke-color-swatch').forEach(function(x){ x.classList.remove('active'); }); sw.classList.add('active'); });
+      });
+    });
+    document.querySelectorAll('.lke-font-list').forEach(function(list){
+      list.querySelectorAll('.lke-font-pill').forEach(function(p){
+        p.addEventListener('click', function(e){ e.stopPropagation(); list.querySelectorAll('.lke-font-pill').forEach(function(x){ x.classList.remove('active'); }); p.classList.add('active'); });
+      });
+    });
+    document.querySelectorAll('.lke-layout-select').forEach(function(grid){
+      grid.querySelectorAll('.lke-layout-tile').forEach(function(t){
+        t.addEventListener('click', function(e){ e.stopPropagation(); grid.querySelectorAll('.lke-layout-tile').forEach(function(x){ x.classList.remove('active'); }); t.classList.add('active'); });
+      });
+    });
+  }
+  if(document.readyState==='loading') document.addEventListener('DOMContentLoaded', bindAll);
+  else bindAll();
+})();
+
+function initLinkView(){
+  var h = document.getElementById('lk-handle-disp'); if(h) h.textContent = lkeState.handle || 'yuminhye';
+  var d2=document.getElementById('lk-handle-disp-2'); if(d2) d2.textContent=lkeState.handle || 'yuminhye';
+  lkeRender();
 }
 
 // ═══ EDITOR ═══
@@ -5909,9 +7518,24 @@ function addTarget(){
 function delTarget(btn){ btn.closest('.target-item').remove(); }
 function finalizeTargets(){
   checkNewbie('target');
+  // AI 말투 학습 반영 토스트
+  lkeShowToast('✓ 참고 계정·해시태그가 <b>AI 말투 학습</b>에 반영됐어요');
   // 필수 3단계 완료 시 celebrate에서 홈 이동 처리. 아니면 수동으로 홈으로
   var allDone = newbieRequired.every(function(k){ return newbieChecks[k]; });
-  if(!allDone) go('home');
+  if(!allDone) setTimeout(function(){ go('home'); }, 900);
+}
+// 간단 토스트
+function lkeShowToast(html){
+  var existing = document.getElementById('ssobi-toast');
+  if(existing) existing.remove();
+  var t = document.createElement('div');
+  t.id = 'ssobi-toast';
+  t.innerHTML = html;
+  t.style.cssText = 'position:fixed;left:50%;bottom:calc(var(--nav-h) + 40px);transform:translateX(-50%) translateY(20px);background:var(--dark);color:#fff;padding:12px 18px;border-radius:100px;font-size:13px;font-weight:700;letter-spacing:-.2px;box-shadow:0 10px 30px rgba(15,19,25,.25);z-index:400;opacity:0;transition:all .3s cubic-bezier(.32,1,.32,1);max-width:88vw;white-space:nowrap';
+  t.querySelectorAll('b').forEach(function(b){ b.style.color='var(--mint)'; });
+  document.body.appendChild(t);
+  requestAnimationFrame(function(){ t.style.opacity='1'; t.style.transform='translateX(-50%) translateY(0)'; });
+  setTimeout(function(){ t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(20px)'; setTimeout(function(){ t.remove(); }, 300); }, 2600);
 }
 
 
@@ -5935,6 +7559,8 @@ function selectPost(el) {
     p.style.borderColor = 'transparent';
   });
   el.style.borderColor = 'var(--mint)';
+  // 설정 팝업도 같이 열기
+  openModal('m-dm-rule');
 }
 
 // 내 최근 게시물 9개 샘플
