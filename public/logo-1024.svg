@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-label="Ssobi">
+  <defs>
+    <linearGradient id="bg-1024" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A1F27"/>
+      <stop offset="100%" stop-color="#0F1319"/>
+    </linearGradient>
+    <radialGradient id="glow-1024" cx="80%" cy="20%" r="60%">
+      <stop offset="0%" stop-color="#00C896" stop-opacity="0.28"/>
+      <stop offset="100%" stop-color="#00C896" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1024" height="1024" rx="224" fill="url(#bg-1024)"/>
+  <rect width="1024" height="1024" rx="224" fill="url(#glow-1024)"/>
+  <text x="210" y="720" font-family="Fraunces, 'Times New Roman', serif" font-style="italic" font-weight="300" font-size="760" letter-spacing="-30" fill="#FFFFFF">S</text>
+  <circle cx="790" cy="700" r="75" fill="#00C896"/>
+</svg>
