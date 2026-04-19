@@ -2,6 +2,7 @@ import { createClient as createAdminClient, type SupabaseClient } from '@supabas
 import { NextRequest, NextResponse } from 'next/server'
 import { isOverLimit } from '@/lib/plans'
 import { logAIUsage } from '@/lib/ai-usage'
+import { classifyText, upsertFollower, recordOutboundMessage, maybeCreateRevenueProposal } from '@/lib/webhook-helpers'
 
 type AdminClient = SupabaseClient
 
@@ -108,16 +109,48 @@ async function handleComment(supabase: AdminClient, value: any) {
       )
 
       const igData = await igRes.json()
+      const sent = igRes.ok
+      const commenterHandle = value.from?.username || String(value.from?.id || '')
+      const cls = classifyText(text)
 
-      // 로그 저장
-      await supabase.from('reply_logs').insert({
+      // 분류 포함 reply_log
+      const { data: replyLog } = await supabase.from('reply_logs').insert({
         user_id: account.user_id,
         ig_account_id: account.id,
         type: 'comment',
         original_text: text,
         reply_text: reply,
         platform_id: igData.id || commentId,
+        urgency: cls.urgency,
+        sentiment: cls.sentiment,
+        send_status: sent ? 'sent' : 'failed',
+      }).select('id').single()
+
+      // outbound 로그
+      await recordOutboundMessage(supabase, {
+        userId: account.user_id,
+        platform: 'instagram',
+        kind: 'comment_reply',
+        body: reply,
+        recipientHandle: commenterHandle,
+        recipientPlatformId: String(value.from?.id || ''),
+        status: sent ? 'sent' : 'failed',
+        platformMessageId: igData.id,
+        errorMessage: sent ? undefined : JSON.stringify(igData.error || {}),
+        sourceRefType: 'reply_logs',
+        sourceRefId: replyLog?.id,
       })
+
+      // 팔로워 CRM upsert
+      if (commenterHandle) {
+        await upsertFollower(supabase, {
+          userId: account.user_id,
+          platform: 'instagram',
+          handle: commenterHandle,
+          kind: 'comment',
+          sentiment: cls.sentiment,
+        })
+      }
 
       // 사용량 카운트
       const month = new Date().toISOString().slice(0, 7)
@@ -127,7 +160,7 @@ async function handleComment(supabase: AdminClient, value: any) {
         p_type: 'comment',
       })
 
-      console.log(`[Webhook] Replied to comment ${commentId}: "${reply.substring(0, 40)}"`)
+      console.log(`[Webhook] Replied to comment ${commentId}: "${reply.substring(0, 40)}" (${cls.urgency}/${cls.sentiment})`)
       break // 첫 매칭 계정만 처리
     } catch (e) {
       console.error(`[Webhook] Comment reply error:`, e)
@@ -180,15 +213,53 @@ async function handleMessage(supabase: AdminClient, value: any) {
       )
 
       const igData = await igRes.json()
-      const status = igRes.ok ? 'sent' : `error:${igData.error?.message || igRes.status}`
+      const sent = igRes.ok
+      const senderHandle = value.sender?.username || String(senderId)
+      const cls = classifyText(text)
 
-      await supabase.from('reply_logs').insert({
+      const { data: replyLog } = await supabase.from('reply_logs').insert({
         user_id: account.user_id,
         ig_account_id: account.id,
         type: 'dm',
         original_text: text,
         reply_text: reply,
         platform_id: igData.message_id || messageId,
+        urgency: cls.urgency,
+        sentiment: cls.sentiment,
+        send_status: sent ? 'sent' : 'failed',
+      }).select('id').single()
+
+      await recordOutboundMessage(supabase, {
+        userId: account.user_id,
+        platform: 'instagram',
+        kind: 'dm',
+        body: reply,
+        recipientHandle: senderHandle,
+        recipientPlatformId: String(senderId),
+        status: sent ? 'sent' : 'failed',
+        platformMessageId: igData.message_id,
+        errorMessage: sent ? undefined : JSON.stringify(igData.error || {}),
+        sourceRefType: 'reply_logs',
+        sourceRefId: replyLog?.id,
+      })
+
+      if (senderHandle) {
+        await upsertFollower(supabase, {
+          userId: account.user_id,
+          platform: 'instagram',
+          handle: senderHandle,
+          kind: 'dm',
+          sentiment: cls.sentiment,
+        })
+      }
+
+      // 비즈 DM 자동 분류 → revenue_proposals 적재
+      await maybeCreateRevenueProposal(supabase, {
+        userId: account.user_id,
+        sourceChannel: 'instagram_dm',
+        fromPlatformId: String(senderId),
+        fromHandle: senderHandle,
+        text,
       })
 
       const month = new Date().toISOString().slice(0, 7)
@@ -198,7 +269,7 @@ async function handleMessage(supabase: AdminClient, value: any) {
         p_type: 'dm',
       })
 
-      console.log(`[Webhook] DM reply to ${senderId}: "${reply.substring(0, 40)}" → ${status}`)
+      console.log(`[Webhook] DM reply to ${senderId}: "${reply.substring(0, 40)}" → ${sent ? 'sent' : 'failed'} (${cls.urgency}/${cls.sentiment})`)
       break
     } catch (e) {
       console.error(`[Webhook] DM reply error:`, e)

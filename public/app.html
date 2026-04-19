@@ -5735,7 +5735,42 @@ function shareFollowerIds(kind){
 }
 function saveLink(){
   try{ localStorage.setItem('ssobi_link_state', JSON.stringify(linkState)); }catch(e){}
+  lkeSyncToServer();
   copyLinkUrl();
+}
+
+// 서버 자동 동기화 (디바운스 2초)
+var _lkeSyncTimer = null;
+function lkeSyncToServer(){
+  if(_lkeSyncTimer) clearTimeout(_lkeSyncTimer);
+  _lkeSyncTimer = setTimeout(function(){
+    _lkeSyncTimer = null;
+    _lkeSyncNow();
+  }, 2000);
+}
+function _lkeSyncNow(){
+  var state = (typeof lkeState !== 'undefined' && lkeState) ? lkeState : null;
+  if(!state || !state.handle) return;
+  var payload = {
+    handle: state.handle,
+    hero: state.hero || {},
+    theme: state.theme || {},
+    settings: state.settings || {},
+    blocks: state.blocks || [],
+    published: state.published !== false,
+  };
+  try {
+    fetch('/api/link', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(payload),
+      credentials:'include',
+    }).then(function(r){
+      if(!r.ok){ console.warn('[ssobi] link sync failed', r.status); }
+      else { console.debug('[ssobi] link synced'); }
+    }).catch(function(e){ console.warn('[ssobi] link sync error', e); });
+  } catch(e) { console.warn(e); }
+  try{ localStorage.setItem('ssobi_lke_state', JSON.stringify(state)); }catch(e){}
 }
 function shareTo(ch){
   var url = 'https://ssobi.ai/u/'+linkState.handle;
@@ -5848,6 +5883,8 @@ function lkeRender(){
     root.appendChild(el);
     root.appendChild(lkeAddZone(i+1));
   });
+  // 상태 변경 후 서버 동기화 (디바운스)
+  if(typeof lkeSyncToServer === 'function') lkeSyncToServer();
 }
 
 function lkeAddZone(idx){
@@ -7772,6 +7809,20 @@ function mytplSave(){
     selectTpl(myItem,'custom');
   }
   window._customTplBg = mytplState.bg;
+  // 서버에 저장 (user_templates 테이블)
+  try {
+    fetch('/api/templates', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        name: 'My Template',
+        bg: mytplState.bg,
+        logo_url: mytplState.logo || null,
+        elements: mytplState.elements || [],
+      }),
+      credentials:'include',
+    }).catch(function(e){ console.warn('[ssobi] template save failed', e); });
+  } catch(e){}
   cm('m-my-tpl');
   if(typeof lkeShowToast==='function') lkeShowToast('✓ 내 템플릿 저장 완료');
 }
@@ -8065,12 +8116,23 @@ function addTarget(){
   var val=inp.value.trim();
   if(!val) return;
   var handle=val.startsWith('@')?val:'@'+val;
+  var cleanHandle = handle.replace(/^@/, '');
   var list=document.getElementById('target-list');
   var item=document.createElement('div');
   item.className='target-item';
+  item.dataset.handle = cleanHandle;
   item.innerHTML='<div class="target-av2">'+handle[1].toUpperCase()+'</div><div class="target-info2"><div class="target-name2">'+handle+'</div><div class="target-meta">방금 추가됨</div></div><button class="target-del" onclick="delTarget(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg></button>';
   list.appendChild(item);
   inp.value='';
+  // 서버에 저장 (reference_accounts)
+  try {
+    fetch('/api/reference-accounts', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ handle: cleanHandle, platform: 'ig' }),
+      credentials:'include',
+    }).catch(function(e){ console.warn('[ssobi] ref account save failed', e); });
+  } catch(e){}
 }
 function delTarget(btn){ btn.closest('.target-item').remove(); }
 function finalizeTargets(){
