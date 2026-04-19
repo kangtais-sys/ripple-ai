@@ -5,7 +5,7 @@
 - **회사**: (주)공팔리터글로벌
 - **대상**: K-뷰티 인플루언서의 SNS 자동 관리 SaaS
 - **GitHub**: https://github.com/kangtais-sys/ripple-ai
-- **배포 URL**: https://ripple-ai-umber.vercel.app
+- **배포 URL**: https://ssobi.ai
 - **랜딩**: legacy/repli_landing.html
 - **앱 프로토타입**: legacy/repli_v3.html
 
@@ -72,9 +72,9 @@ vercel.json                         cron 설정
 - **앱 ID**: 973683215179192
 - **Instagram 앱 ID**: 1746122143490239
 - **권한**: instagram_business_basic / instagram_manage_comments / instagram_business_manage_messages
-- **Webhook URL**: https://ripple-ai-umber.vercel.app/api/webhook/instagram
+- **Webhook URL**: https://ssobi.ai/api/webhook/instagram
 - **Webhook Verify Token**: repli_webhook_2026
-- **IG OAuth Redirect URI**: https://ripple-ai-umber.vercel.app/api/auth/instagram/callback
+- **IG OAuth Redirect URI**: https://ssobi.ai/api/auth/instagram/callback
 - **Webhook 등록 완료**: comments, messages 구독
 
 ## Google OAuth
@@ -366,7 +366,7 @@ public/
 
 ### Vercel 환경변수 (Repli → Ssobi 리네이밍 필요)
 - 다음 env 값의 도메인 참조 확인·수정 필요:
-  - `NEXT_PUBLIC_APP_URL` = https://ripple-ai-umber.vercel.app
+  - `NEXT_PUBLIC_APP_URL` = https://ssobi.ai
     → `https://ssobi.ai` 로 교체
   - 각 OAuth provider의 redirect URI (Supabase, Meta, Google, Kakao)
     모두 ssobi.ai 기반으로 추가 등록 필요
@@ -375,7 +375,7 @@ public/
 - **서비스명**: Ssobi. (쏘비)
 - **회사**: (주)공팔리터글로벌
 - **도메인**: https://ssobi.ai
-- **구 도메인**: https://ripple-ai-umber.vercel.app (당분간 유지)
+- **구 도메인**: https://ssobi.ai (당분간 유지)
 - **포지셔닝**: 소셜 비서 SaaS (키우기·만들기·수익화)
 - **타겟**: K-뷰티 인플루언서 → 확장 중
 
