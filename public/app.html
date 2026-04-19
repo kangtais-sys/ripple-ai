@@ -473,7 +473,7 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .trend-divider::before{left:0}.trend-divider::after{right:0}
 
 .direct-box{background:var(--s);border-radius:20px;border:1.5px dashed var(--b);padding:18px}
-.direct-ta{width:100%;border:none;background:none;font-size:14px;font-family:'Pretendard',sans-serif;color:var(--t1);resize:none;outline:none;line-height:1.6;min-height:80px}
+.direct-ta{width:100%;border:none;background:none;font-size:15.5px;font-family:'Pretendard',sans-serif;color:var(--t1);resize:none;outline:none;line-height:1.55;min-height:90px;letter-spacing:-.2px}
 .direct-ta::placeholder{color:var(--t3)}
 /* ── 만들기 온보딩 (강조 컬러) ── */
 .discover-box{background:linear-gradient(135deg,#F0FDF9,#EEF2FF);border-radius:20px;border:1px solid #A7F3D0;margin-top:20px;overflow:hidden;transition:border-color .15s,box-shadow .2s}
@@ -1975,7 +1975,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <!-- 처음이면 여기부터 (얇은 바) -->
     <button class="first-bar" onclick="openModal('m-discover')">
       <span class="first-bar-ico">✨</span>
-      <span class="first-bar-txt">처음이신가요? <strong>프로필·주제 세팅</strong></span>
+      <span class="first-bar-txt">처음 SNS를 시작한다면? <strong>프로필·주제 세팅</strong></span>
       <span class="first-bar-arr">→</span>
     </button>
 
@@ -2032,7 +2032,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         <div style="font-size:13px;font-weight:800;color:var(--t1)">직접 입력하기</div>
       </div>
       <div style="font-size:11.5px;color:var(--t2);line-height:1.55;margin-bottom:10px">주제 한 줄 적으면 <b style="color:var(--t1)">내 말투</b>로 카드뉴스·캡션을 자동 생성해요.</div>
-      <textarea class="direct-ta" id="direct-topic" placeholder="예: 토너 패드 추천 / 민감 피부 봄철 루틴 / 이번주 공구 정리" oninput="toggleDirectBtn()" onkeyup="toggleDirectBtn()" oncompositionupdate="toggleDirectBtn()" oncompositionend="toggleDirectBtn()" onchange="toggleDirectBtn()"></textarea>
+      <textarea class="direct-ta" id="direct-topic" placeholder="예: 우울할 때 보기 좋은 책 속 글귀 추천 (출처 포함) / 아이돌 메이크업 트렌드 Best 3 / 민감 피부 봄철 루틴 / 이번주 공구 정리" oninput="toggleDirectBtn()" onkeyup="toggleDirectBtn()" oncompositionupdate="toggleDirectBtn()" oncompositionend="toggleDirectBtn()" onchange="toggleDirectBtn()"></textarea>
       <button class="direct-gen" id="direct-gen-btn" disabled onclick="generatePrompt()">카드뉴스 생성하기</button>
     </div>
   </div>
