@@ -1458,8 +1458,9 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
 /* Drag handle & DnD */
 #v-link .lke-block{position:relative}
-#v-link .lke-drag{position:absolute;top:8px;left:8px;z-index:11;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border:1px solid var(--b);display:none;align-items:center;justify-content:center;cursor:grab;color:var(--t2);font-size:14px;font-weight:900;letter-spacing:-2px}
-#v-link .lke-block:hover .lke-drag,#v-link .lke-block.selected .lke-drag{display:flex}
+#v-link .lke-drag{position:absolute;top:8px;left:8px;z-index:11;width:32px;height:32px;border-radius:10px;background:#fff;backdrop-filter:blur(8px);border:1px solid rgba(15,19,25,.08);display:flex;align-items:center;justify-content:center;cursor:grab;color:var(--t2);font-size:14px;font-weight:900;letter-spacing:-2px;box-shadow:0 2px 8px rgba(15,19,25,.08);touch-action:none;user-select:none;-webkit-user-select:none}
+#v-link .lke-drag:active{cursor:grabbing;background:var(--mint);color:#fff;border-color:var(--mint);transform:scale(.95)}
+#v-link.lke-preview .lke-drag,#v-link .lke-block-hero .lke-drag{display:none}
 #v-link .lke-block.dragging{opacity:.4;transform:scale(.98);transition:transform .15s}
 #v-link .lke-block.lke-ready{outline:2px solid var(--mint);outline-offset:3px;transform:scale(1.01);transition:transform .15s,outline .15s;box-shadow:0 8px 22px rgba(0,200,150,.22)}
 #v-link .lke-drop-target{border-top:3px solid var(--mint)}
@@ -6275,12 +6276,60 @@ var lkeDragIdx = null;
 var _lkPressTimer = null;
 var _lkPressEl = null;
 var _lkDragArmed = false;
+var _lkSuppressClickUntil = 0;
 var _lkTouchStartY = 0;
 var _lkTouchStartX = 0;
+var LKE_LONGPRESS_MS = 350;
 
 function lkeAttachDnD(el){
-  // 기본적으로 draggable=false. 롱프레스 후에만 draggable=true
+  // 기본적으로 draggable=false. 롱프레스 또는 핸들 조작 후에만 draggable=true
   el.setAttribute('draggable','false');
+
+  // 드래그 핸들(⋮⋮) — 즉시 드래그 가능, 편집팝업 차단
+  var handle = el.querySelector('.lke-drag');
+  if(handle){
+    handle.addEventListener('mousedown', function(e){
+      e.stopPropagation();
+      el.setAttribute('draggable','true');
+      _lkDragArmed=true;
+      el.classList.add('lke-ready');
+      _lkSuppressClickUntil = Date.now() + 2000;
+    });
+    handle.addEventListener('click', function(e){ e.preventDefault(); e.stopPropagation(); });
+    handle.addEventListener('touchstart', function(e){
+      e.stopPropagation();
+      var t=e.touches[0];
+      _lkTouchStartX=t.clientX; _lkTouchStartY=t.clientY;
+      _lkDragArmed=true;
+      _lkSuppressClickUntil = Date.now() + 2000;
+      el.classList.add('lke-ready');
+      lkeTouchDragStart(el);
+      if(navigator.vibrate) try{ navigator.vibrate(10); }catch(_){}
+    }, {passive:true});
+    handle.addEventListener('touchmove', function(e){
+      if(!_lkDragArmed) return;
+      e.preventDefault();
+      lkeTouchDragMove(e.touches[0]);
+    }, {passive:false});
+    handle.addEventListener('touchend', function(e){
+      e.stopPropagation();
+      el.classList.remove('lke-ready');
+      if(_lkDragArmed){
+        _lkSuppressClickUntil = Date.now() + 600;
+        lkeTouchDragEnd();
+      }
+      _lkDragArmed=false;
+    });
+  }
+
+  // 롱프레스 직후 click은 캡처 단계에서 차단 (편집 팝업이 뜨지 않도록)
+  el.addEventListener('click', function(e){
+    if(Date.now() < _lkSuppressClickUntil){
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+    }
+  }, true);
 
   // HTML5 DnD 핸들러 (데스크탑 + armed 상태 모바일)
   el.addEventListener('dragstart',function(e){
@@ -6303,22 +6352,24 @@ function lkeAttachDnD(el){
   el.addEventListener('dragend',function(){
     this.classList.remove('dragging');
     this.setAttribute('draggable','false');
+    _lkSuppressClickUntil = Date.now() + 400;
     _lkDragArmed=false;
     lkeDragIdx=null;
   });
 
-  // 마우스 롱프레스 (데스크탑) — 450ms
+  // 마우스 롱프레스 (데스크탑) — 350ms
   el.addEventListener('mousedown', function(e){
-    if(e.target.closest('button,input,textarea,select,a,[contenteditable="true"],.lke-editable-text,.lke-hero-stat,.lke-hero-cta-wrap')) return;
+    if(e.target.closest('button,input,textarea,select,a,[contenteditable="true"],.lke-editable-text,.lke-hero-stat,.lke-hero-cta-wrap,.lke-drag')) return;
     var self=this;
     _lkPressEl=self;
     clearTimeout(_lkPressTimer);
     _lkPressTimer = setTimeout(function(){
       self.setAttribute('draggable','true');
       _lkDragArmed=true;
+      _lkSuppressClickUntil = Date.now() + 2000;
       self.classList.add('lke-ready');
       if(navigator.vibrate) try{ navigator.vibrate(12); }catch(_){}
-    }, 450);
+    }, LKE_LONGPRESS_MS);
   });
   el.addEventListener('mouseup', function(){
     clearTimeout(_lkPressTimer);
@@ -6329,9 +6380,9 @@ function lkeAttachDnD(el){
     clearTimeout(_lkPressTimer);
   });
 
-  // 터치 롱프레스 (모바일) — 450ms, 손가락 움직이면 취소 (스크롤 허용)
+  // 터치 롱프레스 (모바일) — 350ms, 손가락 움직이면 취소 (스크롤 허용)
   el.addEventListener('touchstart', function(e){
-    if(e.target.closest('button,input,textarea,select,a,[contenteditable="true"],.lke-editable-text,.lke-hero-stat,.lke-hero-cta-wrap')) return;
+    if(e.target.closest('button,input,textarea,select,a,[contenteditable="true"],.lke-editable-text,.lke-hero-stat,.lke-hero-cta-wrap,.lke-drag')) return;
     var self=this;
     var t=e.touches[0];
     _lkTouchStartX=t.clientX; _lkTouchStartY=t.clientY;
@@ -6340,9 +6391,10 @@ function lkeAttachDnD(el){
     _lkPressTimer = setTimeout(function(){
       self.classList.add('lke-ready');
       _lkDragArmed=true;
+      _lkSuppressClickUntil = Date.now() + 2000;
       lkeTouchDragStart(self);
       if(navigator.vibrate) try{ navigator.vibrate(18); }catch(_){}
-    }, 450);
+    }, LKE_LONGPRESS_MS);
   }, {passive:true});
   el.addEventListener('touchmove', function(e){
     if(!_lkDragArmed){
@@ -6358,13 +6410,19 @@ function lkeAttachDnD(el){
   el.addEventListener('touchend', function(){
     clearTimeout(_lkPressTimer);
     this.classList.remove('lke-ready');
-    if(_lkDragArmed){ lkeTouchDragEnd(); }
+    if(_lkDragArmed){
+      _lkSuppressClickUntil = Date.now() + 600;
+      lkeTouchDragEnd();
+    }
     _lkDragArmed=false;
   });
   el.addEventListener('touchcancel', function(){
     clearTimeout(_lkPressTimer);
     this.classList.remove('lke-ready');
-    if(_lkDragArmed){ lkeTouchDragEnd(); }
+    if(_lkDragArmed){
+      _lkSuppressClickUntil = Date.now() + 600;
+      lkeTouchDragEnd();
+    }
     _lkDragArmed=false;
   });
 }
