@@ -211,8 +211,8 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--t1);ma
     <div class="company-name">(주)공팔리터글로벌</div>
     <div class="company-info">
       서비스명: Ssobi.<br>
-      고객센터: support@repli.ai<br>
-      서비스 문의: help@repli.ai
+      고객센터: support@ssobi.ai<br>
+      서비스 문의: help@ssobi.ai
     </div>
   </div>
 
@@ -367,7 +367,7 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--t1);ma
         <li><strong>삭제권</strong>: 개인정보 삭제 요청 (법령에 따른 보관 의무가 없는 경우)</li>
         <li><strong>처리정지권</strong>: 개인정보 처리 정지 요청</li>
       </ul>
-      <p>권리 행사는 support@repli.ai 으로 이메일 요청하시면 지체 없이 처리합니다.</p>
+      <p>권리 행사는 support@ssobi.ai 으로 이메일 요청하시면 지체 없이 처리합니다.</p>
     </div>
   </div>
 
@@ -393,16 +393,61 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--t1);ma
     </div>
   </div>
 
-  <div class="section">
+  <div class="section" id="data-deletion">
     <div class="section-num">제 9조</div>
+    <div class="section-title">데이터 삭제 요청 (Data Deletion)</div>
+    <div class="section-body">
+      <p><strong>Ssobi. 계정 및 연동된 SNS 데이터(Instagram, Facebook 등)를 삭제하실 수 있습니다.</strong></p>
+
+      <div class="highlight">
+        <strong>🇰🇷 삭제 방법 (한국어)</strong><br><br>
+        <strong>방법 1. 앱 내 탈퇴</strong><br>
+        1) Ssobi 앱 접속 → <b>내 정보</b> 탭<br>
+        2) 하단 <b>"계정 삭제"</b> 버튼 탭<br>
+        3) 확인 후 30일 이내 모든 개인정보·SNS 연동 토큰·응대 기록이 파기됩니다.<br><br>
+        <strong>방법 2. 이메일 요청</strong><br>
+        <b>privacy@ssobi.ai</b> 로 "데이터 삭제 요청" 제목의 메일을 보내주세요.<br>
+        (가입 이메일·연동된 SNS 핸들·삭제 범위 명시)<br>
+        → 영업일 기준 <b>7일 이내</b> 처리 완료 회신드립니다.
+      </div>
+
+      <div class="highlight" style="margin-top:12px">
+        <strong>🇺🇸 How to Delete Your Data (English)</strong><br><br>
+        <strong>Option 1. In-app deletion</strong><br>
+        1) Open the Ssobi app → <b>My Info</b> tab<br>
+        2) Tap <b>"Delete Account"</b> at the bottom<br>
+        3) All personal data, SNS access tokens, and reply logs will be permanently deleted within 30 days.<br><br>
+        <strong>Option 2. Email request</strong><br>
+        Email <b>privacy@ssobi.ai</b> with subject <em>"Data Deletion Request"</em>.<br>
+        Include your signup email, connected SNS handles, and scope of deletion.<br>
+        → We'll confirm completion within <b>7 business days</b>.
+      </div>
+
+      <p style="margin-top:12px"><strong>삭제 범위</strong></p>
+      <ul>
+        <li>프로필 정보 (이메일, 이름, 가입일 등)</li>
+        <li>연동된 SNS 계정 정보 (Instagram/Facebook/TikTok/YouTube 핸들·액세스 토큰)</li>
+        <li>AI 말투 학습 데이터 (분석된 샘플 텍스트 및 학습 결과)</li>
+        <li>댓글·DM 응대 기록 (원문·응답 로그)</li>
+        <li>카드뉴스·내 링크·숏링크 등 이용자가 생성한 콘텐츠</li>
+        <li>사용량 로그 및 결제 이력 (관계 법령상 보존 의무가 있는 항목은 해당 기간 후 파기)</li>
+      </ul>
+
+      <p style="margin-top:8px"><strong>Meta Platforms (Instagram·Facebook) 연동 데이터</strong></p>
+      <p>Meta를 통해 연동한 Instagram·Facebook 계정의 액세스 토큰과 해당 계정을 통해 수집·처리된 모든 데이터(댓글, DM, 게시물 메타데이터 등)는 삭제 요청 시 <b>즉시 해제</b>되며, <b>30일 이내 완전 파기</b>됩니다.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-num">제 10조</div>
     <div class="section-title">개인정보 보호책임자</div>
     <div class="section-body">
       <div class="company-box">
         <div class="company-name">(주)공팔리터글로벌</div>
         <div class="company-info">
           개인정보 보호책임자: 대표이사<br>
-          이메일: privacy@repli.ai<br>
-          고객센터: support@repli.ai<br><br>
+          이메일: privacy@ssobi.ai<br>
+          고객센터: support@ssobi.ai<br><br>
           개인정보 침해 신고 및 상담<br>
           개인정보 분쟁조정위원회: 1833-6972<br>
           개인정보침해신고센터: privacy.kisa.or.kr
@@ -423,19 +468,28 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--t1);ma
 </div>
 
 <script>
-// URL 파라미터로 탭 자동 전환
+// URL 파라미터 + 해시로 탭·섹션 자동 전환
 window.addEventListener('load', function(){
   var params = new URLSearchParams(window.location.search);
   var tab = params.get('tab');
-  if(tab === 'privacy') switchTab('privacy');
+  var hash = window.location.hash.slice(1); // "data-deletion" 등
+  // 해시가 #data-deletion 이면 privacy 탭으로 자동 전환
+  if(hash === 'data-deletion' && !tab) tab = 'privacy';
+  if(tab === 'privacy') switchTab('privacy', hash);
+  else if(hash) scrollToAnchor(hash);
 });
 
-function switchTab(tab) {
+function switchTab(tab, hashAfter) {
   document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('on'); });
   document.querySelectorAll('.doc').forEach(function(d){ d.classList.remove('on'); });
   document.getElementById('btn-'+tab).classList.add('on');
   document.getElementById('doc-'+tab).classList.add('on');
-  window.scrollTo(0,0);
+  if(hashAfter){ setTimeout(function(){ scrollToAnchor(hashAfter); }, 80); }
+  else window.scrollTo(0,0);
+}
+function scrollToAnchor(id){
+  var el = document.getElementById(id);
+  if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
 }
 </script>
 </body>
