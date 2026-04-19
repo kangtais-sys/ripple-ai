@@ -138,16 +138,46 @@ body > *{position:relative;z-index:1}
 .track-badge.earn{background:linear-gradient(135deg,#F97316,#DC2626);color:#fff}
 .track-badge.link-badge{background:linear-gradient(135deg,#8B5CF6,#00C896);color:#fff}
 
-/* LINK showcase */
-.link-showcase{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:960px;margin:0 auto}
-.link-demo-card{background:#fff;border-radius:20px;padding:24px 22px;border:1px solid rgba(15,19,25,.06);transition:transform .2s cubic-bezier(.32,1,.32,1),box-shadow .2s;display:flex;flex-direction:column;gap:10px}
-.link-demo-card:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(15,19,25,.06),0 4px 10px rgba(139,92,246,.08);border-color:rgba(139,92,246,.25)}
-.link-demo-eye{font-family:'JetBrains Mono','Pretendard',monospace;font-size:10.5px;font-weight:800;letter-spacing:.22em;color:var(--purple);text-transform:uppercase}
-.link-demo-title{font-family:'Fraunces','Pretendard',serif;font-size:24px;font-weight:400;line-height:1.15;letter-spacing:-.6px;color:var(--ink)}
-.link-demo-title em{font-style:italic;color:var(--mint)}
-.link-demo-desc{font-size:13px;color:var(--ink2);line-height:1.65;font-weight:500;word-break:keep-all}
-@media (max-width:900px){.link-showcase{grid-template-columns:1fr 1fr;gap:12px}}
-@media (max-width:640px){.link-showcase{grid-template-columns:1fr;gap:10px}.link-demo-card{padding:20px 18px}.link-demo-title{font-size:21px}}
+/* LINK 썸네일 프리뷰 (feat-card 안 들어감) */
+.link-thumb{height:120px;border-radius:12px;margin-bottom:14px;background:#F8FAFC;border:1px solid rgba(15,19,25,.06);padding:12px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
+/* Carousel */
+.link-thumb-carousel{background:linear-gradient(135deg,#1A1F27,#374151);padding:0;overflow:hidden}
+.link-thumb-slide{padding:18px 14px;color:#fff;width:100%;height:100%;display:flex;flex-direction:column;justify-content:center}
+.link-thumb-slide .lt-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.2em;color:#00C896;margin-bottom:4px}
+.link-thumb-slide .lt-title{font-family:'Fraunces','Pretendard',serif;font-size:24px;font-weight:400;letter-spacing:-.6px;line-height:1.1}
+.link-thumb-slide .lt-title em{font-style:italic;color:#00C896}
+.link-thumb-dots{position:absolute;bottom:10px;left:50%;transform:translateX(-50%);display:flex;gap:4px}
+.link-thumb-dots span{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,.4)}
+.link-thumb-dots span.on{background:#fff;width:14px;border-radius:3px}
+/* Blocks grid */
+.link-thumb-blocks{display:grid;grid-template-columns:1fr 1fr;gap:6px;padding:14px}
+.lt-block{background:#fff;border:1px solid rgba(15,19,25,.08);border-radius:6px;padding:6px 8px;font-size:10px;font-weight:700;color:var(--ink2);letter-spacing:-.2px;display:flex;align-items:center}
+.lt-b1{background:linear-gradient(135deg,#1A1F27,#2D2D2D);color:#fff;border:none}
+.lt-b2{background:var(--mint);color:#fff;border:none}
+.lt-b3{padding:4px;gap:3px}
+.lt-b3 span{flex:1;height:14px;background:linear-gradient(135deg,#FFE8DC,#FFB098);border-radius:3px}
+.lt-b4{background:linear-gradient(135deg,#A7F3D0,#00A87E);color:#fff;border:none;font-family:'Fraunces','Pretendard',serif;font-style:italic}
+/* Drag */
+.link-thumb-drag{flex-direction:column;gap:4px;padding:12px}
+.lt-drag-item{background:#fff;border:1px solid rgba(15,19,25,.08);border-radius:6px;padding:7px 10px;font-size:11px;font-weight:700;color:var(--ink2);width:80%;display:flex;align-items:center;justify-content:space-between}
+.lt-drag-item.moving{background:var(--mint-l);border-color:var(--mint);transform:translateX(14px);box-shadow:0 6px 14px rgba(0,200,150,.2)}
+.lt-grip{color:var(--mint-d);font-weight:900;letter-spacing:-2px;font-size:10px}
+/* Short */
+.link-thumb-short{flex-direction:column;gap:8px}
+.lt-short-url{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--ink);background:#fff;border:1px solid rgba(15,19,25,.08);padding:8px 14px;border-radius:100px;letter-spacing:-.3px}
+.lt-short-meta{font-size:11px;color:var(--ink3);font-weight:600}
+.lt-short-meta b{color:var(--mint-d);font-weight:800}
+/* Proposal */
+.link-thumb-prop{gap:10px}
+.lt-prop-chip{padding:8px 14px;border-radius:100px;background:#fff;border:1px solid rgba(15,19,25,.08);font-size:11.5px;font-weight:700;color:var(--ink)}
+.lt-prop-chip.dark{background:#1A1F27;color:#fff;border-color:#1A1F27}
+.lt-prop-arrow{color:var(--mint-d);font-size:15px;font-weight:800}
+/* Template */
+.link-thumb-tpl{padding:12px;gap:6px}
+.lt-tpl-card{flex:1;height:80px;background:#fff;border:1px solid rgba(15,19,25,.08);border-radius:6px;padding:6px;display:flex;flex-direction:column;gap:4px}
+.lt-tpl-b{flex:1;background:rgba(15,19,25,.1);border-radius:2px}
+.lt-tpl-b.g{background:linear-gradient(135deg,#FFAE9D,#FF4D1F)}
+.lt-tpl-b.p{background:linear-gradient(135deg,#A7F3D0,#00A87E);flex:2}
 .track-badge svg{width:14px;height:14px;stroke:#fff;stroke-width:2.5;fill:none}
 .track-hint{font-size:13px;color:var(--ink3);font-weight:500;max-width:460px;line-height:1.6;word-break:keep-all}
 
@@ -878,36 +908,59 @@ body > *{position:relative;z-index:1}
       <p class="track-sub">다들 똑같이 생긴 페이지 말고 블록 조합으로 <strong>내 스타일</strong>대로. <br>쇼핑몰·에디토리얼·미니멀 중 고르고 시작.</p>
     </div>
 
-    <div class="link-showcase">
-      <div class="link-demo-card">
-        <div class="link-demo-eye">EDITORIAL</div>
-        <div class="link-demo-title">히어로 <em>캐러셀</em></div>
-        <div class="link-demo-desc">여러 장 좌우 스와이프 · 슬라이드마다 배경 이미지/텍스트 따로 편집 (타 서비스엔 없는 고유 기능)</div>
+    <div class="feat-grid-3">
+      <div class="feat-card">
+        <div class="link-thumb link-thumb-carousel">
+          <div class="link-thumb-slide"><div class="lt-label">LIVE</div><div class="lt-title">Glow <em>Drop.</em></div></div>
+          <div class="link-thumb-dots"><span class="on"></span><span></span><span></span></div>
+        </div>
+        <div class="feat-name">히어로 캐러셀</div>
+        <div class="feat-desc">여러 배너를 좌우 스와이프로. 슬라이드마다 배경 이미지 · 텍스트 따로 편집. 링크트리엔 없는 고유 기능.</div>
       </div>
-      <div class="link-demo-card">
-        <div class="link-demo-eye">BLOCKS · 14</div>
-        <div class="link-demo-title"><em>14종</em> 블록 조합</div>
-        <div class="link-demo-desc">히어로 · 이벤트 바 · 공구 카운트다운 · 제품 그리드 · 매거진 카드 · 빅 배너 · 제안 박스 · 퀵링크 · 소셜 · 여백 · 구분선…</div>
+      <div class="feat-card">
+        <div class="link-thumb link-thumb-blocks">
+          <div class="lt-block lt-b1">히어로</div>
+          <div class="lt-block lt-b2">카운트다운</div>
+          <div class="lt-block lt-b3 grid"><span></span><span></span></div>
+          <div class="lt-block lt-b4">매거진</div>
+        </div>
+        <div class="feat-name">14종 블록 조합</div>
+        <div class="feat-desc">히어로·카운트다운·제품 그리드·매거진·빅배너·제안함·퀵링크·소셜·여백…. 원하는 대로 블록 꾸러미로 조립.</div>
       </div>
-      <div class="link-demo-card">
-        <div class="link-demo-eye">DRAG</div>
-        <div class="link-demo-title">드래그해서 <em>재배치</em></div>
-        <div class="link-demo-desc">블록 순서를 손가락으로 끌어서 바꾸고, 제품 카드도 개별 드래그로 순서 변경</div>
+      <div class="feat-card">
+        <div class="link-thumb link-thumb-drag">
+          <div class="lt-drag-item">1</div>
+          <div class="lt-drag-item moving">2 <span class="lt-grip">⋮⋮</span></div>
+          <div class="lt-drag-item">3</div>
+        </div>
+        <div class="feat-name">드래그 재배치</div>
+        <div class="feat-desc">블록을 손가락으로 끌어서 순서 변경. 제품 카드도 그리드 안에서 개별 드래그 가능.</div>
       </div>
-      <div class="link-demo-card">
-        <div class="link-demo-eye">SHORTLINK</div>
-        <div class="link-demo-title">자동 <em>숏링크</em></div>
-        <div class="link-demo-desc">링크 블록마다 ssobi.ai/s/xxxxxx 자동 생성 · 클릭 추적 (방문자·국가·시간대)</div>
+      <div class="feat-card">
+        <div class="link-thumb link-thumb-short">
+          <div class="lt-short-url">ssobi.ai/s/a1b2c3</div>
+          <div class="lt-short-meta">클릭 <b>12</b> · 한국 67%</div>
+        </div>
+        <div class="feat-name">자동 숏링크</div>
+        <div class="feat-desc">링크 블록마다 ssobi.ai/s/xxxxxx 자동 생성. 클릭·국가·시간대 추적해 인사이트 제공.</div>
       </div>
-      <div class="link-demo-card">
-        <div class="link-demo-eye">PROPOSAL</div>
-        <div class="link-demo-title">제안함 <em>자동 수신</em></div>
-        <div class="link-demo-desc">방문자가 "제안하기" 버튼으로 남긴 협업·광고·공구 문의가 Ssobi 수익제안 탭에 자동 쌓임</div>
+      <div class="feat-card">
+        <div class="link-thumb link-thumb-prop">
+          <div class="lt-prop-chip">💌 제안하기</div>
+          <div class="lt-prop-arrow">→</div>
+          <div class="lt-prop-chip dark">수익제안 +1</div>
+        </div>
+        <div class="feat-name">제안함 자동 수신</div>
+        <div class="feat-desc">방문자가 "제안하기"로 남긴 협업·광고·공구 문의가 Ssobi 수익제안 탭에 쌓임.</div>
       </div>
-      <div class="link-demo-card">
-        <div class="link-demo-eye">START</div>
-        <div class="link-demo-title">3종 <em>템플릿</em></div>
-        <div class="link-demo-desc">미니멀 · 쇼핑몰 · 에디토리얼 중 고르면 블록 기본 세팅 완성. 이후 내 스타일로 디테일만 수정</div>
+      <div class="feat-card">
+        <div class="link-thumb link-thumb-tpl">
+          <div class="lt-tpl-card"><div class="lt-tpl-b"></div><div class="lt-tpl-b"></div></div>
+          <div class="lt-tpl-card"><div class="lt-tpl-b g"></div><div class="lt-tpl-b g"></div></div>
+          <div class="lt-tpl-card"><div class="lt-tpl-b p"></div></div>
+        </div>
+        <div class="feat-name">3종 템플릿</div>
+        <div class="feat-desc">미니멀 · 쇼핑몰 · 에디토리얼. 고르면 블록 기본 세팅 완성. 이후 내 스타일로 디테일만.</div>
       </div>
     </div>
   </div>
