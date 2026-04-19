@@ -920,6 +920,15 @@ input:checked+.tsl::before{transform:translateX(18px)}
 
 /* editor */
 .edt-wrap{position:relative;margin:0 -20px;padding:0 20px}
+.edt-mode-tabs{display:inline-flex;padding:4px;background:var(--bg);border-radius:100px;margin-bottom:10px;gap:2px}
+.edt-mode-tab{display:flex;align-items:center;gap:6px;padding:8px 16px;border:none;background:transparent;color:var(--t3);font-family:'Pretendard',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:-.2px;border-radius:100px;cursor:pointer;transition:all .15s}
+.edt-mode-tab svg{width:13px;height:13px;stroke:currentColor;fill:none}
+.edt-mode-tab.on{background:#fff;color:var(--t1);font-weight:800;box-shadow:0 1px 4px rgba(15,19,25,.08)}
+#cs-4.preview-mode .edt-tools,#cs-4.preview-mode .edt-panel,#cs-4.preview-mode .edt-arrows,#cs-4.preview-mode #edt-img-input{display:none!important}
+#cs-4.preview-mode .edt-hnd,#cs-4.preview-mode .edt-size-badge{display:none!important}
+#cs-4.preview-mode .edt-canvas-wrap{box-shadow:0 8px 28px rgba(15,19,25,.12);border:none}
+#cs-4.preview-mode .edt-el.selected{outline:none!important;box-shadow:none!important}
+#cs-4.preview-mode .edt-el{cursor:default!important;pointer-events:none!important}
 .edt-canvas-wrap{width:100%;max-height:560px;aspect-ratio:1;background:var(--bg);border-radius:16px;border:1px solid var(--b);overflow:hidden;position:relative;margin-bottom:14px;margin-left:auto;margin-right:auto;transition:aspect-ratio .25s ease}
 .edt-canvas-wrap.sz-sq{aspect-ratio:1/1}
 .edt-canvas-wrap.sz-pt{aspect-ratio:4/5}
@@ -2172,6 +2181,29 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         </div>
         <div class="tpl-name" style="color:var(--t1);text-shadow:none">팝</div>
       </div>
+      <div class="tpl-item" onclick="selectTpl(this,'editorial')" style="background:#FAF8F4">
+        <div class="tpl-prev">
+          <div style="font-family:'Fraunces','Pretendard',serif;font-style:italic;font-size:11px;color:#1A1F27;letter-spacing:.1em;margin-bottom:8px">— Editorial</div>
+          <div style="font-family:'Fraunces','Pretendard',serif;font-style:italic;font-size:15px;font-weight:400;color:var(--t1);line-height:1.1;letter-spacing:-.5px">Quiet<br>Notes.</div>
+        </div>
+        <div class="tpl-name" style="color:var(--t1);text-shadow:none">에디토리얼</div>
+      </div>
+      <div class="tpl-item" onclick="selectTpl(this,'mono')" style="background:#0F1319">
+        <div class="tpl-prev" style="color:#fff">
+          <div style="font-family:'JetBrains Mono',monospace;font-size:8.5px;color:rgba(255,255,255,.5);letter-spacing:.15em;margin-bottom:8px">01 / 05</div>
+          <div style="font-size:13px;font-weight:500;color:#fff;line-height:1.15;letter-spacing:-.5px">핵심만<br>간결하게.</div>
+          <div style="width:30%;height:2px;background:var(--mint);margin-top:8px"></div>
+        </div>
+        <div class="tpl-name">모노</div>
+      </div>
+      <div class="tpl-item" onclick="selectTpl(this,'pastel')" style="background:linear-gradient(160deg,#FDF2F8,#E0E7FF)">
+        <div class="tpl-prev">
+          <div style="font-size:9.5px;font-weight:800;color:#7C3AED;letter-spacing:.2em;margin-bottom:6px">SOFT</div>
+          <div style="font-size:13px;font-weight:700;color:var(--t1);line-height:1.2;letter-spacing:-.3px">조용한<br>하루</div>
+          <div style="display:flex;gap:3px;margin-top:10px"><div style="width:6px;height:6px;border-radius:50%;background:#FBCFE8"></div><div style="width:6px;height:6px;border-radius:50%;background:#C4B5FD"></div><div style="width:6px;height:6px;border-radius:50%;background:#A7F3D0"></div></div>
+        </div>
+        <div class="tpl-name" style="color:var(--t1);text-shadow:none">파스텔</div>
+      </div>
       <div class="tpl-my" onclick="openMyTpl()">
         <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
         <div class="tpl-my-txt">내 템플릿 만들기</div>
@@ -2183,8 +2215,11 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
   <!-- STEP 4: 편집 & 미리보기 -->
   <div class="create-step" id="cs-4">
-    <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:4px">편집 & 미리보기</div>
-    <div style="font-size:11px;color:var(--t3);margin-bottom:14px">드래그로 위치 이동 · 모서리로 크기 조절 · 탭하면 편집</div>
+    <div class="edt-mode-tabs">
+      <button class="edt-mode-tab on" id="edt-mode-edit" onclick="edtSetMode('edit')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke-linecap="round" stroke-linejoin="round"/></svg>편집</button>
+      <button class="edt-mode-tab" id="edt-mode-preview" onclick="edtSetMode('preview')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3"/></svg>미리보기</button>
+    </div>
+    <div style="font-size:11px;color:var(--t3);margin:2px 0 12px" id="edt-mode-hint">드래그로 위치 이동 · 모서리로 크기 조절 · 탭하면 편집</div>
 
     <div class="edt-wrap">
       <div class="edt-canvas-wrap sz-sq" id="edt-canvas">
@@ -7065,15 +7100,18 @@ function tplBg(t){
     bold:'linear-gradient(160deg,#1A1F27,#374151)',
     mint:'linear-gradient(160deg,#00C896,#06B6D4)',
     mag:'linear-gradient(160deg,#FFF1F3,#FFE8EC)',
-    pop:'linear-gradient(160deg,#FDE68A,#FB923C)'
+    pop:'linear-gradient(160deg,#FDE68A,#FB923C)',
+    editorial:'#FAF8F4',
+    mono:'#0F1319',
+    pastel:'linear-gradient(160deg,#FDF2F8,#E0E7FF)'
   })[t]||'#fff';
 }
 function tplText(t){
   if(t==='custom'){
     var bg = window._customTplBg||'';
-    return /#1A1F27|#FF4D4D|#00C896|#06B6D4|#6366F1|#E1306C/.test(bg) ? '#fff':'#1A1F27';
+    return /#1A1F27|#FF4D4D|#00C896|#06B6D4|#6366F1|#E1306C|#0F1319/.test(bg) ? '#fff':'#1A1F27';
   }
-  return (t==='bold'||t==='mint')?'#fff':'#1A1F27';
+  return (t==='bold'||t==='mint'||t==='mono')?'#fff':'#1A1F27';
 }
 function makeTextEl(text, opts){
   var div = document.createElement('div');
@@ -7132,24 +7170,44 @@ function initEditor(){
   while(parsed.length < target){ parsed.push({kind:'slide', title:'내용 '+(parsed.length+1), text:''}); }
   var titleTxt = (createData.hook || '제목').replace(/^"|"$/g,'');
   var c = tplText(createData.template);
+  // MINE AI 크리에이터 순서: 1=표지(큰 후킹), 2=프리뷰(오늘 알려드릴 N가지),
+  // 3~N-1=중간장(번호+짧은 제목+본문), N=CTA(저장/공유/팔로우)
+  var middleCount = Math.max(0, parsed.length - 2); // 표지/CTA 제외
   parsed.forEach(function(p, i){
     var sl = document.createElement('div');
     sl.className = 'edt-slide'+(i===0?' on':'');
     sl.style.background = tplBg(createData.template);
-    var isCover = /표지|cover/i.test(p.kind) || i===0;
-    var isEnding = /마지막|ending|last/i.test(p.kind) || i===parsed.length-1;
+    var isCover = i===0;
+    var isIntro = i===1 && parsed.length>=4;
+    var isEnding = i===parsed.length-1;
     if(isCover){
-      sl.appendChild(makeTextEl(titleTxt, {x:8,y:32,w:84,size:24,color:c,weight:900}));
-      sl.appendChild(makeTextEl(p.text || '저장해두세요 :)', {x:8,y:62,w:84,size:13,color:c,weight:600}));
-      sl.appendChild(makeTextEl('@millimilli', {x:8,y:88,w:40,size:11,color:c,weight:700}));
+      // 표지: 아주 큰 후킹 (2~3줄), 서브 한 줄
+      sl.appendChild(makeTextEl(String(1).padStart(2,'0')+' / '+String(parsed.length).padStart(2,'0'), {x:8,y:8,w:30,size:10,color:c,weight:700}));
+      sl.appendChild(makeTextEl(titleTxt, {x:8,y:36,w:84,size:28,color:c,weight:900}));
+      sl.appendChild(makeTextEl(p.text || '저장하고 따라해보세요', {x:8,y:74,w:84,size:12,color:c,weight:600}));
+      sl.appendChild(makeTextEl('@millimilli', {x:8,y:90,w:40,size:10,color:c,weight:700}));
+    } else if(isIntro){
+      // 2장: 오늘 알려드릴 N가지 리스트 프리뷰
+      sl.appendChild(makeTextEl('오늘 알려드릴 '+middleCount+'가지', {x:8,y:14,w:84,size:17,color:c,weight:900}));
+      var intro = '';
+      for(var k=0;k<Math.min(middleCount,4);k++){
+        intro += '0'+(k+1)+'. '+(parsed[k+2] && parsed[k+2].title ? parsed[k+2].title : '핵심 포인트')+'\n';
+      }
+      if(!intro) intro = '01. 핵심 포인트\n02. 꼭 알아야 할 것\n03. 꿀팁 하나 더';
+      sl.appendChild(makeTextEl(intro.trim(), {x:8,y:38,w:84,size:13,color:c,weight:600}));
+      sl.appendChild(makeTextEl('→ 스와이프해서 확인해보세요', {x:8,y:88,w:84,size:11,color:c,weight:700}));
     } else if(isEnding){
+      // 마지막: CTA (질문+행동 유도)
       sl.appendChild(makeTextEl(p.title || '어떤 게 제일 와닿았어요?', {x:8,y:26,w:84,size:20,color:c,weight:900}));
-      sl.appendChild(makeTextEl(p.text || '댓글로 알려주면\n맞춤 답변 해드릴게요', {x:8,y:52,w:84,size:13,color:c,weight:600}));
-      sl.appendChild(makeTextEl('💬 댓글  ·  🔖 저장  ·  ➕ 팔로우', {x:8,y:82,w:84,size:11,color:c,weight:800}));
+      sl.appendChild(makeTextEl(p.text || '댓글로 알려주면\n맞춤 답변 해드릴게요', {x:8,y:54,w:84,size:13,color:c,weight:600}));
+      sl.appendChild(makeTextEl('💬 댓글  ·  🔖 저장  ·  ➕ 팔로우', {x:8,y:86,w:84,size:11,color:c,weight:800}));
     } else {
-      sl.appendChild(makeTextEl(String(i).padStart(2,'0'), {x:8,y:8,w:20,size:28,color:c,weight:900}));
-      sl.appendChild(makeTextEl(p.title || '내용', {x:8,y:26,w:84,size:16,color:c,weight:800}));
-      sl.appendChild(makeTextEl(p.text || '', {x:8,y:48,w:84,size:12,color:c,weight:500}));
+      // 중간장: 번호 + 짧은 제목 + 본문 (적당히 여백)
+      var num = String(i).padStart(2,'0');
+      sl.appendChild(makeTextEl(num, {x:8,y:10,w:20,size:32,color:c,weight:900}));
+      sl.appendChild(makeTextEl(p.title || '포인트', {x:8,y:30,w:84,size:18,color:c,weight:900}));
+      sl.appendChild(makeTextEl(p.text || '이 부분이 가장 중요해요.\n기억해두면 좋아요.', {x:8,y:52,w:84,size:12,color:c,weight:500}));
+      sl.appendChild(makeTextEl('@millimilli', {x:8,y:90,w:40,size:9.5,color:c,weight:600}));
     }
     canvas.appendChild(sl);
     edtSlides.push(sl);
@@ -7176,6 +7234,24 @@ function edtGoto(i){
   renderEdtNav();
 }
 function edtNav(d){ edtGoto(edtCur+d); }
+function edtSetMode(m){
+  var cs4 = document.getElementById('cs-4');
+  var tEdit = document.getElementById('edt-mode-edit');
+  var tPrev = document.getElementById('edt-mode-preview');
+  var hint = document.getElementById('edt-mode-hint');
+  if(!cs4) return;
+  if(m==='preview'){
+    cs4.classList.add('preview-mode');
+    if(tEdit) tEdit.classList.remove('on');
+    if(tPrev) tPrev.classList.add('on');
+    if(hint) hint.textContent='실제 게시 모습을 미리 봐요 · 좌우 화살표로 넘기기';
+  } else {
+    cs4.classList.remove('preview-mode');
+    if(tEdit) tEdit.classList.add('on');
+    if(tPrev) tPrev.classList.remove('on');
+    if(hint) hint.textContent='드래그로 위치 이동 · 모서리로 크기 조절 · 탭하면 편집';
+  }
+}
 
 function attachEdt(el){
   el.addEventListener('pointerdown', edtStart);
