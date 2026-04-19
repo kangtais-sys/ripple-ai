@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 아이콘 마크: 다크 라운드 사각형 + 흰 "S" (Fraunces italic) + mint 마침표 -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Ssobi mark">
+  <defs>
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#1A1F27"/>
+      <stop offset="100%" stop-color="#0F1319"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="14" fill="url(#bg-grad)"/>
+  <text x="14" y="45" font-family="Fraunces, 'Times New Roman', serif" font-style="italic" font-weight="400" font-size="42" letter-spacing="-1.5" fill="#FFFFFF">S</text>
+  <circle cx="46" cy="44" r="5" fill="#00C896"/>
+</svg>

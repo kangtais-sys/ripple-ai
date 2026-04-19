@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630" role="img" aria-label="Ssobi OG">
+  <defs>
+    <radialGradient id="bg-radial" cx="50%" cy="20%" r="70%">
+      <stop offset="0%" stop-color="#0F2A22"/>
+      <stop offset="100%" stop-color="#0A0D12"/>
+    </radialGradient>
+    <radialGradient id="mint-glow" cx="82%" cy="30%" r="40%">
+      <stop offset="0%" stop-color="#00C896" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#00C896" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg-radial)"/>
+  <rect width="1200" height="630" fill="url(#mint-glow)"/>
+  <!-- eyebrow -->
+  <text x="72" y="118" font-family="'JetBrains Mono', monospace" font-size="18" font-weight="700" letter-spacing="6" fill="#00C896">— SOCIAL · SECRETARY</text>
+  <!-- wordmark (Ssobi.) -->
+  <text x="72" y="360" font-family="Fraunces, 'Times New Roman', serif" font-style="italic" font-weight="300" font-size="220" letter-spacing="-6" fill="#FFFFFF">Ssobi</text>
+  <circle cx="578" cy="340" r="24" fill="#00C896"/>
+  <!-- tagline -->
+  <text x="72" y="440" font-family="Pretendard, sans-serif" font-weight="800" font-size="42" letter-spacing="-1.5" fill="#FFFFFF">키우고, 만들고.</text>
+  <text x="72" y="498" font-family="Pretendard, sans-serif" font-weight="500" font-size="32" letter-spacing="-.5" fill="rgba(255,255,255,0.66)">이젠 나 대신 <tspan font-style="italic" fill="#00C896">Ssobi</tspan>가.</text>
+  <!-- bottom right: url badge -->
+  <g transform="translate(72, 560)">
+    <rect x="0" y="0" width="190" height="42" rx="21" fill="#1A1F27" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+    <text x="95" y="28" text-anchor="middle" font-family="'JetBrains Mono', monospace" font-size="16" font-weight="700" letter-spacing="1" fill="rgba(255,255,255,0.72)">ssobi.ai</text>
+  </g>
+</svg>

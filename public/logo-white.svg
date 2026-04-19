@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 72" width="200" height="72" role="img" aria-label="Ssobi.">
+  <style>
+    .wordmark { font-family: 'Fraunces', 'Times New Roman', serif; font-style: italic; font-weight: 400; font-size: 56px; letter-spacing: -1.5px; }
+  </style>
+  <text x="4" y="54" class="wordmark" fill="#FFFFFF">Ssobi</text>
+  <circle cx="158" cy="52" r="7" fill="#00C896"/>
+</svg>
