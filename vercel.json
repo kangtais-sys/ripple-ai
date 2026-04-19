@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/refresh-ig-token",
       "schedule": "0 3 * * 1"
+    },
+    {
+      "path": "/api/cron/publish-scheduled",
+      "schedule": "*/5 * * * *"
     }
   ]
 }
