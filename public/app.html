@@ -7965,6 +7965,15 @@ function renderDraftCard(d){
   ta.addEventListener('blur', function(){ this.style.borderColor='var(--b)'; this.style.background='#FBFDFC'; });
   card.appendChild(ta);
 
+  // 댓글이면 "DM도 보내기" 체크박스 노출
+  var dmCheckLabel = null;
+  if(d.type === 'comment'){
+    dmCheckLabel = document.createElement('label');
+    dmCheckLabel.style.cssText = 'display:flex;align-items:center;gap:6px;margin-top:10px;padding:8px 10px;background:var(--mint-l);border-radius:8px;font-size:11.5px;font-weight:700;color:var(--mint-d);cursor:pointer';
+    dmCheckLabel.innerHTML = '<input type="checkbox" class="draft-dm-check" style="cursor:pointer;accent-color:var(--mint)"><span>이 사람에게 DM으로 상세 안내도 보내기</span>';
+    card.appendChild(dmCheckLabel);
+  }
+
   // 액션 버튼
   var acts = document.createElement('div');
   acts.style.cssText = 'display:flex;gap:8px;margin-top:10px';
@@ -7974,7 +7983,8 @@ function renderDraftCard(d){
   card.appendChild(acts);
 
   acts.querySelector('.draft-approve').addEventListener('click', function(){
-    approveDraft(d.id, ta.value, card, this);
+    var alsoDm = dmCheckLabel && dmCheckLabel.querySelector('.draft-dm-check').checked;
+    approveDraft(d.id, ta.value, card, this, alsoDm);
   });
   acts.querySelector('.draft-skip').addEventListener('click', function(){
     skipDraft(d.id, card);
@@ -7983,14 +7993,16 @@ function renderDraftCard(d){
   return card;
 }
 
-function approveDraft(id, finalReply, card, btn){
+function approveDraft(id, finalReply, card, btn, alsoSendDm){
   btn.disabled = true;
   btn.textContent = '발송 중...';
+  var payload = { final_reply: finalReply };
+  if(alsoSendDm) payload.also_send_dm = true;
   fetch('/api/replies/'+id+'/approve', {
     method:'POST',
     headers:{'Content-Type':'application/json'},
     credentials:'include',
-    body: JSON.stringify({ final_reply: finalReply }),
+    body: JSON.stringify(payload),
   }).then(function(r){ return r.json().then(function(j){ return { ok:r.ok, data:j }; }); })
     .then(function(res){
       if(res.ok){
@@ -7998,7 +8010,9 @@ function approveDraft(id, finalReply, card, btn){
         card.style.opacity = '0';
         card.style.transform = 'translateX(20px)';
         setTimeout(function(){ card.remove(); loadPendingDrafts(); }, 320);
-        if(typeof lkeShowToast==='function') lkeShowToast('✓ 발송 완료');
+        var msg = '✓ 발송 완료';
+        if(res.data && res.data.followup_dm_id) msg += ' · DM 초안 생성됨';
+        if(typeof lkeShowToast==='function') lkeShowToast(msg);
       } else {
         btn.disabled = false;
         btn.textContent = '✓ 승인 · 발송';

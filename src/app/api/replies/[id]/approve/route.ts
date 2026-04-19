@@ -12,7 +12,11 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   const { data: { user } } = await sb.auth.getUser()
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
 
-  const body = await req.json().catch(() => ({})) as { final_reply?: string }
+  const body = await req.json().catch(() => ({})) as {
+    final_reply?: string
+    also_send_dm?: boolean        // 댓글 승인 후 동일인에게 DM 초안도 생성
+    dm_template?: string          // DM 기본 문구 (없으면 AI가 초안)
+  }
 
   // 드래프트 조회 + 소유권 확인
   const { data: reply } = await sb
@@ -42,6 +46,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     comment_id?: string
     sender_platform_id?: string
     recipient_handle?: string
+    commenter_handle?: string
+    commenter_platform_id?: string
+    sender_handle?: string
   }
   const platformId = reply.platform_id as string | null
 
@@ -107,5 +114,50 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     p_type: reply.type,
   })
 
-  return NextResponse.json({ ok: true, sent: true, edited: userEdited, similarity })
+  // 댓글 승인 후 DM 초안 생성 옵션 (Comment-to-DM 플로우)
+  let followupDmId: string | null = null
+  if (reply.type === 'comment' && body.also_send_dm && context.commenter_platform_id) {
+    const dmDraft = body.dm_template && body.dm_template.trim()
+      ? body.dm_template.trim()
+      : `안녕하세요! 댓글 주셔서 감사해요 🌿 요청 주신 내용은 아래로 안내드려요: (상세 링크·정보)`
+    const { data: dmLog } = await admin.from('reply_logs').insert({
+      user_id: user.id,
+      ig_account_id: igAccount.id,
+      type: 'dm',
+      original_text: `댓글에 이어 DM 제안: ${reply.original_text || ''}`,
+      reply_text: dmDraft,
+      platform_id: context.commenter_platform_id,
+      urgency: 'medium',
+      sentiment: reply.sentiment,
+      send_status: 'pending',
+      is_approved: null,
+      context: {
+        sender_platform_id: context.commenter_platform_id,
+        sender_handle: (context as { commenter_handle?: string }).commenter_handle || null,
+        source_comment_reply_id: id,
+        simulated: false,
+      },
+    }).select('id').single()
+    followupDmId = dmLog?.id || null
+
+    await admin.from('outbound_messages').insert({
+      user_id: user.id,
+      platform: 'instagram',
+      kind: 'dm',
+      recipient_platform_id: context.commenter_platform_id,
+      recipient_handle: (context as { commenter_handle?: string }).commenter_handle || null,
+      source_ref_type: 'reply_logs',
+      source_ref_id: followupDmId,
+      body: dmDraft,
+      status: 'queued',
+    })
+  }
+
+  return NextResponse.json({
+    ok: true,
+    sent: true,
+    edited: userEdited,
+    similarity,
+    followup_dm_id: followupDmId,
+  })
 }
