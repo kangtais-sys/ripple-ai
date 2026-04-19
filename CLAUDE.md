@@ -178,3 +178,106 @@ vercel.json                         cron 설정
 - 최종 앱 디자인: ~/ripple-ai/legacy/repli_v3.html
 - 랜딩페이지: ~/ripple-ai/legacy/repli_landing.html
 - 약관: ~/ripple-ai/legacy/repli_terms.html
+
+---
+
+## 2026-04-19 세션 업데이트 (Ssobi v2)
+
+### 탭 구조 변경
+- 기존 `홈 / 키우기 / 만들기 / 관리 / 내정보` (5탭)
+- **신규** `홈 / 키우기 / 만들기 / 내 링크 / 내정보` (5탭)
+- 관리는 키우기 탭 안에 서브탭(실시간 관리)으로 편입
+
+### 키우기 탭
+- 상단 **underline C안 서브탭** (SNS 자동화 / 실시간 관리 3)
+- 하단 나브바 그대로 유지, 실시간 관리는 v-manage 뷰로 점프
+- `proof-banner` (N명 사용 중) 두 서브에 공통 노출
+- 댓글 감지 DM: "N개 활성" 대신 "목록 더보기 → m-dm-all" 모달
+- 대상 게시물 썸네일 클릭 시 선택 + 설정 팝업(m-dm-rule) 함께 오픈
+
+### 만들기 탭
+- "처음이면 여기부터" → 얇은 pill 바 (proof-banner 크기 맞춤), m-discover 모달
+- "FOR YOU · 유민혜님께 딱 맞는 오늘 주제" 섹션 (수직 리스트)
+- 캐러셀 → 수직 스택 (3개 trend 카드)
+- 카드뉴스 프롬프트 (cs-2) 인라인 편집: hook/body/caption contenteditable,
+  [수정][적용][다시 생성] 3-버튼
+
+### 내 링크 탭 (에디토리얼 블록 에디터)
+- 상단 미니 topbar (뒤로 / ssobi.ai/u/핸들 / 공유)
+- 하단 floating toolbar: 테마 / 블록 추가 / 설정 (3개)
+- 블록 타입 14종 (hero 캐러셀 / event / countdown / section / grid / bigbanner
+  / contact / magazine / link / image / quicklinks / socials / spacer / divider)
+- 각 블록 DnD 재배치 (HTML5 drag), 제품 카드는 내부 DnD까지
+- "꾸미기" 통합 패널 (글자색 · 배경 단색 · 배경 그라디 · 배경 이미지)
+  - 스펙트럼(input type=color) 기반 원형 컬러닷
+  - 그라디: 시작색 / 방향 select(↘↓→↗⊙) / 끝색
+- 리치 텍스트 제목 편집 (B·I, Enter→<br>)
+- 히어로 캐러셀: 여러 배너 좌우 스와이프, 슬라이드별 bg 이미지/텍스트 편집
+  - 스탯(팔로워·공구남음)/CTA 클릭 시 편집/삭제 팝업 메뉴
+- See all / Read more → 서브뷰 (모달 아님, 페이지 내부 전환)
+  - 원본 섹션 제목 Fraunces 세리프 그대로 끌고 가서 렌더
+- 자동 숏링크: 각 링크 블록마다 `ssobi.ai/s/[6자리]` 생성 (설정에서 자동 생성 토글)
+- 테마 시트:
+  - 3종 레이아웃 시작점 (미니멀 / 쇼핑몰 / 에디토리얼)
+  - 페이지 꾸미기 (배경 그라디 + 단색 + 기본 글자색 + 제목 색)
+  - 제목 폰트 / 본문 폰트 (Pretendard / Fraunces / Noto / Nanum Myeongjo / IBM / JetBrains)
+- 설정 시트: 핸들 (prefix 고정, 3자 이상, 중복체크 debounce 400ms)
+- 공유 시트: 핸들별 복사, IG/TK/YT/기타 분기
+- 제안하기: 방문자 폼 → localStorage 저장 (추후 수익제안 탭 연동 예정)
+- 첫날 모드 최초 진입 시 welcome 모달
+  ("링크트리가 아니라 내 사이트처럼 · 내 스타일대로 꾸미는 나만의 링크 페이지")
+- **프리미엄 게이팅**: 첫날 모드 = 전체 해금, 이후
+  - 프리미엄 전용 블록: 카운트다운 · 제품 그리드 · 빅 배너 · 매거진
+  - 프리미엄 전용 템플릿: 쇼핑몰 · 에디토리얼
+  - 잠긴 카드 탭 → m-plan 업셀 오픈
+
+### 내정보 탭
+- 카카오톡 카드 제거 → 설정 메뉴 "카카오톡으로 알림 받기" 노란 강조 (mitem-kakao)
+- 프로필 아바타 제거 + 중복 plan chip 제거
+- 프리미엄 업셀 **앰버 sparkle 슬림 배너**:
+  `✦ 프리미엄 전환 시 · 포인트 계산 없이 무한 혜택 →`
+
+### 홈 탭
+- ROI 날짜 `2026년 4월 17일` → `4. 17` 간소화
+- 섹션 `sec-eye` eyebrow 시스템 (LIVE / AUTOMATION / FOR YOU)
+- 캘린더 5종 (AI 댓글 / AI DM / 팔로워 / 업로드 / 예약)
+
+### 첫날 모드 플로우
+- 3단계 체크리스트 (SNS 연동 / AI 말투 / 참고 계정)
+- 참고 계정 "확인 완료 · 적용하기" → 다크 pill 토스트:
+  `✓ 참고 계정·해시태그가 AI 말투 학습에 반영됐어요`
+- 3단계 완료 시 축하 모달 → 홈으로 자동 이동
+- 내 링크는 첫날도 활성 (연동 불필요), 첫 진입 시 welcome 모달
+
+### 브랜딩
+- 로고: Fraunces italic `.logo.brand` 변형만 (일반 `.logo`는 Pretendard 유지)
+- 앱 hdr 탭 제목 (키우기/만들기/내정보)은 Pretendard 유지 (브랜드 아님)
+- `Ssobi<em>.</em>` 표기, em = mint (`#00C896`)
+- 랜딩 nav/footer 동일 적용
+
+### 폰트 전략
+- 주요 UI: Pretendard
+- 에디토리얼 악센트: Fraunces italic (히어로/매거진 타이틀 / 영어 em)
+- 기술 label: JetBrains Mono (URL, 짧은 코드)
+- 한글 폴백 체인: `Fraunces,Pretendard,Noto Sans KR,sans-serif` → 영어만 Fraunces, 한글 자동 Pretendard
+
+### 채널 아이콘 (.ch-av)
+- Instagram: 핑크 배경 + 흰 카메라 SVG (그라디언트 #FEDA75 → #4F5BD5)
+- TikTok: 블랙 + 흰 music note SVG
+- YouTube: 레드 + 흰 play triangle SVG
+- DM: 블루 + 흰 chat bubble SVG
+- 모든 알파벳 텍스트 숨김, 아이콘만
+
+### 공개 링크 페이지 (정적 데모)
+- `public/u/yuminhye.html` — Beauty 테마 샘플
+- `public/s/a1b2c3.html` — 숏링크 리다이렉트 샘플
+- OG 메타, 제안하기 FAB 포함
+
+### 현재 배포 파일 구조
+```
+public/
+├─ app.html           메인 앱 (v2_2 에디터 포함)
+├─ landing.html       랜딩 페이지
+├─ u/yuminhye.html    공개 링크 샘플
+└─ s/a1b2c3.html      숏링크 샘플
+```

@@ -136,6 +136,18 @@ body > *{position:relative;z-index:1}
 .track-badge.grow{background:var(--mint);color:#fff}
 .track-badge.create{background:var(--purple);color:#fff}
 .track-badge.earn{background:linear-gradient(135deg,#F97316,#DC2626);color:#fff}
+.track-badge.link-badge{background:linear-gradient(135deg,#8B5CF6,#00C896);color:#fff}
+
+/* LINK showcase */
+.link-showcase{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;max-width:960px;margin:0 auto}
+.link-demo-card{background:#fff;border-radius:20px;padding:24px 22px;border:1px solid rgba(15,19,25,.06);transition:transform .2s cubic-bezier(.32,1,.32,1),box-shadow .2s;display:flex;flex-direction:column;gap:10px}
+.link-demo-card:hover{transform:translateY(-3px);box-shadow:0 18px 40px rgba(15,19,25,.06),0 4px 10px rgba(139,92,246,.08);border-color:rgba(139,92,246,.25)}
+.link-demo-eye{font-family:'JetBrains Mono','Pretendard',monospace;font-size:10.5px;font-weight:800;letter-spacing:.22em;color:var(--purple);text-transform:uppercase}
+.link-demo-title{font-family:'Fraunces','Pretendard',serif;font-size:24px;font-weight:400;line-height:1.15;letter-spacing:-.6px;color:var(--ink)}
+.link-demo-title em{font-style:italic;color:var(--mint)}
+.link-demo-desc{font-size:13px;color:var(--ink2);line-height:1.65;font-weight:500;word-break:keep-all}
+@media (max-width:900px){.link-showcase{grid-template-columns:1fr 1fr;gap:12px}}
+@media (max-width:640px){.link-showcase{grid-template-columns:1fr;gap:10px}.link-demo-card{padding:20px 18px}.link-demo-title{font-size:21px}}
 .track-badge svg{width:14px;height:14px;stroke:#fff;stroke-width:2.5;fill:none}
 .track-hint{font-size:13px;color:var(--ink3);font-weight:500;max-width:460px;line-height:1.6;word-break:keep-all}
 
@@ -491,6 +503,7 @@ body > *{position:relative;z-index:1}
     <div class="nav-links">
       <a href="#grow">키우기</a>
       <a href="#create">만들기</a>
+      <a href="#link">내 링크</a>
       <a href="#earn">돈벌기</a>
       <a href="#pricing">요금제</a>
       <a href="#faq">자주 묻는 질문</a>
@@ -506,12 +519,12 @@ body > *{position:relative;z-index:1}
     이미 312,847명이 사용 중
   </div>
   <h1 class="hero-title">
-    키우고, 만들고, 돈벌고.<br>
+    키우고, 만들고, 꾸미고, 벌고.<br>
     <strong>이젠 나 대신 <em>Ssobi</em>가.</strong>
   </h1>
   <p class="hero-sub">
     소셜 비서, <strong>Ssobi(쏘비)</strong>.<br>
-    딸깍 한 번이면 SNS가 자동으로 움직여요.
+    SNS 자동화 · 카드뉴스 1초 생성 · <strong>내 사이트같은 링크 페이지</strong>까지.
   </p>
   <div class="hero-cta">
     <button class="btn-main" onclick="start()">1초 만에 내 SNS 비서 만들기</button>
@@ -849,6 +862,53 @@ body > *{position:relative;z-index:1}
         <div class="feat-ico p"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M8 2v4M16 2v4M3 10h18" stroke-linecap="round"/></svg></div>
         <div class="feat-name">예약 게시 · 멀티 채널</div>
         <div class="feat-desc">Instagram·TikTok·YouTube에 동시 예약. 캘린더에서 한눈에 보고 취소도 한 탭.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════ LINK (내 링크 페이지) ══════════════════ -->
+<section class="sec feat-bg fade-in" id="link">
+  <div class="wrap">
+    <div class="track-header">
+      <div class="track-badge link-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.72M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        TRACK 04 · LINK
+      </div>
+      <h2 class="track-title">링크트리 말고,<br><em>내 사이트처럼.</em></h2>
+      <p class="track-sub">다들 똑같이 생긴 페이지 말고 블록 조합으로 <strong>내 스타일</strong>대로. <br>쇼핑몰·에디토리얼·미니멀 중 고르고 시작.</p>
+    </div>
+
+    <div class="link-showcase">
+      <div class="link-demo-card">
+        <div class="link-demo-eye">EDITORIAL</div>
+        <div class="link-demo-title">히어로 <em>캐러셀</em></div>
+        <div class="link-demo-desc">여러 장 좌우 스와이프 · 슬라이드마다 배경 이미지/텍스트 따로 편집 (타 서비스엔 없는 고유 기능)</div>
+      </div>
+      <div class="link-demo-card">
+        <div class="link-demo-eye">BLOCKS · 14</div>
+        <div class="link-demo-title"><em>14종</em> 블록 조합</div>
+        <div class="link-demo-desc">히어로 · 이벤트 바 · 공구 카운트다운 · 제품 그리드 · 매거진 카드 · 빅 배너 · 제안 박스 · 퀵링크 · 소셜 · 여백 · 구분선…</div>
+      </div>
+      <div class="link-demo-card">
+        <div class="link-demo-eye">DRAG</div>
+        <div class="link-demo-title">드래그해서 <em>재배치</em></div>
+        <div class="link-demo-desc">블록 순서를 손가락으로 끌어서 바꾸고, 제품 카드도 개별 드래그로 순서 변경</div>
+      </div>
+      <div class="link-demo-card">
+        <div class="link-demo-eye">SHORTLINK</div>
+        <div class="link-demo-title">자동 <em>숏링크</em></div>
+        <div class="link-demo-desc">링크 블록마다 ssobi.ai/s/xxxxxx 자동 생성 · 클릭 추적 (방문자·국가·시간대)</div>
+      </div>
+      <div class="link-demo-card">
+        <div class="link-demo-eye">PROPOSAL</div>
+        <div class="link-demo-title">제안함 <em>자동 수신</em></div>
+        <div class="link-demo-desc">방문자가 "제안하기" 버튼으로 남긴 협업·광고·공구 문의가 Ssobi 수익제안 탭에 자동 쌓임</div>
+      </div>
+      <div class="link-demo-card">
+        <div class="link-demo-eye">START</div>
+        <div class="link-demo-title">3종 <em>템플릿</em></div>
+        <div class="link-demo-desc">미니멀 · 쇼핑몰 · 에디토리얼 중 고르면 블록 기본 세팅 완성. 이후 내 스타일로 디테일만 수정</div>
       </div>
     </div>
   </div>
