@@ -1268,10 +1268,9 @@ input:checked+.tsl::before{transform:translateX(18px)}
 
 /* Editor / Block 공통 */
 #v-link .lke-editor{padding-top:104px;padding-bottom:20px}
-#v-link .lke-block{position:relative;cursor:pointer;transition:filter .15s}
-#v-link .lke-block:not(.selected):hover{outline:1.5px dashed rgba(0,200,150,.5);outline-offset:-2px}
-#v-link .lke-block.selected{outline:2px dashed var(--mint);outline-offset:2px}
-#v-link .lke-block.selected::before{content:attr(data-type);position:absolute;top:-26px;left:8px;padding:4px 10px;background:var(--mint);color:#fff;border-radius:100px 100px 100px 0;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600;z-index:10}
+#v-link .lke-block{position:relative;cursor:pointer;transition:box-shadow .18s,outline-color .18s}
+#v-link .lke-block.selected{outline:1.5px solid var(--mint);outline-offset:2px;box-shadow:0 0 0 5px rgba(0,200,150,.12)}
+#v-link .lke-block.selected::before{content:attr(data-type);position:absolute;top:-24px;left:8px;padding:3px 10px;background:var(--mint);color:#fff;border-radius:100px;font-family:'JetBrains Mono',monospace;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;z-index:10;box-shadow:0 2px 8px rgba(0,200,150,.25)}
 
 #v-link .lke-add-zone{height:12px;position:relative;cursor:pointer}
 #v-link .lke-add-zone::before{content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:0;height:1px;background:var(--mint);transition:width .3s}
