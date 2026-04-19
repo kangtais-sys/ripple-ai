@@ -1152,7 +1152,8 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .today-cta.mint{background:var(--mint)}
 
 /* ── 신규 유저 모드 ── */
-.newbie-toggle{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:100px;background:var(--bg);border:1px solid var(--b);font-size:10px;font-weight:700;color:var(--t2);cursor:pointer;margin-right:6px}
+.newbie-toggle{display:none;align-items:center;gap:4px;padding:4px 8px;border-radius:100px;background:var(--bg);border:1px solid var(--b);font-size:10px;font-weight:700;color:var(--t2);cursor:pointer;margin-right:6px}
+body.dev-mode .newbie-toggle{display:inline-flex}
 .newbie-toggle.on{background:var(--mint);color:#fff;border-color:var(--mint)}
 .newbie-toggle::before{content:'🆕';font-size:10px}
 
@@ -5367,6 +5368,19 @@ function discFinish(){
 }
 
 // ═══ 트렌드 캐러셀 dots ═══
+// Dev 모드 감지: ?dev=1 쿼리 또는 localStorage.ssobi_dev=1 일 때만 개발용 UI 노출
+(function initDevMode(){
+  try{
+    var q = new URLSearchParams(location.search);
+    if(q.get('dev')==='1'){ localStorage.setItem('ssobi_dev','1'); }
+    if(q.get('dev')==='0'){ localStorage.removeItem('ssobi_dev'); }
+    if(localStorage.getItem('ssobi_dev')==='1'){
+      if(document.body) document.body.classList.add('dev-mode');
+      else document.addEventListener('DOMContentLoaded', function(){ document.body.classList.add('dev-mode'); });
+    }
+  }catch(e){}
+})();
+
 document.addEventListener('DOMContentLoaded', function(){
   var car = document.getElementById('trend-carousel');
   if(!car) return;
