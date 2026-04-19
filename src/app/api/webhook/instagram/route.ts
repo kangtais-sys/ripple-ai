@@ -92,56 +92,48 @@ async function handleComment(supabase: AdminClient, value: any) {
     }
 
     try {
-      const reply = await generateReply(account.user_id, text, supabase)
-      if (!reply || reply === 'SKIP') continue
+      const draft = await generateReply(account.user_id, text, supabase)
+      if (!draft || draft === 'SKIP') continue
 
-      // Instagram API로 답글 달기
-      const igRes = await fetch(
-        `https://graph.instagram.com/v21.0/${commentId}/replies`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            message: reply,
-            access_token: account.access_token,
-          }),
-        }
-      )
-
-      const igData = await igRes.json()
-      const sent = igRes.ok
+      // ⚠️ Meta 심사 대응: 자동 발송 제거. 드래프트로 저장하고 유저 승인 대기.
+      // 유저가 "실시간 관리"에서 [승인·발송] 누르면 /api/replies/[id]/approve 호출.
       const commenterHandle = value.from?.username || String(value.from?.id || '')
       const cls = classifyText(text)
 
-      // 분류 포함 reply_log
       const { data: replyLog } = await supabase.from('reply_logs').insert({
         user_id: account.user_id,
         ig_account_id: account.id,
         type: 'comment',
         original_text: text,
-        reply_text: reply,
-        platform_id: igData.id || commentId,
+        reply_text: draft,         // AI 초안
+        platform_id: commentId,    // 답글 달 대상 comment_id
         urgency: cls.urgency,
         sentiment: cls.sentiment,
-        send_status: sent ? 'sent' : 'failed',
+        send_status: 'pending',    // 승인 대기
+        is_approved: null,
+        context: {
+          comment_id: commentId,
+          media_id: value.media?.id || null,
+          parent_id: value.parent_id || null,
+          commenter_handle: commenterHandle,
+          commenter_platform_id: String(value.from?.id || ''),
+        },
       }).select('id').single()
 
-      // outbound 로그
+      // outbound 로그 — 대기 상태
       await recordOutboundMessage(supabase, {
         userId: account.user_id,
         platform: 'instagram',
         kind: 'comment_reply',
-        body: reply,
+        body: draft,
         recipientHandle: commenterHandle,
         recipientPlatformId: String(value.from?.id || ''),
-        status: sent ? 'sent' : 'failed',
-        platformMessageId: igData.id,
-        errorMessage: sent ? undefined : JSON.stringify(igData.error || {}),
+        status: 'queued',
         sourceRefType: 'reply_logs',
         sourceRefId: replyLog?.id,
       })
 
-      // 팔로워 CRM upsert
+      // 팔로워 CRM 업데이트 (발송과 무관하게 접촉 기록)
       if (commenterHandle) {
         await upsertFollower(supabase, {
           userId: account.user_id,
@@ -152,18 +144,10 @@ async function handleComment(supabase: AdminClient, value: any) {
         })
       }
 
-      // 사용량 카운트
-      const month = new Date().toISOString().slice(0, 7)
-      await supabase.rpc('increment_usage', {
-        p_user_id: account.user_id,
-        p_month: month,
-        p_type: 'comment',
-      })
-
-      console.log(`[Webhook] Replied to comment ${commentId}: "${reply.substring(0, 40)}" (${cls.urgency}/${cls.sentiment})`)
+      console.log(`[Webhook] Draft queued for comment ${commentId}: "${draft.substring(0, 40)}" (${cls.urgency}/${cls.sentiment})`)
       break // 첫 매칭 계정만 처리
     } catch (e) {
-      console.error(`[Webhook] Comment reply error:`, e)
+      console.error(`[Webhook] Comment draft error:`, e)
     }
   }
 }
@@ -193,27 +177,10 @@ async function handleMessage(supabase: AdminClient, value: any) {
     }
 
     try {
-      const reply = await generateReply(account.user_id, text, supabase, 'dm')
-      if (!reply || reply === 'SKIP') continue
+      const draft = await generateReply(account.user_id, text, supabase, 'dm')
+      if (!draft || draft === 'SKIP') continue
 
-      // Instagram Send API로 DM 발송 (24시간 윈도우 내)
-      const igRes = await fetch(
-        `https://graph.instagram.com/v21.0/me/messages`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${account.access_token}`,
-          },
-          body: JSON.stringify({
-            recipient: { id: senderId },
-            message: { text: reply },
-          }),
-        }
-      )
-
-      const igData = await igRes.json()
-      const sent = igRes.ok
+      // ⚠️ 자동 발송 제거 — 드래프트 저장 후 유저 승인 대기
       const senderHandle = value.sender?.username || String(senderId)
       const cls = classifyText(text)
 
@@ -222,23 +189,27 @@ async function handleMessage(supabase: AdminClient, value: any) {
         ig_account_id: account.id,
         type: 'dm',
         original_text: text,
-        reply_text: reply,
-        platform_id: igData.message_id || messageId,
+        reply_text: draft,
+        platform_id: String(senderId),
         urgency: cls.urgency,
         sentiment: cls.sentiment,
-        send_status: sent ? 'sent' : 'failed',
+        send_status: 'pending',
+        is_approved: null,
+        context: {
+          sender_platform_id: String(senderId),
+          sender_handle: senderHandle,
+          source_message_id: messageId,
+        },
       }).select('id').single()
 
       await recordOutboundMessage(supabase, {
         userId: account.user_id,
         platform: 'instagram',
         kind: 'dm',
-        body: reply,
+        body: draft,
         recipientHandle: senderHandle,
         recipientPlatformId: String(senderId),
-        status: sent ? 'sent' : 'failed',
-        platformMessageId: igData.message_id,
-        errorMessage: sent ? undefined : JSON.stringify(igData.error || {}),
+        status: 'queued',
         sourceRefType: 'reply_logs',
         sourceRefId: replyLog?.id,
       })
@@ -262,17 +233,10 @@ async function handleMessage(supabase: AdminClient, value: any) {
         text,
       })
 
-      const month = new Date().toISOString().slice(0, 7)
-      await supabase.rpc('increment_usage', {
-        p_user_id: account.user_id,
-        p_month: month,
-        p_type: 'dm',
-      })
-
-      console.log(`[Webhook] DM reply to ${senderId}: "${reply.substring(0, 40)}" → ${sent ? 'sent' : 'failed'} (${cls.urgency}/${cls.sentiment})`)
+      console.log(`[Webhook] DM draft queued for ${senderId}: "${draft.substring(0, 40)}" (${cls.urgency}/${cls.sentiment})`)
       break
     } catch (e) {
-      console.error(`[Webhook] DM reply error:`, e)
+      console.error(`[Webhook] DM draft error:`, e)
     }
   }
 }
