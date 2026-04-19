@@ -38,6 +38,27 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--t1);ma
 .preview-shade-cta{padding:9px 14px;border-radius:100px;background:var(--mint);color:#fff;border:none;font-size:12px;font-weight:800;cursor:pointer;flex-shrink:0}
 .preview-shade-cta:active{transform:scale(.96)}
 
+/* 첫날 모드 튜토리얼 오버레이 */
+.tut-ov{display:none;position:fixed;inset:0;background:rgba(10,12,18,.88);z-index:500;animation:tut-fade .28s ease both;padding:40px 22px;align-items:center;justify-content:center;cursor:pointer}
+.tut-ov.on{display:flex}
+@keyframes tut-fade{from{opacity:0}to{opacity:1}}
+.tut-skip{position:absolute;top:18px;right:18px;padding:8px 14px;border-radius:100px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);color:#fff;font-size:12.5px;font-weight:700;cursor:pointer;letter-spacing:-.2px;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+.tut-skip:active{background:rgba(255,255,255,.14)}
+.tut-card{width:100%;max-width:380px;text-align:left;cursor:default;animation:tut-rise .36s cubic-bezier(.32,1,.32,1) both}
+@keyframes tut-rise{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.tut-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.24em;color:var(--mint);margin-bottom:14px;text-transform:uppercase}
+.tut-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:30px;font-weight:400;letter-spacing:-1.2px;line-height:1.15;color:#fff;margin-bottom:26px}
+.tut-title em{font-style:italic;color:var(--mint);font-weight:500}
+.tut-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px}
+.tut-list li{display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:12px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06)}
+.tut-ico{width:34px;height:34px;border-radius:10px;background:rgba(0,200,150,.12);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.tut-list li div{display:flex;flex-direction:column;gap:2px;min-width:0}
+.tut-list li b{font-size:13.5px;font-weight:800;color:#fff;letter-spacing:-.2px}
+.tut-list li span{font-size:11.5px;color:rgba(255,255,255,.58);letter-spacing:-.1px;line-height:1.4}
+.tut-cta{width:100%;margin-top:22px;padding:14px;border-radius:12px;background:var(--mint);color:#fff;border:none;font-size:14px;font-weight:800;letter-spacing:-.2px;cursor:pointer;box-shadow:0 6px 20px rgba(0,200,150,.3)}
+.tut-cta:active{transform:scale(.98);background:var(--mint-d)}
+.tut-hint{text-align:center;margin-top:12px;font-size:11px;color:rgba(255,255,255,.4);letter-spacing:-.1px}
+
 /* HEADER */
 .hdr{display:flex;justify-content:space-between;align-items:center;padding:20px 0 16px}
 .logo{font-size:26px;font-weight:900;letter-spacing:-1.2px;color:var(--dark)}.logo em{color:var(--mint);font-style:normal}
@@ -3057,7 +3078,24 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 </div>
 
 <!-- m-link-share: 공유 -->
-<!-- See all / Read more 전체 보기 -->
+<!-- 첫날 모드 튜토리얼 오버레이 -->
+<div class="tut-ov" id="tut-ov" onclick="tutNext(event)">
+  <button class="tut-skip" onclick="event.stopPropagation();tutClose()">건너뛰기</button>
+  <div class="tut-card">
+    <div class="tut-eyebrow">SSOBI · 시작하기</div>
+    <div class="tut-title">5개의 탭으로<br><em>나 대신 일하는 SNS.</em></div>
+    <ul class="tut-list">
+      <li><span class="tut-ico">🏠</span><div><b>홈</b><span>하루 요약·시간값·자동화 캘린더</span></div></li>
+      <li><span class="tut-ico">🌱</span><div><b>키우기</b><span>댓글·DM 자동 응대, 실시간 관리</span></div></li>
+      <li><span class="tut-ico">✨</span><div><b>만들기</b><span>오늘 주제 추천·카드뉴스 생성</span></div></li>
+      <li><span class="tut-ico">🔗</span><div><b>내 링크</b><span>내 스타일대로 꾸미는 링크 페이지</span></div></li>
+      <li><span class="tut-ico">👤</span><div><b>내 정보</b><span>연동·플랜·설정 한 곳에서</span></div></li>
+    </ul>
+    <button class="tut-cta" onclick="event.stopPropagation();tutClose()">시작하기 →</button>
+    <div class="tut-hint">화면 아무 곳이나 탭하면 계속 진행돼요</div>
+  </div>
+</div>
+
 <!-- 첫날 모드 · 내 링크 welcome -->
 <div class="ov" id="m-link-welcome" onclick="co(event,'m-link-welcome')">
   <div class="sheet" style="padding:30px 24px 28px;text-align:center">
@@ -4277,7 +4315,21 @@ function toggleNewbie(){
   }
   refreshNavLock();
   window.scrollTo(0,0);
+  // 첫날 모드 시작 시 튜토리얼 (최초 1회)
+  if(newbieMode){
+    try{
+      if(!localStorage.getItem('ssobi_tut_seen')){
+        setTimeout(tutOpen, 260);
+      }
+    }catch(e){}
+  }
 }
+function tutOpen(){ var el=document.getElementById('tut-ov'); if(el) el.classList.add('on'); }
+function tutClose(){
+  var el=document.getElementById('tut-ov'); if(el) el.classList.remove('on');
+  try{ localStorage.setItem('ssobi_tut_seen','1'); }catch(e){}
+}
+function tutNext(e){ if(e.target===e.currentTarget) tutClose(); }
 
 function refreshNavLock(){
   // 자물쇠 대신 블러 프리뷰 방식으로 변경됨. 남겨진 훅은 비워둠.
