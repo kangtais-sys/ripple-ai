@@ -41,6 +41,20 @@ body > *{position:relative;z-index:1}
 .nav-logo{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-style:italic;font-size:26px;font-weight:900;letter-spacing:-1px;color:var(--ink);line-height:1}
 .nav-logo em{color:var(--mint);font-style:italic}
 .nav-logo em{color:var(--mint);font-style:normal}
+.nav-right{display:flex;align-items:center;gap:10px;position:relative}
+.lang-btn{background:none;border:1px solid rgba(15,19,25,.1);padding:7px 11px;border-radius:100px;font-size:12px;font-weight:700;color:var(--ink2);cursor:pointer;display:flex;align-items:center;gap:5px;font-family:'Pretendard',sans-serif;letter-spacing:.3px}
+.lang-btn:hover{border-color:var(--ink);color:var(--ink)}
+.lang-btn svg{stroke:currentColor;fill:none;flex-shrink:0}
+.lang-menu{display:none;position:absolute;top:calc(100% + 8px);right:0;background:#fff;border:1px solid rgba(15,19,25,.08);border-radius:12px;box-shadow:0 10px 30px rgba(15,19,25,.12);padding:6px;z-index:60;min-width:140px;flex-direction:column;gap:2px}
+.lang-menu.on{display:flex}
+.lang-menu button{background:none;border:none;padding:9px 12px;font-size:13px;text-align:left;cursor:pointer;border-radius:8px;color:var(--ink2);font-family:'Pretendard',sans-serif;font-weight:600}
+.lang-menu button:hover{background:var(--soft);color:var(--ink)}
+.lang-menu button.on{background:var(--mint-l);color:var(--mint-d);font-weight:800}
+/* Google Translate banner 숨김 */
+.goog-te-banner-frame,#goog-gt-tt,.skiptranslate{display:none!important}
+body{top:0!important}
+/* 모바일 */
+@media (max-width:640px){.lang-btn span{display:none}.lang-btn{padding:7px}}
 .nav-links{display:flex;align-items:center;gap:28px}
 .nav-links a{font-size:13px;font-weight:500;color:var(--ink3);text-decoration:none;transition:color .15s}
 .nav-links a:hover{color:var(--mint)}
@@ -230,6 +244,7 @@ body > *{position:relative;z-index:1}
 
 /* ── CREATE SHOWCASE (phone frame 데모) ── */
 .create-show{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;max-width:960px;margin:0 auto 40px}
+.create-show.create-show-simple{display:flex;justify-content:center;max-width:420px;margin:0 auto 40px}
 .create-show-left h3{font-size:clamp(22px,3vw,30px);font-weight:700;line-height:1.3;letter-spacing:-.6px;margin-bottom:14px}
 .create-show-left h3 em{font-style:normal;color:var(--purple)}
 .create-show-left p{font-size:14px;color:var(--ink2);line-height:1.75;margin-bottom:16px}
@@ -507,7 +522,7 @@ body > *{position:relative;z-index:1}
   .nav-inner{padding:10px 18px}
   .nav-logo{font-size:22px;letter-spacing:-1px}
   .hero{padding:52px 18px 40px}
-  .hero-title{font-size:32px !important;letter-spacing:-1.1px}
+  .hero-title{font-size:44px !important;letter-spacing:-1.4px;line-height:1.1}
   .sec{padding:48px 18px}
   .sec-title{font-size:23px !important}
   .btn-main{padding:15px 32px;font-size:14px}
@@ -539,9 +554,28 @@ body > *{position:relative;z-index:1}
       <a href="#pricing">요금제</a>
       <a href="#faq">자주 묻는 질문</a>
     </div>
-    <button class="nav-btn" onclick="startPremium()">7일 무료 시작</button>
+    <div class="nav-right">
+      <button class="lang-btn" onclick="toggleLangMenu()" aria-label="Language">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+        <span id="lang-current">KO</span>
+      </button>
+      <div class="lang-menu" id="lang-menu">
+        <button onclick="setLang('ko')" data-lang="ko" class="on">🇰🇷 한국어</button>
+        <button onclick="setLang('en')" data-lang="en">🇺🇸 English</button>
+        <button onclick="setLang('ja')" data-lang="ja">🇯🇵 日本語</button>
+        <button onclick="setLang('zh-CN')" data-lang="zh-CN">🇨🇳 中文(简体)</button>
+      </div>
+      <button class="nav-btn" onclick="startPremium()">7일 무료 시작</button>
+    </div>
   </div>
 </nav>
+<div id="google_translate_element" style="display:none"></div>
+<script>
+function googleTranslateElementInit(){
+  new google.translate.TranslateElement({pageLanguage:'ko',includedLanguages:'en,ja,zh-CN',autoDisplay:false}, 'google_translate_element');
+}
+</script>
+<script src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
 <!-- HERO -->
 <section class="hero">
@@ -550,7 +584,9 @@ body > *{position:relative;z-index:1}
     이미 312,847명이 사용 중
   </div>
   <h1 class="hero-title">
-    키우고, 만들고,<span class="mo-br"><br></span> 돈벌고.<br>
+    키우고,<span class="mo-br"><br></span>
+    만들고,<span class="mo-br"><br></span>
+    돈벌고.<br>
     <strong>이젠 나 대신 <em>Ssobi</em>가.</strong>
   </h1>
   <p class="hero-sub">
@@ -759,15 +795,7 @@ body > *{position:relative;z-index:1}
       <p class="track-hint">AI가 <b>내 주제</b>에 맞는 것만 — 말투까지 나처럼.</p>
     </div>
 
-    <div class="create-show">
-      <div class="create-show-left">
-        <h3>남의 트렌드 말고<br><em>내 계정에 맞는 TOP 3.</em></h3>
-        <p>관심사·톤·팔로워를 분석해 오늘 뜨는 주제만 매일 아침 업데이트.</p>
-        <div class="create-show-points">
-          <div class="create-show-point"><span><strong>딸깍 한 번</strong> — 표지·본문·캡션 자동</span></div>
-          <div class="create-show-point"><span><strong>직접 입력도 OK</strong> — 한 줄이면 AI가 확장</span></div>
-        </div>
-      </div>
+    <div class="create-show create-show-simple">
       <div class="phone-wrap">
         <div class="phone-frame">
           <div class="phone-screens" id="phone-carousel">
@@ -904,10 +932,11 @@ body > *{position:relative;z-index:1}
     <div class="track-header">
       <div class="track-badge link-badge">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.72M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        TRACK 04 · LINK
+        내 링크
       </div>
-      <h2 class="track-title">링크트리 말고,<br><em>내 사이트처럼.</em></h2>
-      <p class="track-sub">다들 똑같이 생긴 페이지 말고 블록 조합으로 <strong>내 스타일</strong>대로. <br>쇼핑몰·에디토리얼·미니멀 중 고르고 시작.</p>
+      <span class="sec-eye" style="color:var(--purple)">MY LINK</span>
+      <h2 class="sec-title">남들과 다른,<br><em class="purple">내 사이트같은 링크.</em></h2>
+      <p class="track-hint">프로필 링크 하나에 쇼핑몰·에디토리얼·공구까지.<br>블록 조합으로 내 스타일대로 꾸며요.</p>
     </div>
 
     <div class="feat-grid-3">
@@ -1249,6 +1278,60 @@ function toggleFaq(el) {
 }
 function start() { window.location.href = '/app.html'; }
 function startPremium() { window.location.href = '/app.html?plan=premium'; }
+
+// 언어 선택
+function toggleLangMenu(){
+  document.getElementById('lang-menu').classList.toggle('on');
+}
+document.addEventListener('click', function(e){
+  if(!e.target.closest('.nav-right')) document.getElementById('lang-menu').classList.remove('on');
+});
+function setLang(lang){
+  document.getElementById('lang-current').textContent = ({ko:'KO',en:'EN',ja:'JA','zh-CN':'中'})[lang];
+  document.querySelectorAll('.lang-menu button').forEach(function(b){ b.classList.toggle('on', b.dataset.lang===lang); });
+  document.getElementById('lang-menu').classList.remove('on');
+  var cookie = '/ko/'+lang;
+  document.cookie = 'googtrans='+cookie+'; path=/';
+  document.cookie = 'googtrans='+cookie+'; domain=.'+location.hostname+'; path=/';
+  try { localStorage.setItem('ssobi_lang', lang); } catch(e){}
+  if(lang === 'ko'){
+    document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+    document.cookie = 'googtrans=; domain=.'+location.hostname+'; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+  }
+  location.reload();
+}
+// 브라우저 언어 자동 감지 (최초 1회)
+(function(){
+  try {
+    if(localStorage.getItem('ssobi_lang_checked')) return;
+    var nav = (navigator.language||'ko').slice(0,2);
+    var map = {en:'en', ja:'ja', zh:'zh-CN'};
+    if(map[nav] && nav!=='ko'){
+      var bar = document.createElement('div');
+      bar.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1A1F27;color:#fff;padding:12px 18px;border-radius:100px;font-size:13px;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.25);z-index:200;display:flex;align-items:center;gap:10px;max-width:92vw;font-family:Pretendard,sans-serif';
+      var label = document.createElement('span');
+      label.textContent = 'Translate to ';
+      var strong = document.createElement('b');
+      strong.style.color = '#00C896';
+      strong.textContent = nav.toUpperCase();
+      label.appendChild(strong);
+      label.appendChild(document.createTextNode('?'));
+      var btn = document.createElement('button');
+      btn.textContent = 'Translate';
+      btn.style.cssText = 'background:#00C896;color:#fff;border:none;padding:6px 12px;border-radius:100px;font-weight:800;cursor:pointer;font-size:12px;font-family:inherit';
+      btn.onclick = function(){ setLang(map[nav]); localStorage.setItem('ssobi_lang_checked','1'); };
+      var close = document.createElement('button');
+      close.textContent = '✕';
+      close.style.cssText = 'background:none;border:none;color:rgba(255,255,255,.6);cursor:pointer;font-size:16px;padding:0;line-height:1';
+      close.onclick = function(){ bar.remove(); localStorage.setItem('ssobi_lang_checked','1'); };
+      bar.appendChild(label);
+      bar.appendChild(btn);
+      bar.appendChild(close);
+      document.body.appendChild(bar);
+    }
+    localStorage.setItem('ssobi_lang_checked','1');
+  } catch(e){}
+})();
 
 // 폰 캐러셀
 var phoneCarousel = document.getElementById('phone-carousel');
