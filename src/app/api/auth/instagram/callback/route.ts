@@ -1,3 +1,4 @@
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
 
@@ -5,7 +6,7 @@ export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get('code')
 
   if (!code) {
-    return NextResponse.redirect(new URL('/app.html?ig_error=no_code', request.url))
+    return NextResponse.redirect(new URL('/app?ig_error=no_code', request.url))
   }
 
   try {
@@ -59,18 +60,34 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(new URL('/app.html?ig_error=profile_failed', request.url))
     }
 
-    // 4. Supabase에 저장
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-
-    if (!user) {
-      return NextResponse.redirect(new URL('/app.html?ig_error=not_logged_in', request.url))
+    // 4. 유저 식별: 쿠키(ssobi_ig_oauth_uid) 우선, 없으면 세션 쿠키
+    let userId: string | null = null
+    const oauthUid = request.cookies.get('ssobi_ig_oauth_uid')?.value
+    if (oauthUid) {
+      userId = oauthUid
+    } else {
+      // Fallback: Supabase SSR 세션 쿠키 시도
+      const supabase = await createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) userId = user.id
     }
+
+    if (!userId) {
+      console.error('[IG OAuth] no user_id (cookie missing AND no session)')
+      return NextResponse.redirect(new URL('/app?ig_error=not_logged_in', request.url))
+    }
+
+    // Admin 클라이언트로 저장 (RLS 우회 — user_id는 쿠키에서 확인한 값)
+    const admin = createAdminClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { persistSession: false } }
+    )
 
     const expiresAt = new Date(Date.now() + expiresIn * 1000).toISOString()
 
-    const { error: dbError } = await supabase.from('ig_accounts').upsert({
-      user_id: user.id,
+    const { error: dbError } = await admin.from('ig_accounts').upsert({
+      user_id: userId,
       ig_user_id: meData.user_id || String(tokenData.user_id),
       ig_username: meData.username,
       access_token: accessToken,
@@ -79,11 +96,17 @@ export async function GET(request: NextRequest) {
 
     if (dbError) {
       console.error('[IG OAuth] DB error:', dbError)
-      return NextResponse.redirect(new URL('/app.html?ig_error=db_failed', request.url))
+      return NextResponse.redirect(new URL('/app?ig_error=db_failed', request.url))
     }
 
-    console.log(`[IG OAuth] Connected @${meData.username} for user ${user.id}`)
-    return NextResponse.redirect(new URL(`/app.html?ig_connected=${meData.username}`, request.url))
+    await admin.from('profiles').update({ ig_linked_at: new Date().toISOString() }).eq('id', userId)
+
+    console.log(`[IG OAuth] Connected @${meData.username} for user ${userId}`)
+
+    // 사용한 임시 쿠키 제거
+    const res = NextResponse.redirect(new URL(`/app?ig_connected=${meData.username}`, request.url))
+    res.cookies.set('ssobi_ig_oauth_uid', '', { maxAge: 0, path: '/' })
+    return res
   } catch (error) {
     console.error('[IG OAuth] Error:', error)
     return NextResponse.redirect(new URL('/app.html?ig_error=unknown', request.url))
