@@ -4179,7 +4179,42 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 <div class="ov" id="m-plan" onclick="co(event,'m-plan')"><div class="sheet"><div class="s-bar"></div><div class="s-title">이용권</div><div style="background:var(--mint-l);border-radius:16px;padding:20px;margin-bottom:16px;border:1px solid #A7F3D0"><div style="font-size:11px;font-weight:700;color:var(--mint-d);margin-bottom:4px">현재 플랜</div><div style="font-size:22px;font-weight:900;color:var(--t1)">프리미엄</div><div style="font-size:13px;color:var(--t2);margin-top:4px">무료체험 D-4 남음</div><div style="margin-top:12px;font-size:12px;color:var(--mint-d);font-weight:600">월 6,600건 응대 · 3개 채널 · AI 말투 학습 포함</div></div><div class="setting-row"><div class="s-body"><div class="s-name">월 응대 한도</div><div class="s-desc">6,600건 / 이번 달 1,842건 사용 (28%)</div></div></div><div class="setting-row"><div class="s-body"><div class="s-name">연결 채널</div><div class="s-desc">Instagram · TikTok · YouTube</div></div></div><div class="setting-row"><div class="s-body"><div class="s-name">갱신일</div><div class="s-desc">2025년 2월 15일</div></div></div><button class="btn-p" onclick="cm('m-plan')">구독 관리</button><button class="btn-s" onclick="cm('m-plan')">닫기</button></div></div>
 
 <!-- 계정 연동 -->
-<div class="ov" id="m-account" onclick="co(event,'m-account')"><div class="sheet"><div class="s-bar"></div><div class="s-title">계정 연동</div><div style="display:flex;flex-direction:column;gap:8px;margin-top:14px"><div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--mint-l);border-radius:14px;border:1px solid #A7F3D0"><div class="ch-av ch-ig" style="flex-shrink:0;border-radius:10px;width:38px;height:38px">IG</div><div style="flex:1"><div style="font-size:13px;font-weight:700">Instagram</div><div style="font-size:11px;color:var(--mint-d);margin-top:1px">연동 완료 · 팔로워 312,000</div></div><span class="badge bg">연결됨</span></div><div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--mint-l);border-radius:14px;border:1px solid #A7F3D0"><div class="ch-av ch-tk" style="flex-shrink:0;border-radius:10px;width:38px;height:38px">TK</div><div style="flex:1"><div style="font-size:13px;font-weight:700">TikTok</div><div style="font-size:11px;color:var(--mint-d);margin-top:1px">연동 완료 · 팔로워 89,400</div></div><span class="badge bg">연결됨</span></div><div style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg);border-radius:14px;border:1px solid var(--b)"><div class="ch-av ch-yt" style="flex-shrink:0;border-radius:10px;width:38px;height:38px">YT</div><div style="flex:1"><div style="font-size:13px;font-weight:700">YouTube</div><div style="font-size:11px;color:var(--t3);margin-top:1px">미연동</div></div><button style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;background:var(--dark);color:#fff;border:none;cursor:pointer">연동하기</button></div></div></div></div>
+<div class="ov" id="m-account" onclick="co(event,'m-account')">
+  <div class="sheet">
+    <div class="s-bar"></div>
+    <div class="s-title">계정 연동</div>
+    <div class="s-sub">공식 API로만 연동돼요. 비밀번호를 입력하지 않아요.</div>
+    <div id="m-account-rows" style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
+      <!-- Instagram -->
+      <div id="m-acc-ig" style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg);border-radius:14px;border:1px solid var(--b);cursor:pointer" onclick="connectIG()">
+        <div class="ch-av ch-ig" style="flex-shrink:0;border-radius:10px;width:38px;height:38px">IG</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">Instagram</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:1px" id="m-acc-ig-status">미연동</div>
+        </div>
+        <button style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;background:var(--dark);color:#fff;border:none;cursor:pointer" id="m-acc-ig-btn">연동하기</button>
+      </div>
+      <!-- TikTok -->
+      <div id="m-acc-tk" style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg);border-radius:14px;border:1px solid var(--b);cursor:pointer" onclick="connectTK()">
+        <div class="ch-av ch-tk" style="flex-shrink:0;border-radius:10px;width:38px;height:38px">TK</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">TikTok</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:1px">준비 중 (API 심사)</div>
+        </div>
+        <button style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;background:var(--b);color:var(--t3);border:none;cursor:not-allowed">대기 중</button>
+      </div>
+      <!-- YouTube -->
+      <div id="m-acc-yt" style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg);border-radius:14px;border:1px solid var(--b);cursor:pointer" onclick="connectYT()">
+        <div class="ch-av ch-yt" style="flex-shrink:0;border-radius:10px;width:38px;height:38px">YT</div>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:700">YouTube</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:1px">준비 중 (API 심사)</div>
+        </div>
+        <button style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;background:var(--b);color:var(--t3);border:none;cursor:not-allowed">대기 중</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 <script>
 var aiOn=true, bulkOn=false, qc=200, qd=100, learnTimer=null;
@@ -8743,6 +8778,19 @@ function updateIGConnectUI(connected, username){
   } else {
     if(status) status.textContent = '탭해서 연동하기';
     if(check) check.style.display = 'none';
+  }
+  // 내 정보 > 계정 연동 모달의 IG 행도 동기화
+  var accStatus = document.getElementById('m-acc-ig-status');
+  var accBtn = document.getElementById('m-acc-ig-btn');
+  var accRow = document.getElementById('m-acc-ig');
+  if(connected){
+    if(accStatus){ accStatus.textContent = (username ? '@' + username : '연동 완료'); accStatus.style.color = 'var(--mint-d)'; }
+    if(accBtn){ accBtn.textContent = '연결됨 ✓'; accBtn.style.background = 'var(--mint)'; accBtn.style.color = '#fff'; }
+    if(accRow){ accRow.style.background = 'var(--mint-l)'; accRow.style.borderColor = '#A7F3D0'; }
+  } else {
+    if(accStatus){ accStatus.textContent = '미연동'; accStatus.style.color = 'var(--t3)'; }
+    if(accBtn){ accBtn.textContent = '연동하기'; accBtn.style.background = 'var(--dark)'; accBtn.style.color = '#fff'; }
+    if(accRow){ accRow.style.background = 'var(--bg)'; accRow.style.borderColor = 'var(--b)'; }
   }
 }
 
