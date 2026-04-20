@@ -4,14 +4,15 @@
 //
 // 유저의 tone_profiles.learned_style을 읽어 그 말투로 캐러셀 프롬프트 생성
 
-import { createClient } from '@/lib/supabase/server'
+import { getUserFromRequest, adminClient } from '@/lib/auth-helper'
 import { logAIUsage } from '@/lib/ai-usage'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
-  const sb = await createClient()
-  const { data: { user } } = await sb.auth.getUser()
+  const user = await getUserFromRequest(req)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const sb = adminClient()
 
   const body = await req.json().catch(() => ({})) as { topic?: string; slides?: number; template?: string }
   const topic = (body.topic || '').trim()

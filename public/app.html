@@ -4698,13 +4698,38 @@ function toggleDirectBtn(){
   var v = (el.value || '').trim();
   btn.disabled = v.length < 1;
 }
-function generatePrompt(){
+async function generatePrompt(){
   var topic = document.getElementById('direct-topic').value.trim();
   if(topic.length<3) return;
   var btn = document.getElementById('direct-gen-btn');
   btn.textContent = '내 말투로 쓰는 중... ✨';
   btn.disabled = true;
-  setTimeout(function(){
+  try {
+    var h = await authHeaders();
+    var res = await fetch('/api/cardnews/generate', {
+      method:'POST', headers: h, credentials:'include',
+      body: JSON.stringify({ topic: topic, slides: 5 })
+    });
+    var j = await res.json();
+    if(!res.ok || !j.hook){
+      throw new Error(j.error || 'AI 생성 실패');
+    }
+    // body: [{title,text}, ...] → 텍스트 블록으로 플래튼
+    var bodyText = (j.body||[]).map(function(b, i){
+      return '[슬라이드 '+(i+1)+'] '+(b.title||'')+'\n'+(b.text||'');
+    }).join('\n\n');
+    createData.hook = j.hook;
+    createData.body = bodyText;
+    createData.caption = j.caption || '';
+    createData._lastJobId = j.job_id;
+    document.getElementById('cs2-hook').textContent = j.hook;
+    document.getElementById('cs2-body').textContent = bodyText;
+    document.getElementById('cs2-caption').textContent = j.caption || '';
+    createData._lastSource = 'direct:'+topic;
+    goStep(2);
+  } catch(e) {
+    // fallback: 로컬 템플릿
+    console.warn('[cardnews] Claude 실패, 폴백 사용:', e);
     var generated = buildCustomPrompt(topic);
     createData.hook = generated.hook;
     createData.body = generated.body;
@@ -4713,10 +4738,11 @@ function generatePrompt(){
     document.getElementById('cs2-body').textContent = generated.body;
     document.getElementById('cs2-caption').textContent = generated.caption;
     createData._lastSource = 'direct:'+topic;
+    goStep(2);
+  } finally {
     btn.textContent = '생성하기';
     btn.disabled = false;
-    goStep(2);
-  }, 1200);
+  }
 }
 // 학습된 말투로 프롬프트 생성 (친근체 + 이모지 + 감사표현 + "저장해두세요/프로필 링크")
 function buildCustomPrompt(topic){
