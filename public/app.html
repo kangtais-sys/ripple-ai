@@ -71,17 +71,13 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--t1);ma
 /* ROI */
 /* 홈 탭 배경 - 로그인과 유사한 메쉬 그라디언트 */
 #v-home{background:radial-gradient(900px circle at 50% -10%,rgba(0,200,150,.22),transparent 55%),radial-gradient(600px circle at 18% 28%,rgba(6,182,212,.12),transparent 55%),radial-gradient(500px circle at 85% 60%,rgba(139,92,246,.09),transparent 55%),linear-gradient(180deg,var(--mint-l) 0%,var(--bg) 55%);min-height:100vh}
-/* Ssobi 효과 카드 */
-.roi-hours{font-size:48px;font-weight:900;color:var(--t1);letter-spacing:-1.8px;line-height:1;margin:2px 0 4px}
-.roi-hours span:first-child{color:var(--mint-d)}
-.roi-hours-u{font-size:22px;font-weight:700;color:var(--t2);margin-left:4px;letter-spacing:-.5px}
-.roi-amt-sub{font-size:13px;font-weight:700;color:var(--t2);margin-bottom:14px}
-.eff-card{background:#fff;border:1px solid var(--b);border-radius:14px;padding:14px 14px 12px}
-.eff-lbl{font-size:10.5px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px}
-.eff-val{font-size:22px;font-weight:900;color:var(--t1);letter-spacing:-.4px;line-height:1}
-.eff-val-u{font-size:13px;font-weight:700;color:var(--t2);margin-left:2px}
-.eff-note{font-size:10.5px;color:var(--t3);margin-top:6px;line-height:1.4;font-weight:500}
-.eff-strip{background:var(--mint-l);border:1px solid #A7F3D0;border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:12.5px;font-weight:700;color:var(--mint-d);line-height:1.5}
+/* Ssobi 효과 — 재방문 strip */
+.eff-strip{background:var(--mint-l);border:1px solid #A7F3D0;border-radius:12px;padding:12px 14px;margin:4px 0 16px;font-size:12.5px;font-weight:700;color:var(--mint-d);line-height:1.5}
+
+/* 통합 empty state — 이모지·색 남발 없이 간결 */
+.empty-soft{padding:32px 18px;text-align:center;color:var(--t3);font-size:12px;line-height:1.55;font-weight:500;background:var(--bg);border-radius:14px;border:1px dashed var(--b)}
+.empty-soft-t{font-size:13px;font-weight:700;color:var(--t2);margin-bottom:4px;letter-spacing:-.2px}
+.empty-soft.bare{background:none;border:none;padding:28px 16px}
 /* ROI - 박스 없이 hero 타이포 */
 .roi-card{background:none;border:none;box-shadow:none;padding:6px 4px 24px;position:relative}
 .roi-card::after{content:'';position:absolute;left:4px;right:4px;bottom:6px;height:1px;background:linear-gradient(90deg,transparent,rgba(15,19,25,.08) 20%,rgba(15,19,25,.08) 80%,transparent)}
@@ -1814,41 +1810,42 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <!-- 기존 홈 (중간 유저 기준) -->
   <div id="home-real">
   <div class="roi-card">
-    <div class="roi-eye">이번 달 절약 · <span id="roi-period">—</span></div>
-    <div class="roi-hours"><span id="roi-hours-v">0</span><span class="roi-hours-u">시간</span></div>
-    <div class="roi-amt-sub">₩<span id="roi-v">0</span> <span style="color:var(--t3);font-weight:500">· 최저시급 기준</span></div>
+    <div class="roi-eye" id="roi-period">—</div>
+    <div class="roi-lbl">쏘비가 아껴준 내 시간값</div>
+    <div class="roi-amt">₩<span id="roi-v">0</span></div>
     <div class="roi-track"><div class="roi-fill" id="roi-fill" style="width:0"></div></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
-      <div style="font-size:11px;font-weight:500;color:var(--t3)"><span id="roi-day">—</span>/<span id="roi-days">—</span>일 <span id="roi-pct" style="color:var(--mint-d);font-weight:700;margin-left:2px">0%</span></div>
-      <div style="font-size:11px;font-weight:500;color:var(--t3)" id="roi-breakdown-mini">—</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+      <div style="font-size:11px;font-weight:400;color:var(--t3)"><span id="roi-day">—</span>/<span id="roi-days">—</span>일 <span id="roi-pct" style="color:var(--mint);font-weight:700;margin-left:2px">0%</span></div>
+      <div style="font-size:11px;font-weight:400;color:var(--t3)" id="roi-date">—</div>
     </div>
-  </div>
-
-  <!-- Ssobi 효과 — 접점 / 즉답 -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
-    <div class="eff-card">
-      <div class="eff-lbl">Ssobi 접점</div>
-      <div class="eff-val"><span id="eff-touchpoint">0</span><span class="eff-val-u">명</span></div>
-      <div class="eff-note" id="eff-touchpoint-note">댓글·DM·내 링크 합산</div>
-    </div>
-    <div class="eff-card">
-      <div class="eff-lbl">Ssobi 즉답 평균</div>
-      <div class="eff-val" id="eff-response">—</div>
-      <div class="eff-note" id="eff-response-note">첫 응대 이후 표시</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;margin-top:18px">
+      <div style="text-align:center;padding:0 4px">
+        <div id="stat-replies" style="font-size:24px;font-weight:900;color:var(--t1);letter-spacing:-.5px;line-height:1">0</div>
+        <div style="font-size:10px;font-weight:500;color:var(--t3);margin-top:4px">자동 응대</div>
+      </div>
+      <div style="text-align:center;padding:0 4px;border-left:1px solid var(--b);border-right:1px solid var(--b)">
+        <div id="stat-hours" style="font-size:24px;font-weight:900;color:var(--t1);letter-spacing:-.5px;line-height:1">0h</div>
+        <div style="font-size:10px;font-weight:500;color:var(--t3);margin-top:4px">절약 시간</div>
+      </div>
+      <div style="text-align:center;padding:0 4px">
+        <div id="stat-touchpoint" style="font-size:24px;font-weight:900;color:var(--mint);letter-spacing:-.5px;line-height:1">0</div>
+        <div style="font-size:10px;font-weight:500;color:var(--t3);margin-top:4px">Ssobi 접점</div>
+      </div>
     </div>
   </div>
   <div class="eff-strip" id="eff-repeat-strip" style="display:none">
     <div>응대한 <b id="eff-total-users">0</b>명 중 <b id="eff-repeat-users" style="color:var(--mint-d)">0</b>명 재방문 · 관계 전환 <span id="eff-repeat-rate">0</span>%</div>
   </div>
-  <div id="home-alert-urgent" class="alert" onclick="go('manage');setTab('urgent')" style="display:none">
-    <div><div class="alert-t">중요 확인 필요 메시지 <span id="home-alert-count">0</span>건</div><div class="alert-s">긴급 · 비즈니스 제안</div></div>
+  <div id="home-alert-urgent" class="alert" onclick="go('manage');setTab('urgent')">
+    <div><div class="alert-t">긴급 응대 대기 <span id="home-alert-count">0</span>건</div><div class="alert-s" id="home-alert-sub">긴급 · 비즈니스 제안</div></div>
     <div class="alert-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>
   <div class="sec-eye">LIVE</div>
   <div class="sec-t">Ssobi AI 실시간 활동</div>
   <div class="live-box" id="home-live-box">
-    <div id="home-live-empty" style="padding:36px 16px;text-align:center;color:var(--t3);font-size:13px;line-height:1.6">
-      🌱 활동 기록 없음<br><span style="font-size:11.5px">Instagram 연동 후 AI 응대·분석 이벤트가 여기에 실시간으로 표시돼요.</span>
+    <div id="home-live-empty" class="empty-soft">
+      <div class="empty-soft-t">실시간 활동 기록 없음</div>
+      <div>AI가 응대하거나 분석 이벤트가 발생하면 여기에 표시됩니다.</div>
     </div>
   </div>
   <div class="sec-eye">AUTOMATION</div>
@@ -1961,8 +1958,9 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         <div style="font-size:12px;font-weight:700;color:var(--t3)">진행 중인 DM 발송</div>
         <button onclick="openModal('m-dm-all')" style="background:none;border:none;font-size:11px;font-weight:700;color:var(--mint-d);cursor:pointer;display:flex;align-items:center;gap:3px">목록 더보기 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       </div>
-      <div id="dm-active-list" style="background:var(--bg);border-radius:12px;overflow:hidden;margin-bottom:14px;padding:18px 14px;text-align:center;color:var(--t3);font-size:12px;line-height:1.6">
-        아직 설정된 룰이 없어요.<br><span style="font-size:11px">"+ 컨텐츠 추가"로 댓글 감지 룰을 만들 수 있어요.</span>
+      <div id="dm-active-list" class="empty-soft" style="margin-bottom:14px">
+        <div class="empty-soft-t">설정된 룰 없음</div>
+        <div>"+ 컨텐츠 추가"로 댓글 감지 룰을 만들 수 있습니다.</div>
       </div>
       <button onclick="addDmRule()" style="width:100%;padding:11px;border-radius:12px;border:1.5px dashed var(--b);background:none;font-size:13px;font-weight:700;color:var(--t3);cursor:pointer">+ 컨텐츠 추가</button>
       <div class="tip" style="margin-top:10px">댓글이 달리면 조건을 확인하고 내 말투로 DM을 보내요.</div>
@@ -2421,8 +2419,9 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <!-- AI 초안 승인 대기 (실데이터 — 긴급 케이스만) -->
     <div id="drafts-pending" style="margin-bottom:14px"></div>
     <!-- 빈 상태 -->
-    <div id="urgent-empty" style="padding:40px 16px;text-align:center;color:var(--t3);font-size:13px;background:var(--bg);border-radius:14px;border:1px dashed var(--b)">
-      ✨ 긴급 응대 대기 없음<br><span style="font-size:11.5px;color:var(--t3);line-height:1.6">결제 오류·부정 이슈 같은 중요한 메시지가 도착하면 AI가 초안을 만들어 여기에 띄워요.</span>
+    <div id="urgent-empty" class="empty-soft">
+      <div class="empty-soft-t">긴급 응대 대기 없음</div>
+      <div>결제 오류·부정 이슈 같은 중요한 메시지가 도착하면 AI 초안이 여기로 올라옵니다.</div>
     </div>
   </div>
 
@@ -2435,8 +2434,9 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     </div>
 
     <div class="msg-card" id="replies-sent-card"></div>
-    <div id="replies-sent-empty" style="padding:40px 16px;text-align:center;color:var(--t3);font-size:13px;background:var(--bg);border-radius:14px;border:1px dashed var(--b)">
-      💬 자동 응대 내역 없음<br><span style="font-size:11.5px;color:var(--t3);line-height:1.6">일반 댓글·DM이 도착하면 AI가 자동으로 답장하고 여기에 쌓여요.</span>
+    <div id="replies-sent-empty" class="empty-soft">
+      <div class="empty-soft-t">자동 응대 내역 없음</div>
+      <div>일반 댓글·DM이 도착하면 AI가 답장하고 여기에 쌓입니다.</div>
     </div>
   </div>
 
@@ -2450,8 +2450,9 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <div class="fs-header"><div class="fs-title">부정 팔로워</div><div class="fs-count" id="neg-count" style="color:var(--red)">0명</div></div>
       <div class="msg-card" id="neg-followers-list"></div>
     </div>
-    <div id="followers-empty" style="padding:40px 16px;text-align:center;color:var(--t3);font-size:13px;background:var(--bg);border-radius:14px;border:1px dashed var(--b);margin-top:10px">
-      👥 팔로워 데이터 없음<br><span style="font-size:11.5px;color:var(--t3);line-height:1.6">댓글·DM이 쌓이면 팔로워별로 자동 분류돼서 여기에 표시돼요.</span>
+    <div id="followers-empty" class="empty-soft" style="margin-top:10px">
+      <div class="empty-soft-t">팔로워 데이터 없음</div>
+      <div>댓글·DM이 쌓이면 팔로워별로 자동 분류됩니다.</div>
     </div>
   </div>
 
@@ -2478,15 +2479,17 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     </div>
 
     <div class="msg-card" id="revenue-list"></div>
-    <div id="revenue-empty" style="padding:40px 16px;text-align:center;color:var(--t3);font-size:13px;background:var(--bg);border-radius:14px;border:1px dashed var(--b)">
-      💼 제안 없음<br><span style="font-size:11.5px;color:var(--t3);line-height:1.6">협찬·광고 DM이나 내 링크 제안하기로 접수되면 AI가 분류해서 모아요. 중요한 건은 긴급 탭에서 승인 대기.</span>
+    <div id="revenue-empty" class="empty-soft">
+      <div class="empty-soft-t">제안 없음</div>
+      <div>협찬·광고 DM 또는 내 링크 제안이 접수되면 AI가 분류해서 모아둡니다.</div>
     </div>
   </div>
 
   <!-- 분석 -->
   <div class="tc" id="tc-insight">
-    <div id="insight-loading" style="padding:60px 16px;text-align:center;color:var(--t3);font-size:13px;background:var(--bg);border-radius:14px;border:1px dashed var(--b)">
-      📊 인스타그램 인사이트 불러오는 중…<br><span style="font-size:11.5px;color:var(--t3);line-height:1.6">실데이터 동기화 (Graph API)</span>
+    <div id="insight-loading" class="empty-soft">
+      <div class="empty-soft-t">인사이트 불러오는 중</div>
+      <div>Graph API 실데이터 동기화 중…</div>
     </div>
     <div id="insight-content" style="display:none">
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px">
@@ -2500,8 +2503,9 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <div style="font-size:13px;font-weight:800;color:var(--t1);margin:10px 0 8px">최근 게시물</div>
       <div id="ins-media-list"></div>
     </div>
-    <div id="insight-empty" style="display:none;padding:60px 16px;text-align:center;color:var(--t3);font-size:13px;background:var(--bg);border-radius:14px;border:1px dashed var(--b)">
-      Instagram 연동 후 실데이터 분석이 여기에 나타나요.
+    <div id="insight-empty" class="empty-soft" style="display:none">
+      <div class="empty-soft-t">Instagram 연동이 필요합니다</div>
+      <div>연동 후 실데이터 분석이 여기에 나타납니다.</div>
     </div>
     <div id="insight-error" style="display:none;padding:40px 16px;text-align:center;color:var(--red);font-size:12.5px;background:#FEF2F2;border-radius:14px;border:1px dashed var(--red-l);line-height:1.6"></div>
   </div>
@@ -8843,31 +8847,18 @@ function applyDashboard(d) {
   if (pctEl) pctEl.textContent = d.percent + '%';
   var dateEl = document.getElementById('roi-date');
   if (dateEl && d.dateLabel) dateEl.textContent = d.dateLabel;
-  // 히어로 시간 애니메이션
-  var hoursEl = document.getElementById('roi-hours-v');
-  if (hoursEl) {
-    var hTarget = d.savedHours || 0;
-    var hCur = 0;
-    var hSteps = 45;
-    hoursEl.textContent = '0';
-    var hTm = setInterval(function(){
-      hCur += hTarget / hSteps;
-      if (hCur >= hTarget) { hCur = hTarget; clearInterval(hTm); }
-      hoursEl.textContent = (Math.round(hCur * 10) / 10);
-    }, 18);
-  }
   // 날짜 기반 진행률
   var dayEl = document.getElementById('roi-day');
   var daysEl = document.getElementById('roi-days');
   if (dayEl) dayEl.textContent = d.today || (new Date().getDate());
   if (daysEl) daysEl.textContent = d.daysInMonth || (new Date(new Date().getFullYear(), new Date().getMonth()+1, 0).getDate());
-  // 브레이크다운 요약 (한 줄로 축약)
-  var parts = [];
-  if (d.commentCount) parts.push('댓글 ' + d.commentCount);
-  if (d.dmCount) parts.push('DM ' + d.dmCount);
-  if (d.cardCount) parts.push('카드 ' + d.cardCount);
-  var mini = document.getElementById('roi-breakdown-mini');
-  if (mini) mini.textContent = parts.length ? parts.join(' · ') : '아직 응대 기록 없음';
+  // 3-stat grid
+  var sr = document.getElementById('stat-replies');
+  if (sr) sr.textContent = ((d.commentCount || 0) + (d.dmCount || 0)).toLocaleString('ko-KR');
+  var sh = document.getElementById('stat-hours');
+  if (sh) sh.textContent = (d.savedHours || 0) + 'h';
+  var stp = document.getElementById('stat-touchpoint');
+  if (stp) stp.textContent = (d.touchpointUsers || 0).toLocaleString('ko-KR');
 
   // 첫날 모드 체크리스트: 이미 연동된 상태면 자동 체크
   if (d.igConnected && !newbieChecks.ig) {
@@ -8918,9 +8909,10 @@ async function loadDashboardData() {
     var j = await res.json();
     if (!j || !j.current_month) return;
     var cm = j.current_month;
+    var tp = j.touchpoint || {};
     applyDashboard({
       savedWon: cm.total_krw,
-      percent: cm.progress_pct,  // 날짜 기반 진행률
+      percent: cm.progress_pct,
       savedHours: cm.total_hours,
       commentCount: cm.comment_count,
       dmCount: cm.dm_count,
@@ -8929,28 +8921,9 @@ async function loadDashboardData() {
       today: cm.today,
       daysInMonth: cm.days_in_month,
       total: cm.comment_count + cm.dm_count,
-      followers: 0,
+      touchpointUsers: tp.unique_users || 0,
       dateLabel: demoDashboard.dateLabel,
     });
-    // Ssobi 접점 (댓글·DM·링크 합산)
-    var tp = j.touchpoint || {};
-    var eTp = document.getElementById('eff-touchpoint');
-    var eTpNote = document.getElementById('eff-touchpoint-note');
-    if (eTp) eTp.textContent = (tp.unique_users || 0).toLocaleString('ko-KR');
-    if (eTpNote) {
-      var tpParts = [];
-      if (tp.reply_unique) tpParts.push('댓글·DM ' + tp.reply_unique);
-      if (tp.link_senders_unique) tpParts.push('내 링크 제안 ' + tp.link_senders_unique);
-      eTpNote.textContent = tpParts.length ? tpParts.join(' · ') : '댓글·DM·내 링크 합산';
-    }
-    // Ssobi 즉답
-    var eResp = document.getElementById('eff-response');
-    var eRespNote = document.getElementById('eff-response-note');
-    if (j.response_avg_seconds !== null && j.response_avg_seconds !== undefined){
-      var sec = j.response_avg_seconds;
-      eResp.textContent = sec < 60 ? sec+'초' : Math.round(sec/60)+'분';
-      eRespNote.textContent = '이번 달 평균';
-    }
     // 재방문 strip
     var strip = document.getElementById('eff-repeat-strip');
     if (j.repeat_engagement && j.repeat_engagement.total_users >= 5){
