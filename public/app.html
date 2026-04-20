@@ -1796,52 +1796,39 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <!-- 기존 홈 (중간 유저 기준) -->
   <div id="home-real">
   <div class="roi-card">
-    <div class="roi-eye">2026 · 4월</div>
+    <div class="roi-eye" id="roi-period">—</div>
     <div class="roi-lbl">쏘비가 아껴준 내 시간값</div>
-    <div class="roi-amt">₩<span id="roi-v">1,248,000</span></div>
+    <div class="roi-amt">₩<span id="roi-v">0</span></div>
     <div class="roi-track"><div class="roi-fill" id="roi-fill" style="width:0"></div></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
-      <div style="font-size:11px;font-weight:400;color:var(--t3)">이번 달 진행률 <span id="roi-pct" style="color:var(--mint);font-weight:700;margin-left:2px">46%</span></div>
-      <div style="font-size:11px;font-weight:400;color:var(--t3)" id="roi-date">4. 17</div>
+      <div style="font-size:11px;font-weight:400;color:var(--t3)">이번 달 진행률 <span id="roi-pct" style="color:var(--mint);font-weight:700;margin-left:2px">0%</span></div>
+      <div style="font-size:11px;font-weight:400;color:var(--t3)" id="roi-date">—</div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;margin-top:18px">
       <div style="text-align:center;padding:0 4px">
-        <div id="stat-replies" style="font-size:24px;font-weight:900;color:var(--t1);letter-spacing:-.5px;line-height:1">1,842</div>
+        <div id="stat-replies" style="font-size:24px;font-weight:900;color:var(--t1);letter-spacing:-.5px;line-height:1">0</div>
         <div style="font-size:10px;font-weight:500;color:var(--t3);margin-top:4px">자동 응대</div>
       </div>
       <div style="text-align:center;padding:0 4px;border-left:1px solid var(--b);border-right:1px solid var(--b)">
-        <div id="stat-hours" style="font-size:24px;font-weight:900;color:var(--t1);letter-spacing:-.5px;line-height:1">72h</div>
+        <div id="stat-hours" style="font-size:24px;font-weight:900;color:var(--t1);letter-spacing:-.5px;line-height:1">0h</div>
         <div style="font-size:10px;font-weight:500;color:var(--t3);margin-top:4px">절약 시간</div>
       </div>
       <div style="text-align:center;padding:0 4px">
-        <div id="stat-followers" style="font-size:24px;font-weight:900;color:var(--mint);letter-spacing:-.5px;line-height:1">+89</div>
+        <div id="stat-followers" style="font-size:24px;font-weight:900;color:var(--mint);letter-spacing:-.5px;line-height:1">+0</div>
         <div style="font-size:10px;font-weight:500;color:var(--t3);margin-top:4px">신규 팔로워</div>
       </div>
     </div>
   </div>
-  <div class="alert" onclick="go('manage');setTab('urgent')">
-    <div><div class="alert-t">중요 확인 필요 메시지 3건</div><div class="alert-s">결제 오류 · 부정 이슈 · 협업 문의</div></div>
+  <div id="home-alert-urgent" class="alert" onclick="go('manage');setTab('urgent')" style="display:none">
+    <div><div class="alert-t">중요 확인 필요 메시지 <span id="home-alert-count">0</span>건</div><div class="alert-s">긴급 · 비즈니스 제안</div></div>
     <div class="alert-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>
   <div class="sec-eye">LIVE</div>
   <div class="sec-t">Ssobi AI 실시간 활동</div>
-  <div class="live-box">
-    <div class="lfade t"></div>
-    <div class="live-stream">
-      <div class="lrow"><div class="ldash"></div>@yuna__daily님 제품 문의 — 말투 98% 댓글 응대 완료</div>
-      <div class="lrow"><div class="ldash"></div>@hazel_skin님 댓글 → "어떤 피부타입이세요?" 질문형 답변</div>
-      <div class="lrow"><div class="ldash"></div>게시물 업로드 감지 → 저장·댓글 자동 실행</div>
-      <div class="lrow"><div class="ldash"></div>@collab_brand_k 협업 문의 — 수익제안 분류 완료</div>
-      <div class="lrow"><div class="ldash"></div>오늘 최적 게시 시간 분석 완료 — 오후 7:20</div>
-      <div class="lrow"><div class="ldash"></div>스토리 CTA "답장하면 루틴" — 34명 답장 수신</div>
-      <div class="lrow"><div class="ldash"></div>@yuna__daily님 제품 문의 — 말투 98% 댓글 응대 완료</div>
-      <div class="lrow"><div class="ldash"></div>@hazel_skin님 댓글 → "어떤 피부타입이세요?" 질문형 답변</div>
-      <div class="lrow"><div class="ldash"></div>게시물 업로드 감지 → 저장·댓글 자동 실행</div>
-      <div class="lrow"><div class="ldash"></div>@collab_brand_k 협업 문의 — 수익제안 분류 완료</div>
-      <div class="lrow"><div class="ldash"></div>오늘 최적 게시 시간 분석 완료 — 오후 7:20</div>
-      <div class="lrow"><div class="ldash"></div>스토리 CTA "답장하면 루틴" — 34명 답장 수신</div>
+  <div class="live-box" id="home-live-box">
+    <div id="home-live-empty" style="padding:36px 16px;text-align:center;color:var(--t3);font-size:13px;line-height:1.6">
+      🌱 활동 기록 없음<br><span style="font-size:11.5px">Instagram 연동 후 AI 응대·분석 이벤트가 여기에 실시간으로 표시돼요.</span>
     </div>
-    <div class="lfade b"></div>
   </div>
   <div class="sec-eye">AUTOMATION</div>
   <div class="sec-t">자동화 캘린더</div>
@@ -4443,18 +4430,9 @@ function celebrateNewbie(){
 
 // ═══════════════ MINI CALENDAR ═══════════════
 var calDate = new Date(2026, 3, 1);
-var calEvents = {
-  '2026-04-01':{c:142,d:68,f:18},      '2026-04-02':{c:198,d:86,f:24,u:1},
-  '2026-04-03':{c:124,d:67,f:12},      '2026-04-04':{c:221,d:91,f:31,u:1},
-  '2026-04-05':{c:118,d:60,f:14},      '2026-04-06':{c:170,d:74,f:20},
-  '2026-04-07':{c:184,d:82,f:26,u:1},  '2026-04-08':{c:131,d:67,f:17},
-  '2026-04-09':{c:156,d:67,f:19},      '2026-04-10':{c:203,d:86,f:28,u:1},
-  '2026-04-11':{c:224,d:88,f:32,u:1},  '2026-04-12':{c:131,d:67,f:16},
-  '2026-04-13':{c:117,d:59,f:13},      '2026-04-14':{c:163,d:71,f:22,u:1},
-  '2026-04-15':{c:182,d:79,f:25},      '2026-04-16':{c:209,d:89,f:29},
-  '2026-04-17':{c:198,d:86,f:27},
-  '2026-04-19':{s:1}, '2026-04-21':{s:1}, '2026-04-25':{s:1}
-};
+// 실데이터로 채워질 캘린더 이벤트 (댓글/DM/팔로워/업로드/예약)
+// { 'YYYY-MM-DD': { c, d, f, u, s } }  — 빈 상태로 시작
+var calEvents = {};
 function keyOf(y,m,d){ return y+'-'+String(m+1).padStart(2,'0')+'-'+String(d).padStart(2,'0'); }
 function makeEl(tag, cls, txt){
   var el = document.createElement(tag);
@@ -7994,18 +7972,10 @@ function connectIG(){
   window.location.href = url;
 }
 function connectTK(){
-  document.getElementById('tk-status').textContent='연동 완료 · 팔로워 89,400';
-  document.getElementById('tk-status').style.color='var(--mint-d)';
-  document.getElementById('tk-btn').style.background='var(--mint-l)';
-  document.getElementById('tk-btn').style.borderColor='#A7F3D0';
-  document.getElementById('tk-check').style.display='block';
+  alert('TikTok 연동은 API 심사 진행 중이에요. 곧 지원 예정입니다.');
 }
 function connectYT(){
-  document.getElementById('yt-status').textContent='연동 완료 · 구독자 12,400';
-  document.getElementById('yt-status').style.color='var(--mint-d)';
-  document.getElementById('yt-btn').style.background='var(--mint-l)';
-  document.getElementById('yt-btn').style.borderColor='#A7F3D0';
-  document.getElementById('yt-check').style.display='block';
+  alert('YouTube 연동은 API 심사 진행 중이에요. 곧 지원 예정입니다.');
 }
 
 function startLearnAnim(){
@@ -8564,6 +8534,9 @@ async function doUpdatePassword() {
 
 // 폴백 (배포 전/세션 없을 때 데모용)
 function applyDashboard(d) {
+  var now = new Date();
+  var periodEl = document.getElementById('roi-period');
+  if (periodEl) periodEl.textContent = now.getFullYear() + ' · ' + (now.getMonth()+1) + '월';
   var roiEl = document.getElementById('roi-v');
   if (roiEl) {
     var target = d.savedWon;
@@ -8613,15 +8586,15 @@ function applyDashboard(d) {
   updateNewbieProgress();
 }
 
-// 데모/폴백 값 — 4월 17일 기준, 지난 30일 progress ≈ 56%
+// 빈 상태 기본값 (데모 숫자 제거)
 var demoDashboard = {
-  savedWon: 1248000,
-  percent: 56,
-  total: 1842,
-  savedHours: 72,
-  followers: 89,
-  dateLabel: '4. 17',
-  igConnected: true,      // 이미 연동됨 → ck-ig 자동 체크
+  savedWon: 0,
+  percent: 0,
+  total: 0,
+  savedHours: 0,
+  followers: 0,
+  dateLabel: (new Date().getMonth()+1) + '. ' + new Date().getDate(),
+  igConnected: false,
   toneLearned: false,
   targetCount: 0,
   kakaoLinked: false
