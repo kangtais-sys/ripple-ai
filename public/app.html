@@ -269,6 +269,9 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .p-acct-lbl{font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.3px;margin-bottom:6px}
 .p-acct-name{font-size:20px;font-weight:900;color:var(--t1);margin-bottom:3px}
 .p-acct-id{font-size:13px;color:var(--t2)}
+.ins-card{background:#fff;border:1px solid var(--b);border-radius:12px;padding:14px 12px;text-align:left}
+.ins-lbl{font-size:10.5px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px}
+.ins-val{font-size:20px;font-weight:900;color:var(--t1);letter-spacing:-.3px}
 .p-stats{display:grid;grid-template-columns:repeat(3,1fr);background:var(--s);border-radius:20px;border:1px solid var(--b);overflow:hidden;margin-bottom:20px}
 .p-stat{padding:15px 8px;text-align:center;border-right:1px solid var(--b);position:relative;transition:background .1s}
 .p-stat:last-child{border:none}
@@ -924,7 +927,7 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .edt-mode-tab{display:flex;align-items:center;gap:6px;padding:8px 16px;border:none;background:transparent;color:var(--t3);font-family:'Pretendard',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:-.2px;border-radius:100px;cursor:pointer;transition:all .15s}
 .edt-mode-tab svg{width:13px;height:13px;stroke:currentColor;fill:none}
 .edt-mode-tab.on{background:#fff;color:var(--t1);font-weight:800;box-shadow:0 1px 4px rgba(15,19,25,.08)}
-#cs-4.preview-mode .edt-tools,#cs-4.preview-mode .edt-panel,#cs-4.preview-mode .edt-arrows,#cs-4.preview-mode #edt-img-input{display:none!important}
+#cs-4.preview-mode .edt-tools,#cs-4.preview-mode .edt-panel,#cs-4.preview-mode #edt-img-input{display:none!important}
 #cs-4.preview-mode .edt-hnd,#cs-4.preview-mode .edt-size-badge{display:none!important}
 #cs-4.preview-mode .edt-canvas-wrap{box-shadow:0 8px 28px rgba(15,19,25,.12);border:none}
 #cs-4.preview-mode .edt-el.selected{outline:none!important;box-shadow:none!important}
@@ -2450,9 +2453,25 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
   <!-- 분석 -->
   <div class="tc" id="tc-insight">
-    <div id="insight-empty" style="padding:60px 16px;text-align:center;color:var(--t3);font-size:13px;background:var(--bg);border-radius:14px;border:1px dashed var(--b)">
-      📊 분석 데이터 준비 중<br><span style="font-size:11.5px;color:var(--t3);line-height:1.6">댓글·DM이 쌓이면 채널별 수신율, 감정 분석, 댓글 유형 분석이 여기에 나타나요.</span>
+    <div id="insight-loading" style="padding:60px 16px;text-align:center;color:var(--t3);font-size:13px;background:var(--bg);border-radius:14px;border:1px dashed var(--b)">
+      📊 인스타그램 인사이트 불러오는 중…<br><span style="font-size:11.5px;color:var(--t3);line-height:1.6">실데이터 동기화 (Graph API)</span>
     </div>
+    <div id="insight-content" style="display:none">
+      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px">
+        <div class="ins-card"><div class="ins-lbl">팔로워</div><div class="ins-val" id="ins-followers">—</div></div>
+        <div class="ins-card"><div class="ins-lbl">게시물</div><div class="ins-val" id="ins-media">—</div></div>
+        <div class="ins-card"><div class="ins-lbl">최근 7일 도달</div><div class="ins-val" id="ins-reach">—</div></div>
+        <div class="ins-card"><div class="ins-lbl">최근 7일 노출</div><div class="ins-val" id="ins-imp">—</div></div>
+        <div class="ins-card"><div class="ins-lbl">프로필 방문</div><div class="ins-val" id="ins-pv">—</div></div>
+        <div class="ins-card"><div class="ins-lbl">웹사이트 클릭</div><div class="ins-val" id="ins-wc">—</div></div>
+      </div>
+      <div style="font-size:13px;font-weight:800;color:var(--t1);margin:10px 0 8px">최근 게시물</div>
+      <div id="ins-media-list"></div>
+    </div>
+    <div id="insight-empty" style="display:none;padding:60px 16px;text-align:center;color:var(--t3);font-size:13px;background:var(--bg);border-radius:14px;border:1px dashed var(--b)">
+      Instagram 연동 후 실데이터 분석이 여기에 나타나요.
+    </div>
+    <div id="insight-error" style="display:none;padding:40px 16px;text-align:center;color:var(--red);font-size:12.5px;background:#FEF2F2;border-radius:14px;border:1px dashed var(--red-l);line-height:1.6"></div>
   </div>
 </div>
 
@@ -4702,8 +4721,21 @@ async function generatePrompt(){
   var topic = document.getElementById('direct-topic').value.trim();
   if(topic.length<3) return;
   var btn = document.getElementById('direct-gen-btn');
-  btn.textContent = '내 말투로 쓰는 중... ✨';
   btn.disabled = true;
+  // 진행 단계 애니메이션 (Claude 호출 중 지루함 방지)
+  var steps = [
+    '✨ 내 말투 분석 중...',
+    '🎨 훅 문구 작성 중...',
+    '📝 슬라이드 구성 중...',
+    '🏷️ 해시태그 선정 중...',
+    '🌿 마무리 다듬는 중...',
+  ];
+  var si = 0;
+  btn.textContent = steps[0];
+  var stepTimer = setInterval(function(){
+    si = (si+1) % steps.length;
+    btn.textContent = steps[si];
+  }, 1800);
   try {
     var h = await authHeaders();
     var res = await fetch('/api/cardnews/generate', {
@@ -4740,6 +4772,7 @@ async function generatePrompt(){
     createData._lastSource = 'direct:'+topic;
     goStep(2);
   } finally {
+    clearInterval(stepTimer);
     btn.textContent = '생성하기';
     btn.disabled = false;
   }
@@ -7204,13 +7237,36 @@ function edtSetMode(m){
     cs4.classList.add('preview-mode');
     if(tEdit) tEdit.classList.remove('on');
     if(tPrev) tPrev.classList.add('on');
-    if(hint) hint.textContent='실제 게시 모습을 미리 봐요 · 좌우 화살표로 넘기기';
+    if(hint) hint.textContent='좌우 스와이프 또는 화살표로 넘기기';
+    bindPreviewSwipe();
   } else {
     cs4.classList.remove('preview-mode');
     if(tEdit) tEdit.classList.add('on');
     if(tPrev) tPrev.classList.remove('on');
     if(hint) hint.textContent='드래그로 위치 이동 · 모서리로 크기 조절 · 탭하면 편집';
   }
+}
+// 미리보기 모드 좌우 스와이프
+function bindPreviewSwipe(){
+  var wrap = document.getElementById('edt-canvas');
+  if(!wrap || wrap.dataset.swipeBound==='1') return;
+  wrap.dataset.swipeBound = '1';
+  var sx=0, sy=0, tracking=false;
+  wrap.addEventListener('touchstart', function(e){
+    if(!document.getElementById('cs-4').classList.contains('preview-mode')) return;
+    var t = e.touches[0];
+    sx = t.clientX; sy = t.clientY; tracking = true;
+  }, {passive:true});
+  wrap.addEventListener('touchend', function(e){
+    if(!tracking) return;
+    tracking = false;
+    var t = e.changedTouches[0];
+    var dx = t.clientX - sx;
+    var dy = t.clientY - sy;
+    if(Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)){
+      edtNav(dx < 0 ? 1 : -1);
+    }
+  }, {passive:true});
 }
 
 function attachEdt(el){
@@ -7795,6 +7851,59 @@ function setTab(t){
   if(tc) tc.classList.add('on');
   if(t==='comments') loadPendingDrafts();
   if(t==='urgent') loadPendingDrafts();
+  if(t==='insight') loadInsights();
+}
+
+async function loadInsights(){
+  var loading = document.getElementById('insight-loading');
+  var content = document.getElementById('insight-content');
+  var empty = document.getElementById('insight-empty');
+  var errBox = document.getElementById('insight-error');
+  if(!content) return;
+  loading.style.display='';
+  content.style.display='none';
+  empty.style.display='none';
+  errBox.style.display='none';
+  try {
+    var h = await authHeaders();
+    var res = await fetch('/api/insights', {credentials:'include', headers: h});
+    var j = await res.json();
+    loading.style.display='none';
+    if(!res.ok){
+      if(j.error && j.error.indexOf('미연동')>=0){ empty.style.display=''; return; }
+      errBox.textContent = 'Insights 조회 실패: '+(j.detail||j.error||'unknown');
+      errBox.style.display='';
+      return;
+    }
+    content.style.display='';
+    var fmt = function(n){ return (n||0).toLocaleString('ko-KR'); };
+    document.getElementById('ins-followers').textContent = fmt(j.profile.followers_count);
+    document.getElementById('ins-media').textContent = fmt(j.profile.media_count);
+    document.getElementById('ins-reach').textContent = fmt(j.last_7_days.reach);
+    document.getElementById('ins-imp').textContent = fmt(j.last_7_days.impressions);
+    document.getElementById('ins-pv').textContent = fmt(j.last_7_days.profile_views);
+    document.getElementById('ins-wc').textContent = fmt(j.last_7_days.website_clicks);
+    var list = document.getElementById('ins-media-list');
+    while(list.firstChild) list.removeChild(list.firstChild);
+    (j.media||[]).forEach(function(m){
+      var card = document.createElement('div');
+      card.style.cssText='background:#fff;border:1px solid var(--b);border-radius:12px;padding:12px 14px;margin-bottom:8px';
+      var cap = (m.caption||'').slice(0,80).replace(/\n/g,' ');
+      card.innerHTML =
+        '<div style="font-size:12px;color:var(--t1);line-height:1.5;margin-bottom:8px">'+(cap||'(캡션 없음)')+'</div>'+
+        '<div style="display:flex;gap:12px;font-size:11px;color:var(--t3);font-weight:700">'+
+          '<span>❤ '+fmt(m.like_count)+'</span>'+
+          '<span>💬 '+fmt(m.comments_count)+'</span>'+
+          (m.reach?'<span>👁 도달 '+fmt(m.reach)+'</span>':'')+
+          (m.impressions?'<span>🔁 노출 '+fmt(m.impressions)+'</span>':'')+
+        '</div>';
+      list.appendChild(card);
+    });
+  } catch(e){
+    loading.style.display='none';
+    errBox.textContent = 'Insights 로드 에러: '+e.message;
+    errBox.style.display='';
+  }
 }
 
 // 승인형 AI 응대 — 대기 드래프트 불러오기
