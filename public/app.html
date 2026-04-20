@@ -942,7 +942,11 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .edt-slide.on{display:block}
 .edt-el{position:absolute;cursor:move;padding:4px 6px;border-radius:4px;user-select:none;touch-action:none}
 .edt-el.sel{outline:2px dashed var(--mint);outline-offset:2px}
-.edt-el.text{font-weight:700;color:var(--t1);line-height:1.3}
+.edt-el.text{font-weight:700;color:var(--t1);line-height:1.3;white-space:pre-wrap;word-break:keep-all}
+.edt-style-row{display:flex;gap:6px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.edt-style-btn{width:34px;height:34px;border-radius:8px;border:1px solid var(--b);background:#fff;color:var(--t1);cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;font-family:'Pretendard',sans-serif;padding:0;font-weight:400;transition:all .12s}
+.edt-style-btn.on{background:var(--t1);color:#fff;border-color:var(--t1)}
+.edt-weight-select{height:34px;padding:0 10px;border:1px solid var(--b);border-radius:8px;background:#fff;font-family:'Pretendard',sans-serif;font-size:12px;color:var(--t1);cursor:pointer;outline:none}
 .edt-el.img{width:60%;height:auto}
 .edt-el.img img{width:100%;display:block;border-radius:6px;pointer-events:none}
 .edt-hnd{position:absolute;right:-6px;bottom:-6px;width:14px;height:14px;background:var(--mint);border:2px solid #fff;border-radius:50%;cursor:nwse-resize;box-shadow:0 1px 3px rgba(0,0,0,.2)}
@@ -2225,6 +2229,20 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         <div class="edt-row-lbl">크기</div>
         <input type="range" id="edt-text-size" min="12" max="64" value="24">
         <div style="font-size:11px;font-weight:700;color:var(--t2);min-width:36px;text-align:right" id="edt-text-size-v">24px</div>
+      </div>
+      <div class="edt-style-row">
+        <div class="edt-row-lbl" style="margin-right:4px">스타일</div>
+        <button type="button" class="edt-style-btn" id="edt-bold-btn" onclick="edtToggleBold()" style="font-weight:900"><b>B</b></button>
+        <button type="button" class="edt-style-btn" id="edt-italic-btn" onclick="edtToggleItalic()" style="font-style:italic"><i>I</i></button>
+        <select class="edt-weight-select" id="edt-weight-sel" onchange="edtSetWeight(this.value)">
+          <option value="400">Regular 400</option>
+          <option value="500">Medium 500</option>
+          <option value="600">Semibold 600</option>
+          <option value="700" selected>Bold 700</option>
+          <option value="800">Extra 800</option>
+          <option value="900">Black 900</option>
+        </select>
+        <button type="button" class="edt-style-btn" id="edt-fraunces-btn" onclick="edtToggleFraunces()" title="세리프 (Fraunces)" style="font-family:'Fraunces','Pretendard',serif;font-style:italic">Aa</button>
       </div>
       <div style="margin-top:10px">
         <div class="edt-row-lbl" style="margin-bottom:6px">색상 팔레트</div>
@@ -7337,7 +7355,52 @@ function edtSelect(el){
     var rzv=document.getElementById('edt-text-size-v');
     if(rz){ rz.value=sz; rz.oninput=function(){ el.style.fontSize=rz.value+'px'; if(rzv) rzv.textContent=rz.value+'px'; }; }
     if(rzv) rzv.textContent = sz+'px';
+    // 스타일 상태 UI 반영
+    var cs = window.getComputedStyle(el);
+    var w = parseInt(el.style.fontWeight || cs.fontWeight || '700', 10) || 700;
+    var wSel = document.getElementById('edt-weight-sel');
+    if(wSel) wSel.value = String(w>=900?900:(w>=800?800:(w>=700?700:(w>=600?600:(w>=500?500:400)))));
+    var bBtn = document.getElementById('edt-bold-btn');
+    if(bBtn) bBtn.classList.toggle('on', w >= 700);
+    var italic = (el.style.fontStyle||cs.fontStyle) === 'italic';
+    var iBtn = document.getElementById('edt-italic-btn');
+    if(iBtn) iBtn.classList.toggle('on', italic);
+    var fBtn = document.getElementById('edt-fraunces-btn');
+    if(fBtn) fBtn.classList.toggle('on', !!(el.style.fontFamily||'').match(/Fraunces/i));
   }
+}
+function edtToggleBold(){
+  if(!edtSel) return;
+  var cs = window.getComputedStyle(edtSel);
+  var w = parseInt(edtSel.style.fontWeight || cs.fontWeight || '700', 10) || 700;
+  var next = w>=700 ? '400' : '700';
+  edtSel.style.fontWeight = next;
+  var bBtn = document.getElementById('edt-bold-btn');
+  if(bBtn) bBtn.classList.toggle('on', next==='700');
+  var wSel = document.getElementById('edt-weight-sel');
+  if(wSel) wSel.value = next;
+}
+function edtToggleItalic(){
+  if(!edtSel) return;
+  var cur = edtSel.style.fontStyle;
+  var next = cur==='italic' ? 'normal' : 'italic';
+  edtSel.style.fontStyle = next;
+  var iBtn = document.getElementById('edt-italic-btn');
+  if(iBtn) iBtn.classList.toggle('on', next==='italic');
+}
+function edtSetWeight(v){
+  if(!edtSel) return;
+  edtSel.style.fontWeight = v;
+  var bBtn = document.getElementById('edt-bold-btn');
+  if(bBtn) bBtn.classList.toggle('on', parseInt(v,10)>=700);
+}
+function edtToggleFraunces(){
+  if(!edtSel) return;
+  var cur = edtSel.style.fontFamily || '';
+  var on = /Fraunces/i.test(cur);
+  edtSel.style.fontFamily = on ? '' : "'Fraunces','Pretendard','Noto Sans KR',serif";
+  var fBtn = document.getElementById('edt-fraunces-btn');
+  if(fBtn) fBtn.classList.toggle('on', !on);
 }
 function edtPanel(t){
   document.querySelectorAll('.edt-panel').forEach(function(e){ e.classList.remove('on'); });
