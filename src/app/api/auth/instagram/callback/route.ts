@@ -10,9 +10,13 @@ export async function GET(request: NextRequest) {
 
   try {
     // 1. code → short-lived token
-    // Instagram OAuth은 Instagram App ID/Secret 사용 (Facebook App 아님)
-    const igAppId = process.env.INSTAGRAM_APP_ID || process.env.META_APP_ID!
-    const igAppSecret = process.env.INSTAGRAM_APP_SECRET || process.env.META_APP_SECRET!
+    // Instagram Login 토큰 교환은 반드시 Instagram App ID/Secret 사용 (FB App ID 아님)
+    const igAppId = process.env.INSTAGRAM_APP_ID || '1746122143490239'   // 하드코딩 폴백
+    const igAppSecret = process.env.INSTAGRAM_APP_SECRET
+    if (!igAppSecret) {
+      console.error('[IG OAuth] INSTAGRAM_APP_SECRET env missing — Vercel에 추가 필요')
+      return NextResponse.redirect(new URL('/app?ig_error=secret_missing', request.url))
+    }
     const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/instagram/callback`
     const tokenRes = await fetch('https://api.instagram.com/oauth/access_token', {
       method: 'POST',
@@ -26,11 +30,12 @@ export async function GET(request: NextRequest) {
       }),
     })
     const tokenData = await tokenRes.json()
-    console.log('[IG OAuth] Token response:', JSON.stringify(tokenData).substring(0, 200))
+    console.log('[IG OAuth] Token response:', JSON.stringify(tokenData).substring(0, 500))
 
     if (!tokenData.access_token) {
       console.error('[IG OAuth] Token error:', tokenData)
-      return NextResponse.redirect(new URL('/app.html?ig_error=token_failed', request.url))
+      const reason = tokenData.error_type || tokenData.error?.message || 'token_failed'
+      return NextResponse.redirect(new URL('/app?ig_error=' + encodeURIComponent(reason), request.url))
     }
 
     // 2. short-lived → long-lived token (60일)
