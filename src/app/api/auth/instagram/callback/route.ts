@@ -10,13 +10,16 @@ export async function GET(request: NextRequest) {
 
   try {
     // 1. code → short-lived token
+    // Instagram OAuth은 Instagram App ID/Secret 사용 (Facebook App 아님)
+    const igAppId = process.env.INSTAGRAM_APP_ID || process.env.META_APP_ID!
+    const igAppSecret = process.env.INSTAGRAM_APP_SECRET || process.env.META_APP_SECRET!
     const redirectUri = `${process.env.NEXT_PUBLIC_APP_URL}/api/auth/instagram/callback`
     const tokenRes = await fetch('https://api.instagram.com/oauth/access_token', {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: new URLSearchParams({
-        client_id: process.env.META_APP_ID!,
-        client_secret: process.env.META_APP_SECRET!,
+        client_id: igAppId,
+        client_secret: igAppSecret,
         grant_type: 'authorization_code',
         redirect_uri: redirectUri,
         code,
@@ -32,7 +35,7 @@ export async function GET(request: NextRequest) {
 
     // 2. short-lived → long-lived token (60일)
     const longRes = await fetch(
-      `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${process.env.META_APP_SECRET}&access_token=${tokenData.access_token}`
+      `https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=${igAppSecret}&access_token=${tokenData.access_token}`
     )
     const longData = await longRes.json()
     const accessToken = longData.access_token || tokenData.access_token

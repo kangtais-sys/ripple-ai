@@ -8146,9 +8146,10 @@ function togglePw(id){
 }
 
 function connectIG(){
-  var appId = '973683215179192';
+  // ⚠️ Instagram OAuth는 Instagram App ID (Facebook App ID 아님)
+  var appId = '1746122143490239';
   var redirectUri = window.location.origin + '/api/auth/instagram/callback';
-  var scope = 'instagram_business_basic,instagram_manage_comments,instagram_business_manage_messages';
+  var scope = 'instagram_business_basic,instagram_business_manage_comments,instagram_business_manage_messages';
   var url = 'https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=' + appId + '&redirect_uri=' + encodeURIComponent(redirectUri) + '&response_type=code&scope=' + scope;
   window.location.href = url;
 }
