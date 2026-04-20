@@ -7994,11 +7994,23 @@ function togglePw(id){
 }
 
 function connectIG(){
-  // ⚠️ Instagram OAuth는 Instagram App ID (Facebook App ID 아님)
-  var appId = '1746122143490239';
+  // Instagram API with Instagram Login (Business Login) 공식 방식
+  // 참조: https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/business-login
+  var appId = '1746122143490239';   // Instagram app ID (FB App ID 아님)
   var redirectUri = window.location.origin + '/api/auth/instagram/callback';
-  var scope = 'instagram_business_basic,instagram_business_manage_comments,instagram_business_manage_messages';
-  var url = 'https://www.instagram.com/oauth/authorize?enable_fb_login=0&force_authentication=1&client_id=' + appId + '&redirect_uri=' + encodeURIComponent(redirectUri) + '&response_type=code&scope=' + scope;
+  var scope = [
+    'instagram_business_basic',
+    'instagram_business_manage_messages',
+    'instagram_business_manage_comments',
+    'instagram_business_content_publish',
+    'instagram_business_manage_insights'
+  ].join(',');
+  var url = 'https://www.instagram.com/oauth/authorize'
+    + '?force_reauth=true'
+    + '&client_id=' + appId
+    + '&redirect_uri=' + encodeURIComponent(redirectUri)
+    + '&response_type=code'
+    + '&scope=' + encodeURIComponent(scope);
   window.location.href = url;
 }
 function connectTK(){
