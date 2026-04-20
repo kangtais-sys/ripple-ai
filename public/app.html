@@ -8616,8 +8616,22 @@ async function doKakaoLogin() {
 }
 
 async function doLogout() {
-  await sb.auth.signOut();
-  go('onb1');
+  try { await sb.auth.signOut(); } catch(e){}
+  // localStorage에 저장된 UI 상태·데모 데이터 전부 정리 (개발자 플래그만 유지)
+  try {
+    var keep = ['ssobi_dev'];
+    var toRemove = [];
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (k && (k.startsWith('ssobi_') || k.startsWith('sb-')) && keep.indexOf(k) === -1) {
+        toRemove.push(k);
+      }
+    }
+    toRemove.forEach(function(k){ localStorage.removeItem(k); });
+    sessionStorage.clear();
+  } catch(e){}
+  // 랜딩으로 완전 새로고침
+  window.location.href = '/landing';
 }
 
 async function doResetPassword() {
@@ -8739,6 +8753,9 @@ async function checkAuth() {
   } else if (hash === 'signup') {
     go('signup');
   } else if (hash === 'login') {
+    go('login');
+  } else {
+    // 세션 없음 + 해시 없음 → 로그인 화면 기본 노출
     go('login');
   }
 }
