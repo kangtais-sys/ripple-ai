@@ -8862,56 +8862,63 @@ async function checkAuth() {
 }
 
 // 유저 실데이터 로드 → 데모 하드코딩 교체
+// Supabase 클라이언트 직접 사용 (API 경유 없음 — 더 빠르고 안정적)
 async function bootstrapUser(){
   try {
-    var res = await fetch('/api/me', {credentials:'include'});
-    if(!res.ok) return;
-    var data = await res.json();
-    var profile = data.profile || {};
-    var email = data.user?.email || profile.email || '';
-    var name = profile.display_name || (email ? email.split('@')[0] : '사용자');
+    var userRes = await sb.auth.getUser();
+    var user = userRes?.data?.user;
+    if(!user) return;
 
-    // 내 정보 프로필 카드
+    var email = user.email || '';
+    var displayName = user.user_metadata?.display_name;
+    var name = displayName || (email ? email.split('@')[0] : '사용자');
+
+    // 1. 내 정보 프로필 카드 이름·이메일
     var nameEl = document.getElementById('p-display-name');
     var mailEl = document.getElementById('p-email');
     if(nameEl) nameEl.textContent = name;
     if(mailEl) mailEl.textContent = email;
 
-    // 첫날 모드 인사말
+    // 2. 첫날 모드 인사말
     var hero = document.querySelector('.nb-hero-t');
     if(hero && name){ hero.innerHTML = '안녕, '+name+'님.<br>오늘이 Ssobi 첫날이에요'; }
 
-    // 만들기 — "유민혜님께 딱 맞는..."
+    // 3. 만들기 "유민혜님께 딱 맞는..."
     document.querySelectorAll('.sec-t.xl').forEach(function(el){
-      if(el.textContent.indexOf('유민혜님께') >= 0){
+      if(el.textContent.indexOf('유민혜님께') >= 0 || el.textContent.indexOf('님께 딱 맞는') >= 0){
         el.textContent = name + '님께 딱 맞는 오늘 주제';
       }
     });
 
-    // Instagram 연결 상태 체크 (ig_accounts 조회)
-    checkIGConnection();
+    // 4. IG 연결 상태 — profiles 테이블 직접 조회
+    var profRes = await sb.from('profiles').select('ig_linked_at').eq('id', user.id).maybeSingle();
+    var igLinkedAt = profRes?.data?.ig_linked_at;
+    updateIGConnectUI(!!igLinkedAt);
+
+    // 5. 실제 ig_accounts 확인 (profiles.ig_linked_at 캐시가 뒤처질 수 있음)
+    var igRes = await sb.from('ig_accounts').select('id, ig_username').eq('user_id', user.id);
+    if(igRes?.data?.length){
+      updateIGConnectUI(true, igRes.data[0].ig_username);
+    }
   } catch(e){ console.warn('[bootstrap] failed', e); }
 }
 
-async function checkIGConnection(){
-  try {
-    var res = await fetch('/api/me', {credentials:'include'});
-    if(!res.ok) return;
-    var data = await res.json();
-    var igLinkedAt = data.profile?.ig_linked_at;
-    var status = document.getElementById('ig-status');
-    var check = document.getElementById('ig-check');
-    var btn = document.getElementById('ig-btn');
-    if(igLinkedAt){
-      if(status) status.textContent = '연동 완료';
-      if(check) check.style.display = 'block';
-      if(btn) btn.style.cursor = 'default';
-    } else {
-      if(status) status.textContent = '탭해서 연동하기';
-      if(check) check.style.display = 'none';
-    }
-  } catch(e){}
+function updateIGConnectUI(connected, username){
+  var status = document.getElementById('ig-status');
+  var check = document.getElementById('ig-check');
+  var btn = document.getElementById('ig-btn');
+  if(connected){
+    if(status) status.textContent = username ? ('연동 완료 · @' + username) : '연동 완료';
+    if(check) check.style.display = 'block';
+    if(btn) btn.style.cursor = 'default';
+  } else {
+    if(status) status.textContent = '탭해서 연동하기';
+    if(check) check.style.display = 'none';
+  }
 }
+
+// 하위 호환
+async function checkIGConnection(){ return bootstrapUser(); }
 
 // DEV: 현재 유저의 모든 localStorage 데모 잔재 제거 (재테스트용)
 function devResetState(){
