@@ -72,14 +72,16 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--t1);ma
 /* 홈 탭 배경 - 로그인과 유사한 메쉬 그라디언트 */
 #v-home{background:radial-gradient(900px circle at 50% -10%,rgba(0,200,150,.22),transparent 55%),radial-gradient(600px circle at 18% 28%,rgba(6,182,212,.12),transparent 55%),radial-gradient(500px circle at 85% 60%,rgba(139,92,246,.09),transparent 55%),linear-gradient(180deg,var(--mint-l) 0%,var(--bg) 55%);min-height:100vh}
 /* Ssobi 효과 카드 */
-.roi-hours{font-size:44px;font-weight:900;color:var(--t1);letter-spacing:-1.5px;line-height:1;margin:4px 0 6px}
+.roi-hours{font-size:48px;font-weight:900;color:var(--t1);letter-spacing:-1.8px;line-height:1;margin:2px 0 4px}
 .roi-hours span:first-child{color:var(--mint-d)}
+.roi-hours-u{font-size:22px;font-weight:700;color:var(--t2);margin-left:4px;letter-spacing:-.5px}
 .roi-amt-sub{font-size:13px;font-weight:700;color:var(--t2);margin-bottom:14px}
 .eff-card{background:#fff;border:1px solid var(--b);border-radius:14px;padding:14px 14px 12px}
 .eff-lbl{font-size:10.5px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px}
 .eff-val{font-size:22px;font-weight:900;color:var(--t1);letter-spacing:-.4px;line-height:1}
+.eff-val-u{font-size:13px;font-weight:700;color:var(--t2);margin-left:2px}
 .eff-note{font-size:10.5px;color:var(--t3);margin-top:6px;line-height:1.4;font-weight:500}
-.eff-strip{background:var(--mint-l);border:1px solid #A7F3D0;border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:13px;font-weight:700;color:var(--mint-d);line-height:1.5}
+.eff-strip{background:var(--mint-l);border:1px solid #A7F3D0;border-radius:12px;padding:12px 14px;margin-bottom:16px;font-size:12.5px;font-weight:700;color:var(--mint-d);line-height:1.5}
 /* ROI - 박스 없이 hero 타이포 */
 .roi-card{background:none;border:none;box-shadow:none;padding:6px 4px 24px;position:relative}
 .roi-card::after{content:'';position:absolute;left:4px;right:4px;bottom:6px;height:1px;background:linear-gradient(90deg,transparent,rgba(15,19,25,.08) 20%,rgba(15,19,25,.08) 80%,transparent)}
@@ -1812,39 +1814,31 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <!-- 기존 홈 (중간 유저 기준) -->
   <div id="home-real">
   <div class="roi-card">
-    <div class="roi-eye" id="roi-period">—</div>
-    <div class="roi-lbl">이번 달 Ssobi가 대신 한 일</div>
-    <div class="roi-hours"><span id="roi-hours-v">0</span><span style="font-size:24px;font-weight:700;color:var(--t2);margin-left:4px">시간 절약</span></div>
-    <div class="roi-amt-sub">₩<span id="roi-v">0</span> 상당 <span style="font-size:10px;color:var(--t3);font-weight:500">· 2026 최저시급 10,320원 기준</span></div>
+    <div class="roi-eye">이번 달 절약 · <span id="roi-period">—</span></div>
+    <div class="roi-hours"><span id="roi-hours-v">0</span><span class="roi-hours-u">시간</span></div>
+    <div class="roi-amt-sub">₩<span id="roi-v">0</span> <span style="color:var(--t3);font-weight:500">· 최저시급 기준</span></div>
     <div class="roi-track"><div class="roi-fill" id="roi-fill" style="width:0"></div></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
-      <div style="font-size:11px;font-weight:400;color:var(--t3)">이번 달 진행률 <span id="roi-pct" style="color:var(--mint);font-weight:700;margin-left:2px">0%</span></div>
-      <div style="font-size:11px;font-weight:400;color:var(--t3)" id="roi-date">—</div>
-    </div>
-    <div id="roi-breakdown" style="font-size:11.5px;color:var(--t3);margin-top:12px;padding-top:12px;border-top:1px solid var(--b);line-height:1.6">
-      댓글 <b id="stat-replies" style="color:var(--t1);font-weight:800">0</b> ·
-      DM <b id="stat-dm" style="color:var(--t1);font-weight:800">0</b> ·
-      카드뉴스 <b id="stat-card" style="color:var(--t1);font-weight:800">0</b> ·
-      예약 <b id="stat-sched" style="color:var(--t1);font-weight:800">0</b>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2px">
+      <div style="font-size:11px;font-weight:500;color:var(--t3)"><span id="roi-day">—</span>/<span id="roi-days">—</span>일 <span id="roi-pct" style="color:var(--mint-d);font-weight:700;margin-left:2px">0%</span></div>
+      <div style="font-size:11px;font-weight:500;color:var(--t3)" id="roi-breakdown-mini">—</div>
     </div>
   </div>
 
-  <!-- Ssobi 효과 — 즉답 / 카드뉴스 도달 -->
+  <!-- Ssobi 효과 — 접점 / 즉답 -->
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+    <div class="eff-card">
+      <div class="eff-lbl">Ssobi 접점</div>
+      <div class="eff-val"><span id="eff-touchpoint">0</span><span class="eff-val-u">명</span></div>
+      <div class="eff-note" id="eff-touchpoint-note">댓글·DM·내 링크 합산</div>
+    </div>
     <div class="eff-card">
       <div class="eff-lbl">Ssobi 즉답 평균</div>
       <div class="eff-val" id="eff-response">—</div>
-      <div class="eff-note" id="eff-response-note">첫 응대 이후 표시돼요</div>
-    </div>
-    <div class="eff-card">
-      <div class="eff-lbl">카드뉴스 총 도달</div>
-      <div class="eff-val" id="eff-reach">—</div>
-      <div class="eff-note" id="eff-reach-note">첫 카드뉴스 발행 이후</div>
+      <div class="eff-note" id="eff-response-note">첫 응대 이후 표시</div>
     </div>
   </div>
   <div class="eff-strip" id="eff-repeat-strip" style="display:none">
-    <div>응대한 <b id="eff-total-users">0</b>명 중 <b id="eff-repeat-users" style="color:var(--mint-d)">0</b>명 재방문</div>
-    <div style="font-size:11px;color:var(--t3);margin-top:2px">관계 전환 <span id="eff-repeat-rate">0</span>%</div>
+    <div>응대한 <b id="eff-total-users">0</b>명 중 <b id="eff-repeat-users" style="color:var(--mint-d)">0</b>명 재방문 · 관계 전환 <span id="eff-repeat-rate">0</span>%</div>
   </div>
   <div id="home-alert-urgent" class="alert" onclick="go('manage');setTab('urgent')" style="display:none">
     <div><div class="alert-t">중요 확인 필요 메시지 <span id="home-alert-count">0</span>건</div><div class="alert-s">긴급 · 비즈니스 제안</div></div>
@@ -8862,15 +8856,18 @@ function applyDashboard(d) {
       hoursEl.textContent = (Math.round(hCur * 10) / 10);
     }, 18);
   }
-  // 브레이크다운 (댓글·DM·카드·예약)
-  var sr = document.getElementById('stat-replies');
-  if (sr) sr.textContent = (d.commentCount || 0).toLocaleString('ko-KR');
-  var sd = document.getElementById('stat-dm');
-  if (sd) sd.textContent = (d.dmCount || 0).toLocaleString('ko-KR');
-  var sc = document.getElementById('stat-card');
-  if (sc) sc.textContent = (d.cardCount || 0).toLocaleString('ko-KR');
-  var ss = document.getElementById('stat-sched');
-  if (ss) ss.textContent = (d.schedCount || 0).toLocaleString('ko-KR');
+  // 날짜 기반 진행률
+  var dayEl = document.getElementById('roi-day');
+  var daysEl = document.getElementById('roi-days');
+  if (dayEl) dayEl.textContent = d.today || (new Date().getDate());
+  if (daysEl) daysEl.textContent = d.daysInMonth || (new Date(new Date().getFullYear(), new Date().getMonth()+1, 0).getDate());
+  // 브레이크다운 요약 (한 줄로 축약)
+  var parts = [];
+  if (d.commentCount) parts.push('댓글 ' + d.commentCount);
+  if (d.dmCount) parts.push('DM ' + d.dmCount);
+  if (d.cardCount) parts.push('카드 ' + d.cardCount);
+  var mini = document.getElementById('roi-breakdown-mini');
+  if (mini) mini.textContent = parts.length ? parts.join(' · ') : '아직 응대 기록 없음';
 
   // 첫날 모드 체크리스트: 이미 연동된 상태면 자동 체크
   if (d.igConnected && !newbieChecks.ig) {
@@ -8923,16 +8920,29 @@ async function loadDashboardData() {
     var cm = j.current_month;
     applyDashboard({
       savedWon: cm.total_krw,
-      percent: Math.min(100, Math.round((cm.total_minutes / 1440) * 100)),  // 24시간 = 100%
+      percent: cm.progress_pct,  // 날짜 기반 진행률
       savedHours: cm.total_hours,
       commentCount: cm.comment_count,
       dmCount: cm.dm_count,
       cardCount: cm.cardnews_count,
       schedCount: cm.schedule_count,
+      today: cm.today,
+      daysInMonth: cm.days_in_month,
       total: cm.comment_count + cm.dm_count,
       followers: 0,
       dateLabel: demoDashboard.dateLabel,
     });
+    // Ssobi 접점 (댓글·DM·링크 합산)
+    var tp = j.touchpoint || {};
+    var eTp = document.getElementById('eff-touchpoint');
+    var eTpNote = document.getElementById('eff-touchpoint-note');
+    if (eTp) eTp.textContent = (tp.unique_users || 0).toLocaleString('ko-KR');
+    if (eTpNote) {
+      var tpParts = [];
+      if (tp.reply_unique) tpParts.push('댓글·DM ' + tp.reply_unique);
+      if (tp.link_senders_unique) tpParts.push('내 링크 제안 ' + tp.link_senders_unique);
+      eTpNote.textContent = tpParts.length ? tpParts.join(' · ') : '댓글·DM·내 링크 합산';
+    }
     // Ssobi 즉답
     var eResp = document.getElementById('eff-response');
     var eRespNote = document.getElementById('eff-response-note');
@@ -8940,16 +8950,6 @@ async function loadDashboardData() {
       var sec = j.response_avg_seconds;
       eResp.textContent = sec < 60 ? sec+'초' : Math.round(sec/60)+'분';
       eRespNote.textContent = '이번 달 평균';
-    }
-    // 카드뉴스 도달
-    var eReach = document.getElementById('eff-reach');
-    var eReachNote = document.getElementById('eff-reach-note');
-    if (typeof j.cardnews_total_reach === 'number'){
-      eReach.textContent = j.cardnews_total_reach.toLocaleString('ko-KR');
-      eReachNote.textContent = '이번 달 게시물 합산';
-    } else if (cm.cardnews_count > 0){
-      eReach.textContent = '—';
-      eReachNote.textContent = '발행 후 반영 (~24h)';
     }
     // 재방문 strip
     var strip = document.getElementById('eff-repeat-strip');

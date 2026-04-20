@@ -55,7 +55,7 @@ export async function GET(request: NextRequest) {
     response_avg_seconds = Math.round(totalSec / approved.length)
   }
 
-  // 5) 응대 재방문 (같은 handle이 2번 이상 등장)
+  // 5) 응대 재방문 (같은 handle이 2번 이상 등장) — 전체 누적 기준
   const { data: allReplies } = await sb
     .from('reply_logs')
     .select('context')
@@ -68,13 +68,52 @@ export async function GET(request: NextRequest) {
     const h = ctx?.commenter_handle || ctx?.sender_handle
     if (h) handleMap.set(h, (handleMap.get(h) || 0) + 1)
   }
-  const total_engaged_users = handleMap.size
   const repeat_users = Array.from(handleMap.values()).filter(c => c >= 2).length
-  const repeat_rate = total_engaged_users > 0 ? repeat_users / total_engaged_users : 0
+  const reply_unique_users = handleMap.size
+  const repeat_rate = reply_unique_users > 0 ? repeat_users / reply_unique_users : 0
 
-  // 6) 카드뉴스 총 도달 — 향후 구현 (card_news_jobs 에 media_id 저장 + insights 조회)
-  // MVP: null 로 내려서 empty state 유도
-  const cardnews_total_reach: number | null = null
+  // 6) 이번 달 Ssobi 접점 — 댓글·DM 응대 unique + 내 링크 제안자 unique 합산
+  //    (내 링크의 link_page_id로 조인해 현재 유저의 페이지로 들어온 제안만)
+  const { data: myPages } = await sb
+    .from('link_pages').select('id').eq('user_id', user.id)
+  const pageIds = (myPages || []).map(p => p.id)
+
+  const { data: monthReplies } = await sb
+    .from('reply_logs')
+    .select('context')
+    .eq('user_id', user.id)
+    .gte('created_at', monthStart)
+    .not('context', 'is', null)
+  const monthHandles = new Set<string>()
+  for (const r of (monthReplies || [])) {
+    const ctx = r.context as { commenter_handle?: string; sender_handle?: string } | null
+    const h = ctx?.commenter_handle || ctx?.sender_handle
+    if (h) monthHandles.add(h)
+  }
+
+  let link_proposals_count = 0
+  const linkSenders = new Set<string>()
+  if (pageIds.length) {
+    const { data: props } = await sb
+      .from('link_proposals')
+      .select('from_handle, from_email, from_name, created_at')
+      .in('link_page_id', pageIds)
+      .gte('created_at', monthStart)
+    for (const p of (props || [])) {
+      link_proposals_count++
+      const key = p.from_handle || p.from_email || p.from_name
+      if (key) linkSenders.add(key)
+    }
+  }
+
+  // 접점 unique = 댓글·DM unique ∪ 링크 제안자 unique
+  const contactUnion = new Set<string>([...monthHandles, ...Array.from(linkSenders).map(s => 'link:'+s)])
+  const touchpoint_unique_users = contactUnion.size
+
+  // 7) 이번 달 진행률 (날짜 기반)
+  const today = now.getDate()
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
+  const month_progress_pct = Math.round((today / daysInMonth) * 100)
 
   return NextResponse.json({
     min_wage_krw: MIN_WAGE_KRW,
@@ -86,11 +125,19 @@ export async function GET(request: NextRequest) {
       total_minutes: savings.totalMinutes,
       total_hours: Math.round(savings.totalHours * 10) / 10,
       total_krw: savings.totalKrw,
+      today,
+      days_in_month: daysInMonth,
+      progress_pct: month_progress_pct,
     },
     response_avg_seconds,
-    cardnews_total_reach,
+    touchpoint: {
+      unique_users: touchpoint_unique_users,
+      reply_unique: monthHandles.size,
+      link_proposals_count,
+      link_senders_unique: linkSenders.size,
+    },
     repeat_engagement: {
-      total_users: total_engaged_users,
+      total_users: reply_unique_users,
       repeat_users,
       rate: Math.round(repeat_rate * 100) / 100,
     },
