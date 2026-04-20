@@ -11,6 +11,12 @@
   ],
   "rewrites": [
     { "source": "/terms", "destination": "/terms.html" },
-    { "source": "/privacy", "destination": "/terms.html?tab=privacy" }
+    { "source": "/privacy", "destination": "/terms.html?tab=privacy" },
+    { "source": "/app", "destination": "/app.html" },
+    { "source": "/landing", "destination": "/landing.html" }
+  ],
+  "redirects": [
+    { "source": "/app.html", "destination": "/app", "permanent": true },
+    { "source": "/landing.html", "destination": "/", "permanent": true }
   ]
 }
