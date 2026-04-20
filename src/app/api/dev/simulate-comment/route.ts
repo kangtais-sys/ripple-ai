@@ -92,6 +92,11 @@ export async function POST(req: Request) {
 
   const cls = classifyText(text)
   const fakeCommentId = 'demo_' + Math.random().toString(36).slice(2, 10)
+  const isUrgent = cls.urgency === 'urgent' || cls.urgency === 'high' || cls.isBizProposal
+
+  // 시뮬레이션: 긴급이면 pending, 그 외에는 자동 발송된 것처럼 sent 로 기록
+  // (실제 IG API 호출은 가짜 ID라서 생략)
+  const now = new Date().toISOString()
 
   const { data: replyLog } = await sb
     .from('reply_logs')
@@ -101,23 +106,27 @@ export async function POST(req: Request) {
       type,
       original_text: text,
       reply_text: draft,
+      final_reply: isUrgent ? null : draft,
       platform_id: fakeCommentId,
       urgency: cls.urgency,
       sentiment: cls.sentiment,
-      send_status: 'pending',
-      is_approved: null,
+      send_status: isUrgent ? 'pending' : 'sent',
+      is_approved: isUrgent ? null : true,
+      approved_at: isUrgent ? null : now,
       context: type === 'comment'
         ? {
             comment_id: fakeCommentId,
             commenter_handle: fromHandle,
             commenter_platform_id: 'demo_user_' + fromHandle,
             simulated: true,
+            auto_sent: !isUrgent,
           }
         : {
             sender_platform_id: 'demo_user_' + fromHandle,
             sender_handle: fromHandle,
             source_message_id: fakeCommentId,
             simulated: true,
+            auto_sent: !isUrgent,
           },
     })
     .select('id')
@@ -130,7 +139,7 @@ export async function POST(req: Request) {
     body: draft,
     recipientHandle: fromHandle,
     recipientPlatformId: 'demo_user_' + fromHandle,
-    status: 'queued',
+    status: isUrgent ? 'queued' : 'sent',
     sourceRefType: 'reply_logs',
     sourceRefId: replyLog?.id,
   })

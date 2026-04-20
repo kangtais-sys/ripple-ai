@@ -95,32 +95,56 @@ async function handleComment(supabase: AdminClient, value: any) {
       const draft = await generateReply(account.user_id, text, supabase)
       if (!draft || draft === 'SKIP') continue
 
-      // ⚠️ Meta 심사 대응: 자동 발송 제거. 드래프트로 저장하고 유저 승인 대기.
-      // 유저가 "실시간 관리"에서 [승인·발송] 누르면 /api/replies/[id]/approve 호출.
       const commenterHandle = value.from?.username || String(value.from?.id || '')
       const cls = classifyText(text)
+
+      // 🎯 분기:
+      //   - 긴급/부정/비즈 → pending (긴급 탭에서 유저 승인 필요)
+      //   - 일반 → 자동 발송 (댓글·DM 탭에 "완료"로 쌓임)
+      const isUrgent = cls.urgency === 'urgent' || cls.urgency === 'high' || cls.isBizProposal
+      let sent = false
+      let platformMsgId: string | undefined
+      let errMsg: string | undefined
+
+      if (!isUrgent) {
+        // 자동 발송 (일반 케이스)
+        const igRes = await fetch(
+          `https://graph.instagram.com/v21.0/${commentId}/replies`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: draft, access_token: account.access_token }),
+          }
+        )
+        const igData = await igRes.json().catch(() => ({}))
+        sent = igRes.ok
+        platformMsgId = igData.id
+        if (!sent) errMsg = JSON.stringify(igData.error || igData)
+      }
 
       const { data: replyLog } = await supabase.from('reply_logs').insert({
         user_id: account.user_id,
         ig_account_id: account.id,
         type: 'comment',
         original_text: text,
-        reply_text: draft,         // AI 초안
-        platform_id: commentId,    // 답글 달 대상 comment_id
+        reply_text: draft,
+        final_reply: sent ? draft : null,
+        platform_id: commentId,
         urgency: cls.urgency,
         sentiment: cls.sentiment,
-        send_status: 'pending',    // 승인 대기
-        is_approved: null,
+        send_status: isUrgent ? 'pending' : (sent ? 'sent' : 'failed'),
+        is_approved: isUrgent ? null : (sent ? true : null),
+        approved_at: sent ? new Date().toISOString() : null,
         context: {
           comment_id: commentId,
           media_id: value.media?.id || null,
           parent_id: value.parent_id || null,
           commenter_handle: commenterHandle,
           commenter_platform_id: String(value.from?.id || ''),
+          auto_sent: !isUrgent,
         },
       }).select('id').single()
 
-      // outbound 로그 — 대기 상태
       await recordOutboundMessage(supabase, {
         userId: account.user_id,
         platform: 'instagram',
@@ -128,12 +152,13 @@ async function handleComment(supabase: AdminClient, value: any) {
         body: draft,
         recipientHandle: commenterHandle,
         recipientPlatformId: String(value.from?.id || ''),
-        status: 'queued',
+        status: isUrgent ? 'queued' : (sent ? 'sent' : 'failed'),
+        platformMessageId: platformMsgId,
+        errorMessage: errMsg,
         sourceRefType: 'reply_logs',
         sourceRefId: replyLog?.id,
       })
 
-      // 팔로워 CRM 업데이트 (발송과 무관하게 접촉 기록)
       if (commenterHandle) {
         await upsertFollower(supabase, {
           userId: account.user_id,
@@ -144,10 +169,19 @@ async function handleComment(supabase: AdminClient, value: any) {
         })
       }
 
-      console.log(`[Webhook] Draft queued for comment ${commentId}: "${draft.substring(0, 40)}" (${cls.urgency}/${cls.sentiment})`)
-      break // 첫 매칭 계정만 처리
+      if (!isUrgent && sent) {
+        const month = new Date().toISOString().slice(0, 7)
+        await supabase.rpc('increment_usage', {
+          p_user_id: account.user_id,
+          p_month: month,
+          p_type: 'comment',
+        })
+      }
+
+      console.log(`[Webhook] Comment ${isUrgent ? 'PENDING(긴급)' : (sent ? 'AUTO-SENT' : 'FAILED')}: "${draft.substring(0, 40)}" (${cls.urgency}/${cls.sentiment})`)
+      break
     } catch (e) {
-      console.error(`[Webhook] Comment draft error:`, e)
+      console.error(`[Webhook] Comment handler error:`, e)
     }
   }
 }
@@ -180,9 +214,30 @@ async function handleMessage(supabase: AdminClient, value: any) {
       const draft = await generateReply(account.user_id, text, supabase, 'dm')
       if (!draft || draft === 'SKIP') continue
 
-      // ⚠️ 자동 발송 제거 — 드래프트 저장 후 유저 승인 대기
       const senderHandle = value.sender?.username || String(senderId)
       const cls = classifyText(text)
+      const isUrgent = cls.urgency === 'urgent' || cls.urgency === 'high' || cls.isBizProposal
+      let sent = false
+      let platformMsgId: string | undefined
+      let errMsg: string | undefined
+
+      if (!isUrgent) {
+        const igRes = await fetch(
+          `https://graph.instagram.com/v21.0/me/messages`,
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${account.access_token}`,
+            },
+            body: JSON.stringify({ recipient: { id: senderId }, message: { text: draft } }),
+          }
+        )
+        const igData = await igRes.json().catch(() => ({}))
+        sent = igRes.ok
+        platformMsgId = igData.message_id
+        if (!sent) errMsg = JSON.stringify(igData.error || igData)
+      }
 
       const { data: replyLog } = await supabase.from('reply_logs').insert({
         user_id: account.user_id,
@@ -190,15 +245,18 @@ async function handleMessage(supabase: AdminClient, value: any) {
         type: 'dm',
         original_text: text,
         reply_text: draft,
+        final_reply: sent ? draft : null,
         platform_id: String(senderId),
         urgency: cls.urgency,
         sentiment: cls.sentiment,
-        send_status: 'pending',
-        is_approved: null,
+        send_status: isUrgent ? 'pending' : (sent ? 'sent' : 'failed'),
+        is_approved: isUrgent ? null : (sent ? true : null),
+        approved_at: sent ? new Date().toISOString() : null,
         context: {
           sender_platform_id: String(senderId),
           sender_handle: senderHandle,
           source_message_id: messageId,
+          auto_sent: !isUrgent,
         },
       }).select('id').single()
 
@@ -209,7 +267,9 @@ async function handleMessage(supabase: AdminClient, value: any) {
         body: draft,
         recipientHandle: senderHandle,
         recipientPlatformId: String(senderId),
-        status: 'queued',
+        status: isUrgent ? 'queued' : (sent ? 'sent' : 'failed'),
+        platformMessageId: platformMsgId,
+        errorMessage: errMsg,
         sourceRefType: 'reply_logs',
         sourceRefId: replyLog?.id,
       })
@@ -224,7 +284,6 @@ async function handleMessage(supabase: AdminClient, value: any) {
         })
       }
 
-      // 비즈 DM 자동 분류 → revenue_proposals 적재
       await maybeCreateRevenueProposal(supabase, {
         userId: account.user_id,
         sourceChannel: 'instagram_dm',
@@ -233,7 +292,16 @@ async function handleMessage(supabase: AdminClient, value: any) {
         text,
       })
 
-      console.log(`[Webhook] DM draft queued for ${senderId}: "${draft.substring(0, 40)}" (${cls.urgency}/${cls.sentiment})`)
+      if (!isUrgent && sent) {
+        const month = new Date().toISOString().slice(0, 7)
+        await supabase.rpc('increment_usage', {
+          p_user_id: account.user_id,
+          p_month: month,
+          p_type: 'dm',
+        })
+      }
+
+      console.log(`[Webhook] DM ${isUrgent ? 'PENDING(긴급)' : (sent ? 'AUTO-SENT' : 'FAILED')}: "${draft.substring(0, 40)}" (${cls.urgency}/${cls.sentiment})`)
       break
     } catch (e) {
       console.error(`[Webhook] DM draft error:`, e)
