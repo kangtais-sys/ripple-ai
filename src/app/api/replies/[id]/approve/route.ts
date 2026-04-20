@@ -56,25 +56,32 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   // admin 클라이언트로 후속 업데이트 (outbound_messages는 owner RLS라 user 세션으로도 가능하나 확실히 하기 위해)
   const admin = serviceClient()
 
+  // 시뮬 드래프트(context.simulated)는 실제 IG API 호출 없이 발송 성공 처리
+  const isSimulated = !!(reply.context as { simulated?: boolean } | null)?.simulated
+
   let result: Awaited<ReturnType<typeof sendCommentReply>>
-  try {
-    if (reply.type === 'comment') {
-      const commentId = context.comment_id || platformId || ''
-      result = await sendCommentReply({
-        accessToken: igAccount.access_token,
-        commentId,
-        message: finalText,
-      })
-    } else {
-      const recipientId = context.sender_platform_id || platformId || ''
-      result = await sendDirectMessage({
-        accessToken: igAccount.access_token,
-        recipientId,
-        message: finalText,
-      })
+  if (isSimulated) {
+    result = { ok: true, status: 200, platformMessageId: 'demo_sent_' + Date.now() }
+  } else {
+    try {
+      if (reply.type === 'comment') {
+        const commentId = context.comment_id || platformId || ''
+        result = await sendCommentReply({
+          accessToken: igAccount.access_token,
+          commentId,
+          message: finalText,
+        })
+      } else {
+        const recipientId = context.sender_platform_id || platformId || ''
+        result = await sendDirectMessage({
+          accessToken: igAccount.access_token,
+          recipientId,
+          message: finalText,
+        })
+      }
+    } catch (e) {
+      result = { ok: false, status: 0, error: String(e) }
     }
-  } catch (e) {
-    result = { ok: false, status: 0, error: String(e) }
   }
 
   // reply_logs 업데이트
