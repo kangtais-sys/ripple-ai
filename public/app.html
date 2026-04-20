@@ -8596,11 +8596,14 @@ async function doSignup() {
     return;
   }
 
-  // 이메일 인증 비활성화 시 바로 세션 생성됨
+  if (typeof lkeShowToast === 'function') lkeShowToast('✓ '+(nameEl.value||'환영합니다')+'님, 가입 완료!');
+
+  // 신규 가입자는 항상 온보딩(SNS 연동)부터
   if (res.data.session) {
-    go('home');
+    go('connect-account-onb');
   } else {
-    go('v-connect-account-onb');
+    // 이메일 인증 필요 시
+    go('signup/confirm');
   }
 }
 
@@ -8621,7 +8624,17 @@ async function doLogin() {
     return;
   }
 
+  // IG 연동 여부 체크해서 분기
+  try {
+    var meRes = await fetch('/api/me', {credentials:'include'});
+    if(meRes.ok){
+      var me = await meRes.json();
+      if(!me.profile?.ig_linked_at){ go('connect-account-onb'); return; }
+    }
+  } catch(e){}
   go('home');
+  loadDashboardData();
+  bootstrapUser();
 }
 
 async function doGoogleLogin() {
