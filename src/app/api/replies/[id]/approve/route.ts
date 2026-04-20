@@ -2,15 +2,16 @@
 // body: { final_reply?: string }  — 있으면 수정본 발송, 없으면 AI 초안 그대로
 // Instagram Graph API로 실제 발송 후 reply_logs·outbound_messages 업데이트
 
-import { createClient } from '@/lib/supabase/server'
+import { getUserFromRequest, adminClient } from '@/lib/auth-helper'
 import { NextResponse } from 'next/server'
 import { sendCommentReply, sendDirectMessage, calcEditSimilarity, serviceClient } from '@/lib/ig-send'
 
 export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const sb = await createClient()
-  const { data: { user } } = await sb.auth.getUser()
+  const user = await getUserFromRequest(req)
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+
+  const sb = adminClient()
 
   const body = await req.json().catch(() => ({})) as {
     final_reply?: string

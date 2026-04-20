@@ -1,14 +1,11 @@
-import { createClient } from '@/lib/supabase/server'
+import { getUserFromRequest, adminClient } from '@/lib/auth-helper'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET(request: NextRequest) {
-  const supabase = await createClient()
+  const user = await getUserFromRequest(request)
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  // 로그인 유저 확인
-  const { data: { user }, error: authError } = await supabase.auth.getUser()
-  if (authError || !user) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const supabase = adminClient()
 
   const searchParams = request.nextUrl.searchParams
   const page = Math.max(1, parseInt(searchParams.get('page') || '1', 10))

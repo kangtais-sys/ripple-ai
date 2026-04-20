@@ -7772,10 +7772,20 @@ function setTab(t){
 }
 
 // 승인형 AI 응대 — 대기 드래프트 불러오기
-function loadPendingDrafts(){
+async function authHeaders(){
+  var h = {'Content-Type':'application/json'};
+  try {
+    var s = (await window.sb.auth.getSession())?.data?.session;
+    if(s?.access_token) h['Authorization'] = 'Bearer ' + s.access_token;
+  } catch(e){}
+  return h;
+}
+
+async function loadPendingDrafts(){
   var box = document.getElementById('drafts-pending');
   if(!box) return;
-  fetch('/api/replies?status=pending&limit=20', {credentials:'include'})
+  var h = await authHeaders();
+  fetch('/api/replies?status=pending&limit=20', {credentials:'include', headers: h})
     .then(function(r){ return r.ok ? r.json() : null; })
     .then(function(j){
       if(!j || !j.replies) return;
@@ -7867,14 +7877,15 @@ function renderDraftCard(d){
   return card;
 }
 
-function approveDraft(id, finalReply, card, btn, alsoSendDm){
+async function approveDraft(id, finalReply, card, btn, alsoSendDm){
   btn.disabled = true;
   btn.textContent = '발송 중...';
   var payload = { final_reply: finalReply };
   if(alsoSendDm) payload.also_send_dm = true;
+  var h = await authHeaders();
   fetch('/api/replies/'+id+'/approve', {
     method:'POST',
-    headers:{'Content-Type':'application/json'},
+    headers: h,
     credentials:'include',
     body: JSON.stringify(payload),
   }).then(function(r){ return r.json().then(function(j){ return { ok:r.ok, data:j }; }); })
@@ -7900,9 +7911,10 @@ function approveDraft(id, finalReply, card, btn, alsoSendDm){
     });
 }
 
-function skipDraft(id, card){
+async function skipDraft(id, card){
   if(!confirm('이 응대를 스킵할까요? 발송하지 않고 폐기돼요.')) return;
-  fetch('/api/replies/'+id+'/skip', {method:'POST', credentials:'include'})
+  var h = await authHeaders();
+  fetch('/api/replies/'+id+'/skip', {method:'POST', credentials:'include', headers: h})
     .then(function(r){ if(r.ok){ card.style.opacity='.3'; setTimeout(function(){ card.remove(); }, 200); } });
 }
 
@@ -7921,19 +7933,14 @@ function devSimulate(kind, level){
     : samples['normal_' + kind];
   var text = prompt((level==='urgent'?'[긴급] ':'[일반] ') + (kind==='dm'?'DM':'댓글')+' 내용', defaultText);
   if(!text) return;
-  (async function(){
-    var headers = {'Content-Type':'application/json'};
-    try {
-      var s = (await window.sb.auth.getSession())?.data?.session;
-      if(s?.access_token) headers['Authorization'] = 'Bearer ' + s.access_token;
-    } catch(e){}
+  authHeaders().then(function(h){
     return fetch('/api/dev/simulate-comment', {
       method:'POST',
-      headers: headers,
+      headers: h,
       credentials:'include',
       body: JSON.stringify({ type:kind, text:text }),
     });
-  })().then(function(r){ return r.json(); })
+  }).then(function(r){ return r.json(); })
     .then(function(j){
       if(j.ok){
         loadPendingDrafts();

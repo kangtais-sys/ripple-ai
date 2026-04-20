@@ -1,12 +1,13 @@
 // POST /api/replies/[id]/skip — 드래프트 폐기 (발송 안 함)
-import { createClient } from '@/lib/supabase/server'
+import { getUserFromRequest, adminClient } from '@/lib/auth-helper'
 import { NextResponse } from 'next/server'
 
-export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const sb = await createClient()
-  const { data: { user } } = await sb.auth.getUser()
+  const user = await getUserFromRequest(req)
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+
+  const sb = adminClient()
 
   const { error } = await sb
     .from('reply_logs')
