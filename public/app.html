@@ -9018,8 +9018,8 @@ async function bootstrapUser(){
     var planEl = document.getElementById('p-stat-plan');
     var planSubEl = document.getElementById('p-stat-plan-sub');
     if(subRes?.data){
-      var planMap = {free:'무료', basic:'베이직', premium:'프리미엄', business:'비즈니스'};
-      if(planEl) planEl.textContent = planMap[subRes.data.plan] || '무료';
+      var planMap = {free:'베이직', basic:'베이직', premium:'프리미엄', business:'프로페셔널'};
+      if(planEl) planEl.textContent = planMap[subRes.data.plan] || '베이직';
       if(planSubEl){
         if(subRes.data.status === 'trial' && subRes.data.current_period_end){
           var diff = Math.ceil((new Date(subRes.data.current_period_end) - Date.now()) / 86400000);
