@@ -5389,10 +5389,24 @@ function discFinish(){
 }
 
 // ═══ 트렌드 캐러셀 dots ═══
-// Dev 모드 감지: ?dev=1 쿼리 또는 localStorage.ssobi_dev=1 일 때만 개발용 UI 노출
+// Dev 모드 감지 + ?reset=1 로 완전 초기화 (모바일용)
 (function initDevMode(){
   try{
     var q = new URLSearchParams(location.search);
+    // ?reset=1 : localStorage 전부 비우고 / 로 리다이렉트
+    if(q.get('reset')==='1'){
+      for(var i=localStorage.length-1;i>=0;i--){
+        var k=localStorage.key(i);
+        if(k && (k.startsWith('ssobi_')||k.startsWith('sb-'))) localStorage.removeItem(k);
+      }
+      try{ sessionStorage.clear(); }catch(_){}
+      if(window.supabase){
+        // 비동기지만 기다리지 않고 바로 이동
+        try{ var c = window.supabase.createClient('https://ffozahaztbudvsnnkvep.supabase.co','sb_publishable_wA6kdCZagrloe_45mvTPRg_g5-UkQJs'); c.auth.signOut(); }catch(_){}
+      }
+      setTimeout(function(){ location.replace('/'); }, 300);
+      return;
+    }
     if(q.get('dev')==='1'){ localStorage.setItem('ssobi_dev','1'); }
     if(q.get('dev')==='0'){ localStorage.removeItem('ssobi_dev'); }
     if(localStorage.getItem('ssobi_dev')==='1'){
