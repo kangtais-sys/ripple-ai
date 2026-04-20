@@ -110,12 +110,41 @@ export async function GET(request: NextRequest) {
   const contactUnion = new Set<string>([...monthHandles, ...Array.from(linkSenders).map(s => 'link:'+s)])
   const touchpoint_unique_users = contactUnion.size
 
-  // 7) 이번 달 진행률 (날짜 기반)
+  // 7) 이번 달 IG 도달 (Graph API insights — reach 합산)
+  let month_ig_reach: number | null = null
+  const { data: igAcc } = await sb
+    .from('ig_accounts')
+    .select('ig_user_id, access_token')
+    .eq('user_id', user.id)
+    .limit(1)
+    .maybeSingle()
+  if (igAcc?.access_token && igAcc.ig_user_id) {
+    try {
+      const since = Math.floor(new Date(monthStart).getTime() / 1000)
+      const until = Math.floor(now.getTime() / 1000)
+      const res = await fetch(
+        `https://graph.instagram.com/v21.0/${igAcc.ig_user_id}/insights` +
+        `?metric=reach&period=day&since=${since}&until=${until}&access_token=${igAcc.access_token}`
+      )
+      if (res.ok) {
+        const json = await res.json()
+        const row = (json.data || []).find((d: { name: string }) => d.name === 'reach')
+        if (row) {
+          month_ig_reach = (row.values || []).reduce(
+            (sum: number, v: { value: number }) => sum + (v.value || 0), 0
+          )
+        }
+      }
+    } catch { /* IG API 실패 시 null 유지 */ }
+  }
+
+  // 8) 이번 달 진행률 (날짜 기반)
   const today = now.getDate()
   const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
   const month_progress_pct = Math.round((today / daysInMonth) * 100)
 
   return NextResponse.json({
+    month_ig_reach,
     min_wage_krw: MIN_WAGE_KRW,
     current_month: {
       comment_count,

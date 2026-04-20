@@ -1828,8 +1828,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         <div style="font-size:10px;font-weight:500;color:var(--t3);margin-top:4px">절약 시간</div>
       </div>
       <div style="text-align:center;padding:0 4px">
-        <div id="stat-touchpoint" style="font-size:24px;font-weight:900;color:var(--mint);letter-spacing:-.5px;line-height:1">0</div>
-        <div style="font-size:10px;font-weight:500;color:var(--t3);margin-top:4px">Ssobi 접점</div>
+        <div id="stat-reach" style="font-size:24px;font-weight:900;color:var(--mint);letter-spacing:-.5px;line-height:1">0</div>
+        <div style="font-size:10px;font-weight:500;color:var(--t3);margin-top:4px">이번 달 도달</div>
       </div>
     </div>
   </div>
@@ -8857,8 +8857,8 @@ function applyDashboard(d) {
   if (sr) sr.textContent = ((d.commentCount || 0) + (d.dmCount || 0)).toLocaleString('ko-KR');
   var sh = document.getElementById('stat-hours');
   if (sh) sh.textContent = (d.savedHours || 0) + 'h';
-  var stp = document.getElementById('stat-touchpoint');
-  if (stp) stp.textContent = (d.touchpointUsers || 0).toLocaleString('ko-KR');
+  var sre = document.getElementById('stat-reach');
+  if (sre) sre.textContent = (d.monthReach === null || d.monthReach === undefined) ? '—' : d.monthReach.toLocaleString('ko-KR');
 
   // 첫날 모드 체크리스트: 이미 연동된 상태면 자동 체크
   if (d.igConnected && !newbieChecks.ig) {
@@ -8909,7 +8909,6 @@ async function loadDashboardData() {
     var j = await res.json();
     if (!j || !j.current_month) return;
     var cm = j.current_month;
-    var tp = j.touchpoint || {};
     applyDashboard({
       savedWon: cm.total_krw,
       percent: cm.progress_pct,
@@ -8921,7 +8920,7 @@ async function loadDashboardData() {
       today: cm.today,
       daysInMonth: cm.days_in_month,
       total: cm.comment_count + cm.dm_count,
-      touchpointUsers: tp.unique_users || 0,
+      monthReach: j.month_ig_reach,
       dateLabel: demoDashboard.dateLabel,
     });
     // 재방문 strip
