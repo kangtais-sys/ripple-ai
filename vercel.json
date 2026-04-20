@@ -17,6 +17,12 @@
   ],
   "redirects": [
     { "source": "/app.html", "destination": "/app", "permanent": true },
-    { "source": "/landing.html", "destination": "/", "permanent": true }
+    { "source": "/landing.html", "destination": "/", "permanent": true },
+    {
+      "source": "/(.*)",
+      "has": [{ "type": "host", "value": "www.ssobi.ai" }],
+      "destination": "https://ssobi.ai/$1",
+      "permanent": true
+    }
   ]
 }

@@ -7994,10 +7994,16 @@ function togglePw(id){
 }
 
 function connectIG(){
+  // www/non-www 불일치로 Supabase 세션 쿠키 누락되면 '로그인 필요' 에러 발생
+  // → 현재 페이지가 www.ssobi.ai 면 ssobi.ai 로 캐노니컬 통일
+  if (location.hostname === 'www.ssobi.ai'){
+    location.href = 'https://ssobi.ai' + location.pathname + location.search;
+    return;
+  }
   // Instagram API with Instagram Login (Business Login) 공식 방식
   // 참조: https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/business-login
   var appId = '1746122143490239';   // Instagram app ID (FB App ID 아님)
-  var redirectUri = window.location.origin + '/api/auth/instagram/callback';
+  var redirectUri = 'https://ssobi.ai/api/auth/instagram/callback';
   var scope = [
     'instagram_business_basic',
     'instagram_business_manage_messages',
