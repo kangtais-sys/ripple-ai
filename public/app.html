@@ -1155,6 +1155,7 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .newbie-toggle{display:none;align-items:center;gap:4px;padding:4px 8px;border-radius:100px;background:var(--bg);border:1px solid var(--b);font-size:10px;font-weight:700;color:var(--t2);cursor:pointer;margin-right:6px}
 body.dev-mode .newbie-toggle{display:inline-flex}
 body.dev-mode .dev-only{display:flex!important}
+body.dev-mode .mitem.dev-only{display:flex!important}
 .newbie-toggle.on{background:var(--mint);color:#fff;border-color:var(--mint)}
 .newbie-toggle::before{content:'🆕';font-size:10px}
 
@@ -2661,8 +2662,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div class="hdr"><div class="logo" style="font-size:18px">내 정보</div></div>
 
   <div class="p-top" style="display:block;padding:4px 0 18px">
-    <div style="font-size:24px;font-weight:900;color:var(--t1);letter-spacing:-.6px">유민혜</div>
-    <div style="font-size:12.5px;color:var(--t3);margin-top:3px">yuminhye@gmail.com</div>
+    <div id="p-display-name" style="font-size:24px;font-weight:900;color:var(--t1);letter-spacing:-.6px">—</div>
+    <div id="p-email" style="font-size:12.5px;color:var(--t3);margin-top:3px">—</div>
   </div>
 
   <div class="p-stats">
@@ -2721,6 +2722,10 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div class="mitem" onclick="if(confirm('로그아웃 하시겠어요?')) doLogout()" style="border:none">
       <div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div class="mbd"><div class="mname2" style="color:var(--red)">로그아웃</div></div>
+    </div>
+    <div class="mitem dev-only" onclick="devResetState()" style="border:none;display:none">
+      <div class="mico" style="background:#FEF3C7;border-color:#F59E0B"><svg viewBox="0 0 24 24" fill="none" stroke="#78350F" stroke-width="1.8"><path d="M4 4v6h6M20 20v-6h-6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 10a8 8 0 0114-5M20 14a8 8 0 01-14 5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      <div class="mbd"><div class="mname2" style="color:#78350F">🧪 데모 상태 초기화 (dev)</div><div class="msub2">localStorage 전부 비우고 로그아웃</div></div>
     </div>
   </div>
   <div style="height:20px"></div>
@@ -8772,6 +8777,7 @@ async function checkAuth() {
   if (res.data.session) {
     go('home');
     loadDashboardData();
+    bootstrapUser();
   } else if (hash === 'signup') {
     go('signup');
   } else if (hash === 'login') {
@@ -8780,6 +8786,72 @@ async function checkAuth() {
     // 세션 없음 + 해시 없음 → 로그인 화면 기본 노출
     go('login');
   }
+}
+
+// 유저 실데이터 로드 → 데모 하드코딩 교체
+async function bootstrapUser(){
+  try {
+    var res = await fetch('/api/me', {credentials:'include'});
+    if(!res.ok) return;
+    var data = await res.json();
+    var profile = data.profile || {};
+    var email = data.user?.email || profile.email || '';
+    var name = profile.display_name || (email ? email.split('@')[0] : '사용자');
+
+    // 내 정보 프로필 카드
+    var nameEl = document.getElementById('p-display-name');
+    var mailEl = document.getElementById('p-email');
+    if(nameEl) nameEl.textContent = name;
+    if(mailEl) mailEl.textContent = email;
+
+    // 첫날 모드 인사말
+    var hero = document.querySelector('.nb-hero-t');
+    if(hero && name){ hero.innerHTML = '안녕, '+name+'님.<br>오늘이 Ssobi 첫날이에요'; }
+
+    // 만들기 — "유민혜님께 딱 맞는..."
+    document.querySelectorAll('.sec-t.xl').forEach(function(el){
+      if(el.textContent.indexOf('유민혜님께') >= 0){
+        el.textContent = name + '님께 딱 맞는 오늘 주제';
+      }
+    });
+
+    // Instagram 연결 상태 체크 (ig_accounts 조회)
+    checkIGConnection();
+  } catch(e){ console.warn('[bootstrap] failed', e); }
+}
+
+async function checkIGConnection(){
+  try {
+    var res = await fetch('/api/me', {credentials:'include'});
+    if(!res.ok) return;
+    var data = await res.json();
+    var igLinkedAt = data.profile?.ig_linked_at;
+    var status = document.getElementById('ig-status');
+    var check = document.getElementById('ig-check');
+    var btn = document.getElementById('ig-btn');
+    if(igLinkedAt){
+      if(status) status.textContent = '연동 완료';
+      if(check) check.style.display = 'block';
+      if(btn) btn.style.cursor = 'default';
+    } else {
+      if(status) status.textContent = '탭해서 연동하기';
+      if(check) check.style.display = 'none';
+    }
+  } catch(e){}
+}
+
+// DEV: 현재 유저의 모든 localStorage 데모 잔재 제거 (재테스트용)
+function devResetState(){
+  if(!confirm('앱 상태를 초기화할까요? 로그아웃 + localStorage 전부 삭제됩니다.')) return;
+  try {
+    for(var i = localStorage.length-1; i >= 0; i--){
+      var k = localStorage.key(i);
+      if(k && (k.startsWith('ssobi_') || k.startsWith('sb-'))) localStorage.removeItem(k);
+    }
+    sessionStorage.clear();
+  } catch(e){}
+  if(window.sb && window.sb.auth) window.sb.auth.signOut().finally(function(){ window.location.href='/'; });
+  else window.location.href='/';
 }
 
 window.addEventListener('load', function(){
