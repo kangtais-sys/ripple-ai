@@ -86,6 +86,17 @@ export async function GET(request: NextRequest) {
 
     const expiresAt = new Date(Date.now() + expiresIn * 1000).toISOString()
 
+    // profiles row 없으면 생성 (데모/초기화 이후 FK 위반 방지)
+    const { data: existingProfile } = await admin
+      .from('profiles').select('id').eq('id', userId).maybeSingle()
+    if (!existingProfile) {
+      const { error: pErr } = await admin.from('profiles').insert({ id: userId })
+      if (pErr) {
+        console.error('[IG OAuth] profiles insert error:', pErr)
+        return NextResponse.redirect(new URL('/app?ig_error=' + encodeURIComponent('profile_insert:' + pErr.message), request.url))
+      }
+    }
+
     const { error: dbError } = await admin.from('ig_accounts').upsert({
       user_id: userId,
       ig_user_id: meData.user_id || String(tokenData.user_id),
@@ -96,7 +107,7 @@ export async function GET(request: NextRequest) {
 
     if (dbError) {
       console.error('[IG OAuth] DB error:', dbError)
-      return NextResponse.redirect(new URL('/app?ig_error=db_failed', request.url))
+      return NextResponse.redirect(new URL('/app?ig_error=' + encodeURIComponent('db:' + dbError.message), request.url))
     }
 
     await admin.from('profiles').update({ ig_linked_at: new Date().toISOString() }).eq('id', userId)
