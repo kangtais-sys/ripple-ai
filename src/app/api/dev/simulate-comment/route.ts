@@ -2,14 +2,35 @@
 // 본인의 ig_accounts 기반. dev 환경 또는 ?dev=1 세션용.
 
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 import { classifyText, recordOutboundMessage, upsertFollower } from '@/lib/webhook-helpers'
 import { logAIUsage } from '@/lib/ai-usage'
 
 export async function POST(req: Request) {
-  const sb = await createClient()
-  const { data: { user } } = await sb.auth.getUser()
+  // 1) Authorization: Bearer <access_token> 우선 (Supabase JS CDN = localStorage 세션)
+  // 2) 없으면 쿠키 세션 (SSR)
+  const admin = createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } }
+  )
+
+  let user: { id: string } | null = null
+  const authHeader = req.headers.get('authorization')
+  if (authHeader?.startsWith('Bearer ')) {
+    const token = authHeader.slice(7)
+    const { data } = await admin.auth.getUser(token)
+    if (data.user) user = { id: data.user.id }
+  }
+  if (!user) {
+    const sb = await createClient()
+    const { data: { user: cookieUser } } = await sb.auth.getUser()
+    if (cookieUser) user = { id: cookieUser.id }
+  }
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+
+  const sb = admin  // 이후 쿼리는 admin 으로 (토큰 검증 완료, RLS 우회 OK)
 
   const body = await req.json().catch(() => ({})) as {
     type?: 'comment' | 'dm'

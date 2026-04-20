@@ -7921,12 +7921,19 @@ function devSimulate(kind, level){
     : samples['normal_' + kind];
   var text = prompt((level==='urgent'?'[긴급] ':'[일반] ') + (kind==='dm'?'DM':'댓글')+' 내용', defaultText);
   if(!text) return;
-  fetch('/api/dev/simulate-comment', {
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    credentials:'include',
-    body: JSON.stringify({ type:kind, text:text }),
-  }).then(function(r){ return r.json(); })
+  (async function(){
+    var headers = {'Content-Type':'application/json'};
+    try {
+      var s = (await window.sb.auth.getSession())?.data?.session;
+      if(s?.access_token) headers['Authorization'] = 'Bearer ' + s.access_token;
+    } catch(e){}
+    return fetch('/api/dev/simulate-comment', {
+      method:'POST',
+      headers: headers,
+      credentials:'include',
+      body: JSON.stringify({ type:kind, text:text }),
+    });
+  })().then(function(r){ return r.json(); })
     .then(function(j){
       if(j.ok){
         loadPendingDrafts();
