@@ -1,12 +1,13 @@
-// 3단계 표기 (베이직·프리미엄·프로페셔널)
+// 3단계 요금제 (베이직·프리미엄·프로페셔널)
+// 가격·한도는 landing.html PRICING 섹션과 완전 일치
 // DB enum 은 free/basic/premium/business 유지 (migration 회피)
-// free·basic 둘 다 '베이직' 으로 표기 (추후 비즈니스 단계 복귀 시 쉽게 분리)
-// 한도·가격은 기존 유지 — 추후 조정 시 여기만 수정
+//   free·basic 둘 다 '베이직'으로 표기 (history 데이터 호환)
+//   business 슬롯은 '프로페셔널' 로 표기 (추후 '비즈니스' 4단계 복귀 가능)
 export const PLANS = {
-  free: { name: '베이직', limit: 100, price: 0 },
-  basic: { name: '베이직', limit: 3300, price: 29000 },
-  premium: { name: '프리미엄', limit: 6600, price: 59000 },
-  business: { name: '프로페셔널', limit: Infinity, price: 129000 },
+  free:     { name: '베이직',       limit: 300,       price: 0,     accountLimit: 1  },
+  basic:    { name: '베이직',       limit: 300,       price: 0,     accountLimit: 1  },
+  premium:  { name: '프리미엄',     limit: 6600,      price: 29800, accountLimit: 3  },
+  business: { name: '프로페셔널',   limit: Infinity,  price: 69800, accountLimit: 10 },
 } as const
 
 export type PlanKey = keyof typeof PLANS
