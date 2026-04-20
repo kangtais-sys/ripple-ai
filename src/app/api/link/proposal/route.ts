@@ -26,7 +26,7 @@ export async function POST(req: Request) {
 
   const { data: page } = await admin
     .from('link_pages')
-    .select('id')
+    .select('id, user_id')
     .eq('handle', body.handle)
     .eq('published', true)
     .maybeSingle()
@@ -40,7 +40,7 @@ export async function POST(req: Request) {
   const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
   const ipHash = await hashString(ip + (process.env.WEBHOOK_VERIFY_TOKEN || ''))
 
-  const { error } = await admin.from('link_proposals').insert({
+  const { error, data: proposalInserted } = await admin.from('link_proposals').insert({
     link_page_id: page.id,
     from_name: (body.from_name || '').slice(0, 80),
     from_email: (body.from_email || '').slice(0, 120),
@@ -48,9 +48,35 @@ export async function POST(req: Request) {
     message: body.message.slice(0, 2000),
     kind,
     ip_hash: ipHash,
-  })
+  }).select('id').single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // 내 링크 제안 = 긴급 응대 대기로 reply_logs 에 입력 → "실시간 관리 > 긴급" 탭에서 보이도록
+  try {
+    const summary = [body.from_name, body.from_email, body.from_handle].filter(Boolean).join(' · ')
+    const header = summary ? `[내 링크 제안 · ${kind}] ${summary}\n` : `[내 링크 제안 · ${kind}]\n`
+    await admin.from('reply_logs').insert({
+      user_id: page.user_id,
+      type: 'dm',                          // DM 계열로 통합
+      original_text: header + body.message.slice(0, 2000),
+      reply_text: '[제안 내용은 내 링크 제안하기 폼을 통해 접수됨. 답변은 이메일로 전송하세요]',
+      platform_id: 'link_proposal_' + (proposalInserted?.id || ''),
+      urgency: 'urgent',
+      sentiment: 'neutral',
+      send_status: 'pending',
+      is_approved: null,
+      context: {
+        source: 'link_proposal',
+        proposal_id: proposalInserted?.id,
+        from_name: body.from_name,
+        from_email: body.from_email,
+        from_handle: body.from_handle,
+        kind,
+      },
+    })
+  } catch (e) { /* 드래프트 생성 실패해도 proposal 저장은 성공 */ }
+
   return NextResponse.json({ ok: true })
 }
 
