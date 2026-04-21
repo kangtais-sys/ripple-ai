@@ -23,15 +23,15 @@ export async function POST(request: NextRequest) {
     },
     body: JSON.stringify({
       model: 'claude-sonnet-4-20250514',
-      max_tokens: 1024,
+      max_tokens: 2048,
       messages: [{
         role: 'user',
-        content: `아래는 한 사람이 SNS에서 실제로 작성한 댓글/답글 샘플입니다. 이 사람의 말투 특성을 분석해서 JSON으로 반환해주세요.
+        content: `아래는 한 사람이 SNS(Instagram)에서 실제로 작성한 게시물 캡션 또는 댓글 샘플입니다. 이 사람이 팔로워의 댓글/DM에 답글을 달 때 어떻게 쓸지 예측 가능하도록 말투 특성을 분석해서 JSON으로 반환해주세요.
 
 샘플:
 ${samples.map((s: string, i: number) => `${i + 1}. "${s}"`).join('\n')}
 
-다음 항목을 분석해서 JSON만 반환:
+다음 항목을 분석해서 JSON만 반환 (코드블록·설명 없이):
 {
   "tone": "전체적 어조 (예: 친근함, 프로페셔널, 캐주얼 등)",
   "sentence_ending": "자주 쓰는 문장 종결어미 목록 (예: ~요, ~ㅎㅎ, ~! 등)",
@@ -44,13 +44,20 @@ ${samples.map((s: string, i: number) => `${i + 1}. "${s}"`).join('\n')}
     }),
   })
 
+  if (!res.ok) {
+    const errTxt = await res.text().catch(() => '')
+    return NextResponse.json({ error: 'Claude API 에러', detail: errTxt }, { status: 502 })
+  }
+
   const data = await res.json()
   const text = data.content?.[0]?.text || '{}'
   const match = text.match(/\{[\s\S]*\}/)
-  const learnedStyle = match ? JSON.parse(match[0]) : null
-
+  let learnedStyle: Record<string, unknown> | null = null
+  if (match) {
+    try { learnedStyle = JSON.parse(match[0]) } catch { learnedStyle = null }
+  }
   if (!learnedStyle) {
-    return NextResponse.json({ error: '분석 실패' }, { status: 500 })
+    return NextResponse.json({ error: '분석 실패 (JSON 파싱)', raw: text.slice(0, 300) }, { status: 500 })
   }
 
   // Supabase에 저장
