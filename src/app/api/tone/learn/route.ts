@@ -71,20 +71,42 @@ ${samples.map((s: string, i: number) => `${i + 1}. "${s}"`).join('\n')}
     }
   }
 
-  // Supabase에 저장 (에러 체크 포함)
-  const { error: upsertErr } = await supabase.from('tone_profiles').upsert({
-    user_id: user.id,
-    sample_texts: samples,
-    learned_style: learnedStyle,
-    updated_at: new Date().toISOString(),
-  }, { onConflict: 'user_id' })
+  // UNIQUE 제약 의존 없이 저장 (migration 누락 대비)
+  //   1) 기존 row 있으면 update
+  //   2) 없으면 insert
+  const { data: existingTone } = await supabase
+    .from('tone_profiles')
+    .select('id')
+    .eq('user_id', user.id)
+    .maybeSingle()
 
-  if (upsertErr) {
-    console.error('[tone/learn] upsert error:', upsertErr)
+  let saveErr: { message?: string; code?: string } | null = null
+  if (existingTone) {
+    const { error } = await supabase
+      .from('tone_profiles')
+      .update({
+        sample_texts: samples,
+        learned_style: learnedStyle,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('user_id', user.id)
+    saveErr = error
+  } else {
+    const { error } = await supabase.from('tone_profiles').insert({
+      user_id: user.id,
+      sample_texts: samples,
+      learned_style: learnedStyle,
+      updated_at: new Date().toISOString(),
+    })
+    saveErr = error
+  }
+
+  if (saveErr) {
+    console.error('[tone/learn] save error:', saveErr)
     return NextResponse.json({
       error: 'db_save_failed',
-      detail: upsertErr.message,
-      code: upsertErr.code,
+      detail: saveErr.message,
+      code: saveErr.code,
     }, { status: 500 })
   }
 
