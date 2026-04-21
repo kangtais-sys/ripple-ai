@@ -1,15 +1,16 @@
 // GET  /api/cardnews              → 내 잡 목록 (최신순, 필터: status)
+// POST /api/cardnews               → 편집기에서 저장 (draft/scheduled)
 // PUT  /api/cardnews/[id]         → 편집/스케줄 (아래 /[id]/route.ts)
 // DELETE /api/cardnews?id=xx      → 삭제
 
-import { createClient } from '@/lib/supabase/server'
+import { getUserFromRequest, adminClient } from '@/lib/auth-helper'
 import { NextResponse } from 'next/server'
 
 export async function GET(req: Request) {
-  const sb = await createClient()
-  const { data: { user } } = await sb.auth.getUser()
+  const user = await getUserFromRequest(req)
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
 
+  const sb = adminClient()
   const { searchParams } = new URL(req.url)
   const status = searchParams.get('status')
   const limit = Math.min(parseInt(searchParams.get('limit') || '50'), 200)
@@ -23,11 +24,45 @@ export async function GET(req: Request) {
   return NextResponse.json({ jobs: data || [] })
 }
 
-export async function DELETE(req: Request) {
-  const sb = await createClient()
-  const { data: { user } } = await sb.auth.getUser()
+export async function POST(req: Request) {
+  const user = await getUserFromRequest(req)
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
 
+  const body = await req.json().catch(() => ({})) as {
+    topic?: string
+    hook?: string
+    body?: string
+    caption?: string
+    template?: string
+    size?: string
+    channels?: string[]
+    status?: string
+    scheduled_at?: string | null
+  }
+
+  const sb = adminClient()
+  const { data, error } = await sb.from('card_news_jobs').insert({
+    user_id: user.id,
+    topic: (body.topic || '').slice(0, 200) || 'draft',
+    prompt_hook: body.hook || null,
+    prompt_body: body.body ? [{ title: '', text: body.body }] : [],
+    prompt_caption: body.caption || null,
+    template: body.template || 'clean',
+    size: body.size || 'sq',
+    channels: body.channels || ['ig'],
+    status: (body.status && ['draft','scheduled','published'].includes(body.status)) ? body.status : 'draft',
+    scheduled_at: body.scheduled_at || null,
+  }).select('id').single()
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ id: data?.id, ok: true })
+}
+
+export async function DELETE(req: Request) {
+  const user = await getUserFromRequest(req)
+  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+
+  const sb = adminClient()
   const { searchParams } = new URL(req.url)
   const id = searchParams.get('id')
   if (!id) return NextResponse.json({ error: 'id required' }, { status: 400 })
