@@ -112,6 +112,23 @@ export async function GET(request: NextRequest) {
 
     await admin.from('profiles').update({ ig_linked_at: new Date().toISOString() }).eq('id', userId)
 
+    // Webhook 구독 활성화: POST /{ig-user-id}/subscribed_apps
+    //   이걸 안 부르면 Meta 가 comments/messages 이벤트를 우리 앱으로 보내지 않음
+    const igUserIdForSub = meData.user_id || String(tokenData.user_id)
+    try {
+      const subRes = await fetch(
+        `https://graph.instagram.com/v21.0/${igUserIdForSub}/subscribed_apps?subscribed_fields=comments,messages&access_token=${accessToken}`,
+        { method: 'POST' }
+      )
+      const subJson = await subRes.json().catch(() => ({}))
+      console.log(`[IG OAuth] subscribed_apps result (@${meData.username}):`, subJson)
+      if (!subJson.success) {
+        console.warn('[IG OAuth] webhook 구독 실패 — 유저 재연동 필요할 수 있음')
+      }
+    } catch (subErr) {
+      console.error('[IG OAuth] subscribed_apps exception:', subErr)
+    }
+
     console.log(`[IG OAuth] Connected @${meData.username} for user ${userId}`)
 
     // 사용한 임시 쿠키 제거
