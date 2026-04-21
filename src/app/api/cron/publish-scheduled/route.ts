@@ -21,11 +21,16 @@ export async function GET(req: Request) {
   )
 
   const nowIso = new Date().toISOString()
+  // 원자적 선점: scheduled_at 을 null 로 클리어하며 매칭된 행만 반환
+  //   (CHECK 제약·기존 meta 보존 — migration 없이 중복 발행 차단)
+  //   동시에 돌아도 Postgres UPDATE ... RETURNING 은 각 행을 한 번만 반환
   const { data: jobs, error } = await admin
     .from('card_news_jobs')
-    .select('id, user_id, status, prompt_caption, meta')
+    .update({ scheduled_at: null })
     .eq('status', 'scheduled')
     .lte('scheduled_at', nowIso)
+    .not('scheduled_at', 'is', null)
+    .select('id, user_id, status, prompt_caption, meta')
     .limit(50)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

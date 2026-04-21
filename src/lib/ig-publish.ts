@@ -24,16 +24,17 @@ export async function publishCardnewsJob(
   job: Job,
   appBaseUrl: string
 ): Promise<PublishResult> {
-  // 1) 유저의 IG 계정
+  // 1) 유저의 IG 계정 (가장 최근 연동 토큰 우선)
   const { data: igAcc } = await admin
     .from('ig_accounts')
-    .select('ig_user_id, access_token')
+    .select('ig_user_id, access_token, token_expires_at')
     .eq('user_id', job.user_id)
+    .order('token_expires_at', { ascending: false, nullsFirst: false })
     .limit(1)
     .maybeSingle()
 
   if (!igAcc?.access_token || !igAcc.ig_user_id) {
-    await markFailed(admin, job.id, 'no_ig_account')
+    await markFailed(admin, job.id, job.meta, 'no_ig_account')
     return { ok: false, error: 'Instagram 계정 미연동' }
   }
 
@@ -50,6 +51,7 @@ export async function publishCardnewsJob(
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           image_url: imageUrl,
+          media_type: 'IMAGE',
           caption,
           access_token: igAcc.access_token,
         }),
@@ -57,7 +59,7 @@ export async function publishCardnewsJob(
     )
     const createData = await createRes.json().catch(() => ({}))
     if (!createRes.ok || !createData.id) {
-      await markFailed(admin, job.id, `media_create_failed: ${JSON.stringify(createData.error || createData)}`)
+      await markFailed(admin, job.id, job.meta, `media_create_failed: ${JSON.stringify(createData.error || createData)}`)
       return {
         ok: false,
         status: createRes.status,
@@ -80,7 +82,14 @@ export async function publishCardnewsJob(
     )
     const pubData = await pubRes.json().catch(() => ({}))
     if (!pubRes.ok || !pubData.id) {
-      await markFailed(admin, job.id, `media_publish_failed: ${JSON.stringify(pubData.error || pubData)}`)
+      // creation_id 는 meta 에 보존 (수동 재발행 가능)
+      await markFailed(
+        admin,
+        job.id,
+        job.meta,
+        `media_publish_failed: ${JSON.stringify(pubData.error || pubData)}`,
+        { ig_creation_id: creationId }
+      )
       return {
         ok: false,
         status: pubRes.status,
@@ -102,17 +111,27 @@ export async function publishCardnewsJob(
 
     return { ok: true, mediaId }
   } catch (e) {
-    await markFailed(admin, job.id, String(e))
+    await markFailed(admin, job.id, job.meta, String(e))
     return { ok: false, error: String(e) }
   }
 }
 
-async function markFailed(admin: SupabaseClient, jobId: string, reason: string) {
+async function markFailed(
+  admin: SupabaseClient,
+  jobId: string,
+  existingMeta: Record<string, unknown> | null,
+  reason: string,
+  extraMeta?: Record<string, unknown>
+) {
   await admin
     .from('card_news_jobs')
     .update({
       status: 'failed',
-      meta: { last_error: reason.slice(0, 500) },
+      meta: {
+        ...(existingMeta || {}),
+        ...(extraMeta || {}),
+        last_error: reason.slice(0, 500),
+      },
     })
     .eq('id', jobId)
 }

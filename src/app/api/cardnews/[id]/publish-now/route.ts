@@ -22,8 +22,11 @@ export async function POST(req: Request, ctx: { params: Promise<Params> }) {
     .maybeSingle()
 
   if (!job) return NextResponse.json({ error: 'not_found' }, { status: 404 })
-  if (job.status === 'published') {
-    return NextResponse.json({ error: 'already_published' }, { status: 409 })
+  if (['published', 'scheduled'].includes(job.status)) {
+    // scheduled 잡은 cron 이 처리 — 즉시 발행 요청 충돌 방지
+    return NextResponse.json({
+      error: job.status === 'published' ? 'already_published' : 'already_scheduled',
+    }, { status: 409 })
   }
 
   const appBase = process.env.NEXT_PUBLIC_APP_URL || 'https://ssobi.ai'

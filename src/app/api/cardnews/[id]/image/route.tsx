@@ -5,7 +5,8 @@
 import { ImageResponse } from 'next/og'
 import { createClient as createAdmin } from '@supabase/supabase-js'
 
-export const runtime = 'edge'
+// Node.js runtime — Supabase JS 전체 번들 대응 (edge 번들 1MB 한도 회피)
+export const runtime = 'nodejs'
 
 type Params = { id: string }
 
@@ -24,14 +25,15 @@ export async function GET(req: Request, ctx: { params: Promise<Params> }) {
 
   const hook = (job?.prompt_hook as string) || (job?.topic as string) || 'Ssobi Cardnews'
   const tpl = (job?.template as string) || 'clean'
-  const palette: Record<string, { bg: string; fg: string; accent: string }> = {
+  // Satori 는 background shorthand 의 linear-gradient 를 지원 안 함 → backgroundImage 로 분리
+  const palette: Record<string, { bg: string; bgImage?: string; fg: string; accent: string }> = {
     clean:     { bg: '#FFFFFF', fg: '#1A1F27', accent: '#00C896' },
     bold:      { bg: '#1A1F27', fg: '#FFFFFF', accent: '#00C896' },
     mint:      { bg: '#00C896', fg: '#FFFFFF', accent: '#FFFFFF' },
     mag:       { bg: '#FAF7F2', fg: '#1A1F27', accent: '#00C896' },
     mono:      { bg: '#0F1319', fg: '#FFFFFF', accent: '#00C896' },
     editorial: { bg: '#FFF9F0', fg: '#2A1E12', accent: '#00A87E' },
-    pastel:    { bg: 'linear-gradient(135deg,#FCE7F3,#E9D5FF)', fg: '#1A1F27', accent: '#8B5CF6' },
+    pastel:    { bg: '#FCE7F3', bgImage: 'linear-gradient(135deg,#FCE7F3,#E9D5FF)', fg: '#1A1F27', accent: '#8B5CF6' },
     pop:       { bg: '#FFD233', fg: '#1A1F27', accent: '#FF4D4D' },
   }
   const p = palette[tpl] || palette.clean
@@ -48,6 +50,7 @@ export async function GET(req: Request, ctx: { params: Promise<Params> }) {
           justifyContent: 'center',
           padding: 80,
           background: p.bg,
+          backgroundImage: p.bgImage,
           color: p.fg,
           fontFamily: 'sans-serif',
         }}
