@@ -1,12 +1,12 @@
-import { createClient } from '@/lib/supabase/server'
+import { getUserFromRequest, adminClient } from '@/lib/auth-helper'
 import { NextResponse } from 'next/server'
 
 // 연동된 IG 계정의 최근 게시물 캡션을 가져옴
-export async function GET() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+export async function GET(request: Request) {
+  const user = await getUserFromRequest(request)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const supabase = adminClient()
   const { data: accounts } = await supabase
     .from('ig_accounts')
     .select('access_token, ig_username')

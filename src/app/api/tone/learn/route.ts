@@ -1,12 +1,12 @@
-import { createClient } from '@/lib/supabase/server'
+import { getUserFromRequest, adminClient } from '@/lib/auth-helper'
 import { logAIUsage } from '@/lib/ai-usage'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(request: NextRequest) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const user = await getUserFromRequest(request)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const supabase = adminClient()
   const { samples } = await request.json()
 
   if (!Array.isArray(samples) || samples.length < 3) {
@@ -74,11 +74,11 @@ ${samples.map((s: string, i: number) => `${i + 1}. "${s}"`).join('\n')}
   return NextResponse.json({ success: true, style: learnedStyle })
 }
 
-export async function GET() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+export async function GET(request: Request) {
+  const user = await getUserFromRequest(request)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
+  const supabase = adminClient()
   const { data } = await supabase
     .from('tone_profiles')
     .select('sample_texts, learned_style, updated_at')

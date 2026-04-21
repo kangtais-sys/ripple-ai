@@ -3472,22 +3472,18 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 <!-- AI 말투 학습 -->
 <div class="ov" id="m-ai-style" onclick="co(event,'m-ai-style')"><div class="sheet"><div class="s-bar"></div>
   <div class="s-title">AI 말투 학습</div>
-  <div class="s-sub">내 게시물과 응대 기록으로 AI가 말투를 학습해요</div>
+  <div class="s-sub">내 Instagram 게시물 캡션으로 말투·뉘앙스를 학습해요</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">
-    <div style="background:var(--mint-l);border-radius:14px;padding:14px;text-align:center"><div style="font-size:26px;font-weight:900;color:var(--mint)">98%</div><div style="font-size:11px;color:var(--mint-d);font-weight:600;margin-top:4px">말투 일치도</div></div>
-    <div style="background:var(--bg);border-radius:14px;padding:14px;text-align:center"><div style="font-size:26px;font-weight:900;color:var(--t1)">250</div><div style="font-size:11px;color:var(--t3);font-weight:600;margin-top:4px">분석한 게시물</div></div>
+    <div style="background:var(--mint-l);border-radius:14px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:900;color:var(--mint)" id="tone-status-label">미학습</div><div style="font-size:11px;color:var(--mint-d);font-weight:600;margin-top:4px">현재 상태</div></div>
+    <div style="background:var(--bg);border-radius:14px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:900;color:var(--t1)" id="tone-sample-count">0</div><div style="font-size:11px;color:var(--t3);font-weight:600;margin-top:4px">분석한 캡션</div></div>
   </div>
   <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:10px">AI가 학습한 내 말투</div>
-  <div style="background:var(--bg);border-radius:12px;padding:14px;margin-bottom:18px;font-size:12px;color:var(--t2);line-height:1.9">
-    ✓ 친근하고 밝은 어투<br>✓ 이모티콘 적절히 사용 (:) 😊 🌿)<br>✓ 반말 사용 안 함<br>✓ 감사 표현 자주 사용<br>✓ 제품 링크는 "프로필 링크에 있어요" 표현<br>✓ 구매 문의는 플랫폼명 직접 안내
+  <div id="tone-characteristics" style="background:var(--bg);border-radius:12px;padding:14px;margin-bottom:18px;font-size:12px;color:var(--t2);line-height:1.9">
+    아직 학습된 말투가 없어요. 아래 버튼으로 학습을 시작해주세요.
   </div>
-  <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:6px">추가 설정</div>
-  <div style="font-size:12px;color:var(--t3);margin-bottom:8px">AI가 추가로 반영할 상황별 응대 방식을 입력하세요</div>
-  <textarea class="sheet-ta" rows="3" placeholder="예: 공구 관련 문의는 '다음 공구는 스토리로 먼저 알려드릴게요!' 라고 답해줘&#10;예: 협찬 문의는 무조건 info@millimilli.co 로 안내해줘"></textarea>
-  <div style="font-size:13px;font-weight:700;color:var(--t1);margin-top:14px;margin-bottom:6px">사용하지 않을 표현</div>
-  <input class="sheet-in" type="text" placeholder="예: 고객님, 구매 부탁드립니다 (콤마로 구분)">
-  <button class="btn-p" style="margin-top:16px" onclick="cm('m-ai-style')">저장</button>
-  <button class="btn-s" onclick="cm('m-ai-style')">닫기</button>
+  <button class="btn-p" onclick="triggerToneLearn()" id="tone-learn-btn" style="margin-top:6px">내 게시물로 말투 학습하기</button>
+  <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:8px;line-height:1.5">Instagram 연동 필수 · 최근 게시물 캡션 25개까지 분석</div>
+  <button class="btn-s" onclick="cm('m-ai-style')" style="margin-top:12px">닫기</button>
 </div></div>
 
 <!-- 인스타 프로필 미리보기 -->
@@ -8172,7 +8168,73 @@ function devSimulate(kind, level){
 
 function toggleAcc(id){ document.getElementById(id).classList.toggle('open'); }
 function openAcc(id){ document.getElementById(id).classList.add('open'); }
-function openModal(id){ var el = document.getElementById(id); if(el) el.classList.add('on'); }
+function openModal(id){ var el = document.getElementById(id); if(el) el.classList.add('on'); if(id==='m-ai-style') loadToneState(); }
+
+async function loadToneState(){
+  try {
+    var h = await authHeaders();
+    var res = await fetch('/api/tone/learn', {credentials:'include', headers: h});
+    var j = await res.json();
+    var statusEl = document.getElementById('tone-status-label');
+    var countEl = document.getElementById('tone-sample-count');
+    var charsEl = document.getElementById('tone-characteristics');
+    if(j.learned_style){
+      if(statusEl) statusEl.textContent = '학습완료';
+      if(countEl) countEl.textContent = (j.sample_texts||[]).length;
+      if(charsEl){
+        var chars = j.learned_style.characteristics || [];
+        var tone = j.learned_style.tone || '';
+        var emoji = j.learned_style.emoji_style || '';
+        var ending = j.learned_style.sentence_ending || '';
+        var lines = [];
+        if(tone) lines.push('✓ 어조: ' + tone);
+        if(ending) lines.push('✓ 종결어미: ' + ending);
+        if(emoji) lines.push('✓ 이모지: ' + emoji);
+        chars.forEach(function(c){ lines.push('✓ ' + c); });
+        charsEl.innerHTML = lines.join('<br>');
+      }
+    } else {
+      if(statusEl) statusEl.textContent = '미학습';
+      if(countEl) countEl.textContent = '0';
+      if(charsEl) charsEl.textContent = '아직 학습된 말투가 없어요. 아래 버튼으로 학습을 시작해주세요.';
+    }
+  } catch(e){ console.warn('tone state load failed', e); }
+}
+
+async function triggerToneLearn(){
+  var btn = document.getElementById('tone-learn-btn');
+  var charsEl = document.getElementById('tone-characteristics');
+  if(btn){ btn.disabled = true; btn.textContent = '게시물 가져오는 중...'; }
+  try {
+    var h = await authHeaders();
+    var postsRes = await fetch('/api/tone/fetch-posts', {credentials:'include', headers: h});
+    var posts = await postsRes.json();
+    var captions = posts.captions || [];
+    if(captions.length < 3){
+      alert('Instagram 게시물이 3개 이상 필요해요. 게시물을 먼저 업로드하거나 직접 입력 학습을 써주세요.');
+      if(btn){ btn.disabled = false; btn.textContent = '내 게시물로 말투 학습하기'; }
+      return;
+    }
+    if(btn) btn.textContent = '말투 분석 중... ✨';
+    if(charsEl) charsEl.textContent = '캡션 ' + captions.length + '개를 Claude가 분석하고 있어요...';
+    var h2 = await authHeaders();
+    var learnRes = await fetch('/api/tone/learn', {
+      method:'POST', headers: h2, credentials:'include',
+      body: JSON.stringify({ samples: captions.slice(0, 15) })
+    });
+    var result = await learnRes.json();
+    if(result.success && result.style){
+      if(btn){ btn.disabled = false; btn.textContent = '✓ 학습 완료 · 다시 학습하기'; }
+      loadToneState();
+    } else {
+      alert('학습 실패: ' + (result.error || '알 수 없는 오류'));
+      if(btn){ btn.disabled = false; btn.textContent = '다시 시도'; }
+    }
+  } catch(e){
+    alert('오류: ' + e.message);
+    if(btn){ btn.disabled = false; btn.textContent = '다시 시도'; }
+  }
+}
 function cm(id){ var el = document.getElementById(id); if(el) el.classList.remove('on'); }
 function co(e,id){ if(e.target===e.currentTarget) cm(id); }
 
@@ -8324,7 +8386,9 @@ function startLearnAnim(){
   setPct(5, '게시물 가져오는 중...');
   if(detail) detail.textContent='Instagram 최근 게시물을 읽고 있어요.';
 
-  fetch('/api/tone/fetch-posts').then(function(r){ return r.json(); }).then(function(postsData){
+  authHeaders().then(function(h){
+    return fetch('/api/tone/fetch-posts', {credentials:'include', headers: h});
+  }).then(function(r){ return r.json(); }).then(function(postsData){
     var captions = postsData.captions || [];
 
     if(captions.length < 3) {
@@ -8339,9 +8403,11 @@ function startLearnAnim(){
     if(detail) detail.textContent='@' + (postsData.username||'') + '의 말투를 학습하고 있어요.';
     setTimeout(function(){ setPct(50, '말투 패턴 추출 중...'); }, 1500);
 
-    fetch('/api/tone/learn', {
-      method:'POST', headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({ samples: captions.slice(0, 10) })
+    authHeaders().then(function(h){
+      return fetch('/api/tone/learn', {
+        method:'POST', headers: h, credentials:'include',
+        body:JSON.stringify({ samples: captions.slice(0, 10) })
+      });
     }).then(function(r){ return r.json(); }).then(function(result){
       if(result.success && result.style) {
         setPct(100, '학습 완료!');
@@ -8385,9 +8451,11 @@ function doLearnFromManual(){
   if(status) status.textContent='AI 말투 분석 중...';
   if(btn){ btn.style.opacity='.4'; btn.style.pointerEvents='none'; btn.textContent='분석 중...'; }
 
-  fetch('/api/tone/learn', {
-    method:'POST', headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({ samples: lines })
+  authHeaders().then(function(h){
+    return fetch('/api/tone/learn', {
+      method:'POST', headers: h, credentials:'include',
+      body:JSON.stringify({ samples: lines })
+    });
   }).then(function(r){ return r.json(); }).then(function(result){
     if(result.success && result.style){
       if(num) num.textContent='100';
