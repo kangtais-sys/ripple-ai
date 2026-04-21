@@ -38,6 +38,12 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'delete_failed', detail: delErr.message }, { status: 500 })
   }
 
+  // 4) tone_profiles 의 IG 기반 학습 내용 초기화
+  //    (브랜드 정보 · 금지어는 유저 설정이라 유지)
+  await sb.from('tone_profiles')
+    .update({ learned_style: null, sample_texts: [] })
+    .eq('user_id', user.id)
+
   await sb.from('profiles').update({ ig_linked_at: null }).eq('id', user.id)
 
   return NextResponse.json({ ok: true, removed_accounts: igIds.length })

@@ -1,13 +1,38 @@
 import { getUserFromRequest, adminClient } from '@/lib/auth-helper'
 import { logAIUsage } from '@/lib/ai-usage'
 import { NextRequest, NextResponse } from 'next/server'
+import type { SupabaseClient } from '@supabase/supabase-js'
+
+const DEFAULT_TONE = {
+  tone: '친근하고 따뜻한',
+  sentence_ending: '~요, ~요!',
+  emoji_style: '적절히 사용 (✨ 😊 🌿)',
+  length: '짧고 임팩트 있게',
+  characteristics: [
+    '감사 표현 자주 사용',
+    '이모지 1-2개',
+    '친근한 존댓말'
+  ],
+  example_reply: '안녕하세요! 관심 가져주셔서 감사해요 😊 자세한 건 프로필 링크에서 확인하실 수 있어요!',
+  _source: 'default',
+}
 
 export async function POST(request: NextRequest) {
   const user = await getUserFromRequest(request)
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const supabase = adminClient()
-  const { samples } = await request.json()
+  const { samples, use_default } = await request.json()
+
+  // 게시물이 부족할 때: 기본 말투로 바로 저장
+  if (use_default) {
+    await ensureProfile(supabase, user.id)
+    const saveErr = await upsertTone(supabase, user.id, Array.isArray(samples) ? samples : [], DEFAULT_TONE)
+    if (saveErr) {
+      return NextResponse.json({ error: 'db_save_failed', detail: saveErr.message }, { status: 500 })
+    }
+    return NextResponse.json({ success: true, style: DEFAULT_TONE, default: true })
+  }
 
   if (!Array.isArray(samples) || samples.length < 3) {
     return NextResponse.json({ error: '최소 3개의 샘플 텍스트가 필요합니다' }, { status: 400 })
@@ -60,49 +85,9 @@ ${samples.map((s: string, i: number) => `${i + 1}. "${s}"`).join('\n')}
     return NextResponse.json({ error: '분석 실패 (JSON 파싱)', raw: text.slice(0, 300) }, { status: 500 })
   }
 
-  // profiles row 없으면 생성 (FK 위반 방지 — 데모 초기화 후 케이스)
-  const { data: existingProfile } = await supabase
-    .from('profiles').select('id').eq('id', user.id).maybeSingle()
-  if (!existingProfile) {
-    const { error: pErr } = await supabase.from('profiles').insert({ id: user.id })
-    if (pErr) {
-      console.error('[tone/learn] profiles insert error:', pErr)
-      return NextResponse.json({ error: 'profiles_insert_failed', detail: pErr.message }, { status: 500 })
-    }
-  }
-
-  // UNIQUE 제약 의존 없이 저장 (migration 누락 대비)
-  //   1) 기존 row 있으면 update
-  //   2) 없으면 insert
-  const { data: existingTone } = await supabase
-    .from('tone_profiles')
-    .select('id')
-    .eq('user_id', user.id)
-    .maybeSingle()
-
-  let saveErr: { message?: string; code?: string } | null = null
-  if (existingTone) {
-    const { error } = await supabase
-      .from('tone_profiles')
-      .update({
-        sample_texts: samples,
-        learned_style: learnedStyle,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('user_id', user.id)
-    saveErr = error
-  } else {
-    const { error } = await supabase.from('tone_profiles').insert({
-      user_id: user.id,
-      sample_texts: samples,
-      learned_style: learnedStyle,
-      updated_at: new Date().toISOString(),
-    })
-    saveErr = error
-  }
-
+  await ensureProfile(supabase, user.id)
+  const saveErr = await upsertTone(supabase, user.id, samples, learnedStyle)
   if (saveErr) {
-    console.error('[tone/learn] save error:', saveErr)
     return NextResponse.json({
       error: 'db_save_failed',
       detail: saveErr.message,
@@ -110,7 +95,6 @@ ${samples.map((s: string, i: number) => `${i + 1}. "${s}"`).join('\n')}
     }, { status: 500 })
   }
 
-  // AI 토큰·비용 로그
   await logAIUsage({
     userId: user.id,
     feature: 'tone_learn',
@@ -135,4 +119,39 @@ export async function GET(request: Request) {
     .single()
 
   return NextResponse.json(data || { sample_texts: [], learned_style: null })
+}
+
+// 공통 헬퍼 ────────────────────────────────────────────
+async function ensureProfile(sb: SupabaseClient, userId: string) {
+  const { data } = await sb.from('profiles').select('id').eq('id', userId).maybeSingle()
+  if (!data) {
+    await sb.from('profiles').insert({ id: userId })
+  }
+}
+
+async function upsertTone(
+  sb: SupabaseClient,
+  userId: string,
+  samples: string[],
+  learned: Record<string, unknown>
+): Promise<{ message?: string; code?: string } | null> {
+  const { data: existing } = await sb
+    .from('tone_profiles').select('id').eq('user_id', userId).maybeSingle()
+
+  if (existing) {
+    const { error } = await sb.from('tone_profiles').update({
+      sample_texts: samples,
+      learned_style: learned,
+      updated_at: new Date().toISOString(),
+    }).eq('user_id', userId)
+    return error
+  } else {
+    const { error } = await sb.from('tone_profiles').insert({
+      user_id: userId,
+      sample_texts: samples,
+      learned_style: learned,
+      updated_at: new Date().toISOString(),
+    })
+    return error
+  }
 }
