@@ -4248,13 +4248,14 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div class="s-sub">공식 API로만 연동돼요. 비밀번호를 입력하지 않아요.</div>
     <div id="m-account-rows" style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
       <!-- Instagram -->
-      <div id="m-acc-ig" style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg);border-radius:14px;border:1px solid var(--b);cursor:pointer" onclick="connectIG()">
+      <div id="m-acc-ig" style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg);border-radius:14px;border:1px solid var(--b)">
         <div class="ch-av ch-ig" style="flex-shrink:0;border-radius:10px;width:38px;height:38px">IG</div>
-        <div style="flex:1">
+        <div style="flex:1;cursor:pointer" onclick="connectIG()">
           <div style="font-size:13px;font-weight:700">Instagram</div>
           <div style="font-size:11px;color:var(--t3);margin-top:1px" id="m-acc-ig-status">미연동</div>
         </div>
-        <button style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;background:var(--dark);color:#fff;border:none;cursor:pointer" id="m-acc-ig-btn">연동하기</button>
+        <button style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;background:var(--dark);color:#fff;border:none;cursor:pointer" id="m-acc-ig-btn" onclick="connectIG()">연동하기</button>
+        <button id="m-acc-ig-disconnect" style="display:none;padding:7px 10px;border-radius:8px;font-size:11px;font-weight:700;background:#fff;color:var(--red);border:1px solid var(--red);cursor:pointer" onclick="disconnectIG()">해제</button>
       </div>
       <!-- TikTok -->
       <div id="m-acc-tk" style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg);border-radius:14px;border:1px solid var(--b);cursor:pointer" onclick="connectTK()">
@@ -9274,14 +9275,41 @@ function updateIGConnectUI(connected, username){
   var accStatus = document.getElementById('m-acc-ig-status');
   var accBtn = document.getElementById('m-acc-ig-btn');
   var accRow = document.getElementById('m-acc-ig');
+  var accDisc = document.getElementById('m-acc-ig-disconnect');
   if(connected){
     if(accStatus){ accStatus.textContent = (username ? '@' + username : '연동 완료'); accStatus.style.color = 'var(--mint-d)'; }
-    if(accBtn){ accBtn.textContent = '연결됨 ✓'; accBtn.style.background = 'var(--mint)'; accBtn.style.color = '#fff'; }
+    if(accBtn){ accBtn.style.display = 'none'; }
+    if(accDisc){ accDisc.style.display = ''; }
     if(accRow){ accRow.style.background = 'var(--mint-l)'; accRow.style.borderColor = '#A7F3D0'; }
   } else {
     if(accStatus){ accStatus.textContent = '미연동'; accStatus.style.color = 'var(--t3)'; }
-    if(accBtn){ accBtn.textContent = '연동하기'; accBtn.style.background = 'var(--dark)'; accBtn.style.color = '#fff'; }
+    if(accBtn){ accBtn.style.display = ''; accBtn.textContent = '연동하기'; accBtn.style.background = 'var(--dark)'; accBtn.style.color = '#fff'; }
+    if(accDisc){ accDisc.style.display = 'none'; }
     if(accRow){ accRow.style.background = 'var(--bg)'; accRow.style.borderColor = 'var(--b)'; }
+  }
+}
+
+async function disconnectIG(){
+  var msg = '정말 Instagram 연동을 해제할까요?\n\n' +
+    '• 저장된 access_token·계정 정보가 삭제돼요\n' +
+    '• 기존 댓글·DM 응대 기록은 남아요\n' +
+    '• 다시 연동하려면 "연동하기"로 OAuth 재진행';
+  if(!confirm(msg)) return;
+  try {
+    var h = await authHeaders();
+    var res = await fetch('/api/ig/disconnect', {
+      method:'POST', headers: h, credentials:'include'
+    });
+    var j = await res.json();
+    if(res.ok && j.ok){
+      alert('✓ 연동 해제 완료');
+      updateIGConnectUI(false);
+      // 모달은 열어둔 채로 두기 (새 계정 연동 유도)
+    } else {
+      alert('해제 실패: ' + (j.detail || j.error || '알 수 없는 오류'));
+    }
+  } catch(e){
+    alert('오류: ' + e.message);
   }
 }
 
