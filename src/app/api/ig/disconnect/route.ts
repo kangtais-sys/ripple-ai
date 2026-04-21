@@ -11,6 +11,28 @@ export async function POST(req: Request) {
 
   const sb = adminClient()
 
+  // 1) 이 유저의 ig_accounts id 들 조회
+  const { data: igs } = await sb
+    .from('ig_accounts')
+    .select('id')
+    .eq('user_id', user.id)
+  const igIds = (igs || []).map(r => r.id as string)
+
+  // 2) reply_logs.ig_account_id FK 끊기 (RESTRICT 회피 — 기록은 보존)
+  if (igIds.length > 0) {
+    const { error: unlinkErr } = await sb
+      .from('reply_logs')
+      .update({ ig_account_id: null })
+      .in('ig_account_id', igIds)
+    if (unlinkErr) {
+      return NextResponse.json({
+        error: 'unlink_reply_logs_failed',
+        detail: unlinkErr.message,
+      }, { status: 500 })
+    }
+  }
+
+  // 3) ig_accounts 삭제
   const { error: delErr } = await sb.from('ig_accounts').delete().eq('user_id', user.id)
   if (delErr) {
     return NextResponse.json({ error: 'delete_failed', detail: delErr.message }, { status: 500 })
@@ -18,5 +40,5 @@ export async function POST(req: Request) {
 
   await sb.from('profiles').update({ ig_linked_at: null }).eq('id', user.id)
 
-  return NextResponse.json({ ok: true })
+  return NextResponse.json({ ok: true, removed_accounts: igIds.length })
 }
