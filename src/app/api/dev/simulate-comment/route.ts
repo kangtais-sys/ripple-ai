@@ -58,16 +58,22 @@ export async function POST(req: Request) {
     }, { status: 400 })
   }
 
-  // 유저 말투 읽기
+  // 유저 말투 + 브랜드 + 금지어
   const { data: tone } = await sb
     .from('tone_profiles')
-    .select('learned_style')
+    .select('learned_style, banned_words, brand_context')
     .eq('user_id', user.id)
     .maybeSingle()
 
-  // Claude 초안 생성
   const toneGuide = tone?.learned_style
     ? `\n\n유저의 말투 스타일: ${JSON.stringify(tone.learned_style)}`
+    : ''
+  const brandGuide = tone?.brand_context
+    ? `\n\n브랜드·제품 정보 (관련 문의에 정확히 안내):\n${tone.brand_context}`
+    : ''
+  const bannedList = Array.isArray(tone?.banned_words) ? tone.banned_words : []
+  const bannedGuide = bannedList.length
+    ? `\n\n절대 사용 금지 표현: ${bannedList.join(', ')}`
     : ''
 
   const claudeRes = await fetch('https://api.anthropic.com/v1/messages', {
@@ -85,13 +91,14 @@ export async function POST(req: Request) {
 규칙:
 - 친근하고 따뜻한 1:1 대화 말투
 - 이모지 1-2개, 3문장 이내
-- 제품 문의 → 자세한 안내 가능, 구매 링크는 "프로필 링크" 안내
-- 가격 직접 언급 금지${toneGuide}`
+- 제품 문의 → 브랜드 정보 참고해 정확히 안내, 구매 링크는 "프로필 링크" 안내
+- 가격 직접 언급 금지${toneGuide}${brandGuide}${bannedGuide}`
         : `당신은 K-뷰티 인플루언서의 SNS 댓글 응대를 대신합니다.
 규칙:
 - 친근하고 따뜻한 말투
 - 이모지 1-2개, 2문장 이내
-- 가격 직접 언급 금지${toneGuide}`,
+- 제품 문의는 브랜드 정보 참고해 정확히 안내
+- 가격 직접 언급 금지${toneGuide}${brandGuide}${bannedGuide}`,
       messages: [{ role: 'user', content: type === 'dm' ? `DM: "${text}"` : `댓글: "${text}"` }],
     }),
   })
