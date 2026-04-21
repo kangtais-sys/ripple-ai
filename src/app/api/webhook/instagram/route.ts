@@ -326,7 +326,7 @@ async function generateReply(
     ? `\n\n유저의 말투 스타일: ${JSON.stringify(tone.learned_style)}`
     : ''
   const brandGuide = tone?.brand_context
-    ? `\n\n브랜드·제품 정보 (관련 문의에 정확히 안내):\n${tone.brand_context}`
+    ? `\n\n내 계정 정보 (관련 문의에 정확히 안내):\n${tone.brand_context}`
     : ''
   const bannedList = Array.isArray(tone?.banned_words) ? tone.banned_words : []
   const bannedGuide = bannedList.length
@@ -348,7 +348,7 @@ async function generateReply(
 규칙:
 - 친근하고 따뜻한 1:1 대화 말투
 - 이모지 1-2개, 3문장 이내
-- 제품 문의 → 브랜드 정보 참고해 정확히 안내, 구매 링크는 "프로필 링크" 안내
+- 계정 정보 참고해 정확히 안내, 구매 링크는 "프로필 링크" 안내
 - 악성/스팸이면 "SKIP"만 반환
 - 가격 직접 언급 금지
 - 개인정보 요청 금지${toneGuide}${brandGuide}${bannedGuide}`
@@ -356,7 +356,7 @@ async function generateReply(
 규칙:
 - 친근하고 따뜻한 말투
 - 이모지 1-2개, 2문장 이내
-- 제품 문의는 브랜드 정보 참고해 정확히 안내
+- 문의가 있으면 계정 정보 참고해 정확히 안내
 - 악성/스팸이면 "SKIP"만 반환
 - 가격 직접 언급 금지${toneGuide}${brandGuide}${bannedGuide}`,
       messages: [{ role: 'user', content: type === 'dm' ? `DM: "${text}"` : `댓글: "${text}"` }],
