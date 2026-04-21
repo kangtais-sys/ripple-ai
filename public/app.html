@@ -8224,11 +8224,19 @@ function toggleAcc(id){ document.getElementById(id).classList.toggle('open'); }
 function openAcc(id){ document.getElementById(id).classList.add('open'); }
 function openModal(id){ var el = document.getElementById(id); if(el) el.classList.add('on'); if(id==='m-ai-style') loadToneState(); }
 
+function toneFmt(v){
+  if(v === null || v === undefined || v === '') return '';
+  if(Array.isArray(v)) return v.filter(Boolean).join(', ');
+  if(typeof v === 'object') return Object.keys(v).map(function(k){ return k+': '+toneFmt(v[k]); }).join(', ');
+  return String(v);
+}
+
 async function loadToneState(){
   try {
     var h = await authHeaders();
     var res = await fetch('/api/tone/learn', {credentials:'include', headers: h});
     var j = await res.json();
+    console.log('[tone] learned:', j);
     var statusEl = document.getElementById('tone-status-label');
     var countEl = document.getElementById('tone-sample-count');
     var charsEl = document.getElementById('tone-characteristics');
@@ -8236,16 +8244,26 @@ async function loadToneState(){
       if(statusEl) statusEl.textContent = '학습완료';
       if(countEl) countEl.textContent = (j.sample_texts||[]).length;
       if(charsEl){
-        var chars = j.learned_style.characteristics || [];
-        var tone = j.learned_style.tone || '';
-        var emoji = j.learned_style.emoji_style || '';
-        var ending = j.learned_style.sentence_ending || '';
+        var s = j.learned_style;
         var lines = [];
-        if(tone) lines.push('✓ 어조: ' + tone);
-        if(ending) lines.push('✓ 종결어미: ' + ending);
-        if(emoji) lines.push('✓ 이모지: ' + emoji);
-        chars.forEach(function(c){ lines.push('✓ ' + c); });
-        charsEl.innerHTML = lines.join('<br>');
+        var tone = toneFmt(s.tone);
+        var ending = toneFmt(s.sentence_ending);
+        var emoji = toneFmt(s.emoji_style);
+        var length = toneFmt(s.length);
+        var example = toneFmt(s.example_reply);
+        var chars = Array.isArray(s.characteristics) ? s.characteristics : (s.characteristics ? [s.characteristics] : []);
+        if(tone) lines.push('<b>어조</b> · ' + tone);
+        if(ending) lines.push('<b>종결어미</b> · ' + ending);
+        if(emoji) lines.push('<b>이모지</b> · ' + emoji);
+        if(length) lines.push('<b>길이</b> · ' + length);
+        chars.forEach(function(c){ var t = toneFmt(c); if(t) lines.push('✓ ' + t); });
+        if(example) lines.push('<div style="margin-top:10px;padding:10px;background:#fff;border-radius:8px;font-size:11.5px;color:var(--t1);border:1px solid var(--b)"><b>예시 답글</b><br>' + example + '</div>');
+        // 모든 필드가 빈 경우 raw JSON 표시 (디버깅)
+        if(lines.length === 0){
+          charsEl.innerHTML = '<div style="font-family:monospace;font-size:10px;color:var(--t3);white-space:pre-wrap;word-break:break-all">' + JSON.stringify(s, null, 2) + '</div>';
+        } else {
+          charsEl.innerHTML = lines.join('<br>');
+        }
       }
     } else {
       if(statusEl) statusEl.textContent = '미학습';
