@@ -60,13 +60,33 @@ ${samples.map((s: string, i: number) => `${i + 1}. "${s}"`).join('\n')}
     return NextResponse.json({ error: '분석 실패 (JSON 파싱)', raw: text.slice(0, 300) }, { status: 500 })
   }
 
-  // Supabase에 저장
-  await supabase.from('tone_profiles').upsert({
+  // profiles row 없으면 생성 (FK 위반 방지 — 데모 초기화 후 케이스)
+  const { data: existingProfile } = await supabase
+    .from('profiles').select('id').eq('id', user.id).maybeSingle()
+  if (!existingProfile) {
+    const { error: pErr } = await supabase.from('profiles').insert({ id: user.id })
+    if (pErr) {
+      console.error('[tone/learn] profiles insert error:', pErr)
+      return NextResponse.json({ error: 'profiles_insert_failed', detail: pErr.message }, { status: 500 })
+    }
+  }
+
+  // Supabase에 저장 (에러 체크 포함)
+  const { error: upsertErr } = await supabase.from('tone_profiles').upsert({
     user_id: user.id,
     sample_texts: samples,
     learned_style: learnedStyle,
     updated_at: new Date().toISOString(),
   }, { onConflict: 'user_id' })
+
+  if (upsertErr) {
+    console.error('[tone/learn] upsert error:', upsertErr)
+    return NextResponse.json({
+      error: 'db_save_failed',
+      detail: upsertErr.message,
+      code: upsertErr.code,
+    }, { status: 500 })
+  }
 
   // AI 토큰·비용 로그
   await logAIUsage({
