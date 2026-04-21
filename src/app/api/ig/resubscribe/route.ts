@@ -19,9 +19,16 @@ export async function POST(req: Request) {
   const results: Array<{ username: string; ok: boolean; detail?: unknown }> = []
   for (const acc of accs) {
     try {
+      const form = new URLSearchParams()
+      form.set('subscribed_fields', 'comments,messages')
+      form.set('access_token', acc.access_token)
       const res = await fetch(
-        `https://graph.instagram.com/v21.0/${acc.ig_user_id}/subscribed_apps?subscribed_fields=comments,messages&access_token=${acc.access_token}`,
-        { method: 'POST' }
+        `https://graph.instagram.com/v21.0/me/subscribed_apps`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: form.toString(),
+        }
       )
       const json = await res.json().catch(() => ({}))
       results.push({

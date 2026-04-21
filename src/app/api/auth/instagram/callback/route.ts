@@ -112,13 +112,19 @@ export async function GET(request: NextRequest) {
 
     await admin.from('profiles').update({ ig_linked_at: new Date().toISOString() }).eq('id', userId)
 
-    // Webhook 구독 활성화: POST /{ig-user-id}/subscribed_apps
-    //   이걸 안 부르면 Meta 가 comments/messages 이벤트를 우리 앱으로 보내지 않음
-    const igUserIdForSub = meData.user_id || String(tokenData.user_id)
+    // Webhook 구독 활성화: POST /me/subscribed_apps (body 형식 필수)
+    //   Query string 방식은 Meta 에 저장 안 됨 (확인 완료). POST body 로 전송.
     try {
+      const form = new URLSearchParams()
+      form.set('subscribed_fields', 'comments,messages')
+      form.set('access_token', accessToken)
       const subRes = await fetch(
-        `https://graph.instagram.com/v21.0/${igUserIdForSub}/subscribed_apps?subscribed_fields=comments,messages&access_token=${accessToken}`,
-        { method: 'POST' }
+        `https://graph.instagram.com/v21.0/me/subscribed_apps`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: form.toString(),
+        }
       )
       const subJson = await subRes.json().catch(() => ({}))
       console.log(`[IG OAuth] subscribed_apps result (@${meData.username}):`, subJson)
