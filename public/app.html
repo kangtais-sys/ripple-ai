@@ -8279,11 +8279,19 @@ async function triggerToneLearn(){
   if(btn){ btn.disabled = true; btn.textContent = '게시물 가져오는 중...'; }
   try {
     var h = await authHeaders();
+    console.log('[tone-learn] authHeaders:', h);
     var postsRes = await fetch('/api/tone/fetch-posts', {credentials:'include', headers: h});
+    console.log('[tone-learn] fetch-posts status:', postsRes.status);
     var posts = await postsRes.json();
+    console.log('[tone-learn] fetch-posts body:', posts);
+    if(postsRes.status === 401){
+      alert('로그인 세션이 끊겼어요. 앱을 새로고침해주세요.');
+      if(btn){ btn.disabled = false; btn.textContent = '내 게시물로 말투 학습하기'; }
+      return;
+    }
     var captions = posts.captions || [];
     if(captions.length < 3){
-      alert('Instagram 게시물이 3개 이상 필요해요. 게시물을 먼저 업로드하거나 직접 입력 학습을 써주세요.');
+      alert('Instagram 게시물이 ' + captions.length + '개밖에 없어요. 3개 이상 필요해요.\n(사유: ' + (posts.error || '캡션이 짧거나 없음') + ')');
       if(btn){ btn.disabled = false; btn.textContent = '내 게시물로 말투 학습하기'; }
       return;
     }
@@ -8294,12 +8302,19 @@ async function triggerToneLearn(){
       method:'POST', headers: h2, credentials:'include',
       body: JSON.stringify({ samples: captions.slice(0, 15) })
     });
+    console.log('[tone-learn] learn status:', learnRes.status);
     var result = await learnRes.json();
+    console.log('[tone-learn] learn body:', result);
+    if(learnRes.status === 401){
+      alert('인증 실패 (401). 앱 새로고침 후 다시 시도해주세요.');
+      if(btn){ btn.disabled = false; btn.textContent = '다시 시도'; }
+      return;
+    }
     if(result.success && result.style){
       if(btn){ btn.disabled = false; btn.textContent = '✓ 학습 완료 · 다시 학습하기'; }
       loadToneState();
     } else {
-      alert('학습 실패: ' + (result.error || '알 수 없는 오류'));
+      alert('학습 실패: ' + (result.error || result.detail || '알 수 없는 오류') + '\n\nraw: ' + JSON.stringify(result).slice(0, 200));
       if(btn){ btn.disabled = false; btn.textContent = '다시 시도'; }
     }
   } catch(e){
