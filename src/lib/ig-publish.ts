@@ -164,7 +164,7 @@ async function createCarouselParent(igUserId: string, token: string, childIds: s
   return data.id as string
 }
 
-async function pollFinished(creationId: string, token: string, attempts = 10, intervalMs = 3000): Promise<void> {
+async function pollFinished(creationId: string, token: string, attempts = 20, intervalMs = 1500): Promise<void> {
   for (let i = 0; i < attempts; i++) {
     await new Promise(r => setTimeout(r, intervalMs))
     const res = await fetch(

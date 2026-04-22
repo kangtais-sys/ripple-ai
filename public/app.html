@@ -2337,7 +2337,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     </div>
 
     <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:10px">캡션</div>
-    <textarea class="sheet-ta" id="post-caption" rows="3" style="margin-top:0">오늘도 나만의 글로우 루틴 ✨ #스킨케어 #데일리뷰티 #MILLIMILLI</textarea>
+    <textarea class="sheet-ta" id="post-caption" rows="3" style="margin-top:0" placeholder="AI가 생성한 캡션이 여기에 들어와요. 자유롭게 편집하세요."></textarea>
 
     <div style="font-size:14px;font-weight:800;color:var(--t1);margin:16px 0 8px">게시 시점</div>
     <div style="display:flex;gap:8px;margin-bottom:10px">
@@ -4746,8 +4746,26 @@ function goStep(n){
   if(title){
     title.textContent = ({1:'만들기',2:'사이즈 설정',3:'템플릿 선택',4:'편집 & 미리보기',5:'게시·예약'})[n];
   }
-  if(n===4) { setTimeout(initEditor, 80); setTimeout(buildColorBar, 100); }
-  if(n===5) { setTimeout(function(){ var cb=document.getElementById('ai-stamp-toggle'); if(cb) toggleAiStamp(cb); }, 60); }
+  if(n===4) {
+    // 기존 편집 상태가 있으면 보존 (미리보기/뒤로가기 시 리셋 방지)
+    //   edtSlides 가 비어있을 때만 새로 생성
+    //   또는 createData._editorDirty 플래그가 없을 때만
+    setTimeout(function(){
+      if(!edtSlides || edtSlides.length === 0 || createData._editorSource !== (createData._lastJobId||createData._lastSource)){
+        initEditor();
+        createData._editorSource = createData._lastJobId || createData._lastSource;
+      }
+    }, 80);
+    setTimeout(buildColorBar, 100);
+  }
+  if(n===5) {
+    setTimeout(function(){
+      var cb=document.getElementById('ai-stamp-toggle'); if(cb) toggleAiStamp(cb);
+      // AI가 생성한 caption 반영 (textarea에 값 없을 때만)
+      var ta = document.getElementById('post-caption');
+      if(ta && !ta.value && createData.caption){ ta.value = createData.caption; }
+    }, 60);
+  }
   window.scrollTo(0,0);
 }
 function createBack(){ if(createStep>1) goStep(createStep-1); }

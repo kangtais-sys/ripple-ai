@@ -4,6 +4,9 @@ import { getUserFromRequest, adminClient } from '@/lib/auth-helper'
 import { publishCardnewsJob } from '@/lib/ig-publish'
 import { NextResponse } from 'next/server'
 
+// 캐러셀 발행 시 슬라이드별 status 폴링으로 시간 소요 (최대 ~2분)
+export const maxDuration = 300  // 5분 — Vercel Pro 필요 (Hobby 는 60s 상한)
+
 type Params = { id: string }
 
 export async function POST(req: Request, ctx: { params: Promise<Params> }) {

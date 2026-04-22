@@ -6,6 +6,7 @@
 
 import { getUserFromRequest, adminClient } from '@/lib/auth-helper'
 import { logAIUsage } from '@/lib/ai-usage'
+import { buildCardnewsSystemPrompt, classifyCategory } from '@/lib/cardnews-prompt'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
@@ -35,36 +36,9 @@ export async function POST(req: NextRequest) {
     characteristics: ['팔로워 공감', '저장 유도'],
   }
 
-  // Claude 호출
-  const prompt = `너는 K-뷰티·라이프스타일 인플루언서의 SNS 캐러셀(카드뉴스) 카피라이터야.
-아래 말투로 "${topic}"에 대한 ${slideCount}장 캐러셀을 만들어줘.
-
-말투:
-- 어조: ${style.tone}
-- 종결어미: ${style.sentence_ending}
-- 이모지: ${style.emoji_style}
-- 길이: ${style.length}
-- 특징: ${Array.isArray(style.characteristics) ? (style.characteristics as string[]).join(', ') : ''}
-
-요구사항:
-1. 1장(표지): 강한 후킹 문구 한 줄 (짧고 임팩트, 20자 이내)
-2. 2장(프리뷰): "오늘 알려드릴 N가지" 목차형 (3~4줄)
-3. 3~${slideCount - 1}장(본문): 각 슬라이드 짧은 제목(10자 이내) + 본문(2~3줄)
-4. ${slideCount}장(마지막): 질문형 CTA + 저장·댓글 유도
-
-그리고 게시 캡션도 만들어줘. 해시태그 6~10개 포함.
-
-반드시 아래 JSON 형식으로만 응답 (코드블록 없이):
-{
-  "hook": "표지 후킹 문구",
-  "body": [
-    {"title": "2장 제목", "text": "2장 본문 (개행은 \\n)"},
-    {"title": "3장 제목", "text": "3장 본문"},
-    ...
-    {"title": "마지막장 제목", "text": "마지막장 본문"}
-  ],
-  "caption": "게시 캡션 (해시태그 포함)"
-}`
+  // 카테고리 자동 분류 + 범용 시스템 프롬프트 생성
+  const prompt = buildCardnewsSystemPrompt({ topic, slideCount, toneStyle: style })
+  const category = classifyCategory(topic)
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -76,7 +50,7 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 2048,
+        max_tokens: 4096,
         messages: [{ role: 'user', content: prompt }],
       }),
     })
@@ -91,7 +65,13 @@ export async function POST(req: NextRequest) {
     const match = text.match(/\{[\s\S]*\}/)
     if (!match) return NextResponse.json({ error: 'parse failed', raw: text }, { status: 502 })
 
-    let parsed: { hook?: string; body?: Array<{ title?: string; text?: string }>; caption?: string }
+    let parsed: {
+      hook?: string
+      body?: Array<{ title?: string; text?: string }>
+      caption?: string
+      category?: string
+      image_keywords?: string[]
+    }
     try {
       parsed = JSON.parse(match[0])
     } catch {
@@ -110,7 +90,12 @@ export async function POST(req: NextRequest) {
         template: body.template || 'clean',
         slide_count: slideCount,
         status: 'draft',
-        meta: { model: 'claude-sonnet-4-20250514', tokens: data.usage || null },
+        meta: {
+          model: 'claude-sonnet-4-20250514',
+          tokens: data.usage || null,
+          category: parsed.category || category,
+          image_keywords: parsed.image_keywords || [],
+        },
       })
       .select('id')
       .single()
@@ -129,6 +114,8 @@ export async function POST(req: NextRequest) {
       hook: parsed.hook || '',
       body: parsed.body || [],
       caption: parsed.caption || '',
+      category: parsed.category || category,
+      image_keywords: parsed.image_keywords || [],
       job_id: job?.id,
     })
   } catch (e) {
