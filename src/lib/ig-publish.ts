@@ -68,7 +68,32 @@ export async function publishCardnewsJob(
     }
     const creationId = createData.id as string
 
-    // 4) POST /media_publish → media_id (실제 게시물 ID)
+    // 4) 컨테이너가 이미지 fetch·인코딩 완료할 때까지 폴링 (최대 30초)
+    //    Meta 권장: status_code=FINISHED 확인 후 publish 호출
+    //    이 단계 스킵 시 간혹 publish 실패 / 이미지 누락 발생
+    let statusOk = false
+    for (let i = 0; i < 10; i++) {
+      await new Promise(r => setTimeout(r, 3000))
+      const sRes = await fetch(
+        `https://graph.instagram.com/v21.0/${creationId}?fields=status_code&access_token=${igAcc.access_token}`
+      )
+      const sData = await sRes.json().catch(() => ({}))
+      if (sData.status_code === 'FINISHED') { statusOk = true; break }
+      if (sData.status_code === 'ERROR' || sData.status_code === 'EXPIRED') {
+        await markFailed(
+          admin, job.id, job.meta,
+          `container_status_${sData.status_code}: ${JSON.stringify(sData)}`,
+          { ig_creation_id: creationId }
+        )
+        return { ok: false, error: `container ${sData.status_code}: ${JSON.stringify(sData)}` }
+      }
+    }
+    if (!statusOk) {
+      await markFailed(admin, job.id, job.meta, 'container_timeout_not_finished', { ig_creation_id: creationId })
+      return { ok: false, error: 'container timeout — still not FINISHED after 30s' }
+    }
+
+    // 5) POST /media_publish → media_id (실제 게시물 ID)
     const pubRes = await fetch(
       `https://graph.instagram.com/v21.0/${igAcc.ig_user_id}/media_publish`,
       {
