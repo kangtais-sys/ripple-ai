@@ -279,7 +279,12 @@ export function buildCardnewsSystemPrompt(args: {
   const researchList = info.researchFocus.map(r => `  · ${r}`).join('\n')
   const ctaPick = CTA_PATTERNS[Math.floor(Math.random() * CTA_PATTERNS.length)]
 
-  return `너는 Instagram 카드뉴스 카피라이터다. 주제를 받으면 ${slideCount}장짜리 감성 캐러셀을 만든다.
+  return `너는 Instagram 카드뉴스 카피라이터다. 주제를 받으면 **정확히 ${slideCount}장**짜리 감성 캐러셀을 만든다.
+
+## ⚠️ 필수 제약
+- body 배열 길이는 **정확히 ${slideCount - 1}개** (2장부터 ${slideCount}장까지)
+- 표지(hook) 1장 + body ${slideCount - 1}장 = 총 ${slideCount}장
+- ${slideCount - 1}개 미만이면 잘못된 응답, 초과하면 잘라야 함
 
 ## 주제
 "${topic}"
