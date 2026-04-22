@@ -1,11 +1,14 @@
 // GET /api/cardnews/:id/image  (public, no auth)
-// Instagram Graph API가 이 URL로 이미지를 fetch 해서 업로드함
-// card_news_jobs 의 prompt_hook 등을 Satori(ImageResponse)로 1080x1080 PNG 렌더
+// Instagram Graph API 가 fetch 하는 이미지 엔드포인트
+//   · Meta 는 JPEG 포맷 권장 (PNG 는 종종 OAuthException code 9004 발생)
+//   · 긴 max-age 헤더 + Access-Control-Allow-Origin * 로 크롤러 친화적
+//   · ImageResponse(Satori) 로 PNG 생성 → sharp 로 JPEG 변환
+// 내부 동작: card_news_jobs 의 prompt_hook 등을 1080x1080 카드로 렌더
 
 import { ImageResponse } from 'next/og'
 import { createClient as createAdmin } from '@supabase/supabase-js'
+import sharp from 'sharp'
 
-// Node.js runtime — Supabase JS 전체 번들 대응 (edge 번들 1MB 한도 회피)
 export const runtime = 'nodejs'
 
 type Params = { id: string }
@@ -25,7 +28,6 @@ export async function GET(req: Request, ctx: { params: Promise<Params> }) {
 
   const hook = (job?.prompt_hook as string) || (job?.topic as string) || 'Ssobi Cardnews'
   const tpl = (job?.template as string) || 'clean'
-  // Satori 는 background shorthand 의 linear-gradient 를 지원 안 함 → backgroundImage 로 분리
   const palette: Record<string, { bg: string; bgImage?: string; fg: string; accent: string }> = {
     clean:     { bg: '#FFFFFF', fg: '#1A1F27', accent: '#00C896' },
     bold:      { bg: '#1A1F27', fg: '#FFFFFF', accent: '#00C896' },
@@ -38,7 +40,7 @@ export async function GET(req: Request, ctx: { params: Promise<Params> }) {
   }
   const p = palette[tpl] || palette.clean
 
-  return new ImageResponse(
+  const pngResponse = new ImageResponse(
     (
       <div
         style={{
@@ -91,4 +93,20 @@ export async function GET(req: Request, ctx: { params: Promise<Params> }) {
     ),
     { width: 1080, height: 1080 }
   )
+
+  const pngBuffer = Buffer.from(await pngResponse.arrayBuffer())
+  const jpegBuffer = await sharp(pngBuffer).jpeg({ quality: 90, mozjpeg: true }).toBuffer()
+
+  return new Response(jpegBuffer, {
+    status: 200,
+    headers: {
+      'Content-Type': 'image/jpeg',
+      'Content-Length': String(jpegBuffer.length),
+      // Meta 크롤러가 재시도 시 CDN 캐시로 빠른 응답
+      'Cache-Control': 'public, max-age=3600, s-maxage=3600, immutable',
+      'Access-Control-Allow-Origin': '*',
+      // Meta facebookexternalhit 등 크롤러 차단 없음을 명시
+      'X-Robots-Tag': 'noindex, nofollow',
+    },
+  })
 }
