@@ -134,7 +134,28 @@ async function handleComment(supabase: AdminClient, value: any) {
     try {
       const draft = await generateReply(account.user_id, text, supabase)
       console.log('[Webhook/Comment] generated draft:', draft?.slice(0, 80))
-      if (!draft || draft === 'SKIP') continue
+
+      // SKIP 이어도 로그는 남기자 (디버깅 + Ssobi 앱에 표시)
+      if (!draft || draft === 'SKIP') {
+        await supabase.from('reply_logs').insert({
+          user_id: account.user_id,
+          ig_account_id: account.id,
+          type: 'comment',
+          original_text: text,
+          reply_text: '[AI SKIP — 악성·스팸 판정]',
+          platform_id: commentId,
+          send_status: 'skipped',
+          is_approved: false,
+          context: {
+            comment_id: commentId,
+            commenter_handle: value.from?.username || '',
+            commenter_platform_id: String(value.from?.id || ''),
+            ai_skipped: true,
+          },
+        })
+        console.log('[Webhook/Comment] SKIP 처리, skipped 로그 저장')
+        continue
+      }
 
       const commenterHandle = value.from?.username || String(value.from?.id || '')
       const cls = classifyText(text)
