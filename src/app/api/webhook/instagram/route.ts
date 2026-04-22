@@ -33,6 +33,7 @@ export async function GET(request: NextRequest) {
 // Webhook event handler (POST)
 export async function POST(request: NextRequest) {
   const body = await request.json()
+  console.log('[Webhook] POST received, body preview:', JSON.stringify(body).slice(0, 500))
 
   // Admin client (bypasses RLS for webhook processing)
   const supabase = createAdminClient(
@@ -42,17 +43,27 @@ export async function POST(request: NextRequest) {
 
   try {
     const entries = body.entry || []
+    console.log('[Webhook] entries count:', entries.length)
 
     for (const entry of entries) {
       const changes = entry.changes || []
+      const messaging = entry.messaging || []
+      console.log('[Webhook] entry', entry.id, '— changes:', changes.length, 'messaging:', messaging.length)
 
       for (const change of changes) {
+        console.log('[Webhook] change.field =', change.field)
         if (change.field === 'comments') {
           await handleComment(supabase, change.value)
         }
         if (change.field === 'messages') {
           await handleMessage(supabase, change.value)
         }
+      }
+
+      // Instagram Messaging API 는 messaging 배열로 전달되기도 함
+      for (const m of messaging) {
+        console.log('[Webhook] messaging event:', JSON.stringify(m).slice(0, 200))
+        await handleMessage(supabase, m)
       }
     }
 
@@ -68,7 +79,12 @@ async function handleComment(supabase: AdminClient, value: any) {
   const commentId = value.id as string
   const text = value.text as string
 
-  if (!text || !commentId) return
+  console.log('[Webhook/Comment] received:', { commentId, text: text?.slice(0, 100), from: value.from })
+
+  if (!text || !commentId) {
+    console.log('[Webhook/Comment] skipped — missing text or id')
+    return
+  }
 
   const igUserId = String(value.from?.id || '')
   // media owner의 IG user ID로 찾아야 함 - 실제로는 media.owner 사용
@@ -79,10 +95,18 @@ async function handleComment(supabase: AdminClient, value: any) {
     .from('ig_accounts')
     .select('id, user_id, ig_user_id, access_token')
 
-  if (!accounts?.length) return
+  if (!accounts?.length) {
+    console.log('[Webhook/Comment] no ig_accounts connected — ignored')
+    return
+  }
+
+  console.log('[Webhook/Comment] checking', accounts.length, 'connected accounts against commenter', igUserId)
 
   for (const account of accounts) {
-    if (account.ig_user_id === igUserId) continue
+    if (account.ig_user_id === igUserId) {
+      console.log('[Webhook/Comment] skip self-comment (account=commenter)', account.ig_user_id)
+      continue
+    }
 
     // 플랜 한도 체크
     const withinLimit = await checkUserLimit(supabase, account.user_id)
@@ -93,6 +117,7 @@ async function handleComment(supabase: AdminClient, value: any) {
 
     try {
       const draft = await generateReply(account.user_id, text, supabase)
+      console.log('[Webhook/Comment] generated draft:', draft?.slice(0, 80))
       if (!draft || draft === 'SKIP') continue
 
       const commenterHandle = value.from?.username || String(value.from?.id || '')
