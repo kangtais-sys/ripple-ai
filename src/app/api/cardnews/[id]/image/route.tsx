@@ -97,11 +97,14 @@ export async function GET(req: Request, ctx: { params: Promise<Params> }) {
   const pngBuffer = Buffer.from(await pngResponse.arrayBuffer())
   const jpegBuffer = await sharp(pngBuffer).jpeg({ quality: 90, mozjpeg: true }).toBuffer()
 
-  return new Response(jpegBuffer, {
+  // Response body 는 Uint8Array 로 넘겨야 Next.js 최신 TS 타입 통과
+  const body = new Uint8Array(jpegBuffer)
+
+  return new Response(body, {
     status: 200,
     headers: {
       'Content-Type': 'image/jpeg',
-      'Content-Length': String(jpegBuffer.length),
+      'Content-Length': String(body.length),
       // Meta 크롤러가 재시도 시 CDN 캐시로 빠른 응답
       'Cache-Control': 'public, max-age=3600, s-maxage=3600, immutable',
       'Access-Control-Allow-Origin': '*',
