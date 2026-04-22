@@ -32,6 +32,7 @@ export async function POST(req: Request) {
     topic?: string
     hook?: string
     body?: string
+    bodySlides?: Array<{ title?: string; text?: string }> | null
     caption?: string
     template?: string
     size?: string
@@ -40,12 +41,18 @@ export async function POST(req: Request) {
     scheduled_at?: string | null
   }
 
+  // 슬라이드 구조: bodySlides 우선 (Claude 원본), 없으면 flatten 문자열로 단일 슬라이드
+  const promptBody = Array.isArray(body.bodySlides) && body.bodySlides.length > 0
+    ? body.bodySlides.map(s => ({ title: (s.title || '').slice(0, 200), text: (s.text || '').slice(0, 1500) }))
+    : (body.body ? [{ title: '', text: body.body }] : [])
+
   const sb = adminClient()
   const { data, error } = await sb.from('card_news_jobs').insert({
     user_id: user.id,
     topic: (body.topic || '').slice(0, 200) || 'draft',
     prompt_hook: body.hook || null,
-    prompt_body: body.body ? [{ title: '', text: body.body }] : [],
+    prompt_body: promptBody,
+    slide_count: Math.max(1, promptBody.length),
     prompt_caption: body.caption || null,
     template: body.template || 'clean',
     size: body.size || 'sq',

@@ -16,7 +16,7 @@ export async function POST(req: Request, ctx: { params: Promise<Params> }) {
   // 소유권 확인
   const { data: job } = await admin
     .from('card_news_jobs')
-    .select('id, user_id, status, prompt_caption, meta')
+    .select('id, user_id, status, prompt_caption, prompt_body, meta')
     .eq('id', id)
     .eq('user_id', user.id)
     .maybeSingle()

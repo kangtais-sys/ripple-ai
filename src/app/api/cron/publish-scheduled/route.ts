@@ -30,7 +30,7 @@ export async function GET(req: Request) {
     .eq('status', 'scheduled')
     .lte('scheduled_at', nowIso)
     .not('scheduled_at', 'is', null)
-    .select('id, user_id, status, prompt_caption, meta')
+    .select('id, user_id, status, prompt_caption, prompt_body, meta')
     .limit(50)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

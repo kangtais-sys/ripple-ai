@@ -1,6 +1,6 @@
 // Instagram 콘텐츠 발행 헬퍼 (Graph API with Instagram Login)
-// 순서: POST /media (creation_id) → POST /media_publish (media_id)
-// 단일 이미지 기준. 캐러셀은 MVP 이후 확장.
+// 슬라이드 1장 → 단일 이미지. 2장 이상 → 캐러셀(CAROUSEL_ALBUM, 최대 10장).
+// 각 슬라이드는 /api/cardnews/:id/image?slide=N 로 렌더됨.
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 
@@ -11,11 +11,13 @@ export type PublishResult = {
   status?: number
 }
 
+type Slide = { title?: string; text?: string }
 type Job = {
   id: string
   user_id: string
   status: string
   prompt_caption: string | null
+  prompt_body: Slide[] | null
   meta: Record<string, unknown> | null
 }
 
@@ -24,7 +26,7 @@ export async function publishCardnewsJob(
   job: Job,
   appBaseUrl: string
 ): Promise<PublishResult> {
-  // 1) 유저의 IG 계정 (가장 최근 연동 토큰 우선)
+  // 1) 유저의 IG 계정
   const { data: igAcc } = await admin
     .from('ig_accounts')
     .select('ig_user_id, access_token, token_expires_at')
@@ -38,93 +40,60 @@ export async function publishCardnewsJob(
     return { ok: false, error: 'Instagram 계정 미연동' }
   }
 
-  // 2) 이미지 URL (우리 render 엔드포인트가 공개 제공)
-  const imageUrl = `${appBaseUrl}/api/cardnews/${job.id}/image`
-  const caption = (job.prompt_caption || '').slice(0, 2200) // IG 캡션 한도
+  const igUserId = igAcc.ig_user_id as string
+  const token = igAcc.access_token as string
+  const caption = (job.prompt_caption || '').slice(0, 2200)
+
+  // 슬라이드 개수 결정: 표지(1) + body 배열 길이
+  const body = Array.isArray(job.prompt_body) ? job.prompt_body : []
+  const totalSlides = Math.min(10, body.length > 0 ? body.length + 1 : 1) // IG 최대 10장
 
   try {
-    // 3) POST /media → creation_id
-    const createRes = await fetch(
-      `https://graph.instagram.com/v21.0/${igAcc.ig_user_id}/media`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          image_url: imageUrl,
-          media_type: 'IMAGE',
-          caption,
-          access_token: igAcc.access_token,
-        }),
-      }
-    )
-    const createData = await createRes.json().catch(() => ({}))
-    if (!createRes.ok || !createData.id) {
-      await markFailed(admin, job.id, job.meta, `media_create_failed: ${JSON.stringify(createData.error || createData)}`)
-      return {
-        ok: false,
-        status: createRes.status,
-        error: `media create 실패: ${JSON.stringify(createData.error || createData)}`,
-      }
-    }
-    const creationId = createData.id as string
+    let finalCreationId: string
 
-    // 4) 컨테이너가 이미지 fetch·인코딩 완료할 때까지 폴링 (최대 30초)
-    //    Meta 권장: status_code=FINISHED 확인 후 publish 호출
-    //    이 단계 스킵 시 간혹 publish 실패 / 이미지 누락 발생
-    let statusOk = false
-    for (let i = 0; i < 10; i++) {
-      await new Promise(r => setTimeout(r, 3000))
-      const sRes = await fetch(
-        `https://graph.instagram.com/v21.0/${creationId}?fields=status_code&access_token=${igAcc.access_token}`
-      )
-      const sData = await sRes.json().catch(() => ({}))
-      if (sData.status_code === 'FINISHED') { statusOk = true; break }
-      if (sData.status_code === 'ERROR' || sData.status_code === 'EXPIRED') {
-        await markFailed(
-          admin, job.id, job.meta,
-          `container_status_${sData.status_code}: ${JSON.stringify(sData)}`,
-          { ig_creation_id: creationId }
-        )
-        return { ok: false, error: `container ${sData.status_code}: ${JSON.stringify(sData)}` }
+    if (totalSlides === 1) {
+      // 단일 이미지 발행
+      finalCreationId = await createSingleMedia(igUserId, token, `${appBaseUrl}/api/cardnews/${job.id}/image?slide=0`, caption)
+    } else {
+      // 캐러셀 발행
+      const childIds: string[] = []
+      for (let i = 0; i < totalSlides; i++) {
+        const childId = await createCarouselChild(igUserId, token, `${appBaseUrl}/api/cardnews/${job.id}/image?slide=${i}`)
+        // 각 child 컨테이너 FINISHED 대기
+        await pollFinished(childId, token)
+        childIds.push(childId)
       }
-    }
-    if (!statusOk) {
-      await markFailed(admin, job.id, job.meta, 'container_timeout_not_finished', { ig_creation_id: creationId })
-      return { ok: false, error: 'container timeout — still not FINISHED after 30s' }
+      // 부모 캐러셀 컨테이너
+      finalCreationId = await createCarouselParent(igUserId, token, childIds, caption)
     }
 
-    // 5) POST /media_publish → media_id (실제 게시물 ID)
+    // 최종 컨테이너 FINISHED 대기
+    await pollFinished(finalCreationId, token)
+
+    // POST /media_publish
     const pubRes = await fetch(
-      `https://graph.instagram.com/v21.0/${igAcc.ig_user_id}/media_publish`,
+      `https://graph.instagram.com/v21.0/${igUserId}/media_publish`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          creation_id: creationId,
-          access_token: igAcc.access_token,
+          creation_id: finalCreationId,
+          access_token: token,
         }),
       }
     )
     const pubData = await pubRes.json().catch(() => ({}))
     if (!pubRes.ok || !pubData.id) {
-      // creation_id 는 meta 에 보존 (수동 재발행 가능)
       await markFailed(
-        admin,
-        job.id,
-        job.meta,
+        admin, job.id, job.meta,
         `media_publish_failed: ${JSON.stringify(pubData.error || pubData)}`,
-        { ig_creation_id: creationId }
+        { ig_creation_id: finalCreationId }
       )
-      return {
-        ok: false,
-        status: pubRes.status,
-        error: `publish 실패: ${JSON.stringify(pubData.error || pubData)}`,
-      }
+      return { ok: false, status: pubRes.status, error: `publish 실패: ${JSON.stringify(pubData.error || pubData)}` }
     }
     const mediaId = pubData.id as string
 
-    // 5) 성공: card_news_jobs 업데이트
-    const newMeta = { ...(job.meta || {}), ig_media_id: mediaId, ig_creation_id: creationId }
+    const newMeta = { ...(job.meta || {}), ig_media_id: mediaId, ig_creation_id: finalCreationId, slides_published: totalSlides }
     await admin
       .from('card_news_jobs')
       .update({
@@ -136,9 +105,81 @@ export async function publishCardnewsJob(
 
     return { ok: true, mediaId }
   } catch (e) {
-    await markFailed(admin, job.id, job.meta, String(e))
-    return { ok: false, error: String(e) }
+    const msg = e instanceof PublishError ? e.message : String(e)
+    const ctx = e instanceof PublishError ? e.extra : undefined
+    await markFailed(admin, job.id, job.meta, msg, ctx)
+    return { ok: false, error: msg }
   }
+}
+
+class PublishError extends Error {
+  extra?: Record<string, unknown>
+  constructor(msg: string, extra?: Record<string, unknown>) {
+    super(msg)
+    this.extra = extra
+  }
+}
+
+async function createSingleMedia(igUserId: string, token: string, imageUrl: string, caption: string): Promise<string> {
+  const res = await fetch(`https://graph.instagram.com/v21.0/${igUserId}/media`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ image_url: imageUrl, media_type: 'IMAGE', caption, access_token: token }),
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || !data.id) {
+    throw new PublishError(`media_create_failed: ${JSON.stringify(data.error || data)}`)
+  }
+  return data.id as string
+}
+
+async function createCarouselChild(igUserId: string, token: string, imageUrl: string): Promise<string> {
+  const res = await fetch(`https://graph.instagram.com/v21.0/${igUserId}/media`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ image_url: imageUrl, is_carousel_item: true, access_token: token }),
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || !data.id) {
+    throw new PublishError(`carousel_child_failed: ${JSON.stringify(data.error || data)}`)
+  }
+  return data.id as string
+}
+
+async function createCarouselParent(igUserId: string, token: string, childIds: string[], caption: string): Promise<string> {
+  const res = await fetch(`https://graph.instagram.com/v21.0/${igUserId}/media`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      media_type: 'CAROUSEL',
+      children: childIds.join(','),
+      caption,
+      access_token: token,
+    }),
+  })
+  const data = await res.json().catch(() => ({}))
+  if (!res.ok || !data.id) {
+    throw new PublishError(`carousel_parent_failed: ${JSON.stringify(data.error || data)}`)
+  }
+  return data.id as string
+}
+
+async function pollFinished(creationId: string, token: string, attempts = 10, intervalMs = 3000): Promise<void> {
+  for (let i = 0; i < attempts; i++) {
+    await new Promise(r => setTimeout(r, intervalMs))
+    const res = await fetch(
+      `https://graph.instagram.com/v21.0/${creationId}?fields=status_code&access_token=${token}`
+    )
+    const data = await res.json().catch(() => ({}))
+    if (data.status_code === 'FINISHED') return
+    if (data.status_code === 'ERROR' || data.status_code === 'EXPIRED') {
+      throw new PublishError(
+        `container_status_${data.status_code}: ${JSON.stringify(data)}`,
+        { ig_creation_id: creationId }
+      )
+    }
+  }
+  throw new PublishError('container_timeout_not_finished', { ig_creation_id: creationId })
 }
 
 async function markFailed(

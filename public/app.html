@@ -937,7 +937,8 @@ input:checked+.tsl::before{transform:translateX(18px)}
 #cs-4.preview-mode .edt-tools,#cs-4.preview-mode .edt-panel,#cs-4.preview-mode #edt-img-input{display:none!important}
 #cs-4.preview-mode .edt-hnd,#cs-4.preview-mode .edt-size-badge{display:none!important}
 #cs-4.preview-mode .edt-canvas-wrap{box-shadow:0 8px 28px rgba(15,19,25,.12);border:none}
-#cs-4.preview-mode .edt-el.selected{outline:none!important;box-shadow:none!important}
+#cs-4.preview-mode .edt-el.sel{outline:none!important;box-shadow:none!important}
+#cs-4.preview-mode .edt-hnd{display:none!important}
 #cs-4.preview-mode .edt-el{cursor:default!important;pointer-events:none!important}
 .edt-canvas-wrap{width:100%;max-height:560px;aspect-ratio:1;background:var(--bg);border-radius:16px;border:1px solid var(--b);overflow:hidden;position:relative;margin-bottom:14px;margin-left:auto;margin-right:auto;transition:aspect-ratio .25s ease}
 .edt-canvas-wrap.sz-sq{aspect-ratio:1/1}
@@ -4801,6 +4802,7 @@ async function generatePrompt(){
     }).join('\n\n');
     createData.hook = j.hook;
     createData.body = bodyText;
+    createData.bodySlides = j.body || [];  // 원본 슬라이드 배열 보존 (발행 시 캐러셀용)
     createData.caption = j.caption || '';
     createData._lastJobId = j.job_id;
     document.getElementById('cs2-hook').textContent = j.hook;
@@ -7607,6 +7609,7 @@ async function saveCardnewsJob(status, scheduledAt){
       topic: createData._lastSource || (createData.hook || '').slice(0, 30),
       hook: createData.hook,
       body: createData.body,
+      bodySlides: createData.bodySlides || null,  // 원본 슬라이드 배열 (캐러셀 발행용)
       caption: createData.caption || (document.getElementById('post-caption')||{}).value || '',
       template: createData.template || 'clean',
       size: createData.size || 'sq',
