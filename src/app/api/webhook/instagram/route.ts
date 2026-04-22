@@ -41,6 +41,22 @@ export async function POST(request: NextRequest) {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
+  // 디버그용: webhook 전체 body 를 Supabase 에 임시 저장 (reply_logs 의 user_id=null 로 특수 기록)
+  //   Vercel 로그가 console.log 를 안 싣는 이슈 회피용 — 운영 후 제거 가능
+  try {
+    await supabase.from('reply_logs').insert({
+      user_id: null,
+      type: 'comment',
+      original_text: '__WEBHOOK_DEBUG__',
+      reply_text: JSON.stringify(body).slice(0, 2000),
+      send_status: 'skipped',
+      is_approved: false,
+      context: { debug: true, raw_body: body },
+    })
+  } catch (dbgErr) {
+    console.error('[Webhook] debug log insert failed:', dbgErr)
+  }
+
   try {
     const entries = body.entry || []
     console.log('[Webhook] entries count:', entries.length)
