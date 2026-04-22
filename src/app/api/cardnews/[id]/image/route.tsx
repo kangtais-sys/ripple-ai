@@ -76,7 +76,7 @@ export async function GET(req: Request, ctx: { params: Promise<Params> }) {
   )
   const { data: job } = await admin
     .from('card_news_jobs')
-    .select('prompt_hook, prompt_body, topic, template')
+    .select('prompt_hook, prompt_body, topic, template, size')
     .eq('id', id)
     .maybeSingle()
 
@@ -85,6 +85,16 @@ export async function GET(req: Request, ctx: { params: Promise<Params> }) {
   const body: Slide[] = Array.isArray(job?.prompt_body) ? (job!.prompt_body as Slide[]) : []
   const totalSlides = Math.max(1, body.length > 0 ? body.length + 1 : 1)
   const p = TPL[tpl] || TPL.clean
+
+  // 사이즈: sq(1:1 1080) / pt(4:5 1080x1350) / st(9:16 1080x1920 피드 X)
+  //   IG 피드 허용 비율: 1:1, 1.91:1, 4:5
+  const sizeKey = (url.searchParams.get('size') as string) || (job?.size as string) || 'sq'
+  const DIM: Record<string, { w: number; h: number }> = {
+    sq: { w: 1080, h: 1080 },
+    pt: { w: 1080, h: 1350 },
+    st: { w: 1080, h: 1920 },
+  }
+  const dim = DIM[sizeKey] || DIM.sq
 
   const fonts = await loadFonts()
   const imageFonts: Array<{ name: string; data: ArrayBuffer; weight: 400 | 700 | 900; style: 'normal' | 'italic' }> = []
@@ -98,8 +108,8 @@ export async function GET(req: Request, ctx: { params: Promise<Params> }) {
     : renderBody(body[Math.min(slideIdx - 1, body.length - 1)] || { title: '', text: '' }, slideIdx, p, pageLabel)
 
   const imgRes = new ImageResponse(slideContent, {
-    width: 1080,
-    height: 1080,
+    width: dim.w,
+    height: dim.h,
     fonts: imageFonts,
   })
 

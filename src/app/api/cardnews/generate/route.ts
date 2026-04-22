@@ -15,12 +15,18 @@ export async function POST(req: NextRequest) {
 
   const sb = adminClient()
 
-  const body = await req.json().catch(() => ({})) as { topic?: string; slides?: number; template?: string }
+  const body = await req.json().catch(() => ({})) as {
+    topic?: string
+    slides?: number
+    template?: string
+    contentTone?: 'warm' | 'friendly' | 'professional' | 'honest' | 'witty' | 'chic'
+  }
   const topic = (body.topic || '').trim()
   if (!topic || topic.length < 3) {
     return NextResponse.json({ error: '주제를 3자 이상 입력해주세요' }, { status: 400 })
   }
   const slideCount = Math.min(Math.max(body.slides || 6, 3), 10)
+  const contentTone = body.contentTone
 
   // 유저의 학습된 말투 불러오기 (없으면 기본값)
   const { data: tone } = await sb
@@ -37,7 +43,7 @@ export async function POST(req: NextRequest) {
   }
 
   // 카테고리 자동 분류 + 범용 시스템 프롬프트 생성
-  const prompt = buildCardnewsSystemPrompt({ topic, slideCount, toneStyle: style })
+  const prompt = buildCardnewsSystemPrompt({ topic, slideCount, toneStyle: style, contentTone })
   const category = classifyCategory(topic)
 
   try {

@@ -2066,7 +2066,15 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       </div>
       <div style="font-size:11.5px;color:var(--t2);line-height:1.55;margin-bottom:10px">주제 한 줄 적으면 <b style="color:var(--t1)">내 말투</b>로 카드뉴스·캡션을 자동 생성해요.</div>
       <textarea class="direct-ta" id="direct-topic" placeholder="예: 우울할 때 보기 좋은 책 속 글귀 추천 (출처 포함) / 아이돌 메이크업 트렌드 Best 3 / 민감 피부 봄철 루틴 / 이번주 공구 정리" oninput="toggleDirectBtn()" onkeyup="toggleDirectBtn()" oncompositionupdate="toggleDirectBtn()" oncompositionend="toggleDirectBtn()" onchange="toggleDirectBtn()"></textarea>
-      <button class="direct-gen" id="direct-gen-btn" disabled onclick="generatePrompt()">카드뉴스 생성하기</button>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px">
+        <button type="button" class="tone-chip" data-tone="warm"         onclick="selectContentTone(this)" style="padding:9px;border-radius:10px;border:1.5px solid var(--b);background:#fff;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;transition:all .12s">다정한</button>
+        <button type="button" class="tone-chip on" data-tone="friendly"  onclick="selectContentTone(this)" style="padding:9px;border-radius:10px;border:1.5px solid var(--mint);background:var(--mint-l);font-size:12px;font-weight:800;color:var(--mint-d);cursor:pointer;transition:all .12s">친근한</button>
+        <button type="button" class="tone-chip" data-tone="professional" onclick="selectContentTone(this)" style="padding:9px;border-radius:10px;border:1.5px solid var(--b);background:#fff;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;transition:all .12s">전문적</button>
+        <button type="button" class="tone-chip" data-tone="honest"       onclick="selectContentTone(this)" style="padding:9px;border-radius:10px;border:1.5px solid var(--b);background:#fff;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;transition:all .12s">솔직한</button>
+        <button type="button" class="tone-chip" data-tone="witty"        onclick="selectContentTone(this)" style="padding:9px;border-radius:10px;border:1.5px solid var(--b);background:#fff;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;transition:all .12s">재치있는</button>
+        <button type="button" class="tone-chip" data-tone="chic"         onclick="selectContentTone(this)" style="padding:9px;border-radius:10px;border:1.5px solid var(--b);background:#fff;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;transition:all .12s">시크한</button>
+      </div>
+      <button class="direct-gen" id="direct-gen-btn" disabled onclick="generatePrompt()" style="margin-top:10px">카드뉴스 생성하기</button>
     </div>
   </div>
 
@@ -2244,18 +2252,26 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         <div style="font-size:11px;font-weight:700;color:var(--t2);min-width:36px;text-align:right" id="edt-text-size-v">24px</div>
       </div>
       <div class="edt-style-row">
+        <div class="edt-row-lbl" style="margin-right:4px">폰트</div>
+        <select class="edt-weight-select" id="edt-font-sel" onchange="edtSetFont(this.value)" style="flex:1;min-width:0">
+          <option value="sans">Pretendard (기본)</option>
+          <option value="serif">Fraunces (세리프)</option>
+          <option value="noto-serif">Noto Serif KR</option>
+          <option value="mono">JetBrains Mono</option>
+        </select>
+      </div>
+      <div class="edt-style-row">
         <div class="edt-row-lbl" style="margin-right:4px">스타일</div>
         <button type="button" class="edt-style-btn" id="edt-bold-btn" onclick="edtToggleBold()" style="font-weight:900"><b>B</b></button>
         <button type="button" class="edt-style-btn" id="edt-italic-btn" onclick="edtToggleItalic()" style="font-style:italic"><i>I</i></button>
         <select class="edt-weight-select" id="edt-weight-sel" onchange="edtSetWeight(this.value)">
-          <option value="400">Regular 400</option>
-          <option value="500">Medium 500</option>
-          <option value="600">Semibold 600</option>
-          <option value="700" selected>Bold 700</option>
-          <option value="800">Extra 800</option>
-          <option value="900">Black 900</option>
+          <option value="400">Regular</option>
+          <option value="500">Medium</option>
+          <option value="600">Semibold</option>
+          <option value="700" selected>Bold</option>
+          <option value="800">Extra</option>
+          <option value="900">Black</option>
         </select>
-        <button type="button" class="edt-style-btn" id="edt-fraunces-btn" onclick="edtToggleFraunces()" title="세리프 (Fraunces)" style="font-family:'Fraunces','Pretendard',serif;font-style:italic">Aa</button>
       </div>
       <div style="margin-top:10px">
         <div class="edt-row-lbl" style="margin-bottom:6px">색상 팔레트</div>
@@ -4716,7 +4732,22 @@ function showDay(k){
 
 // ═══════════════ CREATE FLOW ═══════════════
 var createStep = 1;
-var createData = { hook:'', body:'', slides:6, size:'sq', template:'clean', channels:['ig'] };
+var createData = { hook:'', body:'', slides:6, size:'sq', template:'clean', channels:['ig'], contentTone:'friendly' };
+function selectContentTone(btn){
+  document.querySelectorAll('.tone-chip').forEach(function(c){
+    c.classList.remove('on');
+    c.style.border = '1.5px solid var(--b)';
+    c.style.background = '#fff';
+    c.style.color = 'var(--t2)';
+    c.style.fontWeight = '700';
+  });
+  btn.classList.add('on');
+  btn.style.border = '1.5px solid var(--mint)';
+  btn.style.background = 'var(--mint-l)';
+  btn.style.color = 'var(--mint-d)';
+  btn.style.fontWeight = '800';
+  createData.contentTone = btn.dataset.tone;
+}
 // 학습된 내 말투: 친근체, 이모지 (:) 🌿 😊 ✨), 반말X, 감사표현 자주, 체크리스트형
 var trendPresets = {
   1: {
@@ -4816,7 +4847,7 @@ async function generatePrompt(){
     var h = await authHeaders();
     var res = await fetch('/api/cardnews/generate', {
       method:'POST', headers: h, credentials:'include',
-      body: JSON.stringify({ topic: topic, slides: createData.slides || 6 })
+      body: JSON.stringify({ topic: topic, slides: createData.slides || 6, contentTone: createData.contentTone })
     });
     var j = await res.json();
     if(!res.ok || !j.hook){
@@ -4884,7 +4915,7 @@ async function regenPrompt(){
     var h = await authHeaders();
     var res = await fetch('/api/cardnews/generate', {
       method:'POST', headers: h, credentials:'include',
-      body: JSON.stringify({ topic: topic, slides: createData.slides || 6 })
+      body: JSON.stringify({ topic: topic, slides: createData.slides || 6, contentTone: createData.contentTone })
     });
     var j = await res.json();
     if(!res.ok || !j.hook) throw new Error(j.error || 'AI 재생성 실패');
@@ -7518,8 +7549,9 @@ function edtSelect(el){
     var italic = (el.style.fontStyle||cs.fontStyle) === 'italic';
     var iBtn = document.getElementById('edt-italic-btn');
     if(iBtn) iBtn.classList.toggle('on', italic);
-    var fBtn = document.getElementById('edt-fraunces-btn');
-    if(fBtn) fBtn.classList.toggle('on', !!(el.style.fontFamily||'').match(/Fraunces/i));
+    // 폰트 드롭다운 현재 값 반영
+    var fontSel = document.getElementById('edt-font-sel');
+    if(fontSel) fontSel.value = detectFontKey(el.style.fontFamily || cs.fontFamily || '');
   }
 }
 function edtToggleBold(){
@@ -7554,6 +7586,25 @@ function edtToggleFraunces(){
   edtSel.style.fontFamily = on ? '' : "'Fraunces','Pretendard','Noto Sans KR',serif";
   var fBtn = document.getElementById('edt-fraunces-btn');
   if(fBtn) fBtn.classList.toggle('on', !on);
+}
+// 폰트 드롭다운 처리
+var EDT_FONT_MAP = {
+  'sans':       "'Pretendard','Noto Sans KR',sans-serif",
+  'serif':      "'Fraunces','Pretendard','Noto Serif KR',serif",
+  'noto-serif': "'Noto Serif KR','Fraunces',serif",
+  'mono':       "'JetBrains Mono','Pretendard',monospace",
+};
+function edtSetFont(key){
+  if(!edtSel) return;
+  edtSel.style.fontFamily = EDT_FONT_MAP[key] || EDT_FONT_MAP.sans;
+  // Fraunces/Noto Serif 는 italic 안정적으로 나타나게 — 선택만 바꾸고 italic 은 별도 토글
+}
+function detectFontKey(fam){
+  if(!fam) return 'sans';
+  if(/JetBrains Mono|monospace/i.test(fam)) return 'mono';
+  if(/Noto Serif/i.test(fam)) return 'noto-serif';
+  if(/Fraunces|serif/i.test(fam)) return 'serif';
+  return 'sans';
 }
 function edtPanel(t){
   document.querySelectorAll('.edt-panel').forEach(function(e){ e.classList.remove('on'); });

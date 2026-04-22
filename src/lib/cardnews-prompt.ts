@@ -181,6 +181,38 @@ export function classifyCategory(topic: string): CategoryKey {
 }
 
 // ─────────────────────────────────────────────────────────────
+// 콘텐츠 말투 프리셋 (카드뉴스 전용 — 댓글/DM 학습 말투와 별개)
+// ─────────────────────────────────────────────────────────────
+export type ContentToneKey = 'warm' | 'friendly' | 'professional' | 'honest' | 'witty' | 'chic'
+
+export const CONTENT_TONES: Record<ContentToneKey, { label: string; guide: string }> = {
+  warm: {
+    label: '다정한',
+    guide: '따뜻하고 부드러운 어조. "~해요", "같이 해봐요" 느낌. 공감 표현 자주.',
+  },
+  friendly: {
+    label: '친근한',
+    guide: 'MZ 캐주얼 톤. 반말 살짝 섞음. "~했어", "완전 좋음" 같은 스타일.',
+  },
+  professional: {
+    label: '전문적',
+    guide: '정보·신뢰 위주. 감정 표현 절제, 근거·수치 중심. "~입니다" 격식 있는 존댓말.',
+  },
+  honest: {
+    label: '솔직한',
+    guide: '직설적·리얼. 단점도 있는 그대로 말함. "광고 아님", "진짜 그랬음" 같은 뉘앙스.',
+  },
+  witty: {
+    label: '재치있는',
+    guide: '가벼운 유머·위트. 과장·반전. "레전드", "이게 말이 됨?" 같은 표현.',
+  },
+  chic: {
+    label: '시크한',
+    guide: '간결·쿨한 톤. 미사여구 없음. 짧은 단문 위주. 감정 표현 최소.',
+  },
+}
+
+// ─────────────────────────────────────────────────────────────
 // 후킹 패턴 (카테고리 불문 공통)
 // ─────────────────────────────────────────────────────────────
 export const HOOK_PATTERNS = [
@@ -227,13 +259,17 @@ export function buildCardnewsSystemPrompt(args: {
   topic: string
   slideCount: number
   toneStyle?: Record<string, unknown>
+  contentTone?: ContentToneKey
 }) {
-  const { topic, slideCount, toneStyle } = args
+  const { topic, slideCount, toneStyle, contentTone } = args
   const cat = classifyCategory(topic)
   const info = CATEGORIES[cat]
 
   const toneGuide = toneStyle
-    ? `\n유저 말투 반영:\n${JSON.stringify(toneStyle, null, 2)}`
+    ? `\n유저 말투 참고:\n${JSON.stringify(toneStyle, null, 2)}`
+    : ''
+  const contentToneInfo = contentTone && CONTENT_TONES[contentTone]
+    ? `\n콘텐츠 말투 (${CONTENT_TONES[contentTone].label}):\n${CONTENT_TONES[contentTone].guide}`
     : ''
 
   const hookExamples = HOOK_PATTERNS
@@ -250,7 +286,8 @@ export function buildCardnewsSystemPrompt(args: {
 
 ## 분류
 카테고리: ${info.name}
-어조 지침: ${info.tone}
+카테고리 어조 지침: ${info.tone}
+${contentToneInfo}
 ${toneGuide}
 
 ## 슬라이드 구성 원칙
