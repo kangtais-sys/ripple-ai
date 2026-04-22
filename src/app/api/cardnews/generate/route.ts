@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   if (!topic || topic.length < 3) {
     return NextResponse.json({ error: '주제를 3자 이상 입력해주세요' }, { status: 400 })
   }
-  const slideCount = Math.min(Math.max(body.slides || 5, 3), 10)
+  const slideCount = Math.min(Math.max(body.slides || 6, 3), 10)
 
   // 유저의 학습된 말투 불러오기 (없으면 기본값)
   const { data: tone } = await sb

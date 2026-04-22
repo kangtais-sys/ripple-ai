@@ -940,7 +940,7 @@ input:checked+.tsl::before{transform:translateX(18px)}
 #cs-4.preview-mode .edt-el.sel{outline:none!important;box-shadow:none!important}
 #cs-4.preview-mode .edt-hnd{display:none!important}
 #cs-4.preview-mode .edt-el{cursor:default!important;pointer-events:none!important}
-.edt-canvas-wrap{width:100%;max-height:560px;aspect-ratio:1;background:var(--bg);border-radius:16px;border:1px solid var(--b);overflow:hidden;position:relative;margin-bottom:14px;margin-left:auto;margin-right:auto;transition:aspect-ratio .25s ease}
+.edt-canvas-wrap{width:100%;max-width:calc(100vw - 24px);max-height:min(80vh, 720px);aspect-ratio:1;background:var(--bg);border-radius:16px;border:1px solid var(--b);overflow:hidden;position:relative;margin-bottom:14px;margin-left:auto;margin-right:auto;transition:aspect-ratio .25s ease}
 .edt-canvas-wrap.sz-sq{aspect-ratio:1/1}
 .edt-canvas-wrap.sz-pt{aspect-ratio:4/5}
 .edt-canvas-wrap.sz-st{aspect-ratio:9/16;max-width:315px}
@@ -4716,7 +4716,7 @@ function showDay(k){
 
 // ═══════════════ CREATE FLOW ═══════════════
 var createStep = 1;
-var createData = { hook:'', body:'', slides:5, size:'sq', template:'clean', channels:['ig'] };
+var createData = { hook:'', body:'', slides:6, size:'sq', template:'clean', channels:['ig'] };
 // 학습된 내 말투: 친근체, 이모지 (:) 🌿 😊 ✨), 반말X, 감사표현 자주, 체크리스트형
 var trendPresets = {
   1: {
@@ -4761,9 +4761,17 @@ function goStep(n){
   if(n===5) {
     setTimeout(function(){
       var cb=document.getElementById('ai-stamp-toggle'); if(cb) toggleAiStamp(cb);
-      // AI가 생성한 caption 반영 (textarea에 값 없을 때만)
+      // AI가 생성한 caption 반영
+      //   ta.value 가 비어있거나 이전 데모 문구('오늘도 나만의 글로우 루틴...')이면 교체
       var ta = document.getElementById('post-caption');
-      if(ta && !ta.value && createData.caption){ ta.value = createData.caption; }
+      if(ta){
+        var isDefault = !ta.value || ta.value.indexOf('글로우 루틴') >= 0;
+        if(isDefault){
+          var fallback = createData.caption
+            || (createData.hook ? createData.hook + '\n\n#' + (createData._lastSource||'').replace(/^direct:/, '').replace(/\s+/g,'') : '');
+          ta.value = fallback || '';
+        }
+      }
     }, 60);
   }
   window.scrollTo(0,0);
@@ -4808,7 +4816,7 @@ async function generatePrompt(){
     var h = await authHeaders();
     var res = await fetch('/api/cardnews/generate', {
       method:'POST', headers: h, credentials:'include',
-      body: JSON.stringify({ topic: topic, slides: 5 })
+      body: JSON.stringify({ topic: topic, slides: createData.slides || 6 })
     });
     var j = await res.json();
     if(!res.ok || !j.hook){
@@ -4862,15 +4870,41 @@ function buildCustomPrompt(topic){
   var caption = topic+' 진짜 꿀팁 공개 '+e+'\n저장해두고 따라해봐요!\n#'+topic.replace(/\s+/g,'')+' #뷰티팁 #데일리 #MILLIMILLI';
   return { hook:hook, body:body, caption:caption };
 }
-function regenPrompt(){
+async function regenPrompt(){
   cs2DisableEdit();
   var src = createData._lastSource||'trend-1';
   if(src.startsWith('trend-')){
     useTrend(parseInt(src.split('-')[1]));
-  } else if(src.startsWith('direct:')){
-    var topic = src.slice(7);
+    return;
+  }
+  if(!src.startsWith('direct:')) return;
+  var topic = src.slice(7);
+  // Claude 재호출 — 현재 createData.slides 수로 다시 생성
+  try {
+    var h = await authHeaders();
+    var res = await fetch('/api/cardnews/generate', {
+      method:'POST', headers: h, credentials:'include',
+      body: JSON.stringify({ topic: topic, slides: createData.slides || 6 })
+    });
+    var j = await res.json();
+    if(!res.ok || !j.hook) throw new Error(j.error || 'AI 재생성 실패');
+    var bodyText = (j.body||[]).map(function(b, i){
+      return '[슬라이드 '+(i+1)+'] '+(b.title||'')+'\n'+(b.text||'');
+    }).join('\n\n');
+    createData.hook = j.hook;
+    createData.body = bodyText;
+    createData.bodySlides = j.body || [];
+    createData.caption = j.caption || '';
+    createData._lastJobId = j.job_id;
+    createData._editorSource = null;  // 편집 캔버스 재생성 트리거
+    document.getElementById('cs2-hook').textContent = j.hook;
+    document.getElementById('cs2-body').textContent = bodyText;
+    document.getElementById('cs2-caption').textContent = j.caption || '';
+  } catch(e){
+    console.warn('[regen] Claude 실패, 로컬 fallback:', e);
     var g = buildCustomPrompt(topic);
     createData.hook=g.hook; createData.body=g.body; createData.caption=g.caption;
+    createData._editorSource = null;
     document.getElementById('cs2-hook').textContent = g.hook;
     document.getElementById('cs2-body').textContent = g.body;
     document.getElementById('cs2-caption').textContent = g.caption;
@@ -7370,6 +7404,48 @@ function attachEdt(el){
   hnd.className='edt-hnd';
   hnd.addEventListener('pointerdown', function(e){ e.stopPropagation(); edtStartResize(e, el); });
   el.appendChild(hnd);
+  // 핀치 줌 (두 손가락) — 이미지/텍스트 크기 조절
+  attachPinchZoom(el);
+}
+
+// 두 손가락 핀치 줌: 요소 width 비율 조절
+function attachPinchZoom(el){
+  var startDist = 0;
+  var startW = 0;
+  var startSize = 0;
+  function dist(t){
+    var dx = t[0].clientX - t[1].clientX;
+    var dy = t[0].clientY - t[1].clientY;
+    return Math.sqrt(dx*dx + dy*dy);
+  }
+  el.addEventListener('touchstart', function(e){
+    if(e.touches.length === 2){
+      e.preventDefault();
+      edtSelect(el);
+      startDist = dist(e.touches);
+      startW = parseFloat(el.style.width) || 40;
+      startSize = parseFloat(el.style.fontSize) || 0;
+    }
+  }, {passive:false});
+  el.addEventListener('touchmove', function(e){
+    if(e.touches.length === 2 && startDist > 0){
+      e.preventDefault();
+      var ratio = dist(e.touches) / startDist;
+      var newW = Math.max(8, Math.min(96, startW * ratio));
+      el.style.width = newW + '%';
+      if(startSize > 0){
+        // 텍스트는 fontSize도 비례 조절
+        var newSize = Math.max(12, Math.min(120, startSize * ratio));
+        el.style.fontSize = newSize + 'px';
+        // 크기 슬라이더 UI 동기화
+        var rz = document.getElementById('edt-text-size');
+        var rzv = document.getElementById('edt-text-size-v');
+        if(rz) rz.value = Math.round(newSize);
+        if(rzv) rzv.textContent = Math.round(newSize) + 'px';
+      }
+    }
+  }, {passive:false});
+  el.addEventListener('touchend', function(){ startDist = 0; });
 }
 var drag=null;
 function edtStart(e){
@@ -7628,13 +7704,14 @@ async function publishPost(){
     var ok = confirm('지금 Instagram에 실제로 게시됩니다. 진행할까요?');
     if(!ok) return;
 
-    showPublishProgress('저장 중', '');
+    showPublishProgress('저장 중', '', 1);
     var jobId2 = await saveCardnewsJob('draft', null);
     if(!jobId2){ hidePublishProgress(); alert('저장 실패'); return; }
 
     updatePublishProgress(
-      'Instagram 업로드 중',
-      '슬라이드별 이미지 생성·업로드가 진행돼요.\n30초~2분 정도 걸립니다.\n페이지를 닫지 마세요.'
+      '발행 요청 전송 중',
+      '슬라이드 이미지 생성·Instagram 업로드를 시작해요',
+      2
     );
 
     try {
@@ -7643,10 +7720,18 @@ async function publishPost(){
         method:'POST', headers: h, credentials:'include'
       });
       var j = await res.json();
-      if(res.ok && j.ok){
-        updatePublishProgress('게시 완료', 'Instagram 피드에서 확인하세요');
+      if(res.status === 202 && j.accepted){
+        // 백그라운드 발행 — 페이지 닫아도 됨
+        updatePublishProgress(
+          '백그라운드 발행 시작',
+          '지금 이 창을 닫아도 발행은 계속 진행돼요.\n보통 30초~2분 후 Instagram 피드에 나타나요.',
+          3
+        );
+        // 15초 뒤 자동으로 상태 확인, 완료되면 알림
+        pollPublishStatus(jobId2, 0);
+      } else if(res.ok && j.ok){
+        updatePublishProgress('게시 완료', 'Instagram 피드에서 확인하세요', 4);
         setTimeout(hidePublishProgress, 1800);
-        setTimeout(function(){ alert('Instagram 게시 완료\nmedia_id: ' + j.media_id); }, 300);
       } else {
         hidePublishProgress();
         alert('발행 실패: ' + (j.detail || j.error || '알 수 없는 오류'));
@@ -7658,42 +7743,129 @@ async function publishPost(){
   }
 }
 
-// 발행 진행 상태 오버레이
-function showPublishProgress(title, sub){
+// 발행 상태 폴링 — 최대 3분 간격 10초
+async function pollPublishStatus(jobId, attempt){
+  if(attempt >= 18) return;  // 3분
+  setTimeout(async function(){
+    try {
+      var h = await authHeaders();
+      var res = await fetch('/api/cardnews/' + jobId + '/publish-now', {
+        headers: h, credentials:'include'
+      });
+      var j = await res.json();
+      if(j.status === 'published'){
+        updatePublishProgress('게시 완료', 'Instagram 피드에서 확인하세요', 4);
+        setTimeout(hidePublishProgress, 2000);
+      } else if(j.status === 'failed'){
+        updatePublishProgress('발행 실패', j.last_error || '원인 확인 필요', 0);
+        setTimeout(hidePublishProgress, 3000);
+      } else {
+        pollPublishStatus(jobId, attempt + 1);
+      }
+    } catch(e){
+      pollPublishStatus(jobId, attempt + 1);
+    }
+  }, 10000);
+}
+
+// 발행 진행 상태 오버레이 (스텝 인디케이터 포함)
+// step: 0=실패, 1=저장, 2=전송, 3=업로드 중, 4=완료 (총 4단계)
+var PP_STEPS = ['저장', '전송', '업로드', '완료'];
+function showPublishProgress(title, sub, step){
   var ov = document.getElementById('publish-progress');
   if(!ov){
     ov = document.createElement('div');
     ov.id = 'publish-progress';
     ov.style.cssText = 'position:fixed;inset:0;background:rgba(15,19,25,.72);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
     ov.innerHTML =
-      '<div style="background:#fff;border-radius:22px;padding:32px 26px;max-width:340px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.3)">' +
-        '<div id="pp-spin" style="width:56px;height:56px;margin:0 auto 20px;border:4px solid #D1FAE5;border-top-color:var(--mint);border-radius:50%;animation:pp-spin 1s linear infinite"></div>' +
-        '<div id="pp-title" style="font-size:18px;font-weight:900;color:var(--t1);margin-bottom:8px;letter-spacing:-.3px">' + (title||'처리 중') + '</div>' +
-        '<div id="pp-sub" style="font-size:13px;color:var(--t3);line-height:1.6;white-space:pre-line">' + (sub||'') + '</div>' +
+      '<div style="background:#fff;border-radius:22px;padding:28px 24px 24px;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)">' +
+        // 스피너
+        '<div style="display:flex;justify-content:center;margin-bottom:18px">' +
+          '<div id="pp-spin" style="width:44px;height:44px;border:3px solid #D1FAE5;border-top-color:var(--mint);border-radius:50%;animation:pp-spin .8s linear infinite"></div>' +
+        '</div>' +
+        // 타이틀 + 서브
+        '<div id="pp-title" style="font-size:17px;font-weight:800;color:var(--t1);margin-bottom:6px;letter-spacing:-.3px;text-align:center">처리 중</div>' +
+        '<div id="pp-sub" style="font-size:12.5px;color:var(--t3);line-height:1.6;white-space:pre-line;text-align:center;margin-bottom:18px"></div>' +
+        // 스텝 인디케이터
+        '<div id="pp-steps" style="display:flex;align-items:center;justify-content:space-between;padding:0 4px">' +
+          PP_STEPS.map(function(s,i){
+            return '<div class="pp-step" data-idx="'+(i+1)+'" style="display:flex;flex-direction:column;align-items:center;flex:1;position:relative">' +
+              '<div class="pp-dot" style="width:24px;height:24px;border-radius:50%;background:#E5E7EB;color:#9CA3AF;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;transition:all .25s;z-index:1">'+(i+1)+'</div>' +
+              '<div style="font-size:10px;color:var(--t3);margin-top:4px;font-weight:600">'+s+'</div>' +
+              (i < PP_STEPS.length - 1 ? '<div class="pp-bar" style="position:absolute;top:12px;left:50%;width:100%;height:2px;background:#E5E7EB;z-index:0"></div>' : '') +
+            '</div>';
+          }).join('') +
+        '</div>' +
+        // 진행률 바
+        '<div style="margin-top:18px;height:4px;background:#F3F4F6;border-radius:2px;overflow:hidden">' +
+          '<div id="pp-progress" style="height:100%;width:0%;background:var(--mint);transition:width .4s ease"></div>' +
+        '</div>' +
       '</div>' +
       '<style>@keyframes pp-spin { from {transform:rotate(0)} to {transform:rotate(360deg)} }</style>';
     document.body.appendChild(ov);
   }
-  updatePublishProgress(title, sub);
+  updatePublishProgress(title, sub, step);
   ov.style.display = 'flex';
 }
-function updatePublishProgress(title, sub){
+function updatePublishProgress(title, sub, step){
   var t = document.getElementById('pp-title');
   var s = document.getElementById('pp-sub');
   var spin = document.getElementById('pp-spin');
+  var prog = document.getElementById('pp-progress');
   if(t && title !== undefined) t.textContent = title;
   if(s) s.textContent = sub || '';
-  if(spin && title && title.indexOf('완료') >= 0){
-    spin.style.borderColor = 'var(--mint)';
-    spin.style.animation = 'none';
-    spin.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="var(--mint)" stroke-width="2.5" style="width:100%;height:100%"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  if(step !== undefined && step !== null){
+    var pct = step === 0 ? 0 : (step / PP_STEPS.length) * 100;
+    if(prog) prog.style.width = pct + '%';
+    // 스텝 dots 활성화
+    document.querySelectorAll('.pp-step').forEach(function(el){
+      var idx = parseInt(el.getAttribute('data-idx'), 10);
+      var dot = el.querySelector('.pp-dot');
+      var bar = el.querySelector('.pp-bar');
+      if(step === 0){
+        if(dot){ dot.style.background = '#FEE2E2'; dot.style.color = 'var(--red)'; dot.textContent = '!'; }
+        if(bar) bar.style.background = '#E5E7EB';
+      } else if(idx < step){
+        // 완료된 단계
+        if(dot){ dot.style.background = 'var(--mint)'; dot.style.color = '#fff'; dot.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" style="width:14px;height:14px"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>'; }
+        if(bar) bar.style.background = 'var(--mint)';
+      } else if(idx === step){
+        // 현재 단계
+        if(dot){ dot.style.background = 'var(--mint)'; dot.style.color = '#fff'; dot.textContent = idx; }
+        if(bar) bar.style.background = '#E5E7EB';
+      } else {
+        // 미래 단계
+        if(dot){ dot.style.background = '#E5E7EB'; dot.style.color = '#9CA3AF'; dot.textContent = idx; }
+        if(bar) bar.style.background = '#E5E7EB';
+      }
+    });
+  }
+  if(spin){
+    if(step === PP_STEPS.length){
+      // 완료 — 체크 아이콘
+      spin.style.borderColor = 'var(--mint)';
+      spin.style.animation = 'none';
+      spin.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="var(--mint)" stroke-width="3" style="width:100%;height:100%;padding:6px"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    } else if(step === 0){
+      // 실패
+      spin.style.borderColor = 'var(--red)';
+      spin.style.animation = 'none';
+      spin.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="3" style="width:100%;height:100%;padding:8px"><line x1="18" y1="6" x2="6" y2="18" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke-linecap="round"/></svg>';
+    } else {
+      // 진행 중 - 스피너 유지
+      spin.style.borderColor = '#D1FAE5';
+      spin.style.borderTopColor = 'var(--mint)';
+      spin.style.animation = 'pp-spin .8s linear infinite';
+      spin.innerHTML = '';
+    }
   }
 }
 function hidePublishProgress(){
   var ov = document.getElementById('publish-progress');
-  if(ov){ ov.style.display = 'none'; /* 다음 호출 위해 spinner 복원 */
+  if(ov){ ov.style.display = 'none';
+    // 다음 호출 위해 복원
     var spin = document.getElementById('pp-spin');
-    if(spin){ spin.style.borderColor='#D1FAE5'; spin.style.borderTopColor='var(--mint)'; spin.style.animation='pp-spin 1s linear infinite'; spin.innerHTML=''; }
+    if(spin){ spin.style.borderColor='#D1FAE5'; spin.style.borderTopColor='var(--mint)'; spin.style.animation='pp-spin .8s linear infinite'; spin.innerHTML=''; }
   }
 }
 
