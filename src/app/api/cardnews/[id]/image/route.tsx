@@ -61,17 +61,40 @@ export async function GET(req: Request, ctx: { params: Promise<Params> }) {
   const body: Slide[] = Array.isArray(job?.prompt_body) ? (job!.prompt_body as Slide[]) : []
   const totalSlides = Math.max(1, body.length > 0 ? body.length + 1 : 1)  // 표지 + 본문
 
-  const palette: Record<string, { bg: string; fg: string; accent: string; muted: string }> = {
-    clean:     { bg: '#FFFFFF', fg: '#1A1F27', accent: '#00C896', muted: '#6B7280' },
-    bold:      { bg: '#1A1F27', fg: '#FFFFFF', accent: '#00C896', muted: '#9CA3AF' },
-    mint:      { bg: '#00C896', fg: '#FFFFFF', accent: '#FFFFFF', muted: '#E5F7F1' },
-    mag:       { bg: '#FAF7F2', fg: '#1A1F27', accent: '#00C896', muted: '#8B7355' },
-    mono:      { bg: '#0F1319', fg: '#FFFFFF', accent: '#00C896', muted: '#A0A0A0' },
-    editorial: { bg: '#FFF9F0', fg: '#2A1E12', accent: '#00A87E', muted: '#7A6654' },
-    pastel:    { bg: '#FCE7F3', fg: '#1A1F27', accent: '#8B5CF6', muted: '#6B21A8' },
-    pop:       { bg: '#FFD233', fg: '#1A1F27', accent: '#FF4D4D', muted: '#7C2D12' },
+  // 템플릿 메타: bg/fg/accent + font + italic
+  const TPL: Record<string, {
+    bg: string
+    bgStops?: Array<{ offset: string; color: string }>  // gradient stops (노이어·럭셔리)
+    fg: string
+    accent: string
+    muted: string
+    font: string        // font-family (SVG에서 쓰는 generic name)
+    weight: number
+    italic?: boolean
+  }> = {
+    clean:     { bg: '#FFFFFF', fg: '#1A1F27', accent: '#00C896', muted: '#6B7280', font: 'sans-serif', weight: 800 },
+    bold:      { bg: '#1A1F27', fg: '#FFFFFF', accent: '#FFD233', muted: '#9CA3AF', font: 'sans-serif', weight: 900 },
+    mag:       { bg: '#FAF7F2', fg: '#1A1F27', accent: '#E11D48', muted: '#8B7355', font: 'serif',       weight: 800 },
+    editorial: { bg: '#FFF9F0', fg: '#2A1E12', accent: '#00A87E', muted: '#7A6654', font: 'serif',       weight: 400, italic: true },
+    mono:      { bg: '#0F1319', fg: '#FFFFFF', accent: '#00C896', muted: '#A0A0A0', font: 'monospace',  weight: 500 },
+    pastel:    { bg: '#FCE7F3', fg: '#1A1F27', accent: '#8B5CF6', muted: '#6B21A8', font: 'sans-serif', weight: 600 },
+    noir: {
+      bg: '#0A0A0A',
+      bgStops: [{ offset: '0%', color: '#0A0A0A' }, { offset: '50%', color: '#1F1F1F' }, { offset: '100%', color: '#0A0A0A' }],
+      fg: '#FFFFFF', accent: '#D4A574', muted: '#6B5B47', font: 'serif', weight: 400, italic: true,
+    },
+    luxury: {
+      bg: '#0F0F0F',
+      bgStops: [{ offset: '0%', color: '#0F0F0F' }, { offset: '50%', color: '#3A2A14' }, { offset: '100%', color: '#0F0F0F' }],
+      fg: '#F5E7C8', accent: '#D4A574', muted: '#8B7355', font: 'sans-serif', weight: 900,
+    },
   }
-  const p = palette[tpl] || palette.clean
+  const p = TPL[tpl] || TPL.clean
+  const italicAttr = p.italic ? 'font-style="italic"' : ''
+  const gradient = p.bgStops
+    ? `<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">${p.bgStops.map(s => `<stop offset="${s.offset}" stop-color="${s.color}"/>`).join('')}</linearGradient></defs>`
+    : ''
+  const bgFill = p.bgStops ? 'url(#g)' : p.bg
 
   // 슬라이드 결정
   //   slide=0 → 표지 (hook)
@@ -87,13 +110,14 @@ export async function GET(req: Request, ctx: { params: Promise<Params> }) {
     const startY = 540 - ((lines.length - 1) * lh) / 2
     svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
-  <rect width="1080" height="1080" fill="${p.bg}"/>
+  ${gradient}
+  <rect width="1080" height="1080" fill="${bgFill}"/>
   <text x="80" y="120" fill="${p.accent}" font-family="sans-serif" font-size="28" font-weight="800" letter-spacing="6">SSOBI</text>
   ${lines.map((line, i) =>
-    `<text x="80" y="${startY + i * lh}" fill="${p.fg}" font-family="sans-serif" font-size="${fontSize}" font-weight="900" letter-spacing="-2">${escapeXml(line)}</text>`
+    `<text x="80" y="${startY + i * lh}" fill="${p.fg}" font-family="${p.font}" font-size="${fontSize}" font-weight="${p.weight}" ${italicAttr} letter-spacing="-2">${escapeXml(line)}</text>`
   ).join('\n  ')}
   <rect x="80" y="${startY + lines.length * lh + 30}" width="120" height="6" fill="${p.accent}" rx="3"/>
-  <text x="80" y="980" fill="${p.muted}" font-family="sans-serif" font-size="22" font-weight="600">저장해두면 두고두고 써먹어요</text>
+  <text x="80" y="980" fill="${p.muted}" font-family="${p.font}" font-size="22" font-weight="600" ${italicAttr}>저장해두면 두고두고 써먹어요</text>
   <text x="1000" y="980" fill="${p.muted}" font-family="sans-serif" font-size="22" font-weight="700" text-anchor="end">${pageLabel}</text>
 </svg>`
   } else {
@@ -110,15 +134,16 @@ export async function GET(req: Request, ctx: { params: Promise<Params> }) {
 
     svg = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1080" height="1080" viewBox="0 0 1080 1080">
-  <rect width="1080" height="1080" fill="${p.bg}"/>
+  ${gradient}
+  <rect width="1080" height="1080" fill="${bgFill}"/>
   <text x="80" y="120" fill="${p.accent}" font-family="sans-serif" font-size="28" font-weight="800" letter-spacing="6">SSOBI</text>
   <text x="80" y="180" fill="${p.accent}" font-family="sans-serif" font-size="24" font-weight="800">${String(slideIdx).padStart(2, '0')}</text>
   ${titleLines.map((line, i) =>
-    `<text x="80" y="${260 + i * titleLH}" fill="${p.fg}" font-family="sans-serif" font-size="${titleFS}" font-weight="900" letter-spacing="-1">${escapeXml(line)}</text>`
+    `<text x="80" y="${260 + i * titleLH}" fill="${p.fg}" font-family="${p.font}" font-size="${titleFS}" font-weight="${p.weight}" ${italicAttr} letter-spacing="-1">${escapeXml(line)}</text>`
   ).join('\n  ')}
   <rect x="80" y="${260 + titleLines.length * titleLH + 30}" width="80" height="4" fill="${p.accent}" rx="2"/>
   ${bodyLines.map((line, i) =>
-    `<text x="80" y="${260 + titleLines.length * titleLH + 90 + i * bodyLH}" fill="${p.fg}" font-family="sans-serif" font-size="${bodyFS}" font-weight="500" opacity="0.9">${escapeXml(line)}</text>`
+    `<text x="80" y="${260 + titleLines.length * titleLH + 90 + i * bodyLH}" fill="${p.fg}" font-family="${p.font}" font-size="${bodyFS}" font-weight="500" ${italicAttr} opacity="0.92">${escapeXml(line)}</text>`
   ).join('\n  ')}
   <text x="1000" y="980" fill="${p.muted}" font-family="sans-serif" font-size="22" font-weight="700" text-anchor="end">${pageLabel}</text>
 </svg>`

@@ -2155,12 +2155,19 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         </div>
         <div class="tpl-name">볼드</div>
       </div>
-      <div class="tpl-item" onclick="selectTpl(this,'mint')" style="background:linear-gradient(160deg,#00C896,#06B6D4)">
+      <div class="tpl-item" onclick="selectTpl(this,'noir')" style="background:linear-gradient(135deg,#0A0A0A,#1F1F1F 50%,#0A0A0A)">
         <div class="tpl-prev" style="color:#fff">
-          <div style="width:34px;height:34px;border:3px solid rgba(255,255,255,.5);border-radius:50%;margin-bottom:10px"></div>
-          <div style="font-size:12px;font-weight:900;line-height:1.2;color:#fff">글로우<br>루틴</div>
+          <div style="font-family:'Fraunces','Pretendard',serif;font-style:italic;font-size:10px;color:#D4A574;letter-spacing:.2em;margin-bottom:8px">— NOIR</div>
+          <div style="font-family:'Fraunces','Pretendard',serif;font-style:italic;font-size:14px;font-weight:400;color:#fff;line-height:1.15;letter-spacing:-.3px">Midnight<br>Story.</div>
         </div>
-        <div class="tpl-name">민트 글로우</div>
+        <div class="tpl-name">누아르</div>
+      </div>
+      <div class="tpl-item" onclick="selectTpl(this,'luxury')" style="background:linear-gradient(135deg,#0F0F0F,#3A2A14 50%,#0F0F0F)">
+        <div class="tpl-prev" style="color:#F5E7C8">
+          <div style="font-size:9px;font-weight:800;color:#D4A574;letter-spacing:.3em;margin-bottom:8px">LUXURY</div>
+          <div style="font-size:13px;font-weight:900;color:#F5E7C8;line-height:1.15;letter-spacing:-.3px">GOLD<br>HOUR</div>
+        </div>
+        <div class="tpl-name">럭셔리</div>
       </div>
       <div class="tpl-item" onclick="selectTpl(this,'mag')" style="background:linear-gradient(160deg,#FFF1F3,#FFE8EC)">
         <div class="tpl-prev">
@@ -2168,13 +2175,6 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
           <div style="font-size:13px;font-weight:900;color:var(--t1);line-height:1.15;font-family:serif">매거진<br>스타일</div>
         </div>
         <div class="tpl-name" style="color:var(--t1);text-shadow:none">매거진</div>
-      </div>
-      <div class="tpl-item" onclick="selectTpl(this,'pop')" style="background:linear-gradient(160deg,#FDE68A,#FB923C)">
-        <div class="tpl-prev">
-          <div style="font-size:22px;margin-bottom:4px">✨</div>
-          <div style="font-size:13px;font-weight:900;color:var(--t1);line-height:1.2">POP<br>ENERGY</div>
-        </div>
-        <div class="tpl-name" style="color:var(--t1);text-shadow:none">팝</div>
       </div>
       <div class="tpl-item" onclick="selectTpl(this,'editorial')" style="background:#FAF8F4">
         <div class="tpl-prev">
@@ -7160,9 +7160,9 @@ function tplBg(t){
   return ({
     clean:'linear-gradient(160deg,#fff,#F9FAFB)',
     bold:'linear-gradient(160deg,#1A1F27,#374151)',
-    mint:'linear-gradient(160deg,#00C896,#06B6D4)',
+    noir:'linear-gradient(135deg,#0A0A0A,#1F1F1F 50%,#0A0A0A)',
+    luxury:'linear-gradient(135deg,#0F0F0F,#3A2A14 50%,#0F0F0F)',
     mag:'linear-gradient(160deg,#FFF1F3,#FFE8EC)',
-    pop:'linear-gradient(160deg,#FDE68A,#FB923C)',
     editorial:'#FAF8F4',
     mono:'#0F1319',
     pastel:'linear-gradient(160deg,#FDF2F8,#E0E7FF)'
@@ -7171,9 +7171,32 @@ function tplBg(t){
 function tplText(t){
   if(t==='custom'){
     var bg = window._customTplBg||'';
-    return /#1A1F27|#FF4D4D|#00C896|#06B6D4|#6366F1|#E1306C|#0F1319/.test(bg) ? '#fff':'#1A1F27';
+    return /#1A1F27|#FF4D4D|#00C896|#06B6D4|#6366F1|#E1306C|#0F1319|#0A0A0A/.test(bg) ? '#fff':'#1A1F27';
   }
-  return (t==='bold'||t==='mint'||t==='mono')?'#fff':'#1A1F27';
+  if(t==='luxury') return '#F5E7C8';  // gold-cream
+  return (t==='bold'||t==='mono'||t==='noir')?'#fff':'#1A1F27';
+}
+// 템플릿별 기본 폰트 (텍스트 요소 생성 시 자동 적용)
+function tplFont(t){
+  return ({
+    clean:     "'Pretendard','Noto Sans KR',sans-serif",
+    bold:      "'Pretendard','Noto Sans KR',sans-serif",
+    mag:       "'Fraunces','Pretendard','Noto Serif KR',serif",
+    editorial: "'Fraunces','Pretendard','Noto Serif KR',serif",
+    mono:      "'JetBrains Mono','Pretendard',monospace",
+    pastel:    "'Pretendard','Noto Sans KR',sans-serif",
+    noir:      "'Fraunces','Pretendard','Noto Serif KR',serif",
+    luxury:    "'Pretendard','Noto Sans KR',sans-serif",
+  })[t] || "'Pretendard','Noto Sans KR',sans-serif";
+}
+function tplWeight(t){
+  return ({clean:700, bold:900, mag:800, editorial:400, mono:500, pastel:600, noir:400, luxury:900})[t] || 700;
+}
+function tplItalic(t){
+  return t==='editorial' || t==='noir';
+}
+function tplAccent(t){
+  return ({clean:'#00C896', bold:'#FFD233', mag:'#E11D48', editorial:'#00A87E', mono:'#00C896', pastel:'#8B5CF6', noir:'#D4A574', luxury:'#D4A574'})[t] || '#00C896';
 }
 function makeTextEl(text, opts){
   var div = document.createElement('div');
@@ -7183,7 +7206,10 @@ function makeTextEl(text, opts){
   div.style.width = opts.w+'%';
   div.style.fontSize = opts.size+'px';
   div.style.color = opts.color;
-  div.style.fontWeight = opts.weight;
+  div.style.fontWeight = opts.weight || tplWeight(createData.template);
+  // 템플릿별 기본 폰트 자동 적용 (개별 요소에서 툴바로 덮어쓰기 가능)
+  div.style.fontFamily = opts.fontFamily || tplFont(createData.template);
+  if(opts.italic || tplItalic(createData.template)) div.style.fontStyle = 'italic';
   div.textContent = text;
   attachEdt(div);
   return div;
