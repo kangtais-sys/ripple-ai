@@ -1,12 +1,20 @@
 // POST /api/cardnews/generate
-// body: { topic: string, slides?: number (default 5) }
-// resp: { hook, body: [{title, text}...], caption, job_id }
+// body: { topic, slides?, template?, contentTone?, accountConcept?, researchData? }
+// resp: { hook, body: [{title, text}...], caption, category, image_keywords, image_plan, job_id }
 //
-// 유저의 tone_profiles.learned_style을 읽어 그 말투로 캐러셀 프롬프트 생성
+// 유저의 tone_profiles.learned_style 을 읽어 그 말투로 카드뉴스 생성.
+// CONTENT_GENERATION_PROMPT 를 사용 (7장 기본, 후킹 점수 자체평가).
+// 이미지 계획(planSlideImages)은 프론트가 Pinterest/올영/Gemini 라우팅에 쓸 정보.
 
 import { getUserFromRequest, adminClient } from '@/lib/auth-helper'
 import { logAIUsage } from '@/lib/ai-usage'
-import { buildCardnewsSystemPrompt, classifyCategory } from '@/lib/cardnews-prompt'
+import {
+  buildContentGenerationPrompt,
+  classifyCategory,
+  planSlideImages,
+  ensureCaption,
+  scoreHook,
+} from '@/lib/cardnews-prompt'
 import { NextRequest, NextResponse } from 'next/server'
 
 export async function POST(req: NextRequest) {
@@ -20,30 +28,41 @@ export async function POST(req: NextRequest) {
     slides?: number
     template?: string
     contentTone?: 'warm' | 'friendly' | 'professional' | 'honest' | 'witty' | 'chic'
+    accountConcept?: string
+    researchData?: string
   }
   const topic = (body.topic || '').trim()
   if (!topic || topic.length < 3) {
     return NextResponse.json({ error: '주제를 3자 이상 입력해주세요' }, { status: 400 })
   }
-  const slideCount = Math.min(Math.max(body.slides || 6, 3), 10)
+  const slideCount = Math.min(Math.max(body.slides || 7, 3), 10)
   const contentTone = body.contentTone
 
-  // 유저의 학습된 말투 불러오기 (없으면 기본값)
+  // 유저의 학습된 말투 + 브랜드 컨텍스트 불러오기
   const { data: tone } = await sb
     .from('tone_profiles')
-    .select('learned_style')
+    .select('learned_style, brand_context')
     .eq('user_id', user.id)
     .maybeSingle()
   const style = (tone?.learned_style as Record<string, unknown>) || {
-    tone: '친근하고 밝은',
-    sentence_ending: '~요, ~ㅎㅎ',
-    emoji_style: '적절히 사용 (✨🌿😊)',
+    tone: '친근하고 솔직한',
+    sentence_ending: '~했어, ~임, ~야',
+    emoji_style: '적절히 (✨🌿😊)',
     length: '짧고 임팩트',
-    characteristics: ['팔로워 공감', '저장 유도'],
+    characteristics: ['MZ 반말', '솔직 후기', '공감 유도'],
   }
+  const accountConcept = body.accountConcept
+    || (tone?.brand_context as string)
+    || '한국 MZ 세대 SNS 크리에이터'
 
-  // 카테고리 자동 분류 + 범용 시스템 프롬프트 생성
-  const prompt = buildCardnewsSystemPrompt({ topic, slideCount, toneStyle: style, contentTone })
+  const prompt = buildContentGenerationPrompt({
+    accountConcept,
+    topic,
+    researchData: body.researchData || '',
+    slideCount,
+    toneStyle: style,
+    contentTone,
+  })
   const category = classifyCategory(topic)
 
   try {
@@ -73,6 +92,7 @@ export async function POST(req: NextRequest) {
 
     let parsed: {
       hook?: string
+      hook_score?: number
       body?: Array<{ title?: string; text?: string }>
       caption?: string
       category?: string
@@ -84,6 +104,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'invalid JSON from Claude', raw: match[0] }, { status: 502 })
     }
 
+    // 후킹 점수 서버측 재검증 (Claude 자체평가 참고)
+    const serverScore = parsed.hook ? scoreHook(parsed.hook).total : 0
+    const claudeScore = typeof parsed.hook_score === 'number' ? parsed.hook_score : 0
+
+    // 이미지 계획 생성 (Pinterest/올영/Gemini 라우팅 근거)
+    const cat = (parsed.category as ReturnType<typeof classifyCategory>) || category
+    const imagePlan = planSlideImages({ topic, category: cat, slideCount })
+
+    // 캡션 자동 조립 (Claude가 비웠을 경우)
+    const caption = ensureCaption({
+      rawCaption: parsed.caption,
+      hook: parsed.hook || topic,
+      bodySlides: parsed.body || [],
+      category: cat,
+    })
+
     // DB에 잡 기록 (status draft)
     const { data: job } = await sb
       .from('card_news_jobs')
@@ -92,21 +128,24 @@ export async function POST(req: NextRequest) {
         topic,
         prompt_hook: parsed.hook || null,
         prompt_body: parsed.body || [],
-        prompt_caption: parsed.caption || null,
+        prompt_caption: caption,
         template: body.template || 'clean',
         slide_count: slideCount,
         status: 'draft',
         meta: {
           model: 'claude-sonnet-4-20250514',
           tokens: data.usage || null,
-          category: parsed.category || category,
+          category: cat,
           image_keywords: parsed.image_keywords || [],
+          image_plan: imagePlan,
+          hook_score_claude: claudeScore,
+          hook_score_server: serverScore,
         },
       })
       .select('id')
       .single()
 
-    // AI 토큰·비용 로그 (가격 책정 근거)
+    // AI 토큰·비용 로그
     await logAIUsage({
       userId: user.id,
       feature: 'cardnews',
@@ -118,10 +157,13 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       hook: parsed.hook || '',
+      hook_score: claudeScore,
+      hook_score_server: serverScore,
       body: parsed.body || [],
-      caption: parsed.caption || '',
-      category: parsed.category || category,
+      caption,
+      category: cat,
       image_keywords: parsed.image_keywords || [],
+      image_plan: imagePlan,
       job_id: job?.id,
     })
   } catch (e) {

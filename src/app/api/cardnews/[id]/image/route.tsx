@@ -149,15 +149,6 @@ function renderCover(hook: string, p: TplMeta, pageLabel: string) {
       }}
     >
       <div style={{
-        fontSize: 28,
-        fontWeight: 800,
-        letterSpacing: 6,
-        color: p.accent,
-        marginBottom: 80,
-      }}>
-        SSOBI
-      </div>
-      <div style={{
         display: 'flex',
         flexDirection: 'column',
         flex: 1,
@@ -219,17 +210,7 @@ function renderBody(slide: Slide, idx: number, p: TplMeta, pageLabel: string) {
         marginBottom: 40,
       }}>
         <div style={{
-          fontSize: 28,
-          fontWeight: 800,
-          letterSpacing: 6,
-          color: p.accent,
-          marginBottom: 12,
-          fontFamily: 'Noto',
-        }}>
-          SSOBI
-        </div>
-        <div style={{
-          fontSize: 28,
+          fontSize: 32,
           fontWeight: 800,
           color: p.accent,
           fontFamily: 'Noto',
