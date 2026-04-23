@@ -2042,10 +2042,10 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     </button>
 
     <div class="sec-eye" style="margin-top:4px">FOR YOU</div>
-    <div class="sec-t xl">유민혜님께 딱 맞는 오늘 주제</div>
+    <div class="sec-t xl" id="for-you-title">유민혜님께 딱 맞는 오늘 주제</div>
     <div class="trend-list" id="trend-carousel">
-
-    <div class="trend-card" onclick="useTrend(1)">
+    <!-- 카드 3개는 renderDailyTrends()가 동적으로 주입 -->
+    <div class="trend-card" onclick="useTrend(1)" style="display:none">
       <div class="trend-rank r1">1</div>
       <div class="trend-body-wrap">
         <div class="trend-src">
@@ -2130,7 +2130,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <span>적용</span>
       </button>
-      <button class="cs2-act" onclick="regenPrompt()">
+      <button class="cs2-act" id="cs2-regen-btn" onclick="regenPrompt()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6M1 20v-6h6M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <span>다시 생성</span>
       </button>
@@ -4830,14 +4830,90 @@ function goStep(n){
   window.scrollTo(0,0);
 }
 function createBack(){ if(createStep>1) goStep(createStep-1); }
-function useTrend(n){
-  var p = trendPresets[n]||trendPresets[1];
-  createData.hook = p.hook; createData.body = p.body; createData.caption = p.caption||'';
-  var h=document.getElementById('cs2-hook'); if(h) h.textContent = p.hook;
-  var b=document.getElementById('cs2-body'); if(b) b.textContent = p.body;
-  var c=document.getElementById('cs2-caption'); if(c) c.textContent = p.caption||'';
-  createData._lastSource = 'trend-'+n;
-  goStep(2);
+// 추천 주제 풀 — 매일 9시 3개 로테이션
+var DAILY_TOPIC_POOL = [
+  // 뷰티/제품
+  { topic:'한국인이 절대 안 쓰는 7가지 스킨케어 실수', chip:'뷰티', meta:'🔥 Hot 트렌드' },
+  { topic:'피부과 의사가 절대 안 사는 성분 3가지', chip:'성분', meta:'성분표 체크' },
+  { topic:'2026 유행 글래스 스킨 꿀팁 5가지', chip:'트렌드', meta:'유리 같은 피부' },
+  { topic:'올리브영 세일 때 꼭 사야 할 베스트 5', chip:'쇼핑', meta:'알뜰 뷰티' },
+  { topic:'드럭스토어 1만원 이하 가성비 3선', chip:'가성비', meta:'돈 아끼기' },
+  // 음식/카페
+  { topic:'서울 숨은 브런치 카페 BEST 3', chip:'맛집', meta:'주말 데이트' },
+  { topic:'집에서 카페 음료 똑같이 만드는 꿀팁', chip:'홈카페', meta:'집콕 감성' },
+  { topic:'편의점에서 사먹으면 놀라는 디저트 4가지', chip:'편의점', meta:'실시간 인기' },
+  // 여행
+  { topic:'2박3일 국내 여행 BEST 코스 추천', chip:'여행', meta:'주말 플랜' },
+  { topic:'일본 도쿄 현지인만 아는 맛집 5곳', chip:'해외여행', meta:'로컬 픽' },
+  // 패션/인테리어
+  { topic:'MZ가 실제로 입는 올봄 코디 BEST 5', chip:'패션', meta:'감성 코디' },
+  { topic:'원룸을 북유럽 감성으로 꾸미는 법', chip:'인테리어', meta:'방꾸미기' },
+  // 운동/건강
+  { topic:'하루 10분 홈트로 체지방 감량하기', chip:'홈트', meta:'다이어트' },
+  { topic:'필라테스 초보가 절대 놓치면 안 되는 포인트', chip:'필라테스', meta:'초보 가이드' },
+  // 돈/절약
+  { topic:'월급 200만원으로 100만원 모으는 법', chip:'재테크', meta:'절약 실전' },
+  { topic:'통신비·보험료 10만원 줄이는 꿀팁', chip:'절약', meta:'고정비 절감' },
+  // 생활/꿀팁
+  { topic:'아이폰 유용하지만 아무도 안 쓰는 기능 5가지', chip:'IT', meta:'숨은 기능' },
+  { topic:'집에서 바로 하는 5분 청소 루틴', chip:'살림', meta:'생활 팁' },
+  { topic:'이직 성공한 사람들의 공통 이력서 스킬', chip:'커리어', meta:'취업 팁' },
+  { topic:'취미로 월 30만원 버는 방법 3가지', chip:'부수입', meta:'N잡' },
+];
+// 오늘 시드 계산 (한국 시간 9시 기준)
+//   9시 전이면 '어제' 날짜 사용 (밤새 같은 추천)
+function dailySeed(){
+  var now = new Date();
+  // KST 보정 (UTC+9)
+  var kst = new Date(now.getTime() + (9 * 60 * 60 * 1000 - now.getTimezoneOffset() * 60 * 1000));
+  if(kst.getUTCHours() < 9){
+    kst.setUTCDate(kst.getUTCDate() - 1);
+  }
+  return kst.getUTCFullYear() * 10000 + (kst.getUTCMonth() + 1) * 100 + kst.getUTCDate();
+}
+// 시드로 섞어서 3개 고르기 (deterministic)
+function pickDailyTrends(){
+  var seed = dailySeed();
+  var pool = DAILY_TOPIC_POOL.slice();
+  // Fisher–Yates with seeded random
+  var rnd = function(){
+    seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+    return seed / 0x7fffffff;
+  };
+  for(var i = pool.length - 1; i > 0; i--){
+    var j = Math.floor(rnd() * (i + 1));
+    var tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp;
+  }
+  return pool.slice(0, 3);
+}
+// 트렌드 카드 렌더
+function renderDailyTrends(){
+  var container = document.getElementById('trend-carousel');
+  if(!container) return;
+  var picks = pickDailyTrends();
+  window.__DAILY_TRENDS = picks;
+  // 기존 카드 전체 제거 후 재주입
+  container.innerHTML = picks.map(function(t, i){
+    return '<div class="trend-card" onclick="useTrend('+(i+1)+')">' +
+      '<div class="trend-rank r'+(i+1)+'">'+(i+1)+'</div>' +
+      '<div class="trend-body-wrap">' +
+        '<div class="trend-src"><span class="trend-src-chip src-reddit">'+t.chip+'</span></div>' +
+        '<div class="trend-hook">'+t.topic+'</div>' +
+        '<div class="trend-meta">'+t.meta+'</div>' +
+      '</div>' +
+      '<div class="trend-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
+    '</div>';
+  }).join('');
+}
+// 트렌드 카드 클릭 → direct-topic 필드에 넣고 Claude 생성 트리거
+async function useTrend(n){
+  var picks = window.__DAILY_TRENDS || pickDailyTrends();
+  var t = picks[n - 1] || picks[0];
+  if(!t) return;
+  var topicEl = document.getElementById('direct-topic');
+  if(topicEl){ topicEl.value = t.topic; toggleDirectBtn(); }
+  // 곧바로 generatePrompt (사용자가 버튼 누르지 않아도 바로 AI 생성 진행)
+  await generatePrompt();
 }
 function toggleDirectBtn(){
   var el = document.getElementById('direct-topic');
@@ -4929,14 +5005,19 @@ function buildCustomPrompt(topic){
 async function regenPrompt(){
   cs2DisableEdit();
   var src = createData._lastSource||'trend-1';
-  if(src.startsWith('trend-')){
-    useTrend(parseInt(src.split('-')[1]));
+  // trend 도 장수 바뀌면 Claude 로 재생성
+  var topic;
+  if(src.startsWith('direct:')){
+    topic = src.slice(7);
+  } else if(src.startsWith('trend-')){
+    var preset = trendPresets[parseInt(src.split('-')[1])] || trendPresets[1];
+    topic = preset.hook || preset.body?.slice(0, 50) || '트렌드';
+    createData._lastSource = 'direct:' + topic;  // 이후 재생성은 direct 로
+  } else {
     return;
   }
-  if(!src.startsWith('direct:')) return;
-  var topic = src.slice(7);
-  // 버튼 시각 피드백
-  var regenBtn = document.querySelector('button.cs2-act[onclick="regenPrompt()"]');
+  // 버튼 시각 피드백 (ID로 정확히 찾기)
+  var regenBtn = document.getElementById('cs2-regen-btn');
   var originalHtml = regenBtn ? regenBtn.innerHTML : '';
   if(regenBtn){
     regenBtn.classList.add('shimmer-text');
@@ -5505,6 +5586,8 @@ function discFinish(){
 })();
 
 document.addEventListener('DOMContentLoaded', function(){
+  // 오늘 추천 주제 3개 동적 렌더 (매일 9시 KST 자동 로테이션)
+  try { renderDailyTrends(); } catch(e) { console.warn('[daily-trends]', e); }
   var car = document.getElementById('trend-carousel');
   if(!car) return;
   car.addEventListener('scroll', function(){
