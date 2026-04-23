@@ -46,24 +46,32 @@ export async function publishCardnewsJob(
 
   // 슬라이드 개수 결정: 표지(1) + body 배열 길이
   const body = Array.isArray(job.prompt_body) ? job.prompt_body : []
-  const totalSlides = Math.min(10, body.length > 0 ? body.length + 1 : 1) // IG 최대 10장
+  const defaultCount = Math.min(10, body.length > 0 ? body.length + 1 : 1)
+
+  // slide_overrides: 유저가 편집기에서 캡처한 이미지 URL 우선 (meta.slide_overrides)
+  const meta = (job.meta || {}) as Record<string, unknown>
+  const overrides = Array.isArray(meta.slide_overrides) ? meta.slide_overrides as string[] : []
+  const totalSlides = Math.min(10, Math.max(defaultCount, overrides.length)) // IG 최대 10장
 
   try {
     let finalCreationId: string
 
+    // 슬라이드 N의 이미지 URL 결정:
+    //   overrides[N] 이 있으면 유저 캡처 이미지, 없으면 Satori 렌더 엔드포인트
+    const slideUrl = (i: number): string => {
+      if (overrides[i]) return overrides[i]
+      return `${appBaseUrl}/api/cardnews/${job.id}/image?slide=${i}`
+    }
+
     if (totalSlides === 1) {
-      // 단일 이미지 발행
-      finalCreationId = await createSingleMedia(igUserId, token, `${appBaseUrl}/api/cardnews/${job.id}/image?slide=0`, caption)
+      finalCreationId = await createSingleMedia(igUserId, token, slideUrl(0), caption)
     } else {
-      // 캐러셀 발행
       const childIds: string[] = []
       for (let i = 0; i < totalSlides; i++) {
-        const childId = await createCarouselChild(igUserId, token, `${appBaseUrl}/api/cardnews/${job.id}/image?slide=${i}`)
-        // 각 child 컨테이너 FINISHED 대기
+        const childId = await createCarouselChild(igUserId, token, slideUrl(i))
         await pollFinished(childId, token)
         childIds.push(childId)
       }
-      // 부모 캐러셀 컨테이너
       finalCreationId = await createCarouselParent(igUserId, token, childIds, caption)
     }
 
