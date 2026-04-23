@@ -183,15 +183,14 @@ function renderCover(hook: string, p: TplMeta, pageLabel: string) {
       </div>
       <div style={{
         display: 'flex',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-end',
         alignItems: 'flex-end',
         color: p.muted,
         fontSize: 22,
-        fontWeight: 600,
-        fontStyle: p.italic ? 'italic' : 'normal',
+        fontWeight: 700,
+        fontFamily: 'Noto',
       }}>
-        <div>저장해두면 두고두고 써먹어요</div>
-        <div style={{ fontWeight: 700, fontStyle: 'normal', fontFamily: 'Noto' }}>{pageLabel}</div>
+        {pageLabel}
       </div>
     </div>
   )
