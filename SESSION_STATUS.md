@@ -159,6 +159,185 @@ DB enum: `free/basic/premium/business` 유지 (migration 회피)
 
 ## 📝 Meta 제출 폼 영어 설명문 (권한별)
 
+## 🎯 최종 Meta 제출 영어 설명문 (DUAL-FLOW 강조 버전 · 2026-04-23)
+
+**핵심 전략**: Ssobi의 이중 플로우 (AI 분류 → 자동/승인 분기)를 안전성 · 속도 균형으로 강조.
+
+### [FINAL] instagram_business_manage_comments
+
+```
+DUAL-FLOW AI COMMENT ASSISTANT (Safety + Speed)
+
+Ssobi uses Claude AI to draft reply suggestions for incoming
+Instagram comments. To balance user safety with Instagram's
+recommendation for fast responses, we use a two-path design
+driven by AI content classification:
+
+PATH 1 — Auto-respond (neutral/positive, non-sensitive):
+- AI classifies comment → urgency "low" + sentiment "neutral/
+  positive" + NOT a business inquiry
+- Reply posted via Graph API /{comment_id}/replies immediately
+- Meets Meta's engagement-speed expectation
+
+PATH 2 — Human approval (anything sensitive):
+- AI flags: negative sentiment, refund requests, business
+  inquiries, complaints, legal concerns
+- Draft queued in "긴급 응대 대기 (Pending)" — NOT sent yet
+- User reviews + taps "승인·발송 (Approve & Send)" to post
+- Prevents AI hallucination on critical content
+
+Additional safety layers:
+• AI returns "SKIP" for spam/offensive input — no reply generated
+• Creator's learned tone profile applied — human-sounding replies
+• "[AI Supported]" transparency stamp in caption (user-toggleable)
+• Rate limited per user plan (300–6600 replies/month)
+• All replies logged in reply_logs for user audit
+
+This design is stricter than pure auto-reply and faster than
+pure manual approval — balancing Meta's speed expectations
+with user safety.
+
+Verify in video: Reviewer taps "🧪 긴급 댓글" simulating a
+negative comment → draft appears in Pending queue (NOT posted
+to IG) → Reviewer taps "승인·발송" → Ssobi posts via Graph API.
+A normal comment would have auto-posted instantly (not shown
+in video to emphasize safety path).
+```
+
+### [FINAL] instagram_business_manage_messages
+
+```
+DUAL-FLOW AI DM ASSISTANT
+
+Same dual-flow design as comments, strictly complying with
+Instagram's 24-hour messaging window:
+
+PATH 1 — Auto-respond to neutral inquiries (within 24h window):
+- AI-drafted reply sent via Graph API /me/messages
+- Fast response preserves creator's engagement metrics
+- ONLY replies to existing conversations (never initiates)
+
+PATH 2 — Human approval for sensitive:
+- Refund/complaint/business proposal → Pending queue
+- User explicitly approves before send
+- Prevents wrong-content in high-stakes DMs
+
+Safeguards:
+• Never sends unsolicited DMs (no cold outreach)
+• 24-hour window strict compliance — skipped if expired
+• Spam/offensive → SKIP, no draft
+• Content filter before send
+
+Verify in video at 0:45-0:55: reviewer simulates DM, AI drafts,
+taps approve, message sent via Graph API /me/messages.
+```
+
+### [FINAL] instagram_business_content_publish
+
+```
+USER-CONTROLLED CONTENT PUBLISHING
+
+Ssobi generates K-lifestyle carousel posts using Claude AI based
+on a topic provided by the user. Each slide is user-reviewable
+in an editor before publishing.
+
+User flow (all steps require explicit user action):
+1. User inputs topic (e.g., "봄철 스킨케어 꿀팁").
+2. Claude AI drafts 6 slides + caption.
+3. User edits slides, captions, selects template/size.
+4. User selects "Instagram" as target channel.
+5. User picks publish time (now or scheduled).
+6. User taps "게시·예약 확정 (Confirm Publish)".
+7. ONLY THEN does Ssobi POST to Graph API /media + /media_publish.
+
+No post is published without step 6. Scheduled posts respect
+user's chosen time; user can cancel before that.
+
+Content transparency:
+"[AI Supported]" stamp auto-added to captions (user-toggleable)
+— aligns with Meta's AI disclosure expectations.
+
+Verify in video B at 0:35-0:55 — full flow from topic input to
+final confirmation tap.
+```
+
+### [FINAL] instagram_business_basic
+
+```
+Ssobi retrieves the user's Instagram Business profile (username,
+user_id) via OAuth to link the connected account to the Ssobi
+dashboard. Used only for account identification and display —
+no profile data stored beyond what's necessary.
+
+Data minimization:
+- Stored: username, user_id, access_token
+- NOT stored: followers list, post content, DMs (fetched on
+  demand, cached briefly)
+
+Verify in video A at 0:10 — OAuth completion shows
+"@millimilli.official 연동 완료" confirmation display.
+```
+
+### [FINAL] instagram_business_manage_insights
+
+```
+Ssobi displays the user's own Instagram performance metrics
+(followers, reach, impressions, profile views, website clicks)
+on the home dashboard and analytics tab. All data comes from
+Graph API Insights endpoint for the user's own account only —
+Ssobi never accesses insights of accounts the user doesn't own.
+
+Privacy:
+- Data scoped to authenticated user's IG Business account only
+- No aggregation or sharing with third parties
+- User can disconnect anytime ("해제" button in 내 정보)
+
+Verify in video B at 0:05-0:12 (home) and 0:58-1:00 (analytics).
+```
+
+### [FINAL] Test User Credentials
+
+```
+Test Email: kangtais@naver.com
+Password: [비번]
+
+REVIEWER GUIDE
+
+The app demonstrates Ssobi's Human-in-the-Loop AI assistant
+for Korean creators. Key safety feature: NO auto-posting to
+Instagram without explicit user approval for sensitive content.
+
+Content classified as "urgent" (negative, refund, business)
+always requires manual approval. Neutral comments may auto-
+reply (Meta speed guidance). See DUAL-FLOW explanations above.
+
+To test the approval flow:
+1. Login → 실시간 관리 → 긴급 (Urgent) tab
+2. Tap "🧪 긴급 댓글 (승인 대기)" — simulates incoming comment
+   without affecting real Instagram
+3. Observe: AI draft appears in pending queue (not sent yet)
+4. Review the draft text (in user's learned tone)
+5. Tap "승인·발송 (Approve & Send)" to complete the flow
+
+For content_publish:
+1. Tap 만들기 (Create) → input topic
+2. Watch Claude generate 6-slide carousel
+3. Edit/review in canvas
+4. 게시하기 → Instagram → 지금 바로 → 확정
+
+Dev simulator URL: https://ssobi.ai/app?dev=1
+
+All simulations use fake IDs — no real Instagram impact during
+review. OAuth was captured in the submitted videos.
+
+Instagram account @sisru_doku is pre-linked to this Ssobi
+account via Instagram Tester flow.
+```
+
+---
+
+## 이전 제출 자료 (참고용)
+
 ### `instagram_business_basic`
 **영상**: `https://youtube.com/shorts/mZ84OTgDXuI`
 
