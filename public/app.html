@@ -2348,7 +2348,10 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <input id="edt-img-input" type="file" accept="image/*" style="display:none" onchange="edtImgUpload(event)">
 
     <div class="edt-panel" id="edt-panel-text">
-      <div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:8px">선택 요소 꾸미기 <span style="color:var(--t3);font-weight:500;margin-left:4px">·  텍스트는 직접 더블탭해서 수정</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:11px;font-weight:700;color:var(--t3)">선택 요소 꾸미기 <span style="color:var(--t3);font-weight:500;margin-left:4px">·  더블탭해서 텍스트 수정</span></div>
+        <button type="button" onclick="edtClosePanel()" style="width:24px;height:24px;border-radius:50%;border:none;background:var(--bg);color:var(--t2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;flex-shrink:0" aria-label="닫기">✕</button>
+      </div>
       <div class="edt-row">
         <div class="edt-row-lbl">크기</div>
         <input type="range" id="edt-text-size" min="12" max="64" value="24">
@@ -2402,7 +2405,10 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     </div>
 
     <div class="edt-panel" id="edt-panel-layer">
-      <div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:10px" id="edt-layer-hint">선택한 요소를 앞뒤로 보내요</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+        <div style="font-size:11px;font-weight:700;color:var(--t3)" id="edt-layer-hint">선택한 요소를 앞뒤로 보내요</div>
+        <button type="button" onclick="edtClosePanel()" style="width:24px;height:24px;border-radius:50%;border:none;background:var(--bg);color:var(--t2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1" aria-label="닫기">✕</button>
+      </div>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:6px">
         <button class="edt-tool" onclick="edtLayer('front')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="12" height="12" rx="2" opacity=".4"/><rect x="9" y="9" width="12" height="12" rx="2"/></svg>맨 앞</button>
         <button class="edt-tool" onclick="edtLayer('up')"><svg viewBox="0 0 24 24"><path d="M12 19V5m0 0l-7 7m7-7l7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>앞으로</button>
@@ -7611,16 +7617,15 @@ function boldifyText(txt){
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;');
-  // 1) 숫자+단위 바로 뒤의 일반 공백 → NBSP (줄바꿈 분리 방지)
-  //    "5km 완주" → "5km\u00A0완주" : 한 덩어리로 줄바꿈
   var UNIT = '(?:년|월|일|주|개월|회|명|개|원|만원|천원|만|천|억|%|점|등|위|kg|g|ml|cm|m|km|시간|분|초|배|가지|권|편|장|번)';
   esc = esc.replace(new RegExp('(\\d[\\d,.]*\\s?' + UNIT + ')\\s+(\\S)', 'g'), '$1\u00A0$2');
-  // 2) 강조 태그 주입 — 《책》·(출처)·숫자단위·SPF/PA
   esc = esc.replace(/《[^》]+》/g, '<b class="kw">$&</b>');
   esc = esc.replace(/\([^)]{2,30}\)/g, '<b class="kw src">$&</b>');
   esc = esc.replace(new RegExp('\\d[\\d,.]*\\s?' + UNIT, 'g'), '<b class="kw">$&</b>');
   esc = esc.replace(/(?:SPF|PA)\d+\+?/g, '<b class="kw">$&</b>');
   esc = esc.replace(/₩[\d,]+/g, '<b class="kw">$&</b>');
+  // innerHTML 사용하므로 \n 은 시각적으로 사라짐 → <br> 치환해서 줄바꿈 보존
+  esc = esc.replace(/\n/g, '<br>');
   return esc;
 }
 function makeTextEl(text, opts){
@@ -7805,6 +7810,20 @@ var sizeInfo = {
   pt:{cls:'sz-pt', label:'세로형 · 1080×1350 · IG 피드'},
   st:{cls:'sz-st', label:'스토리/릴스 · 1080×1920 · IG·TK'}
 };
+// 요약 슬라이드 eyebrow 랜덤 — 매 생성마다 다른 문구
+function summaryEyebrowPick(){
+  var pool = [
+    '정리하면 이거야 ✅',
+    '핵심은 이거야 🎯',
+    '한 줄 요약 📌',
+    '기억해야 할 건 💡',
+    '이거 하나만 기억해 ✨',
+    '끝으로 한 마디 🗒️',
+    '결론 먼저 ⚡',
+    '요약하면 👇',
+  ];
+  return pool[Math.floor(Math.random() * pool.length)];
+}
 // 매력적인 마지막 CTA 슬라이드 기본값 — "내용 N" 같은 허접한 자동 텍스트 대신
 function buildAttractiveCTA(topic){
   var lines = [
@@ -7982,7 +8001,8 @@ function initEditor(){
       sl.appendChild(makeCtaPillsEl({x:10,y:78,w:80,accent:ctaAccent}));
     } else if(isSummary){
       // 요약 — 이미지 없음
-      sl.appendChild(makeTextEl('정리하면 이거야 ✅', {x:6,y:12,w:88,size:20,color:c,weight:900}));
+      var summaryEyebrow = summaryEyebrowPick();
+      sl.appendChild(makeTextEl(summaryEyebrow, {x:6,y:12,w:88,size:20,color:c,weight:900}));
       sl.appendChild(makeTextEl(p.title || '핵심 결론', {x:6,y:32,w:88,size:28,color:c,weight:900,isTitle:true}));
       sl.appendChild(makeTextEl(p.text || '', {x:6,y:60,w:88,size:14,color:c,weight:500}));
       sl.appendChild(makeTextEl(String(i+1).padStart(2,'0')+' / '+String(N).padStart(2,'0'), {x:6,y:93,w:20,size:10,color:c,weight:700}));
@@ -8347,6 +8367,9 @@ function edtPanel(t){
   document.querySelectorAll('.edt-panel').forEach(function(e){ e.classList.remove('on'); });
   var p = document.getElementById('edt-panel-'+t);
   if(p) p.classList.add('on');
+}
+function edtClosePanel(){
+  document.querySelectorAll('.edt-panel').forEach(function(e){ e.classList.remove('on'); });
 }
 function edtApplyText(){
   // 텍스트는 인라인 편집으로 처리. 패널은 "적용" 버튼 누르면 닫힘.
