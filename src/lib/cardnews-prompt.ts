@@ -34,7 +34,7 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     imageDirection: '클리닉 피부 감성 클로즈업 사진 (시술 기구 X, 결과 얼굴 O)',
     moodKeywords: ['피부 클로즈업 감성', '얼굴 글로우 photography', 'natural skin aesthetic'],
     researchFocus: ['시술명', '강남언니 평균가', '다운타임', '주의사항', '실제 후기 점수'],
-    hashtags: ['#시술후기', '#피부시술', '#강남피부과', '#리프팅', '#스킨부스터', '#피부관리'],
+    hashtags: ['#시술후기', '#피부시술', '#강남피부과', '#리프팅', '#스킨부스터'],
   },
   beauty_product: {
     name: '뷰티 제품',
@@ -42,7 +42,7 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     imageDirection: '스킨케어 플랫레이 감성 사진',
     moodKeywords: ['스킨케어 플랫레이', '제품 텍스처 클로즈업', '올리브영 감성'],
     researchFocus: ['제품명', '올리브영 가격', '주요 성분', '실제 사용감', '대체 제품'],
-    hashtags: ['#화장품추천', '#올리브영', '#뷰티템', '#스킨케어', '#내돈내산', '#솔직후기'],
+    hashtags: ['#화장품추천', '#올리브영', '#뷰티템', '#스킨케어', '#코스메틱'],
     productSource: 'global.oliveyoung.com',
   },
   beauty_ingredient: {
@@ -51,7 +51,7 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     imageDirection: '세럼 텍스처 클로즈업 감성 photography',
     moodKeywords: ['세럼 텍스처', '화장품 클로즈업 감성', 'cosmetic close-up'],
     researchFocus: ['성분명', '효능', '주의 대상', '좋은 조합', '부작용 사례'],
-    hashtags: ['#성분분석', '#스킨케어', '#뷰티꿀팁', '#피부관리', '#솔직후기', '#내돈내산'],
+    hashtags: ['#성분분석', '#스킨케어', '#뷰티꿀팁', '#피부관리', '#세럼'],
   },
   beauty_trouble: {
     name: '뷰티 트러블·케어',
@@ -59,7 +59,7 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     imageDirection: '피부결 클로즈업 감성 사진',
     moodKeywords: ['피부결 클로즈업', '자연스러운 얼굴 감성', 'skin texture close-up'],
     researchFocus: ['원인', '해결법', '추천 제품', '병원 진료 필요 시점'],
-    hashtags: ['#여드름', '#피부고민', '#트러블케어', '#스킨케어', '#피부관리', '#솔직후기'],
+    hashtags: ['#여드름', '#피부고민', '#트러블케어', '#스킨케어', '#피부관리'],
   },
   food: {
     name: '음식·맛집',
@@ -67,7 +67,7 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     imageDirection: '[음식명] 플레이팅 클로즈업 감성 사진 필름',
     moodKeywords: ['음식 플레이팅', '디저트 클로즈업', 'food aesthetic photography'],
     researchFocus: ['음식명', '가격대', '메뉴 특징', '방문 팁', '웨이팅'],
-    hashtags: ['#맛집', '#음식스타그램', '#맛집추천', '#푸드스타그램', '#내돈내산', '#솔직후기'],
+    hashtags: ['#맛집', '#음식스타그램', '#맛집추천', '#푸드스타그램', '#먹스타그램'],
   },
   cafe: {
     name: '카페·음료',
@@ -75,7 +75,7 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     imageDirection: '카페 음료 감성 필름 사진',
     moodKeywords: ['카페 감성', '음료 클로즈업', 'cafe aesthetic film'],
     researchFocus: ['카페명', '시그니처 메뉴', '가격', '분위기', '위치'],
-    hashtags: ['#카페', '#카페스타그램', '#카페투어', '#감성카페', '#디저트', '#내돈내산'],
+    hashtags: ['#카페', '#카페스타그램', '#카페투어', '#감성카페', '#디저트'],
   },
   travel_domestic: {
     name: '국내 여행',
@@ -83,7 +83,7 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     imageDirection: '[장소명] 여행 감성 필름 사진',
     moodKeywords: ['여행 감성', '풍경 필름', 'korean travel aesthetic'],
     researchFocus: ['지역명', '대중교통', '비용', '꼭 봐야 할 포인트', '실제 후기'],
-    hashtags: ['#국내여행', '#여행꿀팁', '#여행정보', '#여행스타그램', '#주말여행', '#솔직후기'],
+    hashtags: ['#국내여행', '#여행꿀팁', '#여행정보', '#여행스타그램', '#주말여행'],
   },
   travel_abroad: {
     name: '해외 여행',
@@ -91,7 +91,7 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     imageDirection: '[장소명] 해외 여행 풍경 감성 사진',
     moodKeywords: ['travel aesthetic', '해외 여행 필름', 'landscape photography'],
     researchFocus: ['도시/국가', '항공편', '숙소', '현지 팁', '예산'],
-    hashtags: ['#해외여행', '#여행꿀팁', '#여행정보', '#여행스타그램', '#배낭여행', '#솔직후기'],
+    hashtags: ['#해외여행', '#여행꿀팁', '#여행정보', '#여행스타그램', '#배낭여행'],
   },
   fashion: {
     name: '패션·코디',
@@ -99,7 +99,7 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     imageDirection: '코디 감성 필름 사진 aesthetic',
     moodKeywords: ['오오티디 감성', '스트릿 패션 필름', 'fashion aesthetic photography'],
     researchFocus: ['브랜드', '가격', '스타일링 포인트', '구매처'],
-    hashtags: ['#오오티디', '#코디', '#패션', '#데일리룩', '#무신사', '#솔직후기'],
+    hashtags: ['#오오티디', '#코디', '#패션', '#데일리룩', '#무신사'],
   },
   interior: {
     name: '인테리어·공간',
@@ -107,7 +107,7 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     imageDirection: '인테리어 공간 감성 사진',
     moodKeywords: ['인테리어 감성', '미니멀 홈 photography', '방꾸미기 감성'],
     researchFocus: ['아이템', '가격', '배치 팁', '어디서 사는지'],
-    hashtags: ['#인테리어', '#방꾸미기', '#홈인테리어', '#미니멀', '#자취', '#내돈내산'],
+    hashtags: ['#인테리어', '#방꾸미기', '#홈인테리어', '#미니멀', '#자취'],
   },
   fitness: {
     name: '운동·헬스',
@@ -115,7 +115,7 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     imageDirection: '라이프스타일 운동 감성 사진',
     moodKeywords: ['헬스 감성', '필라테스 스튜디오', 'workout aesthetic'],
     researchFocus: ['운동명', '효과', '주의사항', '도구·장소'],
-    hashtags: ['#운동', '#헬스', '#필라테스', '#홈트', '#다이어트', '#솔직후기'],
+    hashtags: ['#운동', '#헬스', '#필라테스', '#홈트', '#다이어트'],
   },
   money_tip: {
     name: '돈 관리·절약',
@@ -123,7 +123,7 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     imageDirection: '미니멀 라이프 감성 사진',
     moodKeywords: ['미니멀 감성', '알뜰 라이프', 'minimalist aesthetic'],
     researchFocus: ['구체 팁', '절약 금액', '시행 난이도'],
-    hashtags: ['#절약', '#재테크', '#돈관리', '#가계부', '#짠테크', '#솔직후기'],
+    hashtags: ['#절약', '#재테크', '#돈관리', '#가계부', '#짠테크'],
   },
   price_compare: {
     name: '가격 비교',
@@ -131,7 +131,7 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     imageDirection: '플랫레이 비교 감성 사진',
     moodKeywords: ['제품 플랫레이', '비교 감성 photography'],
     researchFocus: ['제품A/B', '가격차', '품질차', '추천 대상'],
-    hashtags: ['#가성비', '#가격비교', '#내돈내산', '#솔직후기', '#비교리뷰', '#쇼핑꿀팁'],
+    hashtags: ['#가성비', '#가격비교', '#비교리뷰', '#쇼핑꿀팁', '#할인정보'],
   },
   trend: {
     name: '트렌드',
@@ -139,7 +139,7 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     imageDirection: 'MZ 감성 일상 필름 사진',
     moodKeywords: ['트렌드 감성', 'MZ 라이프', 'youth aesthetic photography'],
     researchFocus: ['최근 트렌드', '기원', '참여 방법', '참여 사례'],
-    hashtags: ['#트렌드', '#요즘뜨는', '#MZ', '#인기', '#일상', '#솔직후기'],
+    hashtags: ['#트렌드', '#요즘뜨는', '#MZ', '#인기', '#핫템'],
   },
   review: {
     name: '리뷰',
@@ -147,7 +147,7 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     imageDirection: '제품 또는 장소 실물 감성',
     moodKeywords: ['리얼 리뷰 감성', '비교 사진 photography'],
     researchFocus: ['대상', '장점 3개', '단점 3개', '추천 대상'],
-    hashtags: ['#솔직후기', '#내돈내산', '#리뷰', '#직접써봄', '#비교리뷰', '#추천'],
+    hashtags: ['#리뷰', '#직접써봄', '#비교리뷰', '#추천', '#후기'],
   },
   life_tip: {
     name: '생활 꿀팁',
@@ -155,7 +155,7 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     imageDirection: '라이프스타일 감성 일상 사진',
     moodKeywords: ['라이프 감성', '일상 필름', 'everyday aesthetic'],
     researchFocus: ['상황', '팁', '효과', '준비물'],
-    hashtags: ['#꿀팁', '#라이프해킹', '#일상꿀팁', '#생활팁', '#저장각', '#솔직후기'],
+    hashtags: ['#꿀팁', '#라이프해킹', '#일상꿀팁', '#생활팁', '#저장각'],
   },
   etc: {
     name: '기타',
@@ -163,7 +163,7 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     imageDirection: '라이프스타일 감성 일상 사진',
     moodKeywords: ['감성 일상', 'MZ 라이프', 'daily aesthetic photography'],
     researchFocus: ['핵심 정보', '실제 사례', '주의점'],
-    hashtags: ['#일상', '#데일리', '#기록', '#라이프', '#솔직후기', '#내돈내산'],
+    hashtags: ['#일상', '#데일리', '#기록', '#라이프', '#요즘'],
   },
 }
 
@@ -584,15 +584,10 @@ export const CAPTION_PROMPT = `캡션 구조:
   · "댓글에 [키워드] 남기면 DM 줄게"
 .
 .
-해시태그: (카테고리별 자동 선택)
-
-공통: #시수르더쿠 #솔직후기 #내돈내산
-뷰티: #스킨케어 #피부관리 #뷰티꿀팁 #피부과
-시술: #시술후기 #피부시술 #강남피부과
-제품: #화장품추천 #올리브영 #뷰티템
-여행: #여행꿀팁 #국내여행 #여행정보
-음식: #맛집 #음식스타그램 #카페
-패션: #오오티디 #코디 #패션
+해시태그: (카테고리별 자동 선택, 최대 5개)
+  · 일반 공통 해시태그(#솔직후기·#내돈내산·#시수르더쿠) 금지
+  · 오직 콘텐츠 주제와 카테고리에 직접 관련된 태그만 (CATEGORIES[cat].hashtags)
+  · 개수는 정확히 5개 이하
 `
 
 // 서버/프론트에서 hook/body 에서 캡션을 조립할 때 사용
@@ -610,9 +605,10 @@ export function buildCaption(args: {
     .slice(0, 3)
     .map(t => t.trim().replace(/\s+/g, ' '))
     .join('\n')
-  const tags = ['#시수르더쿠', '#솔직후기', '#내돈내산', ...info.hashtags]
-    .filter((t, i, a) => a.indexOf(t) === i)
-    .slice(0, 10)
+  // 공통 일반 태그 제거, 카테고리 전용 5개만
+  const tags = info.hashtags
+    .filter((t, i, a) => t.startsWith('#') && a.indexOf(t) === i)
+    .slice(0, 5)
     .join(' ')
   return [
     args.hook.trim(),

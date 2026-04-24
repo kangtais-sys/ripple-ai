@@ -104,6 +104,25 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'invalid JSON from Claude', raw: match[0] }, { status: 502 })
     }
 
+    // 슬라이드 개수 서버 보정 (Claude 가 가끔 절대 규칙 어김)
+    //   초과 → 앞에서 자르고 마지막 CTA 유지
+    //   부족 → 본론 자리에 placeholder 추가
+    if (Array.isArray(parsed.body)) {
+      const expected = slideCount - 1
+      if (parsed.body.length > expected) {
+        const kept = parsed.body.slice(0, expected - 1)
+        const cta = parsed.body[parsed.body.length - 1]
+        parsed.body = [...kept, cta]
+      } else if (parsed.body.length < expected) {
+        const cta = parsed.body[parsed.body.length - 1]
+        const pads = Array.from({ length: expected - parsed.body.length }, (_, i) => ({
+          title: `포인트 ${parsed.body!.length + i - 1}`,
+          text: '직접 채워서 완성해주세요 — AI 가 슬라이드 수를 맞추지 못했어요',
+        }))
+        parsed.body = [...parsed.body.slice(0, parsed.body.length - 1), ...pads, cta]
+      }
+    }
+
     // 후킹 점수 서버측 재검증 (Claude 자체평가 참고)
     const serverScore = parsed.hook ? scoreHook(parsed.hook).total : 0
     const claudeScore = typeof parsed.hook_score === 'number' ? parsed.hook_score : 0
