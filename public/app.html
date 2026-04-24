@@ -1041,7 +1041,10 @@ body.edt-fullscreen #create-back{display:none}
 .edt-arrows{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.9);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.08);z-index:5}
 .edt-arrows.prev{left:8px}.edt-arrows.next{right:8px}
 .edt-arrows svg{width:16px;height:16px;stroke:var(--t1);stroke-width:2}
-.edt-tools{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px}
+/* 편집 툴 바 — sticky (스크롤해도 항상 보임) */
+.edt-tools{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px;position:sticky;top:4px;z-index:50;background:var(--bg);padding:6px;border-radius:12px;box-shadow:0 2px 6px rgba(15,19,25,.04)}
+/* 편집 패널도 sticky — 선택된 요소 편집 중 위로 스크롤 없이 바로 조작 */
+.edt-panel.on{position:sticky;top:62px;z-index:49;box-shadow:0 6px 22px rgba(15,19,25,.08)}
 .edt-tool{padding:10px 4px;border-radius:12px;border:1px solid var(--b);background:var(--s);font-size:10px;font-weight:700;color:var(--t2);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;line-height:1.1}
 .edt-tool svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.8;fill:none}
 .edt-tool:active{background:var(--bg)}
@@ -2322,8 +2325,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <input id="edt-img-input" type="file" accept="image/*" style="display:none" onchange="edtImgUpload(event)">
 
     <div class="edt-panel" id="edt-panel-text">
-      <div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:6px">선택된 텍스트</div>
-      <textarea class="edt-panel-ta" id="edt-text-input" rows="3" placeholder="텍스트 입력"></textarea>
+      <div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:8px">선택 요소 꾸미기 <span style="color:var(--t3);font-weight:500;margin-left:4px">·  텍스트는 직접 더블탭해서 수정</span></div>
       <div class="edt-row">
         <div class="edt-row-lbl">크기</div>
         <input type="range" id="edt-text-size" min="12" max="64" value="24">
@@ -4961,10 +4963,24 @@ function renderDailyTrendsStatic(picks, freshness){
 function renderDailyTrends(){
   var container = document.getElementById('trend-carousel');
   if(!container) return;
-  // 즉시 폴백 렌더 (네트워크 동안 빈 화면 방지)
+  // ① 유저가 이전에 관심 주제를 고른 적 있으면 그걸 최우선
+  try {
+    var savedKey = localStorage.getItem('ssobi_disc_topic');
+    if(savedKey && discoverData[savedKey]){
+      var d = discoverData[savedKey];
+      var mapped = d.trends.map(function(t){
+        return { topic: t.hook, chip: d.name, meta: t.meta, src: t.src };
+      });
+      createData._discTopic = savedKey;
+      window._pickedTopic = d.name;
+      renderDailyTrendsStatic(mapped, 'interest');
+      return;  // 서버 추천 무시 — 유저 관심사가 우선
+    }
+  } catch(_){}
+  // ② 관심사 없으면 즉시 폴백 렌더 (네트워크 동안 빈 화면 방지)
   var fallback = pickDailyTrends();
   renderDailyTrendsStatic(fallback, 'fallback');
-  // 서버 추천 덮어쓰기
+  // ③ 서버 추천 덮어쓰기
   fetch('/api/trends/today', { credentials:'include' })
     .then(function(r){ return r.json(); })
     .then(function(j){
@@ -5012,7 +5028,7 @@ async function generatePrompt(){
   btn.classList.add('loading');
   btn.textContent = 'AI 가 만드는 중';
   var steps = ['말투 분석', '후킹 문구 작성', '슬라이드 구성', '해시태그 선정', '마지막 다듬기'];
-  showGenProgress('AI 가 카드뉴스를 만들고 있어요', topic, steps, 0);
+  showGenProgress(ssobiLoadingCopy('first'), topic, steps, 0);
   var si = 0;
   var stepTimer = setInterval(function(){
     si = Math.min(si + 1, steps.length - 1);
@@ -5111,7 +5127,7 @@ async function regenPrompt(){
   }
   // 풀스크린 생성 모달 (첫 생성과 동일)
   var regenSteps = ['말투 재적용', '후킹 재구성', '슬라이드 ' + (createData.slides || 7) + '장 만들기', '톤 다듬기'];
-  showGenProgress('AI 가 다시 만들고 있어요', topic, regenSteps, 0);
+  showGenProgress(ssobiLoadingCopy('regen'), topic, regenSteps, 0);
   var rsi = 0;
   var regenTimer = setInterval(function(){
     rsi = Math.min(rsi + 1, regenSteps.length - 1);
@@ -5641,24 +5657,23 @@ function discFinish(){
   if(!d){ alert('먼저 관심 주제를 선택해주세요'); return; }
   var bio = (document.getElementById('prof-bio') || {}).value || '';
   if(!bio.trim()){ alert('바이오를 작성해주세요'); return; }
-  // 상단 추천 TOP3 교체 (주제별 트렌드)
-  var cards = document.querySelectorAll('#cs-1 .trend-card');
-  cards.forEach(function(c, i){
-    if(i>=d.trends.length) return;
-    var t = d.trends[i];
-    c.querySelector('.trend-hook').textContent = t.hook;
-    c.querySelector('.trend-meta').textContent = t.meta;
-    var srcWrap = c.querySelector('.trend-src');
-    while(srcWrap.firstChild) srcWrap.removeChild(srcWrap.firstChild);
-    t.src.forEach(function(s){
-      srcWrap.appendChild(makeEl('span','trend-src-chip', s));
-    });
-  });
+  // 관심 주제 영구 저장 — 뒤로 갔다 와도, 새로고침해도 복원
+  try { localStorage.setItem('ssobi_disc_topic', key); } catch(_){}
   window._pickedTopic = d.name;
+  // window.__DAILY_TRENDS 도 같은 데이터로 교체 — useTrend 가 여기서 topic 꺼내 씀
+  window.__DAILY_TRENDS = d.trends.map(function(t){
+    return {
+      topic: t.hook,
+      chip: d.name,
+      meta: t.meta,
+      src: t.src,
+    };
+  });
+  // 화면 렌더는 동일 유틸 사용 → DOM 과 __DAILY_TRENDS 가 항상 일치
+  renderDailyTrendsStatic(window.__DAILY_TRENDS, 'interest');
   // 학습 재실행 시뮬
   var applied = window._profileApplied ? '프로필 · ' : '';
   alert('✨ 적용 완료!\n'+applied+'AI가 새 '+d.name+' 주제·말투를 재학습했어요.\n위 추천 TOP 3가 바뀐 걸 확인해보세요.');
-  // 모달 닫히고 상단으로
   document.getElementById('v-create').scrollIntoView({behavior:'smooth', block:'start'});
 }
 
@@ -7623,7 +7638,7 @@ function setImageSlot(wrap, url, meta){
   if(meta && meta.photographer && meta.sourceLabel){
     var cap = document.createElement('div');
     cap.className = 'edt-img-attr';
-    cap.style.cssText = 'position:absolute;right:4px;bottom:4px;padding:2px 6px;background:rgba(0,0,0,.55);color:#fff;font-size:8.5px;font-weight:600;letter-spacing:.1px;border-radius:0;pointer-events:auto;z-index:2;line-height:1.2;max-width:90%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:-apple-system,BlinkMacSystemFont,sans-serif';
+    cap.style.cssText = 'position:absolute;right:4px;bottom:4px;padding:2px 5px;background:rgba(0,0,0,.18);color:rgba(255,255,255,.7);font-size:7.5px;font-weight:500;letter-spacing:.1px;border-radius:3px;pointer-events:auto;z-index:2;line-height:1.2;max-width:80%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:-apple-system,BlinkMacSystemFont,sans-serif;backdrop-filter:blur(2px);-webkit-backdrop-filter:blur(2px)';
     cap.textContent = 'Photo by ' + meta.photographer + ' on ' + meta.sourceLabel;
     // 링크는 새탭으로 (편집 중 모달 닫힘 방지)
     if(meta.attributionUrl){
@@ -7728,52 +7743,40 @@ function buildAttractivePlaceholder(idx, total){
     text: '탭해서 내가 직접 채우면 돼\n(AI 가 슬라이드 수를 다 못 맞췄어)',
   };
 }
-// 슬라이드 안 모든 텍스트 요소에 세로 공간을 할당 (다음 요소의 top 까지)
-//   이후 overflow 발생 시 font-size 를 자동 축소해 꽉 맞춤.
-function fitTextsInSlide(slideEl, slideHeightPx){
+// 슬라이드 내 모든 텍스트 요소에 세로 공간 할당 + 넘치면 font-size 자동 축소
+//   inline 편집 중에도 호출 가능 (text 노드 파괴 X, contenteditable caret 유지)
+function fitTextsInSlide(slideEl){
   if(!slideEl) return;
   var els = Array.from(slideEl.querySelectorAll('.edt-el.text'));
   if(!els.length) return;
-  // top 순으로 정렬
   var tops = els.map(function(el){ return { el:el, top: parseFloat(el.style.top) || 0 }; });
   tops.sort(function(a, b){ return a.top - b.top; });
-  // 각 요소의 최대 높이 = 다음 요소 top - 현재 top - 여유 (마지막이면 96% - top)
+  // 각 요소에 사용 가능한 세로 공간 부여
   tops.forEach(function(cur, i){
     var nextTop = (i < tops.length - 1) ? tops[i+1].top : 96;
-    var availPct = Math.max(6, nextTop - cur.top - 1); // 최소 6%
+    var availPct = Math.max(6, nextTop - cur.top - 1);
     cur.el.style.height = availPct + '%';
     cur.el.style.overflow = 'hidden';
-    cur.el.style.display = 'flex';
-    cur.el.style.alignItems = 'flex-start';
-    cur.el.style.flexDirection = 'column';
-    cur.el.style.justifyContent = 'flex-start';
-    // 내부 텍스트를 감싸는 span 이 있어야 scrollHeight 측정 정확
-    if(!cur.el.dataset.fitWrapped){
-      var inner = document.createElement('span');
-      inner.style.cssText = 'display:block;width:100%';
-      inner.textContent = cur.el.textContent;
-      cur.el.textContent = '';
-      cur.el.appendChild(inner);
-      cur.el.dataset.fitWrapped = '1';
+    // baseFontSize 기억 (편집 후 다시 키울 때 기준)
+    if(!cur.el.dataset.baseFontSize){
+      cur.el.dataset.baseFontSize = String(parseFloat(cur.el.style.fontSize) || 12);
     }
   });
-  // 실제 DOM 크기 측정 — requestAnimationFrame 2회 대기 후
+  // 측정은 다음 프레임 — 레이아웃 반영 후
   requestAnimationFrame(function(){
-    requestAnimationFrame(function(){
-      tops.forEach(function(cur){
-        var el = cur.el;
-        if(el.dataset.noAutofit === '1') return;
-        var inner = el.firstChild;
-        if(!inner) return;
-        var base = parseFloat(el.style.fontSize) || 12;
-        var size = base;
-        var guard = 0;
-        while((inner.scrollHeight > el.clientHeight + 2) && size > 9 && guard < 25){
-          size = Math.max(9, size * 0.93);
-          el.style.fontSize = size.toFixed(1) + 'px';
-          guard++;
-        }
-      });
+    tops.forEach(function(cur){
+      var el = cur.el;
+      if(el.dataset.noAutofit === '1') return;
+      // 편집 중엔 먼저 base 로 복원해서 재측정 (과도한 축소 방지)
+      var base = parseFloat(el.dataset.baseFontSize) || 12;
+      el.style.fontSize = base + 'px';
+      var size = base;
+      var guard = 0;
+      while((el.scrollHeight > el.clientHeight + 2) && size > 9 && guard < 25){
+        size = Math.max(9, size * 0.93);
+        el.style.fontSize = size.toFixed(1) + 'px';
+        guard++;
+      }
     });
   });
 }
@@ -8056,6 +8059,14 @@ function attachInlineEdit(el){
     lastTap = now;
   });
   el.addEventListener('blur', exitEdit);
+  // 입력 중 auto-fit 재실행 — 글자 늘어도 잘리지 않게
+  el.addEventListener('input', function(){
+    var slide = el.closest('.edt-slide');
+    if(slide && typeof fitTextsInSlide === 'function'){
+      // 편집 중인 요소의 고정 font-size 는 유지하려면 noAutofit, 기본은 재계산
+      fitTextsInSlide(slide);
+    }
+  });
   // Enter: 줄바꿈 (Shift+Enter 도 동일), Escape: 종료
   el.addEventListener('keydown', function(e){
     if(e.key === 'Escape'){
@@ -8238,13 +8249,8 @@ function edtPanel(t){
   if(p) p.classList.add('on');
 }
 function edtApplyText(){
-  if(!edtSel) return;
-  var v = document.getElementById('edt-text-input').value;
-  // 기존 텍스트 노드 모두 제거
-  var nodes = [];
-  edtSel.childNodes.forEach(function(n){ if(n.nodeType===3) nodes.push(n); });
-  nodes.forEach(function(n){ edtSel.removeChild(n); });
-  edtSel.insertBefore(document.createTextNode(v), edtSel.firstChild);
+  // 텍스트는 인라인 편집으로 처리. 패널은 "적용" 버튼 누르면 닫힘.
+  document.querySelectorAll('.edt-panel').forEach(function(e){ e.classList.remove('on'); });
 }
 function edtTextColor(c){ if(edtSel && edtSel.classList.contains('text')) edtSel.style.color=c; }
 function buildColorBar(){
@@ -8676,6 +8682,25 @@ function hidePublishProgress(){
 
 // ────────── AI 생성 오버레이 ──────────
 var __genSteps = [];
+// 쏘비 말투 로딩 카피 — 매번 랜덤
+function ssobiLoadingCopy(mode){
+  var first = [
+    '쏘비가 말투 훔치러 갔어',
+    '쏘비 지금 손 바쁨 🤏',
+    '잠깐, 쏘비 후킹 쥐어짜는 중',
+    '쏘비가 핫한 소스 긁는 중',
+    '쏘비가 주제 파고 있어요',
+    '쏘비 노트북 뜨끈뜨끈하게 돌리는 중',
+  ];
+  var regen = [
+    '쏘비가 다시 간다, 이번엔 진짜',
+    '쏘비 심호흡 한 번 하고 재도전',
+    '쏘비가 말투 다시 가다듬는 중',
+    '쏘비 이번엔 센스 있게 써볼게',
+  ];
+  var pool = mode === 'regen' ? regen : first;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
 function showGenProgress(title, subtitle, steps, curIdx){
   __genSteps = Array.isArray(steps) ? steps.slice() : [];
   var ov = document.getElementById('gen-progress-overlay');
