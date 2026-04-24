@@ -7761,13 +7761,15 @@ function openUploadForSlot(wrap){
   setTimeout(function(){ input.remove(); }, 100);
 }
 // ───────── 영상 trim 모달 ─────────
-var _vtState = { url:'', duration:0, startTime:0, endTime:0, targetSlot:null };
+//   _videoFilesBySlot — DOM 요소와 File 객체 매핑 (캡처 시 업로드용)
+var _videoFilesBySlot = new WeakMap();
+var _vtState = { url:'', duration:0, startTime:0, endTime:0, targetSlot:null, file:null };
 function openVideoTrim(file, slot){
   // 이전 URL 회수
   if(_vtState.url) try { URL.revokeObjectURL(_vtState.url); } catch(_){}
   _vtState = {
     url: URL.createObjectURL(file),
-    duration: 0, startTime: 0, endTime: 0, targetSlot: slot,
+    duration: 0, startTime: 0, endTime: 0, targetSlot: slot, file: file,
   };
   ensureVtModal();
   var v = document.getElementById('vt-preview');
@@ -7793,7 +7795,7 @@ function ensureVtModal(){
     '<div class="sheet" style="padding:14px 20px 24px;max-height:90vh;overflow-y:auto">' +
       '<div class="s-bar"></div>' +
       '<div class="s-title">영상 자르기</div>' +
-      '<div class="s-sub">최대 <b>15초</b>까지 가능 · 시작/끝 슬라이더로 구간 조절</div>' +
+      '<div class="s-sub">구간 미리보기 · <b style="color:var(--t1)">실제 업로드는 전체 영상</b> (IG 가 60초 내로 자동 조정)</div>' +
       '<video id="vt-preview" playsinline muted autoplay loop style="width:100%;max-height:36vh;background:#000;border-radius:12px;display:block;margin:12px 0"></video>' +
       '<div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--t2);margin-bottom:8px">' +
         '<span>시작 <b id="vt-start-time" style="color:var(--mint-d)">0.0s</b></span>' +
@@ -7866,6 +7868,10 @@ function renderVtTimes(){
 }
 function vtApply(){
   if(!_vtState.targetSlot || !_vtState.url) return;
+  // 캡처 시 업로드를 위해 File 객체 저장
+  if(_vtState.file){
+    _videoFilesBySlot.set(_vtState.targetSlot, _vtState.file);
+  }
   setVideoSlot(_vtState.targetSlot, {
     url: _vtState.url,
     startTime: _vtState.startTime,
@@ -8534,7 +8540,19 @@ function edtSelect(el){
     var sz = parseFloat(el.style.fontSize)||24;
     var rz=document.getElementById('edt-text-size');
     var rzv=document.getElementById('edt-text-size-v');
-    if(rz){ rz.value=sz; rz.oninput=function(){ el.style.fontSize=rz.value+'px'; if(rzv) rzv.textContent=rz.value+'px'; }; }
+    if(rz){
+      rz.value = sz;
+      rz.oninput = function(){
+        el.style.fontSize = rz.value + 'px';
+        if(rzv) rzv.textContent = rz.value + 'px';
+        // 수동 크기 변경 → 박스 제한 해제 (잘림 방지)
+        el.dataset.noAutofit = '1';
+        el.dataset.manualSize = '1';
+        el.style.height = 'auto';
+        el.style.overflow = 'visible';
+        el.style.zIndex = '7';  // 위로 올라와 다른 요소에 가려지지 않게
+      };
+    }
     if(rzv) rzv.textContent = sz+'px';
     // 스타일 상태 UI 반영
     var cs = window.getComputedStyle(el);
@@ -8823,6 +8841,29 @@ async function captureAndUploadSlides(jobId){
       await new Promise(function(r){ setTimeout(r, 500); });
       await document.fonts.ready.catch(function(){});
 
+      // 영상 슬라이드면 영상 파일 자체 업로드 → carousel child media_type:VIDEO
+      var videoSlot = slideEl.querySelector('.edt-el.img[data-video-url]');
+      var videoFile = videoSlot ? _videoFilesBySlot.get(videoSlot) : null;
+      if(videoFile){
+        var vfd = new FormData();
+        vfd.append('file', videoFile, 'slide-' + i + '-video.mp4');
+        vfd.append('job_id', jobId);
+        vfd.append('slide', String(i));
+        vfd.append('media_type', 'video');
+        var vUpHeaders = h.Authorization ? { 'Authorization': h.Authorization } : {};
+        var vUpRes = await fetch('/api/upload/cardnews', {
+          method:'POST', headers: vUpHeaders, credentials:'include', body: vfd
+        });
+        var vUpJson = await vUpRes.json().catch(function(){ return {}; });
+        if(vUpRes.ok && vUpJson.url){
+          console.log('[capture] video slide', i, '→', vUpJson.url.slice(-40));
+          uploaded.push({ url: vUpJson.url, media_type: 'VIDEO' });
+        } else {
+          console.error('[capture] video upload failed slide', i, vUpJson);
+        }
+        continue;
+      }
+
       // 크기 확인
       var rect = slideEl.getBoundingClientRect();
       console.log('[capture] slide', i, 'rect:', rect.width, 'x', rect.height);
@@ -8913,7 +8954,7 @@ async function captureAndUploadSlides(jobId){
       var upJson = await upRes.json();
       if(upRes.ok && upJson.url){
         console.log('[capture] uploaded slide', i, '→', upJson.url.slice(-40));
-        uploaded.push(upJson.url);
+        uploaded.push({ url: upJson.url, media_type: 'IMAGE' });
       } else {
         console.error('[capture] upload failed slide', i, upJson);
       }

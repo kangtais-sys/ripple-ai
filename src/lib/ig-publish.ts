@@ -48,28 +48,36 @@ export async function publishCardnewsJob(
   const body = Array.isArray(job.prompt_body) ? job.prompt_body : []
   const defaultCount = Math.min(10, body.length > 0 ? body.length + 1 : 1)
 
-  // slide_overrides: 유저가 편집기에서 캡처한 이미지 URL 우선 (meta.slide_overrides)
+  // slide_overrides: 유저가 편집기에서 캡처한 이미지·영상 URL + media_type
+  //   구버전: string[] · 신버전: { url, media_type }[]
   const meta = (job.meta || {}) as Record<string, unknown>
-  const overrides = Array.isArray(meta.slide_overrides) ? meta.slide_overrides as string[] : []
+  type OverrideItem = { url: string; media_type: 'IMAGE' | 'VIDEO' }
+  const rawOverrides = Array.isArray(meta.slide_overrides) ? (meta.slide_overrides as unknown[]) : []
+  const overrides: OverrideItem[] = rawOverrides.map((o) => {
+    if (typeof o === 'string') return { url: o, media_type: 'IMAGE' as const }
+    const x = o as { url?: string; media_type?: string }
+    return { url: x.url || '', media_type: x.media_type === 'VIDEO' ? 'VIDEO' as const : 'IMAGE' as const }
+  }).filter(o => !!o.url)
   const totalSlides = Math.min(10, Math.max(defaultCount, overrides.length)) // IG 최대 10장
 
   try {
     let finalCreationId: string
 
-    // 슬라이드 N의 이미지 URL 결정:
-    //   overrides[N] 이 있으면 유저 캡처 이미지, 없으면 Satori 렌더 엔드포인트
-    const slideUrl = (i: number): string => {
+    // 슬라이드 N의 URL + 미디어 타입 결정
+    const slideMedia = (i: number): OverrideItem => {
       if (overrides[i]) return overrides[i]
-      return `${appBaseUrl}/api/cardnews/${job.id}/image?slide=${i}`
+      return { url: `${appBaseUrl}/api/cardnews/${job.id}/image?slide=${i}`, media_type: 'IMAGE' }
     }
 
     if (totalSlides === 1) {
-      finalCreationId = await createSingleMedia(igUserId, token, slideUrl(0), caption)
+      const m = slideMedia(0)
+      finalCreationId = await createSingleMedia(igUserId, token, m.url, caption, m.media_type)
     } else {
       const childIds: string[] = []
       for (let i = 0; i < totalSlides; i++) {
-        const childId = await createCarouselChild(igUserId, token, slideUrl(i))
-        await pollFinished(childId, token)
+        const m = slideMedia(i)
+        const childId = await createCarouselChild(igUserId, token, m.url, m.media_type)
+        await pollFinished(childId, token, m.media_type === 'VIDEO' ? 40 : 20, 1500)
         childIds.push(childId)
       }
       finalCreationId = await createCarouselParent(igUserId, token, childIds, caption)
@@ -128,11 +136,21 @@ class PublishError extends Error {
   }
 }
 
-async function createSingleMedia(igUserId: string, token: string, imageUrl: string, caption: string): Promise<string> {
+async function createSingleMedia(
+  igUserId: string, token: string, mediaUrl: string, caption: string,
+  mediaType: 'IMAGE' | 'VIDEO' = 'IMAGE'
+): Promise<string> {
+  const body: Record<string, unknown> = {
+    media_type: mediaType,
+    caption,
+    access_token: token,
+  }
+  if (mediaType === 'VIDEO') body.video_url = mediaUrl
+  else body.image_url = mediaUrl
   const res = await fetch(`https://graph.instagram.com/v21.0/${igUserId}/media`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ image_url: imageUrl, media_type: 'IMAGE', caption, access_token: token }),
+    body: JSON.stringify(body),
   })
   const data = await res.json().catch(() => ({}))
   if (!res.ok || !data.id) {
@@ -141,11 +159,24 @@ async function createSingleMedia(igUserId: string, token: string, imageUrl: stri
   return data.id as string
 }
 
-async function createCarouselChild(igUserId: string, token: string, imageUrl: string): Promise<string> {
+async function createCarouselChild(
+  igUserId: string, token: string, mediaUrl: string,
+  mediaType: 'IMAGE' | 'VIDEO' = 'IMAGE'
+): Promise<string> {
+  const body: Record<string, unknown> = {
+    is_carousel_item: true,
+    access_token: token,
+  }
+  if (mediaType === 'VIDEO') {
+    body.media_type = 'VIDEO'
+    body.video_url = mediaUrl
+  } else {
+    body.image_url = mediaUrl
+  }
   const res = await fetch(`https://graph.instagram.com/v21.0/${igUserId}/media`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ image_url: imageUrl, is_carousel_item: true, access_token: token }),
+    body: JSON.stringify(body),
   })
   const data = await res.json().catch(() => ({}))
   if (!res.ok || !data.id) {

@@ -23,16 +23,24 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'job_id required' }, { status: 400 })
   }
 
-  // 파일 크기 제한 (10MB)
-  if (file.size > 10 * 1024 * 1024) {
-    return NextResponse.json({ error: 'file too large (max 10MB)' }, { status: 413 })
+  const mediaType = String(form.get('media_type') || 'image').toLowerCase()
+  const isVideo = mediaType === 'video' || (file.type || '').startsWith('video/')
+  // 크기 제한: 이미지 10MB, 영상 100MB (IG 최대 1GB 지만 여기선 빠른 업로드 우선)
+  const maxSize = isVideo ? 100 * 1024 * 1024 : 10 * 1024 * 1024
+  if (file.size > maxSize) {
+    return NextResponse.json({
+      error: 'file too large',
+      detail: `max ${isVideo ? '100MB (video)' : '10MB (image)'}`
+    }, { status: 413 })
   }
 
   const arrayBuffer = await file.arrayBuffer()
   const buffer = Buffer.from(arrayBuffer)
-  const contentType = file.type || 'image/jpeg'
-  const ext = contentType.includes('png') ? 'png' : 'jpg'
-  // 경로: users/{user_id}/jobs/{job_id}/slide-{n}-{timestamp}.jpg
+  const contentType = file.type || (isVideo ? 'video/mp4' : 'image/jpeg')
+  let ext = 'jpg'
+  if (isVideo) ext = contentType.includes('quicktime') ? 'mov' : 'mp4'
+  else if (contentType.includes('png')) ext = 'png'
+  // 경로: users/{user_id}/jobs/{job_id}/slide-{n}-{timestamp}.{ext}
   const path = `users/${user.id}/jobs/${jobId}/slide-${slide}-${Date.now()}.${ext}`
 
   const sb = adminClient()
