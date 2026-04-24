@@ -7570,6 +7570,39 @@ function makeOverlayEl(mode){
   }
   return div;
 }
+// Eyebrow 라벨 — hook2 슬라이드에 작은 accent-color 문구 ("이어서 · 더 놀라운 것")
+function makeEyebrowEl(text, opts){
+  var div = document.createElement('div');
+  div.className = 'edt-el edt-eyebrow';
+  div.style.cssText = 'position:absolute;left:' + opts.x + '%;top:' + opts.y + '%;padding:4px 10px;background:' + opts.accent + ';color:#fff;font-size:10px;font-weight:900;letter-spacing:1px;border-radius:3px;font-family:Pretendard,sans-serif;pointer-events:none;z-index:6;display:inline-block;text-transform:uppercase';
+  div.textContent = text;
+  return div;
+}
+// Accent bar — body 슬라이드 제목 아래 포인트 라인
+function makeAccentBarEl(opts){
+  var div = document.createElement('div');
+  div.className = 'edt-el edt-accent-bar';
+  div.style.cssText = 'position:absolute;left:' + opts.x + '%;top:' + opts.y + '%;width:' + (opts.w || 8) + '%;height:3px;background:' + opts.accent + ';border-radius:0;pointer-events:none;z-index:6';
+  return div;
+}
+// CTA 액션 pills — 💾 저장 · ➕ 팔로우 · 💬 댓글
+function makeCtaPillsEl(opts){
+  var wrap = document.createElement('div');
+  wrap.className = 'edt-el edt-cta-pills';
+  wrap.style.cssText = 'position:absolute;left:' + opts.x + '%;top:' + opts.y + '%;width:' + opts.w + '%;display:flex;gap:6%;justify-content:center;pointer-events:none;z-index:6;font-family:Pretendard,sans-serif';
+  var pills = [
+    { icon:'💾', label:'저장' },
+    { icon:'➕', label:'팔로우' },
+    { icon:'💬', label:'댓글' },
+  ];
+  pills.forEach(function(p){
+    var pill = document.createElement('div');
+    pill.style.cssText = 'flex:1;padding:10px 4px;text-align:center;background:' + opts.accent + ';color:#fff;font-size:11px;font-weight:800;border-radius:100px;letter-spacing:-.2px;box-shadow:0 3px 8px rgba(0,0,0,.15);white-space:nowrap';
+    pill.innerHTML = '<div style="font-size:16px;margin-bottom:2px">' + p.icon + '</div>' + p.label;
+    wrap.appendChild(pill);
+  });
+  return wrap;
+}
 // 수치·출처·책제목 자동 볼드 + 줄바꿈 힌트 (non-breaking space) 주입
 //   "5km 완주" · "1만원 크림" 같은 숫자+명사 조합이 줄바꿈에서 분리되지 않도록 NBSP 처리
 //   《책제목》, 괄호 출처, 숫자+단위, SPF/PA 같은 키워드는 <b> 로 강조
@@ -7924,10 +7957,14 @@ function initEditor(){
       pgEl.style.zIndex = '5';
       sl.appendChild(pgEl);
     } else if(isIntro){
-      var titleY = layout === 'full' ? 52 : layout === 'half-left' ? 12 : 54;
-      var textY  = layout === 'full' ? 74 : layout === 'half-left' ? 42 : 76;
+      // 2번 슬라이드 (hook2) — 이중 후킹 전용 eyebrow 라벨 + 더 큰 제목
+      var accent = tplAccent(tpl);
+      var eyebrowY = layout === 'full' ? 46 : layout === 'half-left' ? 6 : 48;
+      var titleY = layout === 'full' ? 52 : layout === 'half-left' ? 14 : 54;
+      var textY  = layout === 'full' ? 74 : layout === 'half-left' ? 44 : 76;
       var textX  = layout === 'half-left' ? 52 : 6;
       var textW  = layout === 'half-left' ? 44 : 88;
+      sl.appendChild(makeEyebrowEl('이어서 · 더 놀라운 거', {x:textX,y:eyebrowY,accent:accent}));
       var tEl = makeTextEl(p.title || '사실 이게 핵심이었어', {x:textX,y:titleY,w:textW,size:26,color:c,weight:900,isTitle:true});
       tEl.style.zIndex = '5';
       sl.appendChild(tEl);
@@ -7938,10 +7975,11 @@ function initEditor(){
       pEl.style.zIndex = '5';
       sl.appendChild(pEl);
     } else if(isEnding){
-      // CTA — 이미지 없음, 큰 텍스트 중앙
-      sl.appendChild(makeTextEl(p.title || '다음편도 올라옴', {x:6,y:28,w:88,size:30,color:c,weight:900,isTitle:true}));
-      sl.appendChild(makeTextEl(p.text || '팔로우하면 볼 수 있음\n광고 아님, 내 경험담', {x:6,y:54,w:88,size:16,color:c,weight:600}));
-      sl.appendChild(makeTextEl('💬 댓글  ·  🔖 저장  ·  ➕ 팔로우', {x:6,y:84,w:88,size:12,color:c,weight:800}));
+      // 마지막 CTA — 큰 제목 + 문구 + 액션 pill 3개
+      var ctaAccent = tplAccent(tpl);
+      sl.appendChild(makeTextEl(p.title || '다음편도 올라옴', {x:6,y:22,w:88,size:30,color:c,weight:900,isTitle:true}));
+      sl.appendChild(makeTextEl(p.text || '팔로우하면 볼 수 있음\n광고 아님, 내 경험담', {x:6,y:48,w:88,size:15,color:c,weight:600}));
+      sl.appendChild(makeCtaPillsEl({x:10,y:78,w:80,accent:ctaAccent}));
     } else if(isSummary){
       // 요약 — 이미지 없음
       sl.appendChild(makeTextEl('정리하면 이거야 ✅', {x:6,y:12,w:88,size:20,color:c,weight:900}));
@@ -7962,11 +8000,14 @@ function initEditor(){
       } else {
         nY = 12; titleY2 = 20; textY2 = 46; textX2 = 6; textW2 = 88;
       }
-      var numEl = makeTextEl(String(i).padStart(2,'0'), {x:textX2,y:nY,w:16,size:22,color:c,weight:900});
+      var bodyAccent = tplAccent(tpl);
+      var numEl = makeTextEl(String(i).padStart(2,'0'), {x:textX2,y:nY,w:16,size:22,color:bodyAccent,weight:900});
       numEl.style.zIndex = '5';
       sl.appendChild(numEl);
       var titleEl = makeTextEl(p.title || '포인트', {x:textX2+7,y:titleY2,w:textW2-7,size:22,color:c,weight:900,isTitle:true});
       titleEl.style.zIndex = '5';
+      // 제목 아래 accent bar (템플릿 컬러 라인)
+      sl.appendChild(makeAccentBarEl({x:textX2, y:titleY2 + 10, w:10, accent:bodyAccent}));
       sl.appendChild(titleEl);
       var textEl = makeTextEl(p.text || '수치·출처 포함한 본문', {x:textX2,y:textY2,w:textW2,size:13,color:c,weight:500});
       textEl.style.zIndex = '5';
