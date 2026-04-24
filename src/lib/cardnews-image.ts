@@ -1,20 +1,30 @@
 // 카드뉴스 이미지 자동 fetch 체인
-// 우선순위: Unsplash → Pexels → Pixabay → Gemini Imagen
-// 키가 없는 provider 는 자동 스킵. 전부 실패하면 { ok:false }.
+// 우선순위: Unsplash → Pexels → Pixabay
+// 키가 없는 provider 는 자동 스킵. 전부 실패하면 { ok:false } → 프론트에서 placeholder 표시.
+// AI 생성(Gemini/HeyGen) 제거 — 비용·저작권 이슈
 //
 // 환경변수:
 //   UNSPLASH_ACCESS_KEY  — https://unsplash.com/developers (무료, 50req/hour)
 //   PEXELS_API_KEY        — https://www.pexels.com/api/ (무료, 200req/hour)
 //   PIXABAY_API_KEY       — https://pixabay.com/api/docs/ (무료, 100req/min)
-//   GEMINI_API_KEY        — https://aistudio.google.com/apikey (무료 티어)
 //
 // 카테고리별 영어 aesthetic 키워드로 자동 변환 (한국어 그대로 검색하면 결과 빈약)
 // Pinterest 는 공개 API 없고 스크래핑은 TOS 위반 여지 → 제외
 
 import type { CategoryKey } from './cardnews-prompt'
 
+// Unsplash / Pexels Production 승인 요건: Photo by X on Unsplash 형식의 크레딧 필수.
+// ImageResult 에 attributionUrl·photographer·sourceLabel 까지 담아 프론트에서 그대로 렌더링.
 export type ImageResult =
-  | { ok: true; url: string; source: 'unsplash' | 'pexels' | 'pixabay' | 'gemini'; attribution?: string }
+  | {
+      ok: true
+      url: string
+      source: 'unsplash' | 'pexels' | 'pixabay'
+      sourceLabel: 'Unsplash' | 'Pexels' | 'Pixabay'
+      photographer?: string
+      attributionUrl?: string           // 사진 원본 페이지 (UTM 파라미터 포함, Unsplash 필수)
+      photographerUrl?: string          // 작가 프로필 페이지 (Unsplash 필수)
+    }
   | { ok: false; error: string; detail?: string }
 
 // ─────────────────────────────────────────────
@@ -126,6 +136,10 @@ export function toEnKeyword(args: {
   return base
 }
 
+// UTM 파라미터 — Unsplash API 가이드라인 필수 (Production 승인 요건)
+// https://help.unsplash.com/en/articles/2511245
+const UTM = 'utm_source=ssobi&utm_medium=referral'
+
 // ─────────────────────────────────────────────
 // 각 provider — 키 없으면 { ok:false } 즉시 반환
 // ─────────────────────────────────────────────
@@ -134,12 +148,17 @@ async function fetchUnsplash(q: string): Promise<ImageResult> {
   if (!key) return { ok: false, error: 'unsplash_no_key' }
   try {
     const res = await fetch(
-      `https://api.unsplash.com/search/photos?query=${encodeURIComponent(q)}&per_page=10&orientation=squarish`,
-      { headers: { Authorization: `Client-ID ${key}` } }
+      `https://api.unsplash.com/search/photos?query=${encodeURIComponent(q)}&per_page=10&orientation=squarish&content_filter=high`,
+      { headers: { Authorization: `Client-ID ${key}`, 'Accept-Version': 'v1' } }
     )
     if (!res.ok) return { ok: false, error: 'unsplash_http', detail: `${res.status}` }
     const data = await res.json() as {
-      results?: Array<{ urls?: { regular?: string; small?: string }; user?: { name?: string } }>
+      results?: Array<{
+        id?: string
+        urls?: { regular?: string; small?: string }
+        links?: { html?: string; download_location?: string }
+        user?: { name?: string; username?: string; links?: { html?: string } }
+      }>
     }
     const results = data.results || []
     if (!results.length) return { ok: false, error: 'unsplash_empty' }
@@ -148,7 +167,19 @@ async function fetchUnsplash(q: string): Promise<ImageResult> {
     const pick = (pool.length ? pool : results)[Math.floor(Math.random() * Math.max(1, (pool.length ? pool.length : results.length)))]
     const url = pick?.urls?.regular || pick?.urls?.small
     if (!url) return { ok: false, error: 'unsplash_no_url' }
-    return { ok: true, url, source: 'unsplash', attribution: pick.user?.name }
+    // Unsplash 가이드: download_location 에 GET (키 포함) 을 non-blocking 으로 호출해 다운로드 카운트 증가
+    if (pick.links?.download_location) {
+      fetch(`${pick.links.download_location}&client_id=${key}`).catch(() => {})
+    }
+    return {
+      ok: true,
+      url,
+      source: 'unsplash',
+      sourceLabel: 'Unsplash',
+      photographer: pick.user?.name,
+      attributionUrl: pick.links?.html ? `${pick.links.html}?${UTM}` : undefined,
+      photographerUrl: pick.user?.links?.html ? `${pick.user.links.html}?${UTM}` : undefined,
+    }
   } catch (e) {
     return { ok: false, error: 'unsplash_exception', detail: String(e).slice(0, 200) }
   }
@@ -164,7 +195,13 @@ async function fetchPexels(q: string): Promise<ImageResult> {
     )
     if (!res.ok) return { ok: false, error: 'pexels_http', detail: `${res.status}` }
     const data = await res.json() as {
-      photos?: Array<{ src?: { large?: string; large2x?: string; medium?: string }; photographer?: string }>
+      photos?: Array<{
+        id?: number
+        url?: string
+        src?: { large?: string; large2x?: string; medium?: string }
+        photographer?: string
+        photographer_url?: string
+      }>
     }
     const photos = data.photos || []
     if (!photos.length) return { ok: false, error: 'pexels_empty' }
@@ -172,7 +209,15 @@ async function fetchPexels(q: string): Promise<ImageResult> {
     const pick = (pool.length ? pool : photos)[Math.floor(Math.random() * Math.max(1, (pool.length ? pool.length : photos.length)))]
     const url = pick?.src?.large2x || pick?.src?.large || pick?.src?.medium
     if (!url) return { ok: false, error: 'pexels_no_url' }
-    return { ok: true, url, source: 'pexels', attribution: pick.photographer }
+    return {
+      ok: true,
+      url,
+      source: 'pexels',
+      sourceLabel: 'Pexels',
+      photographer: pick.photographer,
+      attributionUrl: pick.url,
+      photographerUrl: pick.photographer_url,
+    }
   } catch (e) {
     return { ok: false, error: 'pexels_exception', detail: String(e).slice(0, 200) }
   }
@@ -187,7 +232,13 @@ async function fetchPixabay(q: string): Promise<ImageResult> {
     )
     if (!res.ok) return { ok: false, error: 'pixabay_http', detail: `${res.status}` }
     const data = await res.json() as {
-      hits?: Array<{ largeImageURL?: string; webformatURL?: string; user?: string }>
+      hits?: Array<{
+        pageURL?: string
+        largeImageURL?: string
+        webformatURL?: string
+        user?: string
+        user_id?: number
+      }>
     }
     const hits = data.hits || []
     if (!hits.length) return { ok: false, error: 'pixabay_empty' }
@@ -195,34 +246,17 @@ async function fetchPixabay(q: string): Promise<ImageResult> {
     const pick = (pool.length ? pool : hits)[Math.floor(Math.random() * Math.max(1, (pool.length ? pool.length : hits.length)))]
     const url = pick?.largeImageURL || pick?.webformatURL
     if (!url) return { ok: false, error: 'pixabay_no_url' }
-    return { ok: true, url, source: 'pixabay', attribution: pick.user }
+    return {
+      ok: true,
+      url,
+      source: 'pixabay',
+      sourceLabel: 'Pixabay',
+      photographer: pick.user,
+      attributionUrl: pick.pageURL,
+      photographerUrl: pick.user_id ? `https://pixabay.com/users/${pick.user_id}/` : undefined,
+    }
   } catch (e) {
     return { ok: false, error: 'pixabay_exception', detail: String(e).slice(0, 200) }
-  }
-}
-
-async function fetchGeminiImagen(prompt: string): Promise<ImageResult> {
-  const key = process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY
-  if (!key) return { ok: false, error: 'gemini_no_key' }
-  try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${key}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          instances: [{ prompt: `photorealistic ${prompt}, Korean style, natural lighting, no text, no illustration, no typography` }],
-          parameters: { sampleCount: 1, aspectRatio: '1:1' },
-        }),
-      }
-    )
-    if (!res.ok) return { ok: false, error: 'gemini_http', detail: `${res.status}` }
-    const data = await res.json() as { predictions?: Array<{ bytesBase64Encoded?: string; mimeType?: string }> }
-    const p = data.predictions?.[0]
-    if (!p?.bytesBase64Encoded) return { ok: false, error: 'gemini_empty' }
-    return { ok: true, url: `data:${p.mimeType || 'image/png'};base64,${p.bytesBase64Encoded}`, source: 'gemini' }
-  } catch (e) {
-    return { ok: false, error: 'gemini_exception', detail: String(e).slice(0, 200) }
   }
 }
 
@@ -236,6 +270,7 @@ function cleanQuery(q: string): string {
 
 // ─────────────────────────────────────────────
 // 메인 체인 — 키 있는 첫 번째 provider 가 성공하면 반환
+// Unsplash → Pexels → Pixabay. 전부 실패하면 프론트가 placeholder 렌더.
 // ─────────────────────────────────────────────
 export async function fetchCardnewsImage(args: {
   koKeyword?: string
@@ -244,7 +279,7 @@ export async function fetchCardnewsImage(args: {
 }): Promise<ImageResult> {
   const enQuery = cleanQuery(toEnKeyword(args))
   const errs: string[] = []
-  for (const provider of [fetchUnsplash, fetchPexels, fetchPixabay, fetchGeminiImagen]) {
+  for (const provider of [fetchUnsplash, fetchPexels, fetchPixabay]) {
     const r = await provider(enQuery)
     if (r.ok) return r
     errs.push(r.error)

@@ -1,6 +1,7 @@
 // GET /api/cardnews/image-search?q=...&category=...&slide=N
-// Unsplash → Pexels → Pixabay → Gemini Imagen fallback chain.
-// 프론트는 슬라이드당 1회 호출해 자동 로드. Pinterest 플로우 삭제.
+// Unsplash → Pexels → Pixabay fallback chain. AI 생성 제거.
+// 프론트는 슬라이드당 1회 호출해 자동 로드.
+// 응답에 photographer·attributionUrl·photographerUrl 포함 → Unsplash Production 승인 요건.
 import { NextRequest, NextResponse } from 'next/server'
 import { fetchCardnewsImage } from '@/lib/cardnews-image'
 import type { CategoryKey } from '@/lib/cardnews-prompt'

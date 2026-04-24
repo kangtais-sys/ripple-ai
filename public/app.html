@@ -7593,7 +7593,9 @@ function openUploadForSlot(wrap){
   input.click();
   setTimeout(function(){ input.remove(); }, 100);
 }
-function setImageSlot(wrap, url){
+// 이미지 슬롯에 이미지 세팅 + attribution 하단 라벨 (Unsplash/Pexels Production 요건)
+//   meta: { photographer, sourceLabel, attributionUrl, photographerUrl } — 없으면 라벨 생략
+function setImageSlot(wrap, url, meta){
   if(!wrap || !url) return;
   wrap.dataset.loading = '';
   wrap.innerHTML = '';
@@ -7608,6 +7610,36 @@ function setImageSlot(wrap, url){
     renderImageSlotPlaceholder(wrap);
   };
   wrap.appendChild(img);
+  // attribution 캡션 — 이미지 하단 우측에 얇게 (작가명 · Unsplash)
+  //   유저 직접 업로드는 meta 없음 → 표시 안 함
+  if(meta && meta.photographer && meta.sourceLabel){
+    var cap = document.createElement('div');
+    cap.className = 'edt-img-attr';
+    cap.style.cssText = 'position:absolute;right:4px;bottom:4px;padding:2px 6px;background:rgba(0,0,0,.55);color:#fff;font-size:8.5px;font-weight:600;letter-spacing:.1px;border-radius:0;pointer-events:auto;z-index:2;line-height:1.2;max-width:90%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:-apple-system,BlinkMacSystemFont,sans-serif';
+    cap.textContent = 'Photo by ' + meta.photographer + ' on ' + meta.sourceLabel;
+    // 링크는 새탭으로 (편집 중 모달 닫힘 방지)
+    if(meta.attributionUrl){
+      cap.style.cursor = 'pointer';
+      cap.addEventListener('click', function(e){
+        e.stopPropagation();
+        window.open(meta.attributionUrl, '_blank', 'noopener');
+      });
+      cap.addEventListener('mousedown', function(e){ e.stopPropagation(); });
+      cap.addEventListener('touchstart', function(e){ e.stopPropagation(); }, {passive:true});
+    }
+    wrap.appendChild(cap);
+    // dataset 에도 저장 (발행 시 캡션에 출처 추가하려면 사용)
+    wrap.dataset.attrPhotographer = meta.photographer || '';
+    wrap.dataset.attrSource = meta.sourceLabel || '';
+    wrap.dataset.attrUrl = meta.attributionUrl || '';
+    wrap.dataset.attrPhotographerUrl = meta.photographerUrl || '';
+  } else {
+    // 업로드/수동 이미지 → attribution 속성 클리어
+    wrap.dataset.attrPhotographer = '';
+    wrap.dataset.attrSource = '';
+    wrap.dataset.attrUrl = '';
+    wrap.dataset.attrPhotographerUrl = '';
+  }
 }
 // 편집 캔버스 전체 슬롯 자동 로드 (생성 직후 or 재렌더 후 1회)
 async function autoLoadAllImageSlots(){
@@ -7625,8 +7657,14 @@ async function autoLoadAllImageSlots(){
     fetch('/api/cardnews/image-search?' + params, { headers: h, credentials:'include' })
       .then(function(r){ return r.json(); })
       .then(function(j){
-        if(j && j.ok && j.url){ setImageSlot(slot, j.url); }
-        else {
+        if(j && j.ok && j.url){
+          setImageSlot(slot, j.url, {
+            photographer: j.photographer,
+            sourceLabel: j.sourceLabel,
+            attributionUrl: j.attributionUrl,
+            photographerUrl: j.photographerUrl,
+          });
+        } else {
           slot.dataset.loading = '';
           renderImageSlotPlaceholder(slot);
         }
@@ -8328,11 +8366,14 @@ async function captureAndUploadSlides(jobId){
         continue;
       }
 
-      // 선택 outline·핸들 숨김
+      // 선택 outline·핸들·이미지 attribution 라벨 숨김 (깨끗한 이미지 캡처용)
+      //   attribution 은 IG 캡션에 별도로 추가되므로 이미지에 워터마크 불필요
       var sels = slideEl.querySelectorAll('.edt-el.sel');
       sels.forEach(function(el){ el.classList.remove('sel'); });
       var handles = slideEl.querySelectorAll('.edt-hnd');
       handles.forEach(function(hnd){ hnd.style.display = 'none'; });
+      var attrs = slideEl.querySelectorAll('.edt-img-attr');
+      attrs.forEach(function(a){ a.style.display = 'none'; });
 
       var canvas = await window.html2canvas(slideEl, {
         useCORS: true,
@@ -8345,6 +8386,7 @@ async function captureAndUploadSlides(jobId){
       });
 
       handles.forEach(function(hnd){ hnd.style.display = ''; });
+      attrs.forEach(function(a){ a.style.display = ''; });
       console.log('[capture] slide', i, 'canvas:', canvas.width, 'x', canvas.height);
 
       if(canvas.width === 0 || canvas.height === 0){
@@ -8606,15 +8648,53 @@ function escapeHtml(s){
   return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+// 편집 캔버스의 모든 이미지 슬롯에서 photographer·source 수집 → 캡션 크레딧 라인 생성
+//   Unsplash / Pexels API 약관 준수 — 이미지 근처에 크레딧 필수 (캡션이 "near the photo" 에 해당)
+//   사용자가 직접 업로드한 이미지는 attr 속성 없어서 자동 제외됨
+function buildPhotoCreditsLine(){
+  var slots = document.querySelectorAll('.edt-slide .edt-el.img');
+  var seen = {};
+  var credits = [];
+  Array.from(slots).forEach(function(s){
+    var who = (s.dataset.attrPhotographer || '').trim();
+    var where = (s.dataset.attrSource || '').trim();
+    if(!who || !where) return;
+    var key = who + '|' + where;
+    if(seen[key]) return;
+    seen[key] = true;
+    credits.push(who + ' (' + where + ')');
+  });
+  if(!credits.length) return '';
+  return '📷 Photos: ' + credits.join(', ');
+}
+// 캡션에 크레딧 라인 자동 추가 (이미 있으면 중복 X). 유저 편집 캡션 보존.
+function appendPhotoCredits(caption){
+  caption = caption || '';
+  var line = buildPhotoCreditsLine();
+  if(!line) return caption;
+  // 이미 같은 Photos: 접두가 있으면 해당 라인만 교체
+  var prefix = '📷 Photos:';
+  var lines = caption.split('\n');
+  var idx = lines.findIndex(function(l){ return l.trim().startsWith(prefix); });
+  if(idx >= 0){
+    lines[idx] = line;
+    return lines.join('\n');
+  }
+  // 없으면 캡션 끝에 빈 줄 1개 + 크레딧
+  return caption.trimEnd() + '\n\n' + line;
+}
+
 async function saveCardnewsJob(status, scheduledAt){
   try {
     var h = await authHeaders();
+    var userCaption = createData.caption || (document.getElementById('post-caption')||{}).value || '';
+    var withCredits = appendPhotoCredits(userCaption);
     var body = {
       topic: createData._lastSource || (createData.hook || '').slice(0, 30),
       hook: createData.hook,
       body: createData.body,
       bodySlides: createData.bodySlides || null,  // 원본 슬라이드 배열 (캐러셀 발행용)
-      caption: createData.caption || (document.getElementById('post-caption')||{}).value || '',
+      caption: withCredits,
       template: createData.template || 'clean',
       size: createData.size || 'sq',
       channels: createData.channels || ['ig'],
