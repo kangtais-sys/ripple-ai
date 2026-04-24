@@ -1041,10 +1041,25 @@ body.edt-fullscreen #create-back{display:none}
 .edt-arrows{position:absolute;top:50%;transform:translateY(-50%);width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.9);border:1px solid var(--b);display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.08);z-index:5}
 .edt-arrows.prev{left:8px}.edt-arrows.next{right:8px}
 .edt-arrows svg{width:16px;height:16px;stroke:var(--t1);stroke-width:2}
-/* 편집 툴 바 — sticky (스크롤해도 항상 보임) */
-.edt-tools{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px;position:sticky;top:4px;z-index:50;background:var(--bg);padding:6px;border-radius:12px;box-shadow:0 2px 6px rgba(15,19,25,.04)}
-/* 편집 패널도 sticky — 선택된 요소 편집 중 위로 스크롤 없이 바로 조작 */
-.edt-panel.on{position:sticky;top:62px;z-index:49;box-shadow:0 6px 22px rgba(15,19,25,.08)}
+/* 편집 툴 바 — 기본 flow (수정 패널이 고정 floating 이어서 툴바 sticky 필요 없음) */
+.edt-tools{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px;background:var(--bg);padding:0;border-radius:12px}
+/* 편집 패널 고정 floating — 내 링크 에디터와 동일 방식 (하단 하드 고정) */
+.edt-panel.on{
+  position:fixed;
+  left:50%;
+  bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 12px);
+  transform:translateX(-50%);
+  width:min(calc(100vw - 24px), 420px);
+  max-height:58vh;
+  overflow-y:auto;
+  z-index:9000;
+  box-shadow:0 -8px 28px rgba(15,19,25,.18), 0 0 0 1px rgba(0,0,0,.04);
+  border-radius:16px;
+  animation:edtPanelUp .22s cubic-bezier(.32,1,.32,1);
+}
+@keyframes edtPanelUp { from{transform:translate(-50%, 10px);opacity:0} to{transform:translate(-50%, 0);opacity:1} }
+body.edt-fullscreen .edt-panel.on{ bottom:20px }
+/* 풀스크린에서도 동일하게 floating — nav 없으므로 아래쪽 기본 20px */
 .edt-tool{padding:10px 4px;border-radius:12px;border:1px solid var(--b);background:var(--s);font-size:10px;font-weight:700;color:var(--t2);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;line-height:1.1}
 .edt-tool svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.8;fill:none}
 .edt-tool:active{background:var(--bg)}
@@ -1362,11 +1377,11 @@ body.dev-mode .mitem.dev-only{display:flex!important}
 .cs2-edit-field:hover:not(.editing){background:rgba(0,200,150,.08)}
 .cs2-edit-field.editing{background:#fff!important;outline:2px solid var(--mint);cursor:text;box-shadow:0 2px 8px rgba(0,200,150,.15)}
 .cs2-edit-field:focus{outline:2px solid var(--mint)}
-.cs2-actions{display:flex;gap:8px;margin-top:0}
-.cs2-act{flex:1;display:flex;align-items:center;justify-content:center;gap:6px;padding:12px 10px;border-radius:12px;background:#fff;border:1.5px solid var(--b);color:var(--t1);font-family:'Pretendard',sans-serif;font-size:13px;font-weight:700;letter-spacing:-.2px;cursor:pointer;transition:all .15s}
-.cs2-act svg{width:14px;height:14px;stroke:currentColor;fill:none;flex-shrink:0}
+.cs2-actions{display:flex;gap:6px;margin-top:0;flex-wrap:nowrap}
+.cs2-act{flex:1 1 0;min-width:0;display:flex;align-items:center;justify-content:center;gap:4px;padding:10px 8px;border-radius:10px;background:#fff;border:1.5px solid var(--b);color:var(--t1);font-family:'Pretendard',sans-serif;font-size:12.5px;font-weight:700;letter-spacing:-.2px;cursor:pointer;transition:all .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cs2-act svg{width:13px;height:13px;stroke:currentColor;fill:none;flex-shrink:0}
 .cs2-act:active{transform:scale(.97);background:var(--bg)}
-.cs2-act.primary{background:var(--mint);border-color:var(--mint);color:#fff;flex:2;box-shadow:0 4px 12px rgba(0,200,150,.22)}
+.cs2-act.primary{background:var(--mint);border-color:var(--mint);color:#fff;flex:1 1 0;box-shadow:0 3px 10px rgba(0,200,150,.22)}
 .cs2-act.primary:active{background:var(--mint-d)}
 
 /* ═══════════════════════════════════════════════════
@@ -7926,8 +7941,9 @@ function initEditor(){
   });
   edtCur = 0;
   renderEdtNav();
-  // 텍스트 auto-fit: 각 슬라이드의 텍스트 박스에 세로 공간 할당 + 넘치면 font-size 자동 축소
-  edtSlides.forEach(function(sl){ fitTextsInSlide(sl); });
+  // 텍스트 auto-fit — 첫 슬라이드(visible)만 지금 실행. 나머지는 edtGoto 로 넘어갈 때 실행.
+  //   (display:none 슬라이드는 clientHeight 가 0 이라 자동 축소 과도 적용됨)
+  if(edtSlides[0]){ requestAnimationFrame(function(){ fitTextsInSlide(edtSlides[0]); }); }
   // 모든 이미지 슬롯 병렬 자동 로드 (Unsplash → Pexels → Pixabay)
   setTimeout(autoLoadAllImageSlots, 100);
 }
@@ -7948,6 +7964,10 @@ function edtGoto(i){
   edtCur = i;
   edtSel=null;
   renderEdtNav();
+  // 슬라이드 전환 시 auto-fit 재실행 — display:none 이었던 슬라이드는 초기엔 측정 불가했기 때문
+  if(typeof fitTextsInSlide === 'function'){
+    requestAnimationFrame(function(){ fitTextsInSlide(edtSlides[i]); });
+  }
 }
 function edtNav(d){ edtGoto(edtCur+d); }
 function toggleFullscreenEditor(){

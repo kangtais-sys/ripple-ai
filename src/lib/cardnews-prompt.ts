@@ -15,7 +15,7 @@ export type CategoryKey =
   | 'food' | 'cafe' | 'travel_domestic' | 'travel_abroad'
   | 'fashion' | 'interior' | 'fitness'
   | 'money_tip' | 'price_compare' | 'trend'
-  | 'review' | 'life_tip' | 'etc'
+  | 'review' | 'life_tip' | 'book' | 'etc'
 
 export type CategoryInfo = {
   name: string
@@ -157,6 +157,14 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     researchFocus: ['상황', '팁', '효과', '준비물'],
     hashtags: ['#꿀팁', '#라이프해킹', '#일상꿀팁', '#생활팁', '#저장각'],
   },
+  book: {
+    name: '책·독서',
+    tone: '밑줄 친 사람 말투. 실제 책 제목·작가 이름 필수',
+    imageDirection: 'vintage book aesthetic photography',
+    moodKeywords: ['책 감성', 'vintage book aesthetic', 'reading aesthetic'],
+    researchFocus: ['책 제목', '작가', '유명 인용구', '출판 연도', '평점/베스트셀러 기록'],
+    hashtags: ['#책스타그램', '#독서', '#북스타그램', '#책추천', '#밑줄'],
+  },
   etc: {
     name: '기타',
     tone: 'MZ 감성 일상 톤',
@@ -187,6 +195,7 @@ export function classifyCategory(topic: string): CategoryKey {
   if (/가격|비교|저렴|싸|가성비|최저가/.test(topic)) return 'price_compare'
   if (/트렌드|유행|요즘|인기|MZ|Z세대|밈|핫/.test(topic)) return 'trend'
   if (/리뷰|후기|솔직|써본|사용기/.test(topic)) return 'review'
+  if (/책|독서|소설|에세이|자기계발|베스트셀러|북스타그램|한 권|book|novel|reading/i.test(topic)) return 'book'
   if (/꿀팁|팁|방법|how to|하는 법/.test(topic)) return 'life_tip'
   return 'etc'
 }
@@ -358,7 +367,7 @@ export function buildContentGenerationPrompt(args: {
     : ''
   const researchBlock = args.researchData?.trim()
     ? args.researchData.trim()
-    : '※ 리서치 데이터가 없음. 이 경우 모든 수치·가격·브랜드를 "모름"으로 처리하고, 일반론만 다룸. 지어내지 말 것.'
+    : '※ 별도 리서치 데이터는 없음. 네가 학습한 공개 지식(잘 알려진 책·제품·장소·통계 등)은 적극 활용해도 됨. 단, 지어내지 말고 "확실하지 않은 건 빼는" 방향으로 작성. "정확 수치 확인 필요" 같은 placeholder 문구는 절대 출력 금지.'
 
   return `너는 ${args.accountConcept}다.
 아래 실제 조사된 정보로 카드뉴스 ${slideCount}장을 기획해.
@@ -377,17 +386,29 @@ ${researchBlock}
 - body 배열은 정확히 ${slideCount - 1}개 원소 (1장 hook + ${slideCount - 1}개 body = 총 ${slideCount}장)
 - 이모지는 전체에서 최대 ${Math.ceil(slideCount / 2)}개
 
-## 🔴 수치·출처 강제 규칙 (유저가 제일 중요하게 보는 부분)
-- 각 본론 슬라이드에 **구체 숫자 최소 1개**: 가격(₩) · 기간(일/주/월) · 비율(%) · 순위(위) · 평점(점) 중 하나 이상
-- 모호 표현 절대 금지: "케이스마다 달라" / "사람마다 달라" / "천차만별" / "다양함" / "상황에 따라"
-  → 이런 말 쓸 거면 차라리 그 슬라이드를 "이건 확인 못 했어" 로 솔직하게 표기
-- 출처 한 줄 필수: "(올리브영 평균가)", "(강남언니 후기 100건 기준)", "(무신사 베스트 순위)", "(공식 홈페이지)"
-- 리서치 데이터에 없는 숫자는 절대 지어내지 마 — 없으면 "정확 수치 확인 필요" 라고 명시
-- "약 X원" / "대략 X개월" 도 지양 — 실제 관찰한 범위면 "3~5만원대 (올영 기준)" 처럼 출처 묶어서 명시
+## 🔴 구체성 규칙 (유저가 제일 중요하게 보는 부분)
+- 각 본론 슬라이드는 **구체적 사례·이름·숫자** 중 최소 1개 포함
+  · 책 이름(예: 《원씽》, 《미드나잇 라이브러리》)
+  · 공개된 가격대(예: "2~3만원대", "스탠다드 9,900원")
+  · 기간/빈도(예: "주 3회", "6개월", "매일 아침 10분")
+  · 순위·평점(예: "YES24 베스트 10주 연속")
+  · 실제 작가·공인 인물의 공개 발언
+- **placeholder 문구 절대 금지** (너무 자주 나와서 심각)
+  · "정확 수치 확인 필요" 금지
+  · "리서치 데이터 부족" 금지
+  · "데이터가 없어서" 금지
+  · "~일 수도 있어" 식의 회피 금지
+- 공개된 잘 알려진 정보는 적극 사용해도 됨 (네 학습 지식 기반). 단 확실한 것만.
+  · 예: "《원씽》은 '한 번에 한 가지만' 원칙을 강조한 책"
+  · 예: "스타벅스 아메리카노 톨 사이즈 4,700원 (2026년 기준)"
+- **확실하지 않으면 그 수치·이름을 빼고, 대신 구체적인 '상황 묘사'로 대체**
+  · (나쁨) "독서가 습관이 된 사람들의 비율 - 정확 수치 확인 필요"
+  · (좋음) "출근길 지하철에서 매일 한 챕터씩 읽는 독서가들의 공통점"
+- 모호 표현 금지: "케이스마다 달라" · "사람마다 달라" · "천차만별" · "상황에 따라"
 
 ## 금지 표현
 ${BANNED_PHRASES.map(p => `  · "${p}"`).join('\n')}
-추가 금지: "케이스마다", "사람마다", "상황에 따라", "다양해", "천차만별", "약", "대략"
+추가 금지: "케이스마다", "사람마다", "상황에 따라", "다양해", "천차만별", "확인 필요", "데이터 부족"
 
 ## 장별 구성
 
