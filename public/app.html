@@ -1008,8 +1008,8 @@ body.edt-fullscreen #create-back{display:none}
 .gp-ring-inner { position: absolute; inset: 14px; border: 2px solid transparent; border-bottom-color: var(--mint-d); border-left-color: rgba(0,200,150,.25); border-radius: 50%; animation: gp-ring-spin-rev 2s linear infinite }
 .gp-core { position: absolute; inset: 30px; border-radius: 50%; background: radial-gradient(circle, var(--mint) 0%, var(--mint-d) 100%); box-shadow: 0 0 24px rgba(0,200,150,.6); animation: gp-pulse 1.6s ease-in-out infinite; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 20px; font-weight: 900; letter-spacing: -.5px }
 .gp-orbit { position: absolute; top: 50%; left: 50%; width: 6px; height: 6px; margin: -3px 0 0 -3px; border-radius: 50%; background: #FFD233; box-shadow: 0 0 10px #FFD233; animation: gp-orbit 2.4s linear infinite }
-.gp-title { font-size: 18px; font-weight: 800; color: var(--t1); margin-bottom: 4px; letter-spacing: -.4px }
-.gp-sub { font-size: 12px; color: var(--t3); margin-bottom: 22px; font-weight: 500 }
+.gp-title { font-size: 16px; font-weight: 800; color: var(--t2); margin-bottom: 10px; letter-spacing: -.3px }
+.gp-sub { font-size: 17px; color: var(--t1); margin-bottom: 22px; font-weight: 800; letter-spacing: -.4px; padding: 8px 14px; background: var(--mint-l); border-radius: 10px; border: 1px solid #A7F3D0; line-height: 1.4; display: inline-block; max-width: 100%; word-break: keep-all }
 .gp-steps { text-align: left; margin-bottom: 18px; display: flex; flex-direction: column; gap: 6px }
 .gp-step-row { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; transition: all .3s ease; background: transparent }
 .gp-step-row.on { background: var(--mint-l); animation: gp-step-enter .3s ease }
@@ -1030,8 +1030,10 @@ body.edt-fullscreen #create-back{display:none}
 .edt-style-btn.on{background:var(--t1);color:#fff;border-color:var(--t1)}
 .edt-weight-select{height:34px;padding:0 10px;border:1px solid var(--b);border-radius:8px;background:#fff;font-family:'Pretendard',sans-serif;font-size:12px;color:var(--t1);cursor:pointer;outline:none}
 /* 이미지 슬롯 — 라운드/테두리 없음 (실제 IG 업로드 시 없으니 WYSIWYG 일관성) */
-.edt-el.img{width:60%;height:auto;border-radius:0}
-.edt-el.img img{width:100%;display:block;border-radius:0;pointer-events:none}
+/* 이미지 슬롯 — 라운드·테두리·배경 전혀 없음. 이미지 자체가 꽉 차게 */
+.edt-el.img{width:60%;height:auto;border-radius:0;border:none;padding:0;background:transparent}
+.edt-el.img img{width:100%;height:100%;display:block;border-radius:0;pointer-events:none;object-fit:cover}
+.edt-el.img .edt-img-ph{border-radius:0}
 .edt-hnd{position:absolute;right:-6px;bottom:-6px;width:14px;height:14px;background:var(--mint);border:2px solid #fff;border-radius:50%;cursor:nwse-resize;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .edt-nav{display:flex;justify-content:center;gap:4px;margin-bottom:10px}
 .edt-dot{width:7px;height:7px;border-radius:50%;background:var(--b);cursor:pointer}
@@ -5026,9 +5028,13 @@ async function generatePrompt(){
     if(!res.ok || !j.hook){
       throw new Error(j.error || 'AI 생성 실패');
     }
-    // body: [{title,text}, ...] → 텍스트 블록으로 플래튼
+    // body: [{title,text}, ...] → 텍스트 블록으로 플래튼 (슬라이드 2~N 번호)
+    //   슬라이드 1 = 표지(hook) 는 cs2-hook 에 별도 표시, 본문에는 2부터 번호
     var bodyText = (j.body||[]).map(function(b, i){
-      return '[슬라이드 '+(i+1)+'] '+(b.title||'')+'\n'+(b.text||'');
+      var n = i + 2; // 슬라이드 2, 3, ... N
+      var isLast = (i === (j.body||[]).length - 1);
+      var label = isLast ? '[슬라이드 ' + n + ' · 마지막]' : '[슬라이드 ' + n + ']';
+      return label + ' ' + (b.title||'') + '\n' + (b.text||'');
     }).join('\n\n');
     createData.hook = j.hook;
     createData.body = bodyText;
@@ -7599,8 +7605,10 @@ function setImageSlot(wrap, url, meta){
   if(!wrap || !url) return;
   wrap.dataset.loading = '';
   wrap.innerHTML = '';
-  wrap.style.background = '#000';
+  wrap.style.background = 'transparent';  // 검정 배경 제거 — 이미지가 꽉 차게
   wrap.style.borderRadius = '0';
+  wrap.style.border = 'none';
+  wrap.style.padding = '0';
   var img = document.createElement('img');
   img.src = url;
   img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;border-radius:0';
@@ -7702,6 +7710,73 @@ var sizeInfo = {
   pt:{cls:'sz-pt', label:'세로형 · 1080×1350 · IG 피드'},
   st:{cls:'sz-st', label:'스토리/릴스 · 1080×1920 · IG·TK'}
 };
+// 매력적인 마지막 CTA 슬라이드 기본값 — "내용 N" 같은 허접한 자동 텍스트 대신
+function buildAttractiveCTA(topic){
+  var lines = [
+    { title: '끝까지 봐줘서 고마워', text: '도움됐으면 저장·공유·팔로우 부탁해\n다음 편도 올려줄게' },
+    { title: '저장해두면 유용해', text: '댓글에 궁금한 거 남기면\nDM 으로 더 솔직하게 알려줄게' },
+    { title: '이런 정보 더 보고 싶다면', text: '팔로우하고 알림 켜둬\n비슷한 주제 계속 올라와' },
+    { title: '댓글에 나도 남겨줘', text: '같은 고민 하는 사람 많아\nDM 으로 개인 맞춤 팁 보내줄게' },
+  ];
+  return lines[Math.floor(Math.random() * lines.length)];
+}
+// 중간 플레이스홀더 — Claude 응답이 짧을 때 (허접한 "내용 N" 대신 친절한 안내)
+function buildAttractivePlaceholder(idx, total){
+  return {
+    kind: 'slide',
+    title: '여기 포인트 ' + (idx),
+    text: '탭해서 내가 직접 채우면 돼\n(AI 가 슬라이드 수를 다 못 맞췄어)',
+  };
+}
+// 슬라이드 안 모든 텍스트 요소에 세로 공간을 할당 (다음 요소의 top 까지)
+//   이후 overflow 발생 시 font-size 를 자동 축소해 꽉 맞춤.
+function fitTextsInSlide(slideEl, slideHeightPx){
+  if(!slideEl) return;
+  var els = Array.from(slideEl.querySelectorAll('.edt-el.text'));
+  if(!els.length) return;
+  // top 순으로 정렬
+  var tops = els.map(function(el){ return { el:el, top: parseFloat(el.style.top) || 0 }; });
+  tops.sort(function(a, b){ return a.top - b.top; });
+  // 각 요소의 최대 높이 = 다음 요소 top - 현재 top - 여유 (마지막이면 96% - top)
+  tops.forEach(function(cur, i){
+    var nextTop = (i < tops.length - 1) ? tops[i+1].top : 96;
+    var availPct = Math.max(6, nextTop - cur.top - 1); // 최소 6%
+    cur.el.style.height = availPct + '%';
+    cur.el.style.overflow = 'hidden';
+    cur.el.style.display = 'flex';
+    cur.el.style.alignItems = 'flex-start';
+    cur.el.style.flexDirection = 'column';
+    cur.el.style.justifyContent = 'flex-start';
+    // 내부 텍스트를 감싸는 span 이 있어야 scrollHeight 측정 정확
+    if(!cur.el.dataset.fitWrapped){
+      var inner = document.createElement('span');
+      inner.style.cssText = 'display:block;width:100%';
+      inner.textContent = cur.el.textContent;
+      cur.el.textContent = '';
+      cur.el.appendChild(inner);
+      cur.el.dataset.fitWrapped = '1';
+    }
+  });
+  // 실제 DOM 크기 측정 — requestAnimationFrame 2회 대기 후
+  requestAnimationFrame(function(){
+    requestAnimationFrame(function(){
+      tops.forEach(function(cur){
+        var el = cur.el;
+        if(el.dataset.noAutofit === '1') return;
+        var inner = el.firstChild;
+        if(!inner) return;
+        var base = parseFloat(el.style.fontSize) || 12;
+        var size = base;
+        var guard = 0;
+        while((inner.scrollHeight > el.clientHeight + 2) && size > 9 && guard < 25){
+          size = Math.max(9, size * 0.93);
+          el.style.fontSize = size.toFixed(1) + 'px';
+          guard++;
+        }
+      });
+    });
+  });
+}
 function initEditor(){
   var canvas = document.getElementById('edt-canvas'); if(!canvas) return;
   // 사이즈 클래스 갱신
@@ -7712,12 +7787,31 @@ function initEditor(){
   if(badge) badge.textContent = info.label;
   canvas.querySelectorAll('.edt-slide').forEach(function(e){ e.remove(); });
   edtSlides = [];
-  var parsed = parseBodyIntoSlides(createData.body);
-  var target = createData.slides || 7;
-  // parsed 개수가 target과 다르면 잘라내거나 채우기
-  if(parsed.length > target) parsed = parsed.slice(0, target);
-  while(parsed.length < target){ parsed.push({kind:'slide', title:'내용 '+(parsed.length+1), text:''}); }
+  var body = parseBodyIntoSlides(createData.body);  // N-1 개 body (슬라이드 2~N)
+  var target = createData.slides || 7;              // N (총 슬라이드 수)
   var titleTxt = (createData.hook || '제목').replace(/^"|"$/g,'');
+  // parsed = [cover(hook), ...body] → 총 N개가 되도록 맞춤
+  //   body 부족 시 CTA 보존하며 중간에 플레이스홀더 삽입
+  //   body 초과 시 초반을 자르고 CTA(마지막) 유지
+  var cover = { kind:'cover', title: titleTxt, text: '저장하고 따라해봐' };
+  var parsed = [cover].concat(body);
+  if(parsed.length > target){
+    // 초반 body 를 줄이되 마지막 CTA(parsed[N-1]) 유지
+    var keepHead = parsed.slice(0, target - 1);
+    parsed = keepHead.concat([parsed[parsed.length - 1]]);
+  } else if(parsed.length < target){
+    var cta = parsed.pop();  // 마지막 = CTA
+    var attractivePlaceholder = buildAttractivePlaceholder;  // 함수 참조
+    while(parsed.length < target - 1){
+      parsed.push(attractivePlaceholder(parsed.length, target));
+    }
+    parsed.push(cta || buildAttractiveCTA(titleTxt));
+  }
+  // 마지막 슬라이드가 CTA 답지 않으면 예쁜 기본값으로 보강
+  var last = parsed[parsed.length - 1];
+  if(!last || !(last.title && last.text) || /^내용\s*\d+$/.test(last.title || '')){
+    parsed[parsed.length - 1] = buildAttractiveCTA(titleTxt);
+  }
   var c = tplText(createData.template);
   // 7장 구조: 0=후킹(cover), 1=후킹심화(intro), 2..N-3=본론(body), N-2=요약(summary), N-1=CTA
   //   N<6 이면 summary 슬라이드 생략. N<4 이면 intro 슬라이드 생략.
@@ -7829,7 +7923,9 @@ function initEditor(){
   });
   edtCur = 0;
   renderEdtNav();
-  // 모든 이미지 슬롯 병렬 자동 로드 (Unsplash → Pexels → Pixabay → Gemini)
+  // 텍스트 auto-fit: 각 슬라이드의 텍스트 박스에 세로 공간 할당 + 넘치면 font-size 자동 축소
+  edtSlides.forEach(function(sl){ fitTextsInSlide(sl); });
+  // 모든 이미지 슬롯 병렬 자동 로드 (Unsplash → Pexels → Pixabay)
   setTimeout(autoLoadAllImageSlots, 100);
 }
 function renderEdtNav(){
@@ -8597,7 +8693,7 @@ function showGenProgress(title, subtitle, steps, curIdx){
         '<div class="gp-orbit"></div>' +
       '</div>' +
       '<div class="gp-title" id="gp-title">' + (title || 'AI 가 만드는 중') + '</div>' +
-      '<div class="gp-sub" id="gp-sub">' + (subtitle ? escapeHtml(subtitle) : '') + '</div>' +
+      '<div class="gp-sub" id="gp-sub">' + (subtitle ? '「' + escapeHtml(subtitle) + '」' : '') + '</div>' +
       '<div class="gp-steps" id="gp-steps">' +
         __genSteps.map(function(s, i){
           return '<div class="gp-step-row" data-idx="'+i+'">' +
