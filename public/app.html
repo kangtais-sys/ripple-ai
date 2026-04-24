@@ -6,6 +6,8 @@
 <title>Ssobi</title>
 <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,400;1,9..144,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- 카드뉴스 템플릿용 한국어 현대 폰트 -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700;900&family=Nanum+Myeongjo:wght@700;800&family=Gowun+Dodum&family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Black+Han+Sans&family=Song+Myung&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
@@ -4901,6 +4903,8 @@ function goStep(n){
   if(title){
     title.textContent = ({1:'만들기',2:'사이즈 설정',3:'템플릿 선택',4:'편집 & 미리보기',5:'게시·예약'})[n];
   }
+  // 템플릿 선택 화면 진입 시 썸네일을 실제 hook 문구로 갱신
+  if(n === 3){ try { renderTplThumbs(); } catch(_){} }
   if(n===4) {
     // 기존 편집 상태가 있으면 보존 (미리보기/뒤로가기 시 리셋 방지)
     //   edtSlides 가 비어있을 때만 새로 생성
@@ -7583,21 +7587,29 @@ function tplText(t){
   if(t==='luxury') return '#F5E7C8';  // gold-cream
   return (t==='bold'||t==='mono'||t==='noir')?'#fff':'#1A1F27';
 }
-// 템플릿별 기본 폰트 (텍스트 요소 생성 시 자동 적용)
+// 템플릿별 기본 폰트 — 한국어 현대 감각 중심, 영문은 fallback
 function tplFont(t){
   return ({
-    clean:     "'Pretendard','Noto Sans KR',sans-serif",
-    bold:      "'Pretendard','Noto Sans KR',sans-serif",
-    mag:       "'Fraunces','Pretendard','Noto Serif KR',serif",
-    editorial: "'Fraunces','Pretendard','Noto Serif KR',serif",
-    mono:      "'JetBrains Mono','Pretendard',monospace",
-    pastel:    "'Pretendard','Noto Sans KR',sans-serif",
-    noir:      "'Fraunces','Pretendard','Noto Serif KR',serif",
-    luxury:    "'Pretendard','Noto Sans KR',sans-serif",
+    // 모던 미니멀 — 클린 산세리프
+    clean:     "'Pretendard','IBM Plex Sans KR','Noto Sans KR',sans-serif",
+    // 강렬 볼드 — 블랙한산스 (무거운 디스플레이 체)
+    bold:      "'Black Han Sans','Pretendard','Noto Sans KR',sans-serif",
+    // 매거진 — 송명 + 나눔명조 (세련된 세리프, 감각적)
+    mag:       "'Song Myung','Nanum Myeongjo','Noto Serif KR','Fraunces',serif",
+    // 에디토리얼 — 고운바탕 (부드러운 감성 세리프)
+    editorial: "'Gowun Batang','Nanum Myeongjo','Noto Serif KR',serif",
+    // 모노 — IBM Plex 한국어 (테크 느낌 + 한글 가독성)
+    mono:      "'IBM Plex Sans KR','Pretendard','Noto Sans KR',sans-serif",
+    // 파스텔 — 고운도둠 (모던하면서 부드러운 산세리프)
+    pastel:    "'Gowun Dodum','Pretendard','Noto Sans KR',sans-serif",
+    // 느와르 — 세리프 무거움 (노토세리프 900 + 프라운스 이탤릭)
+    noir:      "'Noto Serif KR','Nanum Myeongjo','Fraunces',serif",
+    // 럭셔리 — 얇은 세리프 고급감
+    luxury:    "'Nanum Myeongjo','Song Myung','Noto Serif KR','Fraunces',serif",
   })[t] || "'Pretendard','Noto Sans KR',sans-serif";
 }
 function tplWeight(t){
-  return ({clean:700, bold:900, mag:800, editorial:400, mono:500, pastel:600, noir:400, luxury:900})[t] || 700;
+  return ({clean:700, bold:900, mag:800, editorial:700, mono:600, pastel:700, noir:900, luxury:800})[t] || 700;
 }
 function tplItalic(t){
   return t==='editorial' || t==='noir';
@@ -9224,6 +9236,29 @@ function hidePublishProgress(){
 
 // ────────── AI 생성 오버레이 ──────────
 var __genSteps = [];
+// 템플릿 썸네일을 실제 유저 hook 문구로 스타일링 — cs-3 진입 시 호출
+function renderTplThumbs(){
+  var hook = (createData.hook || '').replace(/^"|"$/g,'').slice(0, 18) || '나만의 후킹 문구';
+  var subtitle = (createData.coverSubtitle || (createData.hook ? '한 줄 부제목' : '오늘의 주제 한 줄')).slice(0, 16);
+  var labels = { clean:'CLEAN', bold:'BOLD', noir:'NOIR', luxury:'LUXURY', mag:'MAGAZINE', editorial:'EDITORIAL', mono:'MONO', pastel:'SOFT' };
+  document.querySelectorAll('#tpl-grid .tpl-item').forEach(function(item){
+    var oc = item.getAttribute('onclick') || '';
+    var m = oc.match(/selectTpl\(this,'([^']+)'\)/);
+    if(!m) return;
+    var tpl = m[1];
+    if(tpl === 'custom') return;
+    var prev = item.querySelector('.tpl-prev');
+    if(!prev) return;
+    var c = tplText(tpl);
+    var font = tplFont(tpl);
+    var italic = tplItalic(tpl);
+    var accent = tplAccent(tpl);
+    prev.innerHTML =
+      '<div style="font-size:8.5px;font-weight:800;color:' + accent + ';letter-spacing:.22em;margin-bottom:8px;text-transform:uppercase">' + labels[tpl] + '</div>' +
+      '<div style="font-family:' + font + ';font-size:13px;font-weight:' + tplWeight(tpl) + ';color:' + c + ';line-height:1.22;font-style:' + (italic?'italic':'normal') + ';letter-spacing:-.3px;margin-bottom:4px;word-break:keep-all;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + escapeHtml(hook) + '</div>' +
+      '<div style="font-family:' + font + ';font-size:9px;font-weight:500;color:' + c + ';opacity:.66;line-height:1.35;word-break:keep-all;font-style:' + (italic?'italic':'normal')+ '">' + escapeHtml(subtitle) + '</div>';
+  });
+}
 // cs2 본문을 슬라이드별 카드로 렌더 (가독성 + 구분)
 //   bodySlides: [{role, title, text}, ...] — 2번 슬라이드부터 N번까지 (hook 제외)
 function renderBodyAsCards(bodySlides){

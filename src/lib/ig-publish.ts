@@ -72,12 +72,15 @@ export async function publishCardnewsJob(
     if (totalSlides === 1) {
       const m = slideMedia(0)
       finalCreationId = await createSingleMedia(igUserId, token, m.url, caption, m.media_type)
+      // 단일 영상도 처리 시간 더 필요
+      await pollFinished(finalCreationId, token, m.media_type === 'VIDEO' ? 80 : 20, 2000)
     } else {
       const childIds: string[] = []
       for (let i = 0; i < totalSlides; i++) {
         const m = slideMedia(i)
         const childId = await createCarouselChild(igUserId, token, m.url, m.media_type)
-        await pollFinished(childId, token, m.media_type === 'VIDEO' ? 40 : 20, 1500)
+        // 영상 처리 시간: 최대 80회 × 2초 = 160초 대기 (긴 영상도 커버)
+        await pollFinished(childId, token, m.media_type === 'VIDEO' ? 80 : 20, m.media_type === 'VIDEO' ? 2000 : 1500)
         childIds.push(childId)
       }
       finalCreationId = await createCarouselParent(igUserId, token, childIds, caption)
@@ -206,15 +209,18 @@ async function createCarouselParent(igUserId: string, token: string, childIds: s
 async function pollFinished(creationId: string, token: string, attempts = 20, intervalMs = 1500): Promise<void> {
   for (let i = 0; i < attempts; i++) {
     await new Promise(r => setTimeout(r, intervalMs))
+    // 영상은 status_code 외에 status 필드로 처리 이유 상세 제공
     const res = await fetch(
-      `https://graph.instagram.com/v21.0/${creationId}?fields=status_code&access_token=${token}`
+      `https://graph.instagram.com/v21.0/${creationId}?fields=status_code,status&access_token=${token}`
     )
     const data = await res.json().catch(() => ({}))
     if (data.status_code === 'FINISHED') return
     if (data.status_code === 'ERROR' || data.status_code === 'EXPIRED') {
+      // 상세 status 필드까지 포함해서 구체적 원인 파악 가능하게
+      const detail = data.status || JSON.stringify(data)
       throw new PublishError(
-        `container_status_${data.status_code}: ${JSON.stringify(data)}`,
-        { ig_creation_id: creationId }
+        `container_${data.status_code}: ${detail}`,
+        { ig_creation_id: creationId, status_detail: data.status }
       )
     }
   }
