@@ -443,6 +443,29 @@ ${BANNED_PHRASES.map(p => `  · "${p}"`).join('\n')}
 - 출처 한 줄 필수 (예: "(YES24 베스트셀러 10주)", "(올리브영 평균가)")
 - 비교 구조 권장: A vs B vs C
 
+### 본문 슬라이드 특수 role (선택 · 1~2개 섞어주면 저장률↑)
+주제에 맞으면 body 중 1~2개를 아래 role 로 작성:
+
+**role="checklist"** — 체크리스트 (저장률 최상급)
+- 필드: list 배열. 각 항목 { "ok": true/false, "text": "10자 이내" }
+- 3~6개 항목. "해야 할 것 / 하지 말 것" 대비 구조가 이상적
+- 예: { "role":"checklist", "title":"이건 꼭 해", "list":[
+    {"ok":true,"text":"매일 10분 걷기"}, {"ok":true,"text":"심박수 120 유지"},
+    {"ok":false,"text":"무리한 장거리"}, {"ok":false,"text":"비싼 러닝화 선구매"}
+  ]}
+
+**role="number"** — 숫자 임팩트 (슬라이드 중간 breaker)
+- 필드: big_number (거대 표시 숫자/단어 · 6자 이내), sub (한 줄 설명)
+- 강력한 수치 하나만 부각. 카드뉴스 리듬 환기
+- 예: { "role":"number", "title":"충격 사실", "big_number":"91%", "sub":"2주 만에 포기하는 러닝 초보 비율" }
+
+**role="toc"** — 목차 (hook2 대신 body[0] 에 쓸 수도 있음)
+- 필드: items 배열, 각 "8자 이내 한 줄"
+- "오늘 알려줄 3가지" 류 — 스와이프 유도용
+- 예: { "role":"toc", "title":"오늘의 핵심 3가지", "items":["01 시작 타이밍", "02 심박수 관리", "03 완주 꿀팁"] }
+
+**기본 role="body"** 면 위 특수 필드 생략, title+text 만 쓰면 됨.
+
 ### ${slideCount}번 슬라이드 (마지막) — 저장·팔로우·댓글 유도 CTA
 - body[${slideCount - 2}] 이 여기 해당
 - title: 한 줄 후킹 (예: "다음편 놓치지 마")

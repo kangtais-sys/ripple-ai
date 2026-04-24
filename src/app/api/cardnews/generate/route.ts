@@ -90,11 +90,21 @@ export async function POST(req: NextRequest) {
     const match = text.match(/\{[\s\S]*\}/)
     if (!match) return NextResponse.json({ error: 'parse failed', raw: text }, { status: 502 })
 
+    type ChecklistItem = { ok?: boolean; text?: string }
+    type BodySlide = {
+      role?: string
+      title?: string
+      text?: string
+      list?: ChecklistItem[]     // role=checklist
+      big_number?: string        // role=number
+      sub?: string               // role=number
+      items?: string[]           // role=toc
+    }
     type Parsed = {
       hook?: string
       cover_subtitle?: string
       hook_score?: number
-      body?: Array<{ role?: string; title?: string; text?: string }>
+      body?: BodySlide[]
       caption?: string
       category?: string
       image_keywords?: string[]

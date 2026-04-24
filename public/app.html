@@ -7591,6 +7591,63 @@ function makeAccentBarEl(opts){
   div.style.cssText = 'position:absolute;left:' + opts.x + '%;top:' + opts.y + '%;width:' + (opts.w || 8) + '%;height:3px;background:' + opts.accent + ';border-radius:0;pointer-events:none;z-index:6';
   return div;
 }
+// 체크리스트 슬라이드 — ✅/❌ 리스트 렌더 (저장률 최상급 포맷)
+function makeChecklistEl(opts){
+  var wrap = document.createElement('div');
+  wrap.className = 'edt-el edt-checklist';
+  wrap.style.cssText = 'position:absolute;left:' + opts.x + '%;top:' + opts.y + '%;width:' + opts.w + '%;display:flex;flex-direction:column;gap:10px;pointer-events:none;z-index:5;font-family:Pretendard,sans-serif';
+  (opts.list || []).slice(0, 6).forEach(function(it){
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;background:rgba(255,255,255,.85);border-radius:10px;box-shadow:0 1px 3px rgba(0,0,0,.05)';
+    var ico = document.createElement('div');
+    ico.style.cssText = 'width:22px;height:22px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#fff;background:' + (it.ok ? opts.accent : '#EF4444');
+    ico.innerHTML = it.ok
+      ? '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" style="width:12px;height:12px"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+      : '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" style="width:12px;height:12px"><line x1="6" y1="6" x2="18" y2="18" stroke-linecap="round"/><line x1="18" y1="6" x2="6" y2="18" stroke-linecap="round"/></svg>';
+    var txt = document.createElement('div');
+    txt.style.cssText = 'font-size:14px;font-weight:700;color:#1A1F27;letter-spacing:-.2px;flex:1';
+    txt.textContent = it.text || '';
+    row.appendChild(ico);
+    row.appendChild(txt);
+    wrap.appendChild(row);
+  });
+  return wrap;
+}
+// 숫자 임팩트 슬라이드 — 거대 숫자 + 서브 설명
+function makeNumberBreakerEl(opts){
+  var wrap = document.createElement('div');
+  wrap.className = 'edt-el edt-number-breaker';
+  wrap.style.cssText = 'position:absolute;left:0;top:0;width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;z-index:5;text-align:center;padding:0 8%;box-sizing:border-box;font-family:Pretendard,sans-serif';
+  var big = document.createElement('div');
+  big.style.cssText = 'font-size:120px;font-weight:900;letter-spacing:-6px;line-height:1;color:' + opts.accent + ';text-shadow:0 2px 0 rgba(0,0,0,.04);margin-bottom:18px';
+  big.textContent = opts.bigNumber || '';
+  var sub = document.createElement('div');
+  sub.style.cssText = 'font-size:15px;font-weight:700;color:' + opts.color + ';line-height:1.4;max-width:80%';
+  sub.textContent = opts.sub || '';
+  wrap.appendChild(big);
+  wrap.appendChild(sub);
+  return wrap;
+}
+// TOC 목차 슬라이드 — "오늘 알려줄 N가지" 리스트
+function makeTocEl(opts){
+  var wrap = document.createElement('div');
+  wrap.className = 'edt-el edt-toc';
+  wrap.style.cssText = 'position:absolute;left:' + opts.x + '%;top:' + opts.y + '%;width:' + opts.w + '%;display:flex;flex-direction:column;gap:12px;pointer-events:none;z-index:5;font-family:Pretendard,sans-serif';
+  (opts.items || []).slice(0, 5).forEach(function(item, idx){
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:12px';
+    var num = document.createElement('div');
+    num.style.cssText = 'font-size:22px;font-weight:900;color:' + opts.accent + ';letter-spacing:-1px;min-width:36px';
+    num.textContent = String(idx + 1).padStart(2, '0');
+    var line = document.createElement('div');
+    line.style.cssText = 'flex:1;font-size:16px;font-weight:800;color:' + opts.color + ';letter-spacing:-.3px;border-bottom:1.5px solid rgba(0,0,0,.08);padding-bottom:6px';
+    line.textContent = (item || '').replace(/^\d+\s*[\.:·]?\s*/, '');  // "01 ..." 접두 제거
+    row.appendChild(num);
+    row.appendChild(line);
+    wrap.appendChild(row);
+  });
+  return wrap;
+}
 // CTA 액션 pills — 💾 저장 · ➕ 팔로우 · 💬 댓글
 function makeCtaPillsEl(opts){
   var wrap = document.createElement('div');
@@ -7687,17 +7744,173 @@ function renderImageSlotPlaceholder(wrap){
 function openUploadForSlot(wrap){
   var input = document.createElement('input');
   input.type = 'file';
-  input.accept = 'image/*';
+  input.accept = 'image/*,video/*';
   input.style.display = 'none';
   input.addEventListener('change', function(){
     var f = input.files && input.files[0]; if(!f) return;
-    var rd = new FileReader();
-    rd.onload = function(ev){ setImageSlot(wrap, ev.target.result); };
-    rd.readAsDataURL(f);
+    if(f.type.indexOf('video/') === 0){
+      openVideoTrim(f, wrap);
+    } else {
+      var rd = new FileReader();
+      rd.onload = function(ev){ setImageSlot(wrap, ev.target.result); };
+      rd.readAsDataURL(f);
+    }
   });
   document.body.appendChild(input);
   input.click();
   setTimeout(function(){ input.remove(); }, 100);
+}
+// ───────── 영상 trim 모달 ─────────
+var _vtState = { url:'', duration:0, startTime:0, endTime:0, targetSlot:null };
+function openVideoTrim(file, slot){
+  // 이전 URL 회수
+  if(_vtState.url) try { URL.revokeObjectURL(_vtState.url); } catch(_){}
+  _vtState = {
+    url: URL.createObjectURL(file),
+    duration: 0, startTime: 0, endTime: 0, targetSlot: slot,
+  };
+  ensureVtModal();
+  var v = document.getElementById('vt-preview');
+  v.src = _vtState.url;
+  v.load();
+  v.onloadedmetadata = function(){
+    _vtState.duration = v.duration;
+    _vtState.endTime = Math.min(15, v.duration);
+    _vtState.startTime = 0;
+    setupVtSliders();
+    v.currentTime = 0;
+    v.play().catch(function(){});
+  };
+  openModal('m-video-trim');
+}
+function ensureVtModal(){
+  if(document.getElementById('m-video-trim')) return;
+  var ov = document.createElement('div');
+  ov.id = 'm-video-trim';
+  ov.className = 'ov';
+  ov.setAttribute('onclick', "co(event,'m-video-trim')");
+  ov.innerHTML =
+    '<div class="sheet" style="padding:14px 20px 24px;max-height:90vh;overflow-y:auto">' +
+      '<div class="s-bar"></div>' +
+      '<div class="s-title">영상 자르기</div>' +
+      '<div class="s-sub">최대 <b>15초</b>까지 가능 · 시작/끝 슬라이더로 구간 조절</div>' +
+      '<video id="vt-preview" playsinline muted autoplay loop style="width:100%;max-height:36vh;background:#000;border-radius:12px;display:block;margin:12px 0"></video>' +
+      '<div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--t2);margin-bottom:8px">' +
+        '<span>시작 <b id="vt-start-time" style="color:var(--mint-d)">0.0s</b></span>' +
+        '<span id="vt-duration" style="color:var(--t3)">/ 0.0s</span>' +
+        '<span>끝 <b id="vt-end-time" style="color:var(--mint-d)">0.0s</b></span>' +
+      '</div>' +
+      '<div class="vt-slider-wrap" style="padding:8px 0">' +
+        '<label style="font-size:10.5px;font-weight:700;color:var(--t3);display:block;margin-bottom:4px">▶ 시작 시간</label>' +
+        '<input type="range" id="vt-start" min="0" max="1000" value="0" style="width:100%;accent-color:var(--mint)">' +
+      '</div>' +
+      '<div class="vt-slider-wrap" style="padding:8px 0 16px">' +
+        '<label style="font-size:10.5px;font-weight:700;color:var(--t3);display:block;margin-bottom:4px">⏹ 끝 시간</label>' +
+        '<input type="range" id="vt-end" min="0" max="1000" value="1000" style="width:100%;accent-color:var(--mint)">' +
+      '</div>' +
+      '<div style="display:flex;gap:8px">' +
+        '<button onclick="cm(\'m-video-trim\')" style="flex:1;padding:13px;border-radius:12px;border:1.5px solid var(--b);background:#fff;font-size:13px;font-weight:800;color:var(--t1);cursor:pointer">취소</button>' +
+        '<button onclick="vtApply()" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--mint);color:#fff;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(0,200,150,.25)">이 영상 사용</button>' +
+      '</div>' +
+    '</div>';
+  document.body.appendChild(ov);
+}
+function setupVtSliders(){
+  var s = document.getElementById('vt-start');
+  var e = document.getElementById('vt-end');
+  var v = document.getElementById('vt-preview');
+  // duration 표시
+  document.getElementById('vt-duration').textContent = '/ ' + _vtState.duration.toFixed(1) + 's';
+  // start 초기값
+  s.value = 0;
+  e.value = Math.round((_vtState.endTime / _vtState.duration) * 1000);
+  renderVtTimes();
+  s.oninput = function(){
+    var t = (s.value / 1000) * _vtState.duration;
+    _vtState.startTime = t;
+    if(_vtState.endTime - _vtState.startTime > 15){
+      _vtState.endTime = _vtState.startTime + 15;
+      e.value = Math.round((_vtState.endTime / _vtState.duration) * 1000);
+    }
+    if(_vtState.endTime <= _vtState.startTime){
+      _vtState.endTime = Math.min(_vtState.startTime + 1, _vtState.duration);
+      e.value = Math.round((_vtState.endTime / _vtState.duration) * 1000);
+    }
+    renderVtTimes();
+    v.currentTime = _vtState.startTime;
+  };
+  e.oninput = function(){
+    var t = (e.value / 1000) * _vtState.duration;
+    _vtState.endTime = t;
+    if(_vtState.endTime - _vtState.startTime > 15){
+      _vtState.startTime = _vtState.endTime - 15;
+      s.value = Math.round((_vtState.startTime / _vtState.duration) * 1000);
+    }
+    if(_vtState.endTime <= _vtState.startTime){
+      _vtState.startTime = Math.max(_vtState.endTime - 1, 0);
+      s.value = Math.round((_vtState.startTime / _vtState.duration) * 1000);
+    }
+    renderVtTimes();
+    v.currentTime = Math.max(0, _vtState.endTime - 0.3);
+  };
+  // 재생 루프 [start, end]
+  v.ontimeupdate = function(){
+    if(v.currentTime > _vtState.endTime || v.currentTime < _vtState.startTime - 0.1){
+      v.currentTime = _vtState.startTime;
+    }
+  };
+}
+function renderVtTimes(){
+  document.getElementById('vt-start-time').textContent = _vtState.startTime.toFixed(1) + 's';
+  document.getElementById('vt-end-time').textContent = _vtState.endTime.toFixed(1) + 's';
+}
+function vtApply(){
+  if(!_vtState.targetSlot || !_vtState.url) return;
+  setVideoSlot(_vtState.targetSlot, {
+    url: _vtState.url,
+    startTime: _vtState.startTime,
+    endTime: _vtState.endTime,
+  });
+  cm('m-video-trim');
+}
+// 슬롯에 영상 삽입 (자동 재생 · [start,end] 루프)
+function setVideoSlot(wrap, meta){
+  wrap.dataset.loading = '';
+  wrap.innerHTML = '';
+  wrap.style.background = '#000';
+  wrap.style.borderRadius = '0';
+  var v = document.createElement('video');
+  v.src = meta.url;
+  v.autoplay = true;
+  v.muted = true;
+  v.loop = false;  // 수동 루프
+  v.setAttribute('playsinline', '');
+  v.setAttribute('muted', '');
+  v.crossOrigin = 'anonymous';
+  v.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;border-radius:0';
+  v.addEventListener('loadedmetadata', function(){
+    v.currentTime = meta.startTime;
+    v.play().catch(function(){});
+  });
+  v.addEventListener('timeupdate', function(){
+    if(v.currentTime >= meta.endTime || v.currentTime < meta.startTime - 0.1){
+      v.currentTime = meta.startTime;
+    }
+  });
+  wrap.appendChild(v);
+  // 우상단 영상 뱃지
+  var badge = document.createElement('div');
+  badge.textContent = '🎬';
+  badge.style.cssText = 'position:absolute;top:6px;left:6px;padding:3px 7px;background:rgba(0,0,0,.55);color:#fff;font-size:11px;border-radius:3px;pointer-events:none;z-index:3;line-height:1';
+  wrap.appendChild(badge);
+  // dataset — 캡쳐 시 첫프레임 추출용
+  wrap.dataset.videoUrl = meta.url;
+  wrap.dataset.videoStart = String(meta.startTime);
+  wrap.dataset.videoEnd = String(meta.endTime);
+  // attribution 속성 클리어
+  wrap.dataset.attrPhotographer = '';
+  wrap.dataset.attrSource = '';
+  wrap.dataset.attrUrl = '';
 }
 // 이미지 슬롯에 이미지 세팅 + attribution 하단 라벨 (Unsplash/Pexels Production 요건)
 //   meta: { photographer, sourceLabel, attributionUrl, photographerUrl } — 없으면 라벨 생략
@@ -8007,7 +8220,35 @@ function initEditor(){
       sl.appendChild(makeTextEl(p.text || '', {x:6,y:60,w:88,size:14,color:c,weight:500}));
       sl.appendChild(makeTextEl(String(i+1).padStart(2,'0')+' / '+String(N).padStart(2,'0'), {x:6,y:93,w:20,size:10,color:c,weight:700}));
     } else {
-      // 본론
+      // 본론 — role 에 따라 레이아웃 분기
+      var bodyAccent = tplAccent(tpl);
+      var role = (p && p.role) || 'body';
+      if(role === 'checklist' && Array.isArray(p.list) && p.list.length){
+        sl.querySelectorAll('.edt-el.img').forEach(function(e){ e.style.display='none'; });
+        sl.appendChild(makeTextEl(p.title || '체크리스트', {x:6,y:10,w:88,size:22,color:c,weight:900,isTitle:true}));
+        sl.appendChild(makeAccentBarEl({x:6, y:20, w:10, accent:bodyAccent}));
+        sl.appendChild(makeChecklistEl({x:6, y:26, w:88, list:p.list, accent:bodyAccent}));
+        sl.appendChild(makeTextEl(String(i+1).padStart(2,'0')+' / '+String(N).padStart(2,'0'), {x:6,y:93,w:20,size:10,color:c,weight:700}));
+        canvas.appendChild(sl); edtSlides.push(sl); return;
+      }
+      if(role === 'number' && p.big_number){
+        sl.querySelectorAll('.edt-el.img').forEach(function(e){ e.style.display='none'; });
+        sl.appendChild(makeNumberBreakerEl({bigNumber:p.big_number, sub:p.sub || p.text || '', accent:bodyAccent, color:c}));
+        if(p.title){
+          sl.appendChild(makeTextEl(p.title, {x:6,y:14,w:88,size:14,color:c,weight:700}));
+        }
+        sl.appendChild(makeTextEl(String(i+1).padStart(2,'0')+' / '+String(N).padStart(2,'0'), {x:6,y:93,w:20,size:10,color:c,weight:700}));
+        canvas.appendChild(sl); edtSlides.push(sl); return;
+      }
+      if(role === 'toc' && Array.isArray(p.items) && p.items.length){
+        sl.querySelectorAll('.edt-el.img').forEach(function(e){ e.style.display='none'; });
+        sl.appendChild(makeTextEl(p.title || '오늘 알려줄 것', {x:6,y:10,w:88,size:24,color:c,weight:900,isTitle:true}));
+        sl.appendChild(makeAccentBarEl({x:6, y:20, w:10, accent:bodyAccent}));
+        sl.appendChild(makeTocEl({x:6, y:28, w:88, items:p.items, accent:bodyAccent, color:c}));
+        sl.appendChild(makeTextEl(String(i+1).padStart(2,'0')+' / '+String(N).padStart(2,'0'), {x:6,y:93,w:20,size:10,color:c,weight:700}));
+        canvas.appendChild(sl); edtSlides.push(sl); return;
+      }
+      // 기본 body 레이아웃
       var nY, titleY2, textY2, textX2, textW2;
       if(layout === 'full'){
         nY = 48; titleY2 = 54; textY2 = 74; textX2 = 6; textW2 = 88;
@@ -8020,7 +8261,6 @@ function initEditor(){
       } else {
         nY = 12; titleY2 = 20; textY2 = 46; textX2 = 6; textW2 = 88;
       }
-      var bodyAccent = tplAccent(tpl);
       var numEl = makeTextEl(String(i).padStart(2,'0'), {x:textX2,y:nY,w:16,size:22,color:bodyAccent,weight:900});
       numEl.style.zIndex = '5';
       sl.appendChild(numEl);
@@ -8599,6 +8839,25 @@ async function captureAndUploadSlides(jobId){
       handles.forEach(function(hnd){ hnd.style.display = 'none'; });
       var attrs = slideEl.querySelectorAll('.edt-img-attr');
       attrs.forEach(function(a){ a.style.display = 'none'; });
+      // 영상 → 현재 프레임을 <img> 로 교체 (html2canvas 가 <video> 를 잘 못 잡음)
+      var videoReps = [];
+      var videos = slideEl.querySelectorAll('video');
+      videos.forEach(function(vd){
+        try {
+          var cnv = document.createElement('canvas');
+          cnv.width = vd.videoWidth || 1080;
+          cnv.height = vd.videoHeight || 1080;
+          var ctx = cnv.getContext('2d');
+          ctx.drawImage(vd, 0, 0, cnv.width, cnv.height);
+          var rep = document.createElement('img');
+          rep.src = cnv.toDataURL('image/jpeg', 0.95);
+          rep.style.cssText = vd.style.cssText;
+          rep.crossOrigin = 'anonymous';
+          vd.parentNode.insertBefore(rep, vd);
+          vd.style.display = 'none';
+          videoReps.push({ video:vd, img:rep });
+        } catch(ve){ console.warn('[capture] video frame grab failed:', ve); }
+      });
 
       var canvas = await window.html2canvas(slideEl, {
         useCORS: true,
@@ -8612,6 +8871,11 @@ async function captureAndUploadSlides(jobId){
 
       handles.forEach(function(hnd){ hnd.style.display = ''; });
       attrs.forEach(function(a){ a.style.display = ''; });
+      // 영상 복원
+      videoReps.forEach(function(r){
+        try { r.img.remove(); } catch(_){}
+        r.video.style.display = '';
+      });
       console.log('[capture] slide', i, 'canvas:', canvas.width, 'x', canvas.height);
 
       if(canvas.width === 0 || canvas.height === 0){
