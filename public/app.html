@@ -8380,27 +8380,44 @@ function initEditor(){
         sl.appendChild(makeTextEl(String(i+1).padStart(2,'0')+' / '+String(N).padStart(2,'0'), {x:6,y:93,w:20,size:10,color:c,weight:700}));
         canvas.appendChild(sl); edtSlides.push(sl); return;
       }
-      // 기본 body 레이아웃
+      // 기본 body 레이아웃 — 모던 에디토리얼 스타일
+      //   Number (작게, 라벨처럼) ━ 긴 가로선 ━ Title ━ 본문
       var nY, titleY2, textY2, textX2, textW2;
       if(layout === 'full'){
-        nY = 48; titleY2 = 54; textY2 = 74; textX2 = 6; textW2 = 88;
+        nY = 46; titleY2 = 52; textY2 = 74; textX2 = 6; textW2 = 88;
       } else if(layout === 'half-top'){
-        nY = 54; titleY2 = 58; textY2 = 76; textX2 = 6; textW2 = 88;
+        nY = 54; titleY2 = 58; textY2 = 74; textX2 = 6; textW2 = 88;
       } else if(layout === 'half-left'){
-        nY = 10; titleY2 = 14; textY2 = 38; textX2 = 52; textW2 = 44;
+        nY = 10; titleY2 = 14; textY2 = 40; textX2 = 52; textW2 = 44;
       } else if(layout === 'small-top'){
         nY = 42; titleY2 = 46; textY2 = 66; textX2 = 6; textW2 = 88;
       } else {
-        nY = 12; titleY2 = 20; textY2 = 46; textX2 = 6; textW2 = 88;
+        nY = 10; titleY2 = 16; textY2 = 42; textX2 = 6; textW2 = 88;
       }
-      var numEl = makeTextEl(String(i).padStart(2,'0'), {x:textX2,y:nY,w:16,size:22,color:bodyAccent,weight:900});
+      // 번호: 작게 · mono 느낌 · accent 컬러 · 라벨 형식 ("— 01")
+      var numEl = makeTextEl('— ' + String(i).padStart(2,'0'), {
+        x: textX2, y: nY, w: 30,
+        size: 11, color: bodyAccent, weight: 800,
+        fontFamily: "'IBM Plex Sans KR','Pretendard',sans-serif"
+      });
+      numEl.style.letterSpacing = '.2em';
+      numEl.dataset.noAutofit = '1';
       numEl.style.zIndex = '5';
       sl.appendChild(numEl);
-      var titleEl = makeTextEl(p.title || '포인트', {x:textX2+7,y:titleY2,w:textW2-7,size:22,color:c,weight:900,isTitle:true});
+      // 제목: 굵게, 큰 글씨
+      var titleEl = makeTextEl(p.title || '포인트', {
+        x: textX2, y: titleY2, w: textW2,
+        size: 24, color: c, weight: 900, isTitle: true
+      });
+      titleEl.style.letterSpacing = '-.4px';
       titleEl.style.zIndex = '5';
-      // 제목 아래 accent bar (템플릿 컬러 라인)
-      sl.appendChild(makeAccentBarEl({x:textX2, y:titleY2 + 10, w:10, accent:bodyAccent}));
       sl.appendChild(titleEl);
+      // 얇은 구분선 (제목과 본문 사이)
+      var dividerY = Math.min(textY2 - 4, titleY2 + 18);
+      var dividerEl = document.createElement('div');
+      dividerEl.className = 'edt-el edt-divider';
+      dividerEl.style.cssText = 'position:absolute;left:' + textX2 + '%;top:' + dividerY + '%;width:' + Math.min(22, textW2/3) + '%;height:1px;background:' + c + ';opacity:.18;pointer-events:none;z-index:5';
+      sl.appendChild(dividerEl);
       var textEl = makeTextEl(p.text || '수치·출처 포함한 본문', {x:textX2,y:textY2,w:textW2,size:13,color:c,weight:500});
       textEl.style.zIndex = '5';
       sl.appendChild(textEl);
@@ -8905,10 +8922,19 @@ async function publishPost(){
       '편집한 모습 그대로 이미지로 만드는 중',
       2
     );
+    var captureResult = null;
     try {
-      await captureAndUploadSlides(jobId2);
+      captureResult = await captureAndUploadSlides(jobId2);
     } catch(capErr){
-      console.warn('[publish] capture failed, fallback to Satori render:', capErr);
+      console.error('[publish] capture threw:', capErr);
+    }
+    // 캡처 0장이면 Satori fallback 으로 가면 IG 가 fetch 실패 → 발행 실패
+    // → 사전에 차단하고 유저에게 명확한 피드백
+    var uploadedCount = captureResult && captureResult.length != null ? captureResult.length : 0;
+    if(uploadedCount === 0){
+      hidePublishProgress();
+      alert('슬라이드 캡처에 실패했어요 😥\n\n• 브라우저 새로고침 후 다시 시도\n• 영상이 아주 큰 파일이면 100MB 미만으로 압축\n• 편집기에서 모든 슬라이드가 정상 로드됐는지 확인');
+      return;
     }
 
     updatePublishProgress(
@@ -9099,8 +9125,9 @@ async function captureAndUploadSlides(jobId){
     });
     console.log('[capture] set-overrides result:', await metaRes.json());
   } else {
-    console.warn('[capture] 업로드된 슬라이드 없음 — Satori fallback 사용됨');
+    console.warn('[capture] 업로드된 슬라이드 없음 — Satori fallback 은 신뢰도 낮아 발행 차단 권장');
   }
+  return uploaded;
 }
 
 // 발행 상태 폴링 — 최대 3분 간격 10초

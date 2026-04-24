@@ -167,13 +167,13 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // title·text 에 '슬라이드 N'·'N장' 같은 메타 라벨이 들어간 경우 제거
+    // title·text 앞에 '[슬라이드 N]' 같은 라벨이 붙어있으면 제거 (시작 부분만, 본문 손상 방지)
     if (Array.isArray(parsed.body)) {
-      const metaRe = /\s*(?:슬라이드\s*\d+[^·\]]*|\d+\s*장|\d+\s*번째\s*슬라이드)\s*[·\-:]?\s*/g
+      const prefixRe = /^\s*\[?\s*슬라이드\s*\d+\s*[·\]\-:]\s*/
       parsed.body = parsed.body.map(b => ({
         ...b,
-        title: (b.title || '').replace(metaRe, '').trim(),
-        text: (b.text || '').replace(metaRe, '').trim(),
+        title: (b.title || '').replace(prefixRe, '').trim(),
+        text: (b.text || '').replace(prefixRe, '').trim(),
       }))
     }
 

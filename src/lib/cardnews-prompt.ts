@@ -205,13 +205,43 @@ export function classifyCategory(topic: string): CategoryKey {
 // ─────────────────────────────────────────────────────────────
 export type ContentToneKey = 'warm' | 'friendly' | 'professional' | 'honest' | 'witty' | 'chic'
 
-export const CONTENT_TONES: Record<ContentToneKey, { label: string; guide: string }> = {
-  warm:         { label: '다정한',   guide: '따뜻하고 부드러운 어조. "같이 해봐요" 공감 표현 자주' },
-  friendly:     { label: '친근한',   guide: 'MZ 캐주얼 반말. "~했어", "완전 좋음" 스타일' },
-  professional: { label: '전문적',   guide: '정보·신뢰. 감정 절제, 근거·수치 중심. (단 CONTENT_GENERATION_PROMPT 규칙상 여전히 반말 필수)' },
-  honest:       { label: '솔직한',   guide: '직설·리얼. 단점도 있는 그대로. "광고 아님" 뉘앙스' },
-  witty:        { label: '재치있는', guide: '가벼운 유머·위트. "레전드", "이게 말이 됨?"' },
-  chic:         { label: '시크한',   guide: '간결·쿨. 미사여구 없음. 짧은 단문 위주' },
+export const CONTENT_TONES: Record<ContentToneKey, { label: string; guide: string; examples: string; emoji: string }> = {
+  warm: {
+    label: '다정한',
+    guide: '따뜻하고 부드러운 공감. "같이 해봐요" "괜찮아" 류. 부정 표현 최소화',
+    examples: '예: "속상했지? 나도 그랬어" / "조금씩 가보자, 괜찮아질 거야"',
+    emoji: '허용 (🌿 ✨ 🤍 ☺️ 자주)',
+  },
+  friendly: {
+    label: '친근한',
+    guide: 'MZ 캐주얼 반말. 친구한테 말하듯. "~했어" "완전 좋음" "찐" "진심" 사용',
+    examples: '예: "이거 찐이야 진짜" / "완전 레전드임"',
+    emoji: '허용 (😊 ✨ 🤭)',
+  },
+  professional: {
+    label: '전문적',
+    guide: '⚠️ 이모지 사용 금지. 객관적·수치 중심·근거 기반. 감정·과장 표현 전부 제거. 단 "~입니다" 대신 "~야/~임" 단호한 반말 유지',
+    examples: '예: "YES24 10주 연속 1위. 30만 독자 선택의 이유" / "클리닉 평균 50만원. 6개월 지속 87% (강남언니 기준)"',
+    emoji: '금지. 이모지 0개',
+  },
+  honest: {
+    label: '솔직한',
+    guide: '직설·리얼. 단점도 있는 그대로. "광고 아님" "내돈내산" 강조. 돌려 말하지 않음',
+    examples: '예: "3만원 아깝더라, 솔직히" / "이건 광고 아니고 그냥 내돈내산"',
+    emoji: '최소 (1~2개)',
+  },
+  witty: {
+    label: '재치있는',
+    guide: '⚠️ 유머·위트 강제. 반전·과장·재치 표현 필수. "레전드" "이게 말이 됨?" "???" "충격주의" 류',
+    examples: '예: "이거 안 해본 나 바보... 진짜 레전드" / "3만원에 이 퀄리티? 제정신이야?"',
+    emoji: '과장 표현과 함께 (😱 🤯 💀 ㅋㅋ)',
+  },
+  chic: {
+    label: '시크한',
+    guide: '⚠️ 간결·쿨. 미사여구 전부 제거. 짧은 단문. 감정 표현 없음. 여백감',
+    examples: '예: "3만원. 15일 썼음." / "결과만 말함. 효과 있음."',
+    emoji: '금지. 짧은 문장만',
+  },
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -361,9 +391,24 @@ export function buildContentGenerationPrompt(args: {
   const cat = classifyCategory(args.topic)
   const info = CATEGORIES[cat]
   const ctaPick = CTA_PATTERNS[Math.floor(Math.random() * CTA_PATTERNS.length)]
-  const toneGuide = args.toneStyle ? `\n[학습된 유저 말투]\n${JSON.stringify(args.toneStyle, null, 2)}` : ''
-  const contentToneBlock = args.contentTone && CONTENT_TONES[args.contentTone]
-    ? `\n[추가 어조] ${CONTENT_TONES[args.contentTone].label}: ${CONTENT_TONES[args.contentTone].guide}`
+  const toneGuide = args.toneStyle ? `\n[학습된 유저 말투 — 부가 참고용만]\n${JSON.stringify(args.toneStyle, null, 2)}` : ''
+  const toneInfo = args.contentTone && CONTENT_TONES[args.contentTone] ? CONTENT_TONES[args.contentTone] : null
+  const contentToneBlock = toneInfo
+    ? `
+
+## 🎨 어조 강제 (최우선 · 다른 모든 지시보다 우선)
+유저가 선택한 어조: **${toneInfo.label}**
+
+${toneInfo.guide}
+
+이모지 정책: ${toneInfo.emoji}
+
+톤 예시 (반드시 이 느낌으로):
+${toneInfo.examples}
+
+이 어조가 후킹·본문·CTA 전체에 일관되게 드러나야 함.
+어조에 어긋나면 재작성.
+`
     : ''
   const researchBlock = args.researchData?.trim()
     ? args.researchData.trim()
@@ -372,11 +417,11 @@ export function buildContentGenerationPrompt(args: {
   return `너는 ${args.accountConcept}다.
 아래 실제 조사된 정보로 카드뉴스 ${slideCount}장을 기획해.
 **절대 정보 지어내지 마. 모르면 모른다고 써.**
-
+${contentToneBlock}
 ## 주제
 "${args.topic}"
 카테고리: ${info.name}
-카테고리 어조 지침: ${info.tone}${contentToneBlock}${toneGuide}
+카테고리 어조 지침: ${info.tone}${toneGuide}
 
 ## 조사된 실제 정보
 ${researchBlock}
