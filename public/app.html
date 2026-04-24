@@ -1046,23 +1046,28 @@ body.edt-fullscreen #create-back{display:none}
 .edt-arrows svg{width:16px;height:16px;stroke:var(--t1);stroke-width:2}
 /* 편집 툴 바 — 기본 flow (수정 패널이 고정 floating 이어서 툴바 sticky 필요 없음) */
 .edt-tools{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-bottom:14px;background:var(--bg);padding:0;border-radius:12px}
-/* 편집 패널 고정 floating — 내 링크 에디터와 동일 방식 (하단 하드 고정) */
+/* 편집 패널 — 우측 하단에 compact 하게 floating. 캔버스 넓게 보이도록 */
 .edt-panel.on{
   position:fixed;
-  left:50%;
+  right:10px;
   bottom:calc(var(--nav-h) + env(safe-area-inset-bottom) + 12px);
-  transform:translateX(-50%);
-  width:min(calc(100vw - 24px), 420px);
-  max-height:58vh;
+  left:auto;
+  transform:none;
+  width:min(86vw, 280px);
+  max-height:52vh;
   overflow-y:auto;
   z-index:9000;
-  box-shadow:0 -8px 28px rgba(15,19,25,.18), 0 0 0 1px rgba(0,0,0,.04);
-  border-radius:16px;
+  padding:10px;
+  box-shadow:0 -6px 22px rgba(15,19,25,.16), 0 0 0 1px rgba(0,0,0,.04);
+  border-radius:14px;
   animation:edtPanelUp .22s cubic-bezier(.32,1,.32,1);
 }
-@keyframes edtPanelUp { from{transform:translate(-50%, 10px);opacity:0} to{transform:translate(-50%, 0);opacity:1} }
-body.edt-fullscreen .edt-panel.on{ bottom:20px }
-/* 풀스크린에서도 동일하게 floating — nav 없으므로 아래쪽 기본 20px */
+.edt-panel.on .edt-row-lbl{font-size:10px}
+.edt-panel.on .edt-style-row{gap:4px;margin-top:6px}
+.edt-panel.on .edt-colors{grid-template-columns:repeat(7, 1fr);gap:4px}
+.edt-panel.on .edt-apply{padding:8px;font-size:12px;margin-top:6px}
+@keyframes edtPanelUp { from{transform:translateY(8px);opacity:0} to{transform:translateY(0);opacity:1} }
+body.edt-fullscreen .edt-panel.on{ bottom:16px; right:16px }
 .edt-tool{padding:10px 4px;border-radius:12px;border:1px solid var(--b);background:var(--s);font-size:10px;font-weight:700;color:var(--t2);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;line-height:1.1}
 .edt-tool svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.8;fill:none}
 .edt-tool:active{background:var(--bg)}
@@ -5071,6 +5076,7 @@ async function generatePrompt(){
       return label + ' ' + (b.title||'') + '\n' + (b.text||'');
     }).join('\n\n');
     createData.hook = j.hook;
+    createData.coverSubtitle = j.cover_subtitle || '';
     createData.body = bodyText;
     createData.bodySlides = j.body || [];  // 원본 슬라이드 배열 보존 (발행 시 캐러셀용)
     createData.caption = j.caption || '';
@@ -7785,41 +7791,47 @@ function buildAttractivePlaceholder(idx, total){
   };
 }
 // 슬라이드 내 모든 텍스트 요소에 세로 공간 할당 + 넘치면 font-size 자동 축소
-//   inline 편집 중에도 호출 가능 (text 노드 파괴 X, contenteditable caret 유지)
+//   주의: 레이아웃 준비 안 된 상태에서 호출되면 clientHeight=0 → 9px 까지 과도 축소 발생
+//   → clientHeight < 20 이면 측정 skip 하고 다시 시도.
+//   → 최소 크기를 base × 0.75 로 제한 (가독성 보호).
 function fitTextsInSlide(slideEl){
   if(!slideEl) return;
   var els = Array.from(slideEl.querySelectorAll('.edt-el.text'));
   if(!els.length) return;
   var tops = els.map(function(el){ return { el:el, top: parseFloat(el.style.top) || 0 }; });
   tops.sort(function(a, b){ return a.top - b.top; });
-  // 각 요소에 사용 가능한 세로 공간 부여
   tops.forEach(function(cur, i){
     var nextTop = (i < tops.length - 1) ? tops[i+1].top : 96;
     var availPct = Math.max(6, nextTop - cur.top - 1);
     cur.el.style.height = availPct + '%';
     cur.el.style.overflow = 'hidden';
-    // baseFontSize 기억 (편집 후 다시 키울 때 기준)
     if(!cur.el.dataset.baseFontSize){
       cur.el.dataset.baseFontSize = String(parseFloat(cur.el.style.fontSize) || 12);
     }
   });
-  // 측정은 다음 프레임 — 레이아웃 반영 후
-  requestAnimationFrame(function(){
+  function doFit(retries){
     tops.forEach(function(cur){
       var el = cur.el;
       if(el.dataset.noAutofit === '1') return;
-      // 편집 중엔 먼저 base 로 복원해서 재측정 (과도한 축소 방지)
+      if(el.clientHeight < 20){
+        // 레이아웃 준비 안 됨 — 재시도
+        if(retries > 0) setTimeout(function(){ doFit(retries - 1); }, 120);
+        return;
+      }
       var base = parseFloat(el.dataset.baseFontSize) || 12;
+      var minSize = Math.max(10, base * 0.75);  // base 의 75% 이상은 지킴
+      // 먼저 base 로 복원
       el.style.fontSize = base + 'px';
       var size = base;
       var guard = 0;
-      while((el.scrollHeight > el.clientHeight + 2) && size > 9 && guard < 25){
-        size = Math.max(9, size * 0.93);
+      while((el.scrollHeight > el.clientHeight + 4) && size > minSize && guard < 12){
+        size = Math.max(minSize, size * 0.95);
         el.style.fontSize = size.toFixed(1) + 'px';
         guard++;
       }
     });
-  });
+  }
+  requestAnimationFrame(function(){ doFit(4); });
 }
 function initEditor(){
   var canvas = document.getElementById('edt-canvas'); if(!canvas) return;
@@ -7901,9 +7913,10 @@ function initEditor(){
       var hookEl = makeTextEl(titleTxt, {x:6,y:t.hookY,w:88,size:t.hookSize,color:c,weight:t.hookWeight,isTitle:true});
       hookEl.style.zIndex = '5';
       sl.appendChild(hookEl);
-      var sub = (p.text || '').split('\n')[0].slice(0, 30);
+      // 부제목: Claude 응답의 cover_subtitle 우선, 없으면 첫 본문 첫 줄 fallback
+      var sub = (createData.coverSubtitle || (p.text || '').split('\n')[0] || '').slice(0, 32);
       if(sub){
-        var subEl = makeTextEl(sub, {x:6,y:t.subY,w:88,size:13,color:c,weight:600});
+        var subEl = makeTextEl(sub, {x:6,y:t.subY,w:88,size:15,color:c,weight:600});
         subEl.style.zIndex = '5';
         sl.appendChild(subEl);
       }

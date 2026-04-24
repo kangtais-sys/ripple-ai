@@ -90,37 +90,81 @@ export async function POST(req: NextRequest) {
     const match = text.match(/\{[\s\S]*\}/)
     if (!match) return NextResponse.json({ error: 'parse failed', raw: text }, { status: 502 })
 
-    let parsed: {
+    type Parsed = {
       hook?: string
+      cover_subtitle?: string
       hook_score?: number
-      body?: Array<{ title?: string; text?: string }>
+      body?: Array<{ role?: string; title?: string; text?: string }>
       caption?: string
       category?: string
       image_keywords?: string[]
     }
-    try {
-      parsed = JSON.parse(match[0])
-    } catch {
+    const parseJson = (txt: string): Parsed | null => {
+      try { return JSON.parse(txt) as Parsed } catch { return null }
+    }
+    let parsed = parseJson(match[0])
+    if (!parsed) {
       return NextResponse.json({ error: 'invalid JSON from Claude', raw: match[0] }, { status: 502 })
     }
 
-    // 슬라이드 개수 서버 보정 (Claude 가 가끔 절대 규칙 어김)
-    //   초과 → 앞에서 자르고 마지막 CTA 유지
-    //   부족 → 본론 자리에 placeholder 추가
+    // 슬라이드 개수 검증 → 부족/초과 시 Claude 에게 1회 재요청
+    const expected = slideCount - 1
+    if (!Array.isArray(parsed.body) || parsed.body.length !== expected) {
+      const retryPrompt = `${prompt}
+
+━━━ 이전 응답의 body 배열 길이가 잘못됐어. ${parsed.body?.length || 0}개가 아니라 정확히 ${expected}개여야 해. 다시 만들어서 같은 JSON 형식으로만 출력해. 다른 말 금지.`
+      const retry = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.ANTHROPIC_API_KEY!,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 4096,
+          messages: [{ role: 'user', content: retryPrompt }],
+        }),
+      })
+      if (retry.ok) {
+        const retryData = await retry.json()
+        const retryText = retryData.content?.[0]?.text || ''
+        const retryMatch = retryText.match(/\{[\s\S]*\}/)
+        if (retryMatch) {
+          const retryParsed = parseJson(retryMatch[0])
+          if (retryParsed && Array.isArray(retryParsed.body) && retryParsed.body.length === expected) {
+            parsed = retryParsed
+          }
+        }
+      }
+    }
+
+    // 재시도 후에도 개수 안 맞으면 마지막 보정 (조용히, error 문구 없이)
     if (Array.isArray(parsed.body)) {
-      const expected = slideCount - 1
       if (parsed.body.length > expected) {
         const kept = parsed.body.slice(0, expected - 1)
         const cta = parsed.body[parsed.body.length - 1]
         parsed.body = [...kept, cta]
-      } else if (parsed.body.length < expected) {
+      } else if (parsed.body.length < expected && parsed.body.length > 0) {
         const cta = parsed.body[parsed.body.length - 1]
-        const pads = Array.from({ length: expected - parsed.body.length }, (_, i) => ({
-          title: `포인트 ${parsed.body!.length + i - 1}`,
-          text: '직접 채워서 완성해주세요 — AI 가 슬라이드 수를 맞추지 못했어요',
+        const middle = parsed.body.slice(0, -1)
+        const pads = Array.from({ length: expected - parsed.body.length }, () => ({
+          role: 'body',
+          title: '핵심 한 줄',
+          text: '핵심 포인트를 직접 채워보세요',
         }))
-        parsed.body = [...parsed.body.slice(0, parsed.body.length - 1), ...pads, cta]
+        parsed.body = [...middle, ...pads, cta]
       }
+    }
+
+    // title·text 에 '슬라이드 N'·'N장' 같은 메타 라벨이 들어간 경우 제거
+    if (Array.isArray(parsed.body)) {
+      const metaRe = /\s*(?:슬라이드\s*\d+[^·\]]*|\d+\s*장|\d+\s*번째\s*슬라이드)\s*[·\-:]?\s*/g
+      parsed.body = parsed.body.map(b => ({
+        ...b,
+        title: (b.title || '').replace(metaRe, '').trim(),
+        text: (b.text || '').replace(metaRe, '').trim(),
+      }))
     }
 
     // 후킹 점수 서버측 재검증 (Claude 자체평가 참고)
@@ -176,6 +220,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       hook: parsed.hook || '',
+      cover_subtitle: parsed.cover_subtitle || '',
       hook_score: claudeScore,
       hook_score_server: serverScore,
       body: parsed.body || [],
