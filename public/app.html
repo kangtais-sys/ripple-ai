@@ -5086,7 +5086,7 @@ function showHookPicker(mainHook, altHooks){
     card.style.cssText = 'all:unset;display:block;width:100%;background:#fff;border:1.5px solid var(--b);border-radius:14px;padding:16px 14px;cursor:pointer;transition:all .14s;text-align:left;box-sizing:border-box';
     card.onmouseenter = function(){ card.style.borderColor = 'var(--mint)'; card.style.background = 'var(--mint-l)'; };
     card.onmouseleave = function(){ card.style.borderColor = 'var(--b)'; card.style.background = '#fff'; };
-    card.onclick = function(){ pickHook(o.text); };
+    card.onclick = function(){ pickHook(o.text, o.type); };
     var safeText = (o.text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
     card.innerHTML =
       '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">'+
@@ -5098,18 +5098,23 @@ function showHookPicker(mainHook, altHooks){
   });
   window.scrollTo(0,0);
 }
-function pickHook(text){
+function pickHook(text, hookType){
   if(!text) return;
   createData.hook = text;
   var el = document.getElementById('cs2-hook');
   if(el) el.textContent = text;
-  // 선택된 hook 으로 첫 슬라이드(표지) 동기화
-  if(Array.isArray(createData.bodySlides) && createData.bodySlides[0]){
-    // bodySlides 는 본문(2장~)만 보유 — 표지는 hook 으로 별도 렌더라 추가 동기화 불필요
+  // 개인화 누적: 어떤 후킹 패턴 선호하는지 학습
+  if(hookType){
+    authHeaders().then(function(h){
+      fetch('/api/user/preference', {
+        method:'PATCH', headers: h, credentials:'include',
+        body: JSON.stringify({ hook_type: hookType })
+      }).catch(function(){ /* 비치명 */ });
+    });
   }
   goStep(2);
 }
-function hpSkipPick(){ pickHook(createData.hook); }
+function hpSkipPick(){ pickHook(createData.hook, 'main'); }
 // 추천 주제 풀 — 매일 9시 3개 로테이션
 var DAILY_TOPIC_POOL = [
   // 뷰티/제품
@@ -5557,6 +5562,16 @@ function selectTpl(el, t){
   document.querySelectorAll('#tpl-grid .tpl-item').forEach(function(e){ e.classList.remove('on'); });
   el.classList.add('on');
   createData.template = t;
+  // 개인화 누적: 자주 쓰는 템플릿 학습 (debounce: 짧게 여러개 눌러도 마지막만 기록)
+  clearTimeout(window._tplPrefTimer);
+  window._tplPrefTimer = setTimeout(function(){
+    authHeaders().then(function(h){
+      fetch('/api/user/preference', {
+        method:'PATCH', headers: h, credentials:'include',
+        body: JSON.stringify({ template: t })
+      }).catch(function(){ /* 비치명 */ });
+    });
+  }, 800);
 }
 function genCarousel(){ goStep(4); }
 function toggleDiscover(){ openModal('m-discover'); }

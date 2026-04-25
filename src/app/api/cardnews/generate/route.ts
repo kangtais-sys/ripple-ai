@@ -263,6 +263,24 @@ export async function POST(req: NextRequest) {
       refId: job?.id,
     })
 
+    // 개인화 데이터 누적: generated_count++ , category_history[cat]++
+    try {
+      const { data: prof } = await sb
+        .from('profiles')
+        .select('generated_count, category_history')
+        .eq('id', user.id)
+        .maybeSingle()
+      const history = (prof?.category_history as Record<string, number>) || {}
+      history[cat] = (history[cat] || 0) + 1
+      await sb
+        .from('profiles')
+        .update({
+          generated_count: (prof?.generated_count || 0) + 1,
+          category_history: history,
+        })
+        .eq('id', user.id)
+    } catch { /* 비치명 — 카운터 실패해도 응답은 정상 */ }
+
     return NextResponse.json({
       hook: parsed.hook || '',
       cover_subtitle: parsed.cover_subtitle || '',
