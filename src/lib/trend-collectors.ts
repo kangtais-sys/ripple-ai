@@ -183,7 +183,9 @@ export async function collectKoreanTrends(): Promise<FeedItem[]> {
   console.log('[collectKoreanTrends] mk fetched:', !!mkXml, 'len', mkXml?.length || 0)
 
   if (hkXml) {
-    parseRssItems(hkXml, 8).forEach((it, i) => {
+    const hkParsed = parseRssItems(hkXml, 8)
+    console.log('[collectKoreanTrends] hankyung parsed items:', hkParsed.length, 'first:', hkParsed[0]?.title?.slice(0, 60) || '(none)')
+    hkParsed.forEach((it, i) => {
       items.push({
         source: 'hankyung:news',
         title: it.title,
@@ -192,9 +194,13 @@ export async function collectKoreanTrends(): Promise<FeedItem[]> {
         url: it.link,
       })
     })
+  } else {
+    console.warn('[collectKoreanTrends] hankyung fetch failed')
   }
   if (mkXml) {
-    parseRssItems(mkXml, 8).forEach((it, i) => {
+    const mkParsed = parseRssItems(mkXml, 8)
+    console.log('[collectKoreanTrends] mk parsed items:', mkParsed.length, 'first:', mkParsed[0]?.title?.slice(0, 60) || '(none)')
+    mkParsed.forEach((it, i) => {
       items.push({
         source: 'mk:news',
         title: it.title,
@@ -203,6 +209,8 @@ export async function collectKoreanTrends(): Promise<FeedItem[]> {
         url: it.link,
       })
     })
+  } else {
+    console.warn('[collectKoreanTrends] mk fetch failed')
   }
 
   console.log('[collectKoreanTrends] total items:', items.length)
@@ -240,7 +248,9 @@ export async function fetchYonhapLife(): Promise<FeedItem[]> {
 }
 
 // ─────────────────────────────────────────────
-// NewsAPI.org — top-headlines country=kr (NEWS_API_KEY 필요, 무료 dev 1000건/일)
+// NewsAPI.org — everything?q=한국&language=ko&sortBy=popularity
+// (NEWS_API_KEY 필요, 무료 dev 1000건/일)
+// 무료 플랜은 top-headlines?country=kr 미지원 → everything 엔드포인트로 우회.
 // ─────────────────────────────────────────────
 export async function collectNewsAPI(): Promise<FeedItem[]> {
   const key = process.env.NEWS_API_KEY
@@ -250,9 +260,8 @@ export async function collectNewsAPI(): Promise<FeedItem[]> {
     return []
   }
   try {
-    const res = await fetch(
-      `https://newsapi.org/v2/top-headlines?country=kr&pageSize=20&apiKey=${key}`
-    )
+    const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent('한국')}&language=ko&sortBy=popularity&pageSize=20&apiKey=${key}`
+    const res = await fetch(url)
     console.log('[collectNewsAPI] response status:', res.status)
     if (!res.ok) {
       const errBody = await res.text().catch(() => '')
@@ -261,6 +270,7 @@ export async function collectNewsAPI(): Promise<FeedItem[]> {
     }
     const data = await res.json() as {
       status?: string
+      totalResults?: number
       articles?: Array<{
         title?: string
         description?: string
@@ -268,9 +278,9 @@ export async function collectNewsAPI(): Promise<FeedItem[]> {
         source?: { name?: string }
       }>
     }
-    console.log('[collectNewsAPI] articles count:', (data.articles || []).length)
+    console.log('[collectNewsAPI] articles count:', (data.articles || []).length, 'total:', data.totalResults)
     return (data.articles || []).map((a, i) => ({
-      source: `newsapi:${a.source?.name || 'kr'}`,
+      source: `newsapi:${a.source?.name || 'ko'}`,
       title: a.title || '',
       excerpt: (a.description || '').slice(0, 200),
       engagement: Math.max(0, 60 - i * 2),
