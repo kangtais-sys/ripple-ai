@@ -8634,12 +8634,13 @@ function initEditor(){
   edtCur = 0;
   renderEdtNav();
   // 텍스트 auto-fit — 첫 슬라이드(visible)만 지금 실행. 나머지는 edtGoto 로 넘어갈 때 실행.
-  //   (display:none 슬라이드는 clientHeight 가 0 이라 자동 축소 과도 적용됨)
   if(edtSlides[0]){ requestAnimationFrame(function(){ fitTextsInSlide(edtSlides[0]); }); }
-  // 모든 이미지 슬롯 병렬 자동 로드 (Unsplash → Pexels → Pixabay)
-  setTimeout(autoLoadAllImageSlots, 100);
-  // 이미지 로드 후 본문 1장에 stock 영상 자동 삽입 (캐러셀 다이내믹 ↑)
-  setTimeout(autoPlaceVideoInBody, 1500);
+  // 이미지 로드 → 끝나면 본문 1장에 영상 자동 삽입 (race 방지)
+  setTimeout(function(){
+    autoLoadAllImageSlots().then(function(){
+      autoPlaceVideoInBody();
+    }).catch(function(){ autoPlaceVideoInBody(); });
+  }, 100);
 }
 
 // 본문 슬라이드 중 첫 번째 일반 body 에 stock 영상 자동 삽입
@@ -9266,27 +9267,39 @@ async function captureAndUploadSlides(jobId){
       await new Promise(function(r){ setTimeout(r, 500); });
       await document.fonts.ready.catch(function(){});
 
-      // 영상 슬라이드면 영상 파일 자체 업로드 → carousel child media_type:VIDEO
+      // 영상 슬라이드 처리 — 두 케이스 분기
+      //   (A) 유저 업로드 영상: blob URL + WeakMap 에 File 보관 → 파일 업로드
+      //   (B) Stock 영상: HTTPS URL (Pexels CDN 등) → URL 그대로 사용 (재업로드 X)
       var videoSlot = slideEl.querySelector('.edt-el.img[data-video-url]');
-      var videoFile = videoSlot ? _videoFilesBySlot.get(videoSlot) : null;
-      if(videoFile){
-        var vfd = new FormData();
-        vfd.append('file', videoFile, 'slide-' + i + '-video.mp4');
-        vfd.append('job_id', jobId);
-        vfd.append('slide', String(i));
-        vfd.append('media_type', 'video');
-        var vUpHeaders = h.Authorization ? { 'Authorization': h.Authorization } : {};
-        var vUpRes = await fetch('/api/upload/cardnews', {
-          method:'POST', headers: vUpHeaders, credentials:'include', body: vfd
-        });
-        var vUpJson = await vUpRes.json().catch(function(){ return {}; });
-        if(vUpRes.ok && vUpJson.url){
-          console.log('[capture] video slide', i, '→', vUpJson.url.slice(-40));
-          uploaded.push({ url: vUpJson.url, media_type: 'VIDEO' });
-        } else {
-          console.error('[capture] video upload failed slide', i, vUpJson);
+      if(videoSlot){
+        var videoFile = _videoFilesBySlot.get(videoSlot);
+        var stockUrl = videoSlot.dataset.videoUrl || '';
+        if(videoFile){
+          // (A) 유저 업로드 → Supabase Storage 업로드
+          var vfd = new FormData();
+          vfd.append('file', videoFile, 'slide-' + i + '-video.mp4');
+          vfd.append('job_id', jobId);
+          vfd.append('slide', String(i));
+          vfd.append('media_type', 'video');
+          var vUpHeaders = h.Authorization ? { 'Authorization': h.Authorization } : {};
+          var vUpRes = await fetch('/api/upload/cardnews', {
+            method:'POST', headers: vUpHeaders, credentials:'include', body: vfd
+          });
+          var vUpJson = await vUpRes.json().catch(function(){ return {}; });
+          if(vUpRes.ok && vUpJson.url){
+            console.log('[capture] uploaded video slide', i, '→', vUpJson.url.slice(-40));
+            uploaded.push({ url: vUpJson.url, media_type: 'VIDEO' });
+          } else {
+            console.error('[capture] video upload failed slide', i, vUpJson);
+          }
+          continue;
+        } else if(stockUrl && /^https?:/.test(stockUrl)){
+          // (B) Stock 영상 — Pexels CDN URL 직접 사용 (IG 가 fetch 가능)
+          console.log('[capture] stock video slide', i, '→', stockUrl.slice(-40));
+          uploaded.push({ url: stockUrl, media_type: 'VIDEO' });
+          continue;
         }
-        continue;
+        // 그 외 (blob URL 인데 File 없음 — 재진입 후 등) → fallthrough 해서 image 캡처
       }
 
       // 크기 확인
