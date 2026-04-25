@@ -1049,7 +1049,7 @@ body.edt-fullscreen #create-back{display:none}
 .cs2-slide-card.cta .cs2-slide-head{color:#B45309}
 .cs2-slide-num{width:18px;height:18px;border-radius:4px;background:var(--mint);color:#fff;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center}
 .cs2-slide-card.cta .cs2-slide-num{background:#F59E0B}
-.cs2-slide-text{padding:10px 12px;font-size:12.5px;line-height:1.65;color:var(--t1);white-space:pre-wrap;min-height:36px;cursor:text;outline:none}
+.cs2-slide-text{padding:14px 14px;font-size:13.5px;line-height:1.7;color:var(--t1);white-space:pre-wrap;min-height:60px;cursor:text;outline:none;font-family:'Pretendard','Noto Sans KR',sans-serif}
 .cs2-slide-text[contenteditable=true]:focus{background:var(--mint-l)}
 .edt-hnd{position:absolute;right:-6px;bottom:-6px;width:14px;height:14px;background:var(--mint);border:2px solid #fff;border-radius:50%;cursor:nwse-resize;box-shadow:0 1px 3px rgba(0,0,0,.2)}
 .edt-nav{display:flex;justify-content:center;gap:4px;margin-bottom:10px}
@@ -2212,7 +2212,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <div style="font-size:10px;font-weight:800;color:var(--mint-d);margin-bottom:6px;letter-spacing:.3px">✦ 후킹 멘트 <span style="color:var(--t3);font-weight:600;margin-left:4px">탭해서 수정</span></div>
       <div id="cs2-hook" class="cs2-edit-field" contenteditable="false" style="font-size:16px;font-weight:800;color:var(--t1);line-height:1.4;margin-bottom:14px;letter-spacing:-.3px;padding:4px 6px;margin-left:-6px;margin-right:-6px;border-radius:6px;cursor:pointer">—</div>
       <div style="font-size:10px;font-weight:800;color:var(--mint-d);margin-bottom:6px;letter-spacing:.3px">✦ 슬라이드별 본문 <span style="color:var(--t3);font-weight:600;margin-left:4px">탭해서 수정</span></div>
-      <div id="cs2-body-list" style="display:flex;flex-direction:column;gap:8px;max-height:320px;overflow-y:auto;margin-bottom:14px">—</div>
+      <div id="cs2-body-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">—</div>
       <div id="cs2-body" style="display:none" contenteditable="false">—</div>
       <div style="font-size:10px;font-weight:800;color:var(--mint-d);margin-bottom:6px;letter-spacing:.3px">✦ 게시 캡션 <span style="color:var(--t3);font-weight:600;margin-left:4px">탭해서 수정</span></div>
       <div id="cs2-caption" class="cs2-edit-field" contenteditable="false" style="font-size:12px;color:var(--t1);line-height:1.7;white-space:pre-line;background:#fff;border-radius:10px;padding:12px;cursor:pointer">—</div>
@@ -7921,26 +7921,11 @@ function renderImageSlotSpinner(wrap){
 function renderImageSlotPlaceholder(wrap){
   var kw = wrap.dataset.keyword || '';
   wrap.innerHTML =
-    '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:5px;background:linear-gradient(135deg,#E5E7EB,#F3F4F6);color:#6B7280;font-size:10px;font-weight:700;padding:8px;text-align:center">' +
-      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:22px;height:22px;opacity:.55"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 15l-5-5-11 11"/></svg>' +
-      (kw ? '<div style="font-size:9px;opacity:.7;max-width:92%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escapeHtml(kw)+'</div>' : '') +
-      '<div style="display:flex;gap:4px;margin-top:4px">' +
-        '<button type="button" data-act="img" style="padding:4px 8px;border-radius:6px;border:none;background:#1A1F27;color:#fff;font-size:9px;font-weight:700;cursor:pointer">📷 이미지</button>' +
-        '<button type="button" data-act="vid" style="padding:4px 8px;border-radius:6px;border:none;background:#FF4D4D;color:#fff;font-size:9px;font-weight:700;cursor:pointer">🎬 영상</button>' +
-      '</div>' +
+    '<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;background:linear-gradient(135deg,#E5E7EB,#F3F4F6);color:#6B7280;font-size:10px;font-weight:700;pointer-events:none;padding:8px;text-align:center">' +
+      '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="width:24px;height:24px;opacity:.55"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 15l-5-5-11 11"/></svg>' +
+      '<div style="font-size:10.5px;opacity:.85">탭해서 이미지·영상 교체</div>' +
+      (kw ? '<div style="font-size:9px;opacity:.65;max-width:92%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+escapeHtml(kw)+'</div>' : '') +
     '</div>';
-  // 버튼 핸들러
-  Array.from(wrap.querySelectorAll('button[data-act]')).forEach(function(btn){
-    btn.addEventListener('click', function(e){
-      e.stopPropagation();
-      e.preventDefault();
-      var act = btn.getAttribute('data-act');
-      if(act === 'img'){ openUploadForSlot(wrap); }
-      else if(act === 'vid'){ fetchStockVideoForSlot(wrap); }
-    });
-    btn.addEventListener('mousedown', function(e){ e.stopPropagation(); });
-    btn.addEventListener('touchstart', function(e){ e.stopPropagation(); }, {passive:true});
-  });
 }
 // stock 영상 자동 검색 + 슬롯에 삽입 (Pexels → Pixabay)
 async function fetchStockVideoForSlot(wrap){
