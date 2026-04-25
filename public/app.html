@@ -7650,6 +7650,106 @@ function makeOverlayEl(mode){
   }
   return div;
 }
+// ───────── 템플릿 데코 요소들 (감각적 디자인 강화) ─────────
+
+// 거대 영문 outline 숫자 (bold 템플릿용 — 백그라운드 watermark)
+function makeBigOutlineNumber(num, opts){
+  var el = document.createElement('div');
+  el.className = 'edt-deco';
+  el.style.cssText = 'position:absolute;left:' + (opts.x || -2) + '%;top:' + (opts.y || 35) + '%;font-family:\'Black Han Sans\',\'Pretendard\',sans-serif;font-size:' + (opts.size || 220) + 'px;font-weight:900;color:transparent;-webkit-text-stroke:2px ' + opts.color + ';letter-spacing:-8px;line-height:.8;pointer-events:none;z-index:1;opacity:' + (opts.opacity || 0.12);
+  el.textContent = num;
+  return el;
+}
+
+// 매거진 헤더 (mag 템플릿용 — VOL.XX · ISSUE)
+function makeMagazineHeader(opts){
+  var el = document.createElement('div');
+  el.className = 'edt-deco';
+  el.style.cssText = 'position:absolute;left:' + (opts.x || 6) + '%;top:' + (opts.y || 4) + '%;width:' + (opts.w || 88) + '%;display:flex;justify-content:space-between;align-items:center;font-family:\'Pretendard\',sans-serif;font-size:9px;font-weight:800;color:' + opts.color + ';letter-spacing:.4em;pointer-events:none;z-index:5;text-transform:uppercase';
+  el.innerHTML = '<span>SSOBI · VOL ' + (opts.vol || '01') + '</span><span style="font-family:\'Fraunces\',\'Pretendard\',serif;font-style:italic;letter-spacing:.05em">' + (opts.issue || '#001') + '</span>';
+  return el;
+}
+
+// 가로 라인 frame — editorial/luxury/noir 용 (상하단 라인)
+function makeHorizontalFrame(opts){
+  var top = document.createElement('div');
+  top.className = 'edt-deco';
+  top.style.cssText = 'position:absolute;left:' + (opts.inset || 6) + '%;right:' + (opts.inset || 6) + '%;top:' + (opts.topY || 5) + '%;height:1px;background:' + opts.color + ';opacity:' + (opts.opacity || 0.4) + ';pointer-events:none;z-index:5';
+  var bot = document.createElement('div');
+  bot.className = 'edt-deco';
+  bot.style.cssText = 'position:absolute;left:' + (opts.inset || 6) + '%;right:' + (opts.inset || 6) + '%;bottom:' + (opts.botY || 5) + '%;height:1px;background:' + opts.color + ';opacity:' + (opts.opacity || 0.4) + ';pointer-events:none;z-index:5';
+  return [top, bot];
+}
+
+// 그래픽 코너 도트 (pastel·clean 용)
+function makeCornerDots(opts){
+  var wrap = document.createElement('div');
+  wrap.className = 'edt-deco';
+  wrap.style.cssText = 'position:absolute;right:' + (opts.x || 6) + '%;top:' + (opts.y || 6) + '%;display:flex;gap:5px;pointer-events:none;z-index:5';
+  var colors = opts.colors || ['#FBCFE8', '#C4B5FD', '#A7F3D0'];
+  colors.forEach(function(c){
+    var d = document.createElement('div');
+    d.style.cssText = 'width:8px;height:8px;border-radius:50%;background:' + c;
+    wrap.appendChild(d);
+  });
+  return wrap;
+}
+
+// 작은 영문 라벨 (모든 템플릿 우상단 시그니처)
+function makeCornerLabel(text, opts){
+  var el = document.createElement('div');
+  el.className = 'edt-deco';
+  el.style.cssText = 'position:absolute;right:' + (opts.x || 6) + '%;top:' + (opts.y || 6) + '%;font-family:\'Pretendard\',sans-serif;font-size:9.5px;font-weight:800;color:' + opts.color + ';letter-spacing:.3em;pointer-events:none;z-index:5;text-transform:uppercase';
+  el.textContent = text;
+  return el;
+}
+
+// 가는 세리프 워터마크 (luxury 용 — 큰 영문 우측 하단 흐릿)
+function makeSerifWatermark(text, opts){
+  var el = document.createElement('div');
+  el.className = 'edt-deco';
+  el.style.cssText = 'position:absolute;right:' + (opts.x || -8) + '%;bottom:' + (opts.y || 8) + '%;font-family:\'Nanum Myeongjo\',\'Fraunces\',serif;font-style:italic;font-size:' + (opts.size || 90) + 'px;font-weight:400;color:' + opts.color + ';opacity:' + (opts.opacity || 0.08) + ';line-height:.85;letter-spacing:-2px;pointer-events:none;z-index:1';
+  el.textContent = text;
+  return el;
+}
+
+// 템플릿+슬라이드종류 → 데코 요소 배열 반환
+function tplDecoForSlide(tpl, kind, idx, accent, textColor){
+  var decos = [];
+  if(tpl === 'bold'){
+    if(kind === 'cover'){
+      decos.push(makeBigOutlineNumber('SSOBI', {x:-4, y:-8, size:120, color:textColor, opacity:0.18}));
+    } else if(kind === 'body'){
+      decos.push(makeBigOutlineNumber(String(idx).padStart(2,'0'), {x:60, y:-12, size:240, color:accent, opacity:0.15}));
+    }
+    decos.push(makeCornerLabel('SSOBI', {x:6, y:5, color:accent}));
+  } else if(tpl === 'mag'){
+    decos.push(makeMagazineHeader({color:textColor, vol:String(idx + 1).padStart(2,'0'), issue:'#' + String(Math.floor(Math.random()*900) + 100)}));
+  } else if(tpl === 'editorial'){
+    var lines = makeHorizontalFrame({color:textColor, topY:5, botY:5, opacity:0.35});
+    decos.push(lines[0]); decos.push(lines[1]);
+    decos.push(makeCornerLabel('— Editorial', {x:6, y:7, color:accent}));
+  } else if(tpl === 'noir'){
+    var nLines = makeHorizontalFrame({color:accent, topY:6, botY:6, opacity:0.55});
+    decos.push(nLines[0]); decos.push(nLines[1]);
+    decos.push(makeCornerLabel('NOIR', {x:6, y:8.5, color:accent}));
+  } else if(tpl === 'luxury'){
+    var lLines = makeHorizontalFrame({color:accent, topY:6, botY:6, opacity:0.45, inset:8});
+    decos.push(lLines[0]); decos.push(lLines[1]);
+    if(kind === 'cover'){
+      decos.push(makeSerifWatermark('Luxe', {x:-5, y:6, size:110, color:accent, opacity:0.10}));
+    }
+    decos.push(makeCornerLabel('LUXE', {x:6, y:8.5, color:accent}));
+  } else if(tpl === 'pastel'){
+    decos.push(makeCornerDots({x:6, y:6, colors:['#FBCFE8', '#C4B5FD', '#A7F3D0']}));
+  } else if(tpl === 'mono'){
+    decos.push(makeCornerLabel('—— MONO', {x:6, y:6, color:accent}));
+  } else if(tpl === 'clean'){
+    decos.push(makeCornerLabel('SSOBI', {x:6, y:6, color:accent}));
+  }
+  return decos;
+}
+
 // Eyebrow 라벨 — hook2 슬라이드에 작은 accent-color 문구 ("이어서 · 더 놀라운 것")
 function makeEyebrowEl(text, opts){
   var div = document.createElement('div');
@@ -8332,6 +8432,12 @@ function initEditor(){
     } else if(layout === 'small-top'){
       sl.appendChild(makeImageSlotEl(kw, {x:18, y:6, w:64, h:32, slideIdx:i}));
     }
+
+    // 템플릿 데코 요소 (감각적 디자인 — 대형 아웃라인 숫자 / 매거진 헤더 / 가로 프레임 / 도트 등)
+    var deAccent = tplAccent(tpl);
+    var deColor = tplText(tpl);
+    var deKind = isCover ? 'cover' : isEnding ? 'cta' : 'body';
+    tplDecoForSlide(tpl, deKind, i, deAccent, deColor).forEach(function(de){ sl.appendChild(de); });
 
     // 텍스트 영역 위치 (layout 별로 다름) — 전부 z-index:5 (오버레이 위)
     var t = {};
