@@ -9105,16 +9105,6 @@ function initEditor(){
         fontFamily: "'Pretendard','Noto Sans KR',sans-serif"
       }));
       sl.appendChild(makeCtaPillsEl({x:10,y:78,w:80,accent:ctaAccent,textColor:c}));
-    } else if(isSummary){
-      // 요약 — 이미지 없음
-      var summaryEyebrow = summaryEyebrowPick();
-      sl.appendChild(makeTextEl(summaryEyebrow, {x:6,y:12,w:88,size:20,color:c,weight:900}));
-      sl.appendChild(makeTextEl(p.title || '핵심 결론', {x:6,y:32,w:88,size:28,color:c,weight:900,isTitle:true}));
-      sl.appendChild(makeTextEl(p.text || '', {
-        x:6, y:60, w:88, size:14, color:c, weight:500,
-        fontFamily: "'Pretendard','Noto Sans KR',sans-serif"
-      }));
-      sl.appendChild(makeTextEl(String(i+1).padStart(2,'0')+' / '+String(N).padStart(2,'0'), {x:6,y:93,w:20,size:10,color:c,weight:700}));
     } else {
       // 본론 — role 에 따라 레이아웃 분기
       var bodyAccent = tplAccent(tpl);
