@@ -20,8 +20,8 @@ export type ImageResult =
       ok: true
       url: string
       fallbackUrl?: string              // url 로딩 실패 시 프론트가 자동 대체할 URL (picsum 등)
-      source: 'unsplash' | 'pexels' | 'pixabay'
-      sourceLabel: 'Unsplash' | 'Pexels' | 'Pixabay'
+      source: 'unsplash' | 'pexels' | 'pixabay' | 'picsum'
+      sourceLabel: 'Unsplash' | 'Pexels' | 'Pixabay' | 'Picsum'
       photographer?: string
       attributionUrl?: string           // 사진 원본 페이지 (UTM 파라미터 포함, Unsplash 필수)
       photographerUrl?: string          // 작가 프로필 페이지 (Unsplash 필수)
@@ -361,23 +361,17 @@ export async function fetchCardnewsImage(args: {
     r = await tryProvider(fbQuery, [fetchUnsplash, fetchPexels])
     if (r) return r
   }
-  // 3차: source.unsplash.com 직링크 — API 키 없이도 동작
-  const finalKw = encodeURIComponent(cleanQuery(toEnKeyword(args)) || 'aesthetic lifestyle')
+  // 3차 (최후 보장): picsum.photos — deprecated source.unsplash.com 이 503 자주 반환해서 primary 교체
+  // slideIdx + Date.now hash 로 슬라이드별 다른 이미지 보장
   const slideSeed = (args.slideIdx ?? 0)
-  const sourceUrl = `https://source.unsplash.com/1080x1080/?${finalKw}&sig=${slideSeed}`
-  if (used) used.add(sourceUrl)
-  // source.unsplash.com 은 redirect 이므로 200 보장 못함 — 대신 picsum 으로 백업
-  // 4차 (최후 보장): picsum.photos — 항상 200 OK, 무조건 이미지 반환
-  // 슬라이드 인덱스로 seed → 같은 카드뉴스 안에서도 슬라이드별 다른 이미지
   const picsumUrl = `https://picsum.photos/seed/ssobi-${slideSeed}-${Date.now() % 100000}/1080/1080`
-  // 우선 source.unsplash 시도, HEAD 체크 없이 그냥 반환 (브라우저가 onerror 시 picsum 시도하도록 둘 다 반환)
+  if (used) used.add(picsumUrl)
   return {
     ok: true,
-    url: sourceUrl,
-    fallbackUrl: picsumUrl,
-    source: 'unsplash',
-    sourceLabel: 'Unsplash',
-    photographer: 'Unsplash',
-    attributionUrl: `https://unsplash.com/?${UTM}`,
-  } as ImageResult
+    url: picsumUrl,
+    source: 'picsum',
+    sourceLabel: 'Picsum',
+    photographer: 'Picsum',
+    attributionUrl: 'https://picsum.photos',
+  }
 }

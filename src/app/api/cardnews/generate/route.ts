@@ -273,7 +273,7 @@ export async function POST(req: NextRequest) {
     parsed.cover_subtitle = stripEmoji(parsed.cover_subtitle)
 
     // hook ↔ body 일치 검증: hook 의 의미 키워드(숫자/한글 명사 ≥3자) 가 body 어디에도 없으면 1회 재요청
-    let parsedNN: Parsed = parsed
+    const parsedNN: Parsed = parsed
     if (parsedNN.hook && Array.isArray(parsedNN.body)) {
       const hookKeywords = (parsedNN.hook!
         .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '')

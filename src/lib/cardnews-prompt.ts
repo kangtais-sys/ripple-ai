@@ -327,9 +327,11 @@ export function scoreSavability(bodyTexts: string[]): SavabilityScore {
   const merged = bodyTexts.join('\n')
   const hasAction = /\d+\s*(분|시간|회|번|일|주|개월|kg|ml|단계)|아침|저녁|매일|먼저|다음|마지막/.test(merged)
   const hasNumber = (merged.match(/\d{2,}/g) || []).length >= 2
-  const hasNamedEntity = /[A-Z][a-z]+|《.+?》|[가-힣]{2,}(브랜드|올리브영|무신사|쿠팡|네이버|스타벅스|이니스프리|YES24|교보문고)/.test(merged)
+  // 명명체: 영문 2자 이상 / 한글 브랜드 화이트리스트 / 가격(\d+원) / 《...》
+  const hasNamedEntity = /[A-Za-z]{2,}|《.+?》|\d+원|올리브영|무신사|쿠팡|네이버|스타벅스|이니스프리|교보문고|아이허브|배민|카카오|화해|코스알엑스|라네즈|아이오페|에뛰드|마녀공장|아모레|닥터자르트|토니모리/.test(merged)
   const hasComparison = /vs|비교|대신|보다|차이|먼저.*다음|첫.*둘.*셋/.test(merged)
-  const hasSource = /\((출처|기준|평균가|베스트|랭킹|2024|2025|2026|국세청|식약처|관세청|복지부)/.test(merged)
+  // 괄호 안 어디에든 출처 키워드 (예: "(올리브영 평균가)", "(2026년 기준)")
+  const hasSource = /\([^)]*(출처|기준|평균가|평균|베스트|랭킹|2024|2025|2026|국세청|식약처|관세청|복지부)/.test(merged)
   const total =
     (hasAction ? 2 : 0) +
     (hasNumber ? 2 : 0) +
@@ -964,7 +966,9 @@ function formatCaptionBody(category: CategoryKey, bodySlides: BodySlideForCaptio
     .filter(s => (s.text || '').trim().length > 0)
   if (main.length === 0) return ''
 
-  const isQuote = category === 'book' || /명언|글귀|문장|시/.test(bodySlides.map(s => s.title || '').join(' '))
+  // '시' 단독 매칭은 '시작' 등 일반 단어와 충돌 → 명확한 키워드만
+  const titleBlob = bodySlides.map(s => s.title || '').join(' ')
+  const isQuote = category === 'book' || /명언|글귀|구절|문구|시구|밑줄/.test(titleBlob)
   const isPlace = category === 'food' || category === 'cafe' || category === 'travel_domestic' || category === 'travel_abroad'
 
   if (isQuote) {
