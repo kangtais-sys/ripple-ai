@@ -488,6 +488,35 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .first-bar-txt{flex:1;text-align:left;font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px}
 .first-bar-txt strong{color:var(--t1);font-weight:800}
 .first-bar-arr{color:var(--mint-d);font-size:15px;font-weight:800;flex-shrink:0}
+/* ── 온보딩 모달 ── */
+.ob-step{display:none;padding:22px 22px 28px}
+.ob-step.on{display:block}
+.ob-h1{font-size:22px;font-weight:900;color:var(--t1);letter-spacing:-.5px;margin-bottom:8px}
+.ob-sub{font-size:13.5px;color:var(--t2);font-weight:500;line-height:1.55;margin-bottom:20px}
+.ob-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:18px}
+.ob-chip{padding:14px 6px;border:1.5px solid var(--b);border-radius:12px;background:#fff;font-size:12.5px;font-weight:700;color:var(--t1);cursor:pointer;transition:all .12s;text-align:center;letter-spacing:-.2px;position:relative}
+.ob-chip.on{border-color:var(--mint);background:var(--mint-l);color:var(--mint-d)}
+.ob-chip.on::after{content:'✓';position:absolute;top:4px;right:6px;font-size:10px;font-weight:900;color:var(--mint-d)}
+.ob-tone-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px}
+.ob-tone{padding:14px;border:1.5px solid var(--b);border-radius:14px;background:#fff;cursor:pointer;transition:all .12s;text-align:left}
+.ob-tone.on{border-color:var(--mint);background:var(--mint-l)}
+.ob-tone-name{font-size:14px;font-weight:900;color:var(--t1);margin-bottom:6px;letter-spacing:-.3px}
+.ob-tone.on .ob-tone-name{color:var(--mint-d)}
+.ob-tone-eg{font-size:11.5px;color:var(--t3);font-weight:500;line-height:1.45;font-style:italic}
+.ob-goal-list{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.ob-goal{padding:14px 16px;border:1.5px solid var(--b);border-radius:12px;background:#fff;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .12s}
+.ob-goal.on{border-color:var(--mint);background:var(--mint-l)}
+.ob-goal-radio{width:18px;height:18px;border-radius:50%;border:2px solid var(--b);flex-shrink:0;position:relative}
+.ob-goal.on .ob-goal-radio{border-color:var(--mint-d);background:var(--mint-d)}
+.ob-goal.on .ob-goal-radio::after{content:'';position:absolute;top:3px;left:3px;width:8px;height:8px;border-radius:50%;background:#fff}
+.ob-goal-text{flex:1;font-size:13.5px;font-weight:700;color:var(--t1);letter-spacing:-.2px}
+.ob-goal-text small{display:block;font-size:11px;font-weight:500;color:var(--t3);margin-top:2px}
+.ob-next{width:100%;padding:14px;border-radius:12px;background:var(--mint);color:#fff;border:none;font-size:14px;font-weight:800;cursor:pointer;letter-spacing:-.2px;box-shadow:0 4px 14px rgba(0,200,150,.25)}
+.ob-next:disabled{background:#D1D5DB;color:#9CA3AF;cursor:not-allowed;box-shadow:none}
+.ob-back{background:none;border:none;color:var(--t3);font-size:12px;font-weight:600;padding:8px 0;cursor:pointer;margin-top:8px;width:100%}
+.ob-progress{display:flex;gap:4px;margin-bottom:18px}
+.ob-progress-dot{flex:1;height:3px;border-radius:2px;background:var(--b);transition:.2s}
+.ob-progress-dot.on{background:var(--mint)}
 .trend-dots{display:flex;justify-content:center;gap:6px;margin:6px 0 14px}
 .trend-dots span{width:6px;height:6px;border-radius:50%;background:var(--b);transition:all .2s}
 .trend-dots span.on{background:var(--dark);width:18px;border-radius:3px}
@@ -2125,9 +2154,9 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div class="create-step on" id="cs-1">
 
     <!-- 처음이면 여기부터 (얇은 바) -->
-    <button class="first-bar" onclick="openModal('m-discover')">
+    <button class="first-bar" onclick="openOnboarding()">
       <span class="first-bar-ico">✨</span>
-      <span class="first-bar-txt">처음 SNS를 시작한다면? <strong>프로필·주제 세팅</strong></span>
+      <span class="first-bar-txt" id="first-bar-txt">처음 SNS를 시작한다면? <strong>주제·말투·목표 세팅</strong></span>
       <span class="first-bar-arr">→</span>
     </button>
 
@@ -3411,7 +3440,65 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   </div>
 </div>
 
-<!-- ════ 처음이면 여기부터 (3단계 세팅) ════ -->
+<!-- ════ 온보딩 — 처음 SNS 시작 (주제·말투·목표 3단계) ════ -->
+<div class="ov" id="m-onboarding" onclick="co(event,'m-onboarding')">
+  <div class="sheet" style="padding:0;max-height:90vh;overflow-y:auto">
+    <div class="s-bar"></div>
+    <!-- STEP 1: 주제 -->
+    <div class="ob-step on" id="ob-1">
+      <div class="ob-progress"><span class="ob-progress-dot on"></span><span class="ob-progress-dot"></span><span class="ob-progress-dot"></span></div>
+      <div class="ob-h1">어떤 주제로 계정을 키울 거야?</div>
+      <div class="ob-sub">관심 있는 주제를 1~3개 골라봐. 나중에 바꿀 수 있어.</div>
+      <div class="ob-grid" id="ob-topics">
+        <button type="button" class="ob-chip" data-topic="beauty">뷰티·피부</button>
+        <button type="button" class="ob-chip" data-topic="food">음식·맛집</button>
+        <button type="button" class="ob-chip" data-topic="travel">여행</button>
+        <button type="button" class="ob-chip" data-topic="fashion">패션·스타일</button>
+        <button type="button" class="ob-chip" data-topic="interior">인테리어</button>
+        <button type="button" class="ob-chip" data-topic="book">독서·책</button>
+        <button type="button" class="ob-chip" data-topic="baby">육아·살림</button>
+        <button type="button" class="ob-chip" data-topic="fit">운동·헬스</button>
+        <button type="button" class="ob-chip" data-topic="money">재테크·돈</button>
+        <button type="button" class="ob-chip" data-topic="life">라이프 꿀팁</button>
+        <button type="button" class="ob-chip" data-topic="cafe">카페·커피</button>
+        <button type="button" class="ob-chip" data-topic="trend">트렌드·문화</button>
+      </div>
+      <button class="ob-next" id="ob-1-next" disabled onclick="obNext(2)">다음</button>
+    </div>
+    <!-- STEP 2: 말투 -->
+    <div class="ob-step" id="ob-2">
+      <div class="ob-progress"><span class="ob-progress-dot on"></span><span class="ob-progress-dot on"></span><span class="ob-progress-dot"></span></div>
+      <div class="ob-h1">어떤 스타일로 올릴 거야?</div>
+      <div class="ob-sub">내 계정 분위기를 정해줘.</div>
+      <div class="ob-tone-grid" id="ob-tones">
+        <button type="button" class="ob-tone" data-tone="warm"><div class="ob-tone-name">다정한</div><div class="ob-tone-eg">"속상했지? 나도 그랬어"</div></button>
+        <button type="button" class="ob-tone" data-tone="friendly"><div class="ob-tone-name">친근한</div><div class="ob-tone-eg">"이거 찐이야 진짜"</div></button>
+        <button type="button" class="ob-tone" data-tone="professional"><div class="ob-tone-name">전문적</div><div class="ob-tone-eg">"30만 독자 선택"</div></button>
+        <button type="button" class="ob-tone" data-tone="honest"><div class="ob-tone-name">솔직한</div><div class="ob-tone-eg">"3만원 아깝더라 솔직히"</div></button>
+        <button type="button" class="ob-tone" data-tone="witty"><div class="ob-tone-name">재치있는</div><div class="ob-tone-eg">"이 퀄리티? 제정신이야?"</div></button>
+        <button type="button" class="ob-tone" data-tone="chic"><div class="ob-tone-name">시크한</div><div class="ob-tone-eg">"3만원. 15일 썼음. 끝."</div></button>
+      </div>
+      <button class="ob-next" id="ob-2-next" disabled onclick="obNext(3)">다음</button>
+      <button class="ob-back" onclick="obNext(1)">이전</button>
+    </div>
+    <!-- STEP 3: 목표 -->
+    <div class="ob-step" id="ob-3">
+      <div class="ob-progress"><span class="ob-progress-dot on"></span><span class="ob-progress-dot on"></span><span class="ob-progress-dot on"></span></div>
+      <div class="ob-h1">지금 계정 목표가 뭐야?</div>
+      <div class="ob-sub">콘텐츠 방향을 맞춰줄게.</div>
+      <div class="ob-goal-list" id="ob-goals">
+        <button type="button" class="ob-goal" data-goal="grow"><div class="ob-goal-radio"></div><div class="ob-goal-text">팔로워 늘리기<small>계정 성장 초기</small></div></button>
+        <button type="button" class="ob-goal" data-goal="viral"><div class="ob-goal-radio"></div><div class="ob-goal-text">저장·공유 많이 받기<small>바이럴 확산</small></div></button>
+        <button type="button" class="ob-goal" data-goal="brand"><div class="ob-goal-radio"></div><div class="ob-goal-text">브랜드·협찬 받기<small>수익화</small></div></button>
+        <button type="button" class="ob-goal" data-goal="record"><div class="ob-goal-radio"></div><div class="ob-goal-text">그냥 꾸준히 올리기<small>기록·일상</small></div></button>
+      </div>
+      <button class="ob-next" id="ob-3-next" disabled onclick="obFinish()">완료 — 카드뉴스 추천 받기</button>
+      <button class="ob-back" onclick="obNext(2)">이전</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════ 처음이면 여기부터 (구버전 m-discover · 보존용) ════ -->
 <div class="ov" id="m-discover" onclick="co(event,'m-discover')">
   <div class="sheet" style="padding:14px 20px 28px">
     <div class="s-bar"></div>
@@ -5745,6 +5832,117 @@ function applyProfile(){
   var chLabel = chs.map(function(k){ return profChLabels[k]; }).join(', ');
   lkeShowToast('✓ <b>'+chLabel+'</b> 프로필 반영·말투 재학습 시작');
   window._profileApplied = true;
+}
+
+// ═══ 온보딩 3단계 ═══
+//   STEP 1 주제(1~3개) → STEP 2 톤 단일 → STEP 3 목표 단일 → user_profile 저장
+var _obState = { topics: [], tone: '', goal: '' };
+
+function openOnboarding(){
+  // 기존 저장 데이터 복원 (수정 가능)
+  try {
+    var saved = JSON.parse(localStorage.getItem('ssobi_onboarding') || '{}');
+    _obState = { topics: saved.topics || [], tone: saved.tone || '', goal: saved.goal || '' };
+  } catch(_){ _obState = { topics:[], tone:'', goal:'' }; }
+  // 칩 상태 복원
+  document.querySelectorAll('#ob-topics .ob-chip').forEach(function(b){
+    b.classList.toggle('on', _obState.topics.indexOf(b.dataset.topic) >= 0);
+  });
+  document.querySelectorAll('#ob-tones .ob-tone').forEach(function(b){
+    b.classList.toggle('on', b.dataset.tone === _obState.tone);
+  });
+  document.querySelectorAll('#ob-goals .ob-goal').forEach(function(b){
+    b.classList.toggle('on', b.dataset.goal === _obState.goal);
+  });
+  obSyncNextButtons();
+  obShowStep(1);
+  openModal('m-onboarding');
+}
+
+function obShowStep(n){
+  for(var i = 1; i <= 3; i++){
+    var s = document.getElementById('ob-' + i);
+    if(s) s.classList.toggle('on', i === n);
+  }
+}
+function obNext(n){ obShowStep(n); }
+
+function obSyncNextButtons(){
+  var b1 = document.getElementById('ob-1-next');
+  var b2 = document.getElementById('ob-2-next');
+  var b3 = document.getElementById('ob-3-next');
+  if(b1) b1.disabled = _obState.topics.length === 0;
+  if(b2) b2.disabled = !_obState.tone;
+  if(b3) b3.disabled = !_obState.goal;
+}
+
+// 칩 클릭 핸들러 — 이벤트 위임
+document.addEventListener('click', function(e){
+  var chip = e.target.closest('#ob-topics .ob-chip');
+  if(chip){
+    var t = chip.dataset.topic;
+    var i = _obState.topics.indexOf(t);
+    if(i >= 0){
+      _obState.topics.splice(i, 1);
+      chip.classList.remove('on');
+    } else if(_obState.topics.length < 3){
+      _obState.topics.push(t);
+      chip.classList.add('on');
+    } else {
+      // 3개 한도 — 가장 오래된 거 제거 후 새로 추가
+      var oldest = _obState.topics.shift();
+      var oldChip = document.querySelector('#ob-topics .ob-chip[data-topic="' + oldest + '"]');
+      if(oldChip) oldChip.classList.remove('on');
+      _obState.topics.push(t);
+      chip.classList.add('on');
+    }
+    obSyncNextButtons();
+    return;
+  }
+  var tone = e.target.closest('#ob-tones .ob-tone');
+  if(tone){
+    document.querySelectorAll('#ob-tones .ob-tone').forEach(function(b){ b.classList.remove('on'); });
+    tone.classList.add('on');
+    _obState.tone = tone.dataset.tone;
+    obSyncNextButtons();
+    return;
+  }
+  var goal = e.target.closest('#ob-goals .ob-goal');
+  if(goal){
+    document.querySelectorAll('#ob-goals .ob-goal').forEach(function(b){ b.classList.remove('on'); });
+    goal.classList.add('on');
+    _obState.goal = goal.dataset.goal;
+    obSyncNextButtons();
+  }
+});
+
+function obFinish(){
+  if(!_obState.topics.length || !_obState.tone || !_obState.goal){
+    alert('주제·말투·목표를 모두 선택해줘');
+    return;
+  }
+  // 1) localStorage 즉시 저장 (네트워크 실패 무관)
+  try { localStorage.setItem('ssobi_onboarding', JSON.stringify(_obState)); } catch(_){}
+  // 2) 카드뉴스 생성 톤 자동 적용
+  if(window.createData) createData.contentTone = _obState.tone;
+  // 3) Supabase user_profile 저장 (서버) — 비차단
+  authHeaders().then(function(h){
+    fetch('/api/user/onboarding', {
+      method: 'POST', headers: h, credentials: 'include',
+      body: JSON.stringify(_obState),
+    }).catch(function(){});
+  }).catch(function(){});
+  // 4) 만들기 탭 추천 카드 갱신
+  if(typeof refreshTrends === 'function') refreshTrends();
+  // 5) 톤 chip UI 동기화
+  document.querySelectorAll('.tone-chip').forEach(function(b){
+    b.classList.toggle('on', b.dataset.tone === _obState.tone);
+  });
+  // 6) 배너 텍스트 변경
+  var bar = document.getElementById('first-bar-txt');
+  if(bar) bar.innerHTML = '내 주제로 추천받는 중 <strong>· 다시 세팅</strong>';
+  cm('m-onboarding');
+  if(typeof lkeShowToast === 'function') lkeShowToast('✓ 주제·말투·목표 적용 완료');
 }
 
 function discFinish(){
