@@ -1025,7 +1025,7 @@ body.edt-fullscreen #create-back{display:none}
 /* 이미지 슬롯은 sel 시 핸들/테두리 보여야 드래그·리사이즈 가능 */
 .edt-el.img.sel{outline:2px dashed var(--mint);outline-offset:2px}
 .edt-el.img.sel .edt-hnd{display:block}
-.edt-el.text{font-weight:700;color:var(--t1);line-height:1.7;white-space:pre-wrap;word-break:keep-all;text-align:left}
+.edt-el.text{font-weight:700;color:var(--t1);line-height:1.35;white-space:pre-wrap;word-break:keep-all;text-align:left}
 .edt-style-row{display:flex;gap:6px;align-items:center;margin-top:10px;flex-wrap:wrap}
 /* 로딩 shimmer — 버튼에 은은한 좌→우 하이라이트 스윕 (텍스트는 그대로 유지) */
 @keyframes shimmer-slide {
@@ -5285,6 +5285,8 @@ function labelizeCategory(c){
 var _trendShuffleOffset = 0;
 function refreshTrends(){
   _trendShuffleOffset++;
+  // server 캐시 무효화 — 매 클릭마다 진짜 새 fetch
+  window._serverTrendsCache = null;
   renderDailyTrends();
 }
 function shuffleTrendPool(pool){
@@ -9367,13 +9369,13 @@ function initEditor(){
     }
     if(isCover){
       if(layout === 'full'){
-        t = { hookY:50, subY:78, pageY:92, hookSize:44, hookWeight:900 };
+        t = { hookY:50, subY:78, pageY:92, hookSize:36, hookWeight:900 };
       } else if(layout === 'half-top'){
-        t = { hookY:56, subY:82, pageY:93, hookSize:38, hookWeight:900 };
+        t = { hookY:56, subY:82, pageY:93, hookSize:32, hookWeight:900 };
       } else if(layout === 'half-left'){
-        t = { hookY:18, subY:54, pageY:93, hookSize:30, hookWeight:900 };
+        t = { hookY:18, subY:54, pageY:93, hookSize:26, hookWeight:900 };
       } else { // small-top
-        t = { hookY:42, subY:70, pageY:93, hookSize:34, hookWeight:900 };
+        t = { hookY:42, subY:70, pageY:93, hookSize:28, hookWeight:900 };
       }
       var hookEl = makeTextEl(titleTxt, {x:coverX,y:t.hookY,w:coverW,size:t.hookSize,color:c,weight:t.hookWeight,isTitle:true});
       hookEl.style.zIndex = '5';
@@ -9381,7 +9383,7 @@ function initEditor(){
       // 부제목: Claude 응답의 cover_subtitle 우선, 없으면 첫 본문 첫 줄 fallback
       var sub = (createData.coverSubtitle || (p.text || '').split('\n')[0] || '').slice(0, 32);
       if(sub){
-        var subEl = makeTextEl(sub, {x:coverX,y:t.subY,w:coverW,size:18,color:c,weight:600});
+        var subEl = makeTextEl(sub, {x:coverX,y:t.subY,w:coverW,size:15,color:c,weight:600});
         subEl.style.zIndex = '5';
         sl.appendChild(subEl);
       }
@@ -9401,7 +9403,7 @@ function initEditor(){
       tEl.style.zIndex = '5';
       sl.appendChild(tEl);
       var bEl = makeTextEl(p.text || '직접 써보고 느낀 것만 적었어\n댓글에 궁금한 거 남겨줘', {
-        x:textX, y:textY, w:textW, size:21, color:c, weight:500,
+        x:textX, y:textY, w:textW, size:17, color:c, weight:500,
         fontFamily: "'Pretendard','Noto Sans KR',sans-serif"
       });
       bEl.style.zIndex = '5';
@@ -9414,7 +9416,7 @@ function initEditor(){
       var ctaAccent = tplAccent(tpl);
       sl.appendChild(makeTextEl(p.title || '다음편도 올라옴', {x:6,y:22,w:88,size:30,color:c,weight:900,isTitle:true}));
       sl.appendChild(makeTextEl(p.text || '팔로우하면 볼 수 있음\n광고 아님, 내 경험담', {
-        x:6, y:48, w:88, size:22, color:c, weight:600,
+        x:6, y:48, w:88, size:18, color:c, weight:600,
         fontFamily: "'Pretendard','Noto Sans KR',sans-serif"
       }));
       sl.appendChild(makeCtaPillsEl({x:10,y:78,w:80,accent:ctaAccent,textColor:c}));
@@ -9500,12 +9502,13 @@ function initEditor(){
       numEl.dataset.noAutofit = '1';
       numEl.style.zIndex = '5';
       sl.appendChild(numEl);
-      // 제목: 굵게, 큰 글씨
+      // 제목: 굵게, 본문보다 한 단계 큰 글씨 + 빡빡한 줄간격
       var titleEl = makeTextEl(p.title || '포인트', {
         x: textX2, y: titleY2, w: textW2,
-        size: 36, color: c, weight: 900, isTitle: true
+        size: 28, color: c, weight: 900, isTitle: true
       });
-      titleEl.style.letterSpacing = '-.6px';
+      titleEl.style.letterSpacing = '-.5px';
+      titleEl.style.lineHeight = '1.15';
       titleEl.style.zIndex = '5';
       sl.appendChild(titleEl);
       // 본문 폰트: 무드를 위해 일부 템플릿은 템플릿 폰트, 나머지는 가독성용 Pretendard
@@ -9513,9 +9516,10 @@ function initEditor(){
         ? tplFont(tpl)
         : "'Pretendard','Noto Sans KR',sans-serif";
       var textEl = makeTextEl(p.text || '본문을 직접 입력해주세요', {
-        x:textX2, y:textY2, w:textW2, size:21, color:c, weight:500,
+        x:textX2, y:textY2, w:textW2, size:16, color:c, weight:500,
         fontFamily: bodyFont
       });
+      textEl.style.lineHeight = '1.45';
       textEl.style.zIndex = '5';
       sl.appendChild(textEl);
       // 템플릿마다 데코 형태를 다르게 — 세로 바 / 사각형 / 도트 / 가로 라인 / 없음
@@ -9582,25 +9586,17 @@ function initEditor(){
   }, 100);
 }
 
-// 본문 슬라이드 중 첫 번째 일반 body 에 stock 영상 자동 삽입
-//   cover(0) / hook2(1) / cta(마지막) / checklist / number / toc 는 제외
+// 첫 장(cover)에 stock 영상 자동 삽입 — 사용자 피드백 2026-04-26: 첫 장이 훅 되니 영상으로
+//   cover slide image slot 에 영상 박음. 슬롯이 작으면 작게, 풀이미지면 풀로.
 async function autoPlaceVideoInBody(){
   console.log('[autoPlaceVideoInBody] called. edtSlides:', edtSlides?.length, 'autoPlaced:', createData._videoAutoPlaced);
   if(!edtSlides || !edtSlides.length) { console.warn('[autoPlaceVideoInBody] no edtSlides'); return; }
   if(createData._videoAutoPlaced) { console.log('[autoPlaceVideoInBody] already placed → skip'); return; }
-  var bodySlides = createData.bodySlides || [];
-  var targetIdx = -1;
-  for(var i = 2; i < edtSlides.length - 1; i++){
-    var bIdx = i - 1;
-    var b = bodySlides[bIdx];
-    if(!b) continue;
-    var role = b.role || 'body';
-    if(role === 'body'){ targetIdx = i; break; }
-  }
-  console.log('[autoPlaceVideoInBody] targetIdx:', targetIdx);
-  if(targetIdx === -1) { console.warn('[autoPlaceVideoInBody] no body slide found'); return; }
+  // 첫 장(cover) = edtSlides[0]
+  var targetIdx = 0;
+  console.log('[autoPlaceVideoInBody] targetIdx:', targetIdx, '(cover)');
   var slot = edtSlides[targetIdx].querySelector('.edt-el.img');
-  if(!slot) { console.warn('[autoPlaceVideoInBody] no img slot in target'); return; }
+  if(!slot) { console.warn('[autoPlaceVideoInBody] no img slot in cover'); return; }
   if(slot.querySelector('video')) { console.log('[autoPlaceVideoInBody] already has video'); return; }
   try {
     var h = await authHeaders();
