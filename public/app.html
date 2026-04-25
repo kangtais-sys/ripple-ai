@@ -9034,9 +9034,25 @@ function setImageSlot(wrap, url, meta){
   wrap.style.borderRadius = '0';
   wrap.style.border = 'none';
   wrap.style.padding = '0';
+  wrap.style.position = 'absolute';
+
+  // 책 표지 / 음반 자켓 같은 정해진 비율 이미지는 잘리지 않게 contain 으로 표시.
+  //   원본 이미지를 blur cover 로 배경에 깔아 빈 공간 자연스럽게 채움 (Apple Music 앨범커버 스타일)
+  var sourceLabel = (meta && meta.sourceLabel) || '';
+  var preserveRatio = sourceLabel === 'Google Books' || sourceLabel === 'Open Library'
+    || (meta && meta.preserveRatio === true);
+
+  if(preserveRatio){
+    var bgBlur = document.createElement('div');
+    bgBlur.style.cssText = 'position:absolute;inset:0;background-image:url(' + url + ');background-size:cover;background-position:center;filter:blur(24px) brightness(.7);transform:scale(1.15);pointer-events:none;z-index:0';
+    wrap.appendChild(bgBlur);
+  }
+
   var img = document.createElement('img');
   img.src = url;
-  img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;border-radius:0';
+  img.style.cssText = preserveRatio
+    ? 'position:relative;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;border-radius:0;z-index:1'
+    : 'width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;border-radius:0';
   // 표시용 이미지는 crossOrigin 없이 로드 (어떤 소스든 표시되게).
   // 밝기 감지는 별도 probe 가 crossOrigin='anonymous' 로 같은 URL 을 다시 받아서 측정.
   // probe 실패 시 템플릿 기준 색으로 폴백 → 어두운 사진엔 흰 글씨, 밝은 사진엔 검정 글씨.
