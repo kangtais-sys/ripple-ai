@@ -8638,6 +8638,56 @@ function initEditor(){
   if(edtSlides[0]){ requestAnimationFrame(function(){ fitTextsInSlide(edtSlides[0]); }); }
   // 모든 이미지 슬롯 병렬 자동 로드 (Unsplash → Pexels → Pixabay)
   setTimeout(autoLoadAllImageSlots, 100);
+  // 이미지 로드 후 본문 1장에 stock 영상 자동 삽입 (캐러셀 다이내믹 ↑)
+  setTimeout(autoPlaceVideoInBody, 1500);
+}
+
+// 본문 슬라이드 중 첫 번째 일반 body 에 stock 영상 자동 삽입
+//   cover(0) / hook2(1) / cta(마지막) / checklist / number / toc 는 제외
+async function autoPlaceVideoInBody(){
+  if(!edtSlides || !edtSlides.length) return;
+  if(createData._videoAutoPlaced) return;  // 이미 삽입됨 — 중복 방지
+  var bodySlides = createData.bodySlides || [];
+  // edtSlides[0]=cover, edtSlides[1]=hook2(or intro), edtSlides[N-1]=cta
+  // body 영역: edtSlides[2..N-2]
+  var targetIdx = -1;
+  for(var i = 2; i < edtSlides.length - 1; i++){
+    var bIdx = i - 1;  // bodySlides 인덱스 (parsed[0] = cover, parsed[i] = bodySlides[i-1])
+    var b = bodySlides[bIdx];
+    if(!b) continue;
+    var role = b.role || 'body';
+    if(role === 'body'){ targetIdx = i; break; }  // 첫 일반 body 슬라이드
+  }
+  if(targetIdx === -1) return;
+  var slot = edtSlides[targetIdx].querySelector('.edt-el.img');
+  if(!slot) return;
+  // 이미 video 면 skip
+  if(slot.querySelector('video')) return;
+  // 이미지 로드되었으면 그 위에 영상 덮어쓰기
+  try {
+    var h = await authHeaders();
+    var cat = createData.category || '';
+    var idx = parseInt(slot.dataset.slideIdx || String(targetIdx), 10);
+    var kw = slot.dataset.keyword || '';
+    var params = new URLSearchParams({ q: kw, category: cat, slide: String(idx) }).toString();
+    var res = await fetch('/api/cardnews/video-search?' + params, { headers: h, credentials:'include' });
+    var j = await res.json();
+    if(j && j.ok && j.url){
+      setVideoSlot(slot, {
+        url: j.url,
+        startTime: 0,
+        endTime: Math.min(j.duration || 15, 15),
+      });
+      slot.dataset.attrPhotographer = j.photographer || '';
+      slot.dataset.attrSource = j.sourceLabel || '';
+      slot.dataset.attrUrl = j.attributionUrl || '';
+      createData._videoAutoPlaced = true;
+      // 짧은 안내 토스트
+      if(typeof lkeShowToast === 'function'){
+        lkeShowToast('🎬 본문 한 장에 영상 자동 삽입');
+      }
+    }
+  } catch(e){ console.warn('[auto-video]', e); }
 }
 function renderEdtNav(){
   var n = document.getElementById('edt-nav'); if(!n) return;
