@@ -2231,7 +2231,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
           <span class="trend-src-chip src-tk">TikTok</span>
           <span class="trend-src-chip src-ig">IG</span>
         </div>
-        <div class="trend-hook">2026 유행 글래스 스킨, 진짜 꿀팁</div>
+        <div class="trend-hook">올해 유행하는 글래스 스킨, 진짜 꿀팁</div>
         <div class="trend-meta">✨ #슬로우뷰티 8.4k</div>
       </div>
       <div class="trend-arrow"><svg viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -3469,8 +3469,11 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
 <!-- ════ 온보딩 — 처음 SNS 시작 (주제·말투·목표 3단계) ════ -->
 <div class="ov" id="m-onboarding" onclick="co(event,'m-onboarding')">
-  <div class="sheet" style="padding:0;max-height:90vh;overflow-y:auto">
+  <div class="sheet" style="padding:0;max-height:90vh;overflow-y:auto;position:relative">
     <div class="s-bar"></div>
+    <button type="button" aria-label="닫기" onclick="cm('m-onboarding')" style="position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;border:none;background:rgba(15,19,25,.06);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:18px;height:18px;color:var(--t2)"><line x1="18" y1="6" x2="6" y2="18" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke-linecap="round"/></svg>
+    </button>
     <!-- STEP 1: 주제 -->
     <div class="ob-step on" id="ob-1">
       <div class="ob-progress"><span class="ob-progress-dot on"></span><span class="ob-progress-dot"></span><span class="ob-progress-dot"></span></div>
@@ -4893,7 +4896,7 @@ function openSchedPreview(p){
 var schedByDate = {
   '2026-04-19':[{time:'오후 7:00', cap:'한국인이 절대 안 쓰는 7가지 스킨케어 실수', chs:['ig','tk'], img:'linear-gradient(135deg,#FDE68A,#FCA5A5)', pages:7}],
   '2026-04-21':[{time:'오전 9:00', cap:'피부과 의사가 절대 안 산다는 성분 3가지', chs:['ig'], img:'linear-gradient(135deg,#A7F3D0,#67E8F9)', pages:5}],
-  '2026-04-25':[{time:'오후 12:00', cap:'2026 유행 글래스 스킨, 진짜 꿀팁', chs:['ig','yt'], img:'linear-gradient(135deg,#DDD6FE,#FBCFE8)', pages:6}]
+  '2026-04-25':[{time:'오후 12:00', cap:'올해 유행하는 글래스 스킨, 진짜 꿀팁', chs:['ig','yt'], img:'linear-gradient(135deg,#DDD6FE,#FBCFE8)', pages:6}]
 };
 
 function showDay(k){
@@ -5042,8 +5045,8 @@ var trendPresets = {
     caption:'성분표 똑똑하게 읽는 법 저장하세요 🔍\n나의 민감 피부, 이제 억울할 일 없어요!\n#화장품성분 #성분표 #뷰티팁 #MILLIMILLI'
   },
   3: {
-    hook:'2026 유행 글래스 스킨, 진짜 꿀팁 ✨',
-    body:'[표지]\n2026 유행 글래스 스킨\n진짜 꿀팁 공개 ✨\n저장해두세요!\n\n[슬라이드 1] STEP 1. 토너패드로 각질 정리\n세안 후 바로 토너패드 1장으로\n얼굴 전체 닦아주세요.\n각질이 정리되어야 다음 단계가 잘 먹어요 :)\n\n[슬라이드 2] STEP 2. 앰플 3번 나눠 바르기\n한 번에 많이 바르지 말고\n소량씩 3번 나눠 두드려주세요.\n흡수율이 2배 차이나요!\n\n[슬라이드 3] STEP 3. 수분크림은 톡톡\n바르지 말고 톡톡 두드려 흡수시키세요.\n압력으로 모공 안까지 들어가요 🌿\n\n[슬라이드 4] STEP 4. 하이라이팅 포인트\n립밤을 광대·콧등에 아주 소량 톡!\n자연스러운 윤기가 바로 완성돼요 😊\n\n[슬라이드 5] STEP 5. 쿠션 대신 스킨틴트\n커버력보다 투명감!\n스킨틴트 + 수분크림 섞어 바르면\n유리 같은 피부 완성이에요 ✨\n\n[마지막 슬라이드]\n5단계 중 어느 단계가 제일 어려워요?\n댓글로 알려주면 1:1 팁 보내드려요 :)\n\n💬 댓글  ·  🔖 저장  ·  ➕ 팔로우',
+    hook:'올해 유행하는 글래스 스킨, 진짜 꿀팁 ✨',
+    body:'[표지]\n올해 유행하는 글래스 스킨\n진짜 꿀팁 공개 ✨\n저장해두세요!\n\n[슬라이드 1] STEP 1. 토너패드로 각질 정리\n세안 후 바로 토너패드 1장으로\n얼굴 전체 닦아주세요.\n각질이 정리되어야 다음 단계가 잘 먹어요 :)\n\n[슬라이드 2] STEP 2. 앰플 3번 나눠 바르기\n한 번에 많이 바르지 말고\n소량씩 3번 나눠 두드려주세요.\n흡수율이 2배 차이나요!\n\n[슬라이드 3] STEP 3. 수분크림은 톡톡\n바르지 말고 톡톡 두드려 흡수시키세요.\n압력으로 모공 안까지 들어가요 🌿\n\n[슬라이드 4] STEP 4. 하이라이팅 포인트\n립밤을 광대·콧등에 아주 소량 톡!\n자연스러운 윤기가 바로 완성돼요 😊\n\n[슬라이드 5] STEP 5. 쿠션 대신 스킨틴트\n커버력보다 투명감!\n스킨틴트 + 수분크림 섞어 바르면\n유리 같은 피부 완성이에요 ✨\n\n[마지막 슬라이드]\n5단계 중 어느 단계가 제일 어려워요?\n댓글로 알려주면 1:1 팁 보내드려요 :)\n\n💬 댓글  ·  🔖 저장  ·  ➕ 팔로우',
     caption:'오늘부터 글래스 스킨 루틴 도전 ✨\n저장해두고 따라해봐요!\n#글래스스킨 #스킨케어루틴 #데일리뷰티 #MILLIMILLI'
   }
 };
@@ -5178,7 +5181,7 @@ var DAILY_TOPIC_POOL = [
   // 뷰티/제품
   { topic:'한국인이 절대 안 쓰는 7가지 스킨케어 실수', chip:'뷰티', meta:'🔥 Hot 트렌드' },
   { topic:'피부과 의사가 절대 안 사는 성분 3가지', chip:'성분', meta:'성분표 체크' },
-  { topic:'2026 유행 글래스 스킨 꿀팁 5가지', chip:'트렌드', meta:'유리 같은 피부' },
+  { topic:'올해 유행하는 글래스 스킨 꿀팁 5가지', chip:'트렌드', meta:'유리 같은 피부' },
   { topic:'올리브영 세일 때 꼭 사야 할 베스트 5', chip:'쇼핑', meta:'알뜰 뷰티' },
   { topic:'드럭스토어 1만원 이하 가성비 3선', chip:'가성비', meta:'돈 아끼기' },
   // 음식/카페
@@ -5285,20 +5288,20 @@ function refreshTrends(){
   renderDailyTrends();
 }
 function shuffleTrendPool(pool){
-  // 회전 + 셔플 — offset 마다 시작점을 3씩 회전시켜 절대 같은 3개 안 나오게
+  // 1씩 회전하는 sliding window — 풀 N개면 N번 클릭해야 같은 3개 다시 나옴.
+  // 풀 9개 → 9가지 starting point × 3개 = 매번 다름 (8회까지 모두 새 조합).
   if(!pool || pool.length === 0) return [];
   var n = pool.length;
-  var start = (_trendShuffleOffset * 3) % n;
-  var rotated = pool.slice(start).concat(pool.slice(0, start));
-  // 회전된 풀에 가벼운 셔플 적용 (앞 3개 우선 보존하되 약간만 섞음)
-  var seed = (Date.now() + _trendShuffleOffset * 97) & 0x7fffffff;
-  var rnd = function(){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
-  // 앞 3개는 보존하되 4번째 이후만 셔플 → 회전 효과 유지하면서도 약간의 무작위성
-  for(var i = rotated.length - 1; i > 3; i--){
-    var j = 3 + Math.floor(rnd() * (i - 2));
-    var tmp = rotated[i]; rotated[i] = rotated[j]; rotated[j] = tmp;
+  if(n < 3){
+    // 풀 부족하면 그대로 반환 (회전 의미 없음)
+    return pool.slice();
   }
-  return rotated.slice(0, 3);
+  var start = _trendShuffleOffset % n;
+  return [
+    pool[start],
+    pool[(start + 1) % n],
+    pool[(start + 2) % n],
+  ];
 }
 function renderDailyTrends(){
   var container = document.getElementById('trend-carousel');
@@ -5786,7 +5789,7 @@ var discoverData = {
       {hook:'다이소 뷰티템, 이건 진짜 사야 함', src:['TikTok','Threads'], meta:'💬 공감 9k'},
       {hook:'트러블 폭발기, 진짜 효과 본 한 달 후기', src:['Reddit'], meta:'📈 저장 7k'},
       {hook:'5만원 이하 K-뷰티 풀세트 짜는 법', src:['IG'], meta:'🔥 카드뉴스 강세'},
-      {hook:'2026 봄 글래스 스킨, 한국인 버전', src:['TikTok','IG'], meta:'✨ #슬로우뷰티 8.4k'},
+      {hook:'올봄 글래스 스킨, 한국인 버전', src:['TikTok','IG'], meta:'✨ #슬로우뷰티 8.4k'},
       {hook:'한국인이 절대 안 하는 7가지 스킨케어 실수', src:['Reddit'], meta:'🔥 r/AsianBeauty 2.8k'}
     ]
   },
@@ -5915,7 +5918,7 @@ var discoverData = {
       {hook:'월급 200으로 100 모은 30대 루틴', src:['Reddit','Threads'], meta:'🔥 저장 16k'},
       {hook:'카카오페이 vs 토스, 진짜 비교', src:['Threads','X'], meta:'📊 비교 9k'},
       {hook:'30대가 진짜 가입한 보험 정리', src:['IG'], meta:'💾 저장 11k'},
-      {hook:'2026 하반기 ETF 뭘 사야 하나', src:['X'], meta:'📈 리트윗 6k'},
+      {hook:'이번 하반기 ETF 뭘 사야 하나', src:['X'], meta:'📈 리트윗 6k'},
       {hook:'적금 vs ETF, 같은 금액 1년 결과', src:['Reddit'], meta:'📊 비교 8k'},
       {hook:'부업으로 월 50 만드는 법, 1년 후기', src:['IG','TikTok'], meta:'💬 댓글 14k'},
       {hook:'가계부 앱 5개 직접 써본 후기', src:['IG'], meta:'✨ 비교 7k'},
@@ -5988,7 +5991,7 @@ var discoverData = {
       {h:'@notion.master', f:'8.9만', s:'노션 템플릿 + Q&A'}
     ],
     trends:[
-      {hook:'2026년 꼭 써야 할 AI 앱 5', src:['X','Reddit'], meta:'🔥 리트윗 15k'},
+      {hook:'지금 꼭 써야 할 AI 앱 5', src:['X','Reddit'], meta:'🔥 리트윗 15k'},
       {hook:'아이폰 설정 바꾸면 배터리 2배', src:['TikTok','IG'], meta:'💾 저장 폭발'},
       {hook:'노션 vs 옵시디언 6개월 비교', src:['Reddit','IG'], meta:'📊 비교 8k'},
       {hook:'집중 못 할 때 쓰는 앱 3개', src:['Threads'], meta:'❤️ 공감 9k'},
@@ -6010,7 +6013,7 @@ var discoverData = {
       {hook:'이 책 안 읽었으면 큰일날 뻔', src:['IG','Threads'], meta:'💾 저장 8k'},
       {hook:'30대가 결국 사는 책 4권', src:['IG'], meta:'🔥 저장 11k'},
       {hook:'분야별 입문 책 BEST 정리', src:['Reddit'], meta:'📊 큐레이션 7k'},
-      {hook:'2026 상반기 베스트셀러 진짜 이유', src:['X'], meta:'❤️ 공감 7k'},
+      {hook:'이번 상반기 베스트셀러 진짜 이유', src:['X'], meta:'❤️ 공감 7k'},
       {hook:'한 권으로 인생 바뀐 사람들', src:['Reddit'], meta:'💬 댓글 폭발'},
       {hook:'영어 원서 입문, 추천 책 6권', src:['IG'], meta:'💾 저장 6k'},
       {hook:'독서 노트, 진짜 하면 좋은 양식', src:['Threads'], meta:'📈 공유 5k'},
