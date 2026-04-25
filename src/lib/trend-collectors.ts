@@ -1,14 +1,15 @@
 // 트렌드 수집기 — 매일 23:00 cron 이 실행
-// 2026-04 업데이트: ProductHunt RSS 단종 → 더쿠+클리앙 / Reddit 제거 (글로벌이라 K-MZ 적합도 낮음)
+// 2026-04 업데이트: 더쿠/클리앙 RSS 차단 → YouTube Trending KR + 한국 뉴스 RSS 로 교체
+//                  네이버 데이터랩 → NewsAPI.org 로 교체
 //
 // 활성 소스:
 //   ✅ Google Trends Korea RSS  (trending/rss?geo=KR)
 //   ✅ Signal.bz 실시간 검색어  (네이버/다음/줌/네이트 통합)
 //   ✅ Hacker News Algolia API
-//   ✅ 더쿠 핫게 + 클리앙 RSS  (한국 커뮤니티)
+//   ✅ YouTube Trending KR + 한경/매경 뉴스 RSS  (collectKoreanTrends, YOUTUBE_API_KEY)
 //   ✅ Lifehacker RSS  (라이프 팁 글로벌)
 //   ✅ 연합뉴스 문화·생활 RSS  (국내 라이프)
-//   ✅ 네이버 데이터랩 검색 추이  (NAVER_CLIENT_ID/SECRET 필요)
+//   ✅ NewsAPI.org top-headlines KR  (collectNewsAPI, NEWS_API_KEY)
 //
 // 공통 주의: 바깥 사이트라 레이아웃·정책 바뀌면 실패 가능 → 전부 soft-fail.
 
@@ -128,45 +129,84 @@ export async function fetchHackerNews(): Promise<FeedItem[]> {
 }
 
 // ─────────────────────────────────────────────
-// 한국 커뮤니티 — 더쿠 핫게 + 클리앙 RSS (구 ProductHunt 자리)
-// ProductHunt RSS 는 단종 → K-MZ 에 더 적합한 한국 커뮤니티로 교체
+// 한국 트렌드 — YouTube Trending KR + 한경/매경 뉴스 RSS
+// 2026-04 디버그: 네이버 뉴스 RSS(news.naver.com/rss/ranking.xml) 폐지로 404
+//                대신 한경(hankyung)·매경(mk) 메인 RSS 사용 (둘 다 200, items 50)
+// 사용자 요청한 "YouTube Trending KR + 한국 뉴스" 결합형.
 // ─────────────────────────────────────────────
-export async function collectKoreanCommunity(): Promise<FeedItem[]> {
-  const [theqooXml, clienXml] = await Promise.all([
-    safeText('https://theqoo.net/index.php?mid=hot&act=rss'),
-    safeText('https://www.clien.net/service/rss'),
-  ])
+export async function collectKoreanTrends(): Promise<FeedItem[]> {
   const items: FeedItem[] = []
 
-  // 더쿠 핫게 — 광고/공지 키워드 제외
-  if (theqooXml) {
-    parseRssItems(theqooXml, 12).forEach((it, i) => {
-      if (/공지|광고|이벤트\s*당첨|광고문의/.test(it.title)) return
+  // 1) YouTube Trending KR (영상 제목 20개) — YOUTUBE_API_KEY 필요
+  const ytKey = process.env.YOUTUBE_API_KEY
+  console.log('[collectKoreanTrends] youtube key present:', !!ytKey)
+  if (ytKey) {
+    try {
+      const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&regionCode=KR&maxResults=20&key=${ytKey}`
+      const res = await fetch(url)
+      console.log('[collectKoreanTrends] youtube response status:', res.status)
+      if (res.ok) {
+        const data = await res.json() as {
+          items?: Array<{
+            id?: string
+            snippet?: { title?: string; description?: string; channelTitle?: string; tags?: string[] }
+          }>
+        }
+        ;(data.items || []).forEach((v, i) => {
+          const t = v.snippet?.title?.trim()
+          if (!t) return
+          items.push({
+            source: 'youtube:trending_kr',
+            title: t,
+            excerpt: (v.snippet?.description || '').slice(0, 200),
+            engagement: Math.max(0, 80 - i * 2),
+            url: v.id ? `https://www.youtube.com/watch?v=${v.id}` : undefined,
+          })
+        })
+      } else {
+        const errBody = await res.text().catch(() => '')
+        console.warn('[collectKoreanTrends] youtube error body:', errBody.slice(0, 300))
+      }
+    } catch (e) {
+      console.error('[collectKoreanTrends] youtube exception:', e)
+    }
+  } else {
+    console.warn('[collectKoreanTrends] missing YOUTUBE_API_KEY → youtube skip')
+  }
+
+  // 2) 한국 뉴스 RSS — 네이버 뉴스 RSS 폐지(404) → 한경 + 매경
+  const [hkXml, mkXml] = await Promise.all([
+    safeText('https://www.hankyung.com/feed/all-news'),
+    safeText('https://www.mk.co.kr/rss/30000001/'),
+  ])
+  console.log('[collectKoreanTrends] hankyung fetched:', !!hkXml, 'len', hkXml?.length || 0)
+  console.log('[collectKoreanTrends] mk fetched:', !!mkXml, 'len', mkXml?.length || 0)
+
+  if (hkXml) {
+    parseRssItems(hkXml, 8).forEach((it, i) => {
       items.push({
-        source: 'theqoo:hot',
+        source: 'hankyung:news',
         title: it.title,
         excerpt: it.excerpt,
-        engagement: Math.max(0, 55 - i * 2),
+        engagement: Math.max(0, 45 - i * 2),
+        url: it.link,
+      })
+    })
+  }
+  if (mkXml) {
+    parseRssItems(mkXml, 8).forEach((it, i) => {
+      items.push({
+        source: 'mk:news',
+        title: it.title,
+        excerpt: it.excerpt,
+        engagement: Math.max(0, 45 - i * 2),
         url: it.link,
       })
     })
   }
 
-  // 클리앙 — 광고/공지 제외
-  if (clienXml) {
-    parseRssItems(clienXml, 12).forEach((it, i) => {
-      if (/공지|광고|판매|구매/.test(it.title)) return
-      items.push({
-        source: 'clien:rss',
-        title: it.title,
-        excerpt: it.excerpt,
-        engagement: Math.max(0, 50 - i * 2),
-        url: it.link,
-      })
-    })
-  }
-
-  return items.slice(0, 20)
+  console.log('[collectKoreanTrends] total items:', items.length)
+  return items.slice(0, 30)
 }
 
 // ─────────────────────────────────────────────
@@ -200,66 +240,44 @@ export async function fetchYonhapLife(): Promise<FeedItem[]> {
 }
 
 // ─────────────────────────────────────────────
-// 네이버 데이터랩 — 미리 정의된 K-MZ 핫 키워드 그룹의 최근 7일 검색 추이
-// 네이버는 2021년 실시간 급상승을 폐지 → datalab.search API 로 키워드 그룹 추이 측정.
-// 환경변수 없으면 빈 배열 (graceful fail).
+// NewsAPI.org — top-headlines country=kr (NEWS_API_KEY 필요, 무료 dev 1000건/일)
 // ─────────────────────────────────────────────
-const NAVER_KEYWORD_GROUPS = [
-  { groupName: '뷰티 핫이슈', keywords: ['올리브영', '닥터지', '메디큐브', '토리든'] },
-  { groupName: '카페 트렌드', keywords: ['스타벅스 신메뉴', '런던베이글뮤지엄', '컴포즈커피', '블루보틀'] },
-  { groupName: '쇼핑 핫템', keywords: ['무신사', '다이소', '이케아', '쿠팡'] },
-  { groupName: '푸드 트렌드', keywords: ['편의점 신메뉴', '에어프라이어 레시피', '백종원 레시피', '망원동 맛집'] },
-  { groupName: '여행 핫플', keywords: ['제주 여행', '도쿄 여행', '오사카 여행', '강릉 카페'] },
-  { groupName: '라이프 트렌드', keywords: ['1인 가구 가전', '미니멀 라이프', '홈인테리어', '자취템'] },
-]
-
-export async function collectNaverTrends(): Promise<FeedItem[]> {
-  const id = process.env.NAVER_CLIENT_ID
-  const secret = process.env.NAVER_CLIENT_SECRET
-  if (!id || !secret) return []
-  const today = new Date()
-  const start = new Date(today.getTime() - 30 * 86400000)
-  const fmt = (d: Date) => d.toISOString().slice(0, 10)
+export async function collectNewsAPI(): Promise<FeedItem[]> {
+  const key = process.env.NEWS_API_KEY
+  console.log('[collectNewsAPI] env key present:', !!key)
+  if (!key) {
+    console.warn('[collectNewsAPI] missing NEWS_API_KEY → skip')
+    return []
+  }
   try {
-    const res = await fetch('https://openapi.naver.com/v1/datalab/search', {
-      method: 'POST',
-      headers: {
-        'X-Naver-Client-Id': id,
-        'X-Naver-Client-Secret': secret,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        startDate: fmt(start),
-        endDate: fmt(today),
-        timeUnit: 'date',
-        keywordGroups: NAVER_KEYWORD_GROUPS,
-      }),
-    })
-    if (!res.ok) return []
+    const res = await fetch(
+      `https://newsapi.org/v2/top-headlines?country=kr&pageSize=20&apiKey=${key}`
+    )
+    console.log('[collectNewsAPI] response status:', res.status)
+    if (!res.ok) {
+      const errBody = await res.text().catch(() => '')
+      console.warn('[collectNewsAPI] error body:', errBody.slice(0, 300))
+      return []
+    }
     const data = await res.json() as {
-      results?: Array<{
+      status?: string
+      articles?: Array<{
         title?: string
-        keywords?: string[]
-        data?: Array<{ period: string; ratio: number }>
+        description?: string
+        url?: string
+        source?: { name?: string }
       }>
     }
-    const items: FeedItem[] = []
-    ;(data.results || []).forEach(r => {
-      if (!r.title || !r.keywords) return
-      const recent = (r.data || []).slice(-7)
-      const avg = recent.length ? recent.reduce((a, b) => a + (b.ratio || 0), 0) / recent.length : 0
-      r.keywords.forEach((kw, i) => {
-        items.push({
-          source: 'naver:datalab',
-          title: kw,
-          excerpt: `${r.title} · 최근 7일 검색 비율 ${avg.toFixed(1)}`,
-          engagement: Math.min(100, avg + (10 - i * 2)),
-          url: `https://search.naver.com/search.naver?query=${encodeURIComponent(kw)}`,
-        })
-      })
-    })
-    return items.slice(0, 12)
-  } catch {
+    console.log('[collectNewsAPI] articles count:', (data.articles || []).length)
+    return (data.articles || []).map((a, i) => ({
+      source: `newsapi:${a.source?.name || 'kr'}`,
+      title: a.title || '',
+      excerpt: (a.description || '').slice(0, 200),
+      engagement: Math.max(0, 60 - i * 2),
+      url: a.url,
+    })).filter(x => x.title.length > 0)
+  } catch (e) {
+    console.error('[collectNewsAPI] exception:', e)
     return []
   }
 }
@@ -271,18 +289,18 @@ export async function collectAllTrends(): Promise<{
   items: FeedItem[]
   stats: Record<string, number>
 }> {
-  const [googleTrends, signalbz, hn, koreanCommunity, lh, yna, naver] = await Promise.all([
+  const [googleTrends, signalbz, hn, koreanTrends, lh, yna, newsApi] = await Promise.all([
     fetchGoogleTrendsKR().catch(() => [] as FeedItem[]),
     fetchSignalBz().catch(() => [] as FeedItem[]),
     fetchHackerNews().catch(() => [] as FeedItem[]),
-    collectKoreanCommunity().catch(() => [] as FeedItem[]),
+    collectKoreanTrends().catch(() => [] as FeedItem[]),
     fetchLifehacker().catch(() => [] as FeedItem[]),
     fetchYonhapLife().catch(() => [] as FeedItem[]),
-    collectNaverTrends().catch(() => [] as FeedItem[]),
+    collectNewsAPI().catch(() => [] as FeedItem[]),
   ])
   const items = [
     ...googleTrends, ...signalbz,
-    ...hn, ...koreanCommunity, ...lh, ...yna, ...naver,
+    ...hn, ...koreanTrends, ...lh, ...yna, ...newsApi,
   ]
   return {
     items,
@@ -290,10 +308,10 @@ export async function collectAllTrends(): Promise<{
       google_trends: googleTrends.length,
       signalbz: signalbz.length,
       hackernews: hn.length,
-      korean_community: koreanCommunity.length,
+      korean_trends: koreanTrends.length,
       lifehacker: lh.length,
       yonhap: yna.length,
-      naver_datalab: naver.length,
+      news_api: newsApi.length,
       total: items.length,
     },
   }
