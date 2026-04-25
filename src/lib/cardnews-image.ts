@@ -168,10 +168,15 @@ export function toEnKeyword(args: {
   if (args.variant && angle) {
     for (const [k, v] of Object.entries(ANGLE_VARIANTS)) angle = angle.replace(k, v)
   }
-  // 원본이 이미 영어면 그대로 쓸 수 있지만 aesthetic 키워드 보강
+  // koKeyword 가 있으면 영어/한국어 무관하게 query 에 포함 — 슬라이드 내용 정보 살림.
+  // (이전엔 한국어면 통째로 무시 → 카테고리 generic 만 검색돼서 슬라이드 내용 무관 이미지 노출)
   const ko = (args.koKeyword || '').trim()
   const isLatin = ko.length > 0 && /^[\x00-\x7F\s]+$/.test(ko)
   if (isLatin && ko.length > 3) return `${ko} ${angle || 'aesthetic'}`.trim()
+  if (ko.length > 1) {
+    // 한국어 키워드 + 카테고리 generic — Unsplash/Pexels 가 한국어 검색도 부분 지원
+    return `${ko} ${angle || base}`.trim()
+  }
   return angle ? `${angle} ${base}` : base
 }
 
@@ -341,6 +346,7 @@ export async function fetchCardnewsImage(args: {
   usedUrls?: Set<string>          // 중복 회피
 }): Promise<ImageResult> {
   const enQuery = cleanQuery(toEnKeyword(args))
+  console.log('[fetchCardnewsImage] slide', args.slideIdx, 'koKeyword:', args.koKeyword, '→ enQuery:', enQuery)
   const errs: string[] = []
   const used = args.usedUrls
   const tryProvider = async (q: string, fns: Array<(q: string) => Promise<ImageResult>>) => {
@@ -355,7 +361,7 @@ export async function fetchCardnewsImage(args: {
     }
     return null
   }
-  // 1차: 카테고리 + angle
+  // 1차: koKeyword + category angle 조합 (슬라이드 내용 직접 반영)
   let r = await tryProvider(enQuery, [fetchUnsplash, fetchPexels, fetchPixabay])
   if (r) return r
   // 1.5차: angle variant 로 변환 후 재시도 (중복 회피)
@@ -366,22 +372,18 @@ export async function fetchCardnewsImage(args: {
       if (r) return r
     }
   }
-  // 2차: 포괄 fallback
+  // 2차: 카테고리 generic 만 (koKeyword 빠짐) — 슬라이드 내용은 잃지만 카테고리 매칭은 됨
+  const genericQuery = cleanQuery(toEnKeyword({ category: args.category, slideIdx: args.slideIdx, angle: args.angle }))
+  if (genericQuery !== enQuery) {
+    r = await tryProvider(genericQuery, [fetchUnsplash, fetchPexels, fetchPixabay])
+    if (r) return r
+  }
+  // 3차: 카테고리 무드 키워드만
   for (const fbQuery of FALLBACK_QUERIES) {
     r = await tryProvider(fbQuery, [fetchUnsplash, fetchPexels])
     if (r) return r
   }
-  // 3차 (최후 보장): picsum.photos — deprecated source.unsplash.com 이 503 자주 반환해서 primary 교체
-  // slideIdx + Date.now hash 로 슬라이드별 다른 이미지 보장
-  const slideSeed = (args.slideIdx ?? 0)
-  const picsumUrl = `https://picsum.photos/seed/ssobi-${slideSeed}-${Date.now() % 100000}/1080/1080`
-  if (used) used.add(picsumUrl)
-  return {
-    ok: true,
-    url: picsumUrl,
-    source: 'picsum',
-    sourceLabel: 'Picsum',
-    photographer: 'Picsum',
-    attributionUrl: 'https://picsum.photos',
-  }
+  // 모든 provider 실패 → picsum 무관 이미지 노출 X. 클라가 placeholder 표시.
+  console.warn('[fetchCardnewsImage] all providers failed for slide', args.slideIdx, 'errs:', errs.slice(0, 6).join('|'))
+  return { ok: false, error: 'all_providers_failed', detail: errs.slice(0, 6).join('|') }
 }

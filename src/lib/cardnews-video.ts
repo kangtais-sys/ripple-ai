@@ -154,11 +154,15 @@ export async function fetchCardnewsVideo(args: {
   slideIdx?: number
 }): Promise<VideoResult> {
   const q = pickKeyword(args)
+  console.log('[fetchCardnewsVideo] slide', args.slideIdx, 'category', args.category, 'query:', q)
+  console.log('[fetchCardnewsVideo] env pexels:', !!process.env.PEXELS_API_KEY, 'pixabay:', !!process.env.PIXABAY_API_KEY)
   const errs: string[] = []
   for (const provider of [fetchPexelsVideo, fetchPixabayVideo]) {
     const r = await provider(q)
+    console.log('[fetchCardnewsVideo]', provider.name, '→', r.ok ? 'OK url:' + r.url.slice(0, 80) : 'FAIL ' + r.error)
     if (r.ok) return r
     errs.push(r.error)
   }
+  console.warn('[fetchCardnewsVideo] all failed:', errs.join(' | '))
   return { ok: false, error: 'all_failed', detail: errs.join(' | ') }
 }

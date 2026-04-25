@@ -3479,15 +3479,21 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <div class="ob-grid" id="ob-topics">
         <button type="button" class="ob-chip" data-topic="beauty">뷰티·피부</button>
         <button type="button" class="ob-chip" data-topic="food">음식·맛집</button>
+        <button type="button" class="ob-chip" data-topic="cafe">카페·커피</button>
         <button type="button" class="ob-chip" data-topic="travel">여행</button>
         <button type="button" class="ob-chip" data-topic="fashion">패션·스타일</button>
         <button type="button" class="ob-chip" data-topic="interior">인테리어</button>
+        <button type="button" class="ob-chip" data-topic="kpop">아이돌·K팝</button>
+        <button type="button" class="ob-chip" data-topic="movie">영화·드라마</button>
+        <button type="button" class="ob-chip" data-topic="music">음악·플레이리스트</button>
+        <button type="button" class="ob-chip" data-topic="psych">심리·연애</button>
+        <button type="button" class="ob-chip" data-topic="mystery">미스터리·공포</button>
         <button type="button" class="ob-chip" data-topic="book">독서·책</button>
         <button type="button" class="ob-chip" data-topic="baby">육아·살림</button>
+        <button type="button" class="ob-chip" data-topic="pet">반려동물</button>
         <button type="button" class="ob-chip" data-topic="fit">운동·헬스</button>
         <button type="button" class="ob-chip" data-topic="money">재테크·돈</button>
         <button type="button" class="ob-chip" data-topic="life">라이프 꿀팁</button>
-        <button type="button" class="ob-chip" data-topic="cafe">카페·커피</button>
         <button type="button" class="ob-chip" data-topic="trend">트렌드·문화</button>
       </div>
       <button class="ob-next" id="ob-1-next" disabled onclick="obNext(2)">다음</button>
@@ -4979,7 +4985,7 @@ var createData = { hook:'', body:'', slides:7, size:'sq', template:'clean', chan
 // 메타 라벨 제거 — 괄호로 묶인 시스템성 표기만 잡음.
 //   비괄호 패턴(* 참고: ...) 까지 잡으면 실제 본문 라인을 잘라먹어서 본문이 통째 사라지는 버그 발생.
 //   그래서 괄호 안 키워드만 처리. AI 가 비괄호로 박으면 후처리 대신 시스템 프롬프트 룰로 차단.
-var META_LABEL_RE = /\s*[\(（\[【「《]\s*(?:참고용|참고|참조|검증\s*필요|검증필요|확인\s*필요|확인필요|주관적|개인적\s*의견|개인의견|예시|예시일\s*뿐|단지\s*참고|일반적|보통|대략|아마도|추정|예상|TBD|출처\s*없음|출처\s*불명)\s*[\)）\]】」》]/g;
+var META_LABEL_RE = /\s*[\(（\[【「《]\s*(?:참고용|참고|참조|검증\s*필요|검증필요|확인\s*필요|확인필요|확인\s*불가|확인불가|확인\s*안\s*됨|확인안됨|정보\s*부족|정보부족|모름|미상|불명|주관적|개인적\s*의견|개인의견|예시|예시일\s*뿐|단지\s*참고|일반적|보통|대략|아마도|추정|예상|TBD|N\/?A|출처\s*없음|출처\s*불명)\s*[\)）\]】」》]/g;
 function stripMetaLabels(s){
   if(s == null) return s;
   return String(s).replace(META_LABEL_RE, '').replace(/[ \t]{2,}/g, ' ').trim();
@@ -5279,54 +5285,86 @@ function refreshTrends(){
   renderDailyTrends();
 }
 function shuffleTrendPool(pool){
-  // offset 에 따라 회전 + 셔플
-  var copy = pool.slice();
+  // 회전 + 셔플 — offset 마다 시작점을 3씩 회전시켜 절대 같은 3개 안 나오게
+  if(!pool || pool.length === 0) return [];
+  var n = pool.length;
+  var start = (_trendShuffleOffset * 3) % n;
+  var rotated = pool.slice(start).concat(pool.slice(0, start));
+  // 회전된 풀에 가벼운 셔플 적용 (앞 3개 우선 보존하되 약간만 섞음)
   var seed = (Date.now() + _trendShuffleOffset * 97) & 0x7fffffff;
   var rnd = function(){ seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
-  for(var i = copy.length - 1; i > 0; i--){
-    var j = Math.floor(rnd() * (i + 1));
-    var tmp = copy[i]; copy[i] = copy[j]; copy[j] = tmp;
+  // 앞 3개는 보존하되 4번째 이후만 셔플 → 회전 효과 유지하면서도 약간의 무작위성
+  for(var i = rotated.length - 1; i > 3; i--){
+    var j = 3 + Math.floor(rnd() * (i - 2));
+    var tmp = rotated[i]; rotated[i] = rotated[j]; rotated[j] = tmp;
   }
-  return copy.slice(0, 3);
+  return rotated.slice(0, 3);
 }
 function renderDailyTrends(){
   var container = document.getElementById('trend-carousel');
   if(!container) return;
-  // ① 유저가 이전에 관심 주제를 고른 적 있으면 그걸 최우선 (매 호출마다 셔플)
-  try {
-    var savedKey = localStorage.getItem('ssobi_disc_topic');
-    if(savedKey && discoverData[savedKey]){
-      var d = discoverData[savedKey];
-      var shuffled = shuffleTrendPool(d.trends);
-      var mapped = shuffled.map(function(t){
-        return { topic: t.hook, chip: d.name, meta: t.meta, src: t.src };
-      });
-      createData._discTopic = savedKey;
-      window._pickedTopic = d.name;
-      renderDailyTrendsStatic(mapped, 'interest');
-      return;
+  // 하이브리드 전략: 매번 호출 시 클라이언트 풀 + server daily_trends 결합.
+  //   짝수번째 호출 → 카테고리 풀 위주 (2 my + 1 trending)
+  //   홀수번째 호출 → trending 위주 (1 my + 2 trending)
+  //   server 응답 캐시 (window._serverTrends) 로 재호출 부담 X
+  var savedKey = '';
+  try { savedKey = localStorage.getItem('ssobi_disc_topic') || ''; } catch(_){}
+
+  function mergeAndRender(serverTopics){
+    var myPool = (savedKey && discoverData[savedKey])
+      ? discoverData[savedKey].trends.map(function(t){
+          return { topic: t.hook, chip: discoverData[savedKey].name, meta: t.meta, src: t.src };
+        })
+      : pickDailyTrends();  // 관심 주제 없으면 일반 폴백 풀
+
+    var trendPool = Array.isArray(serverTopics) ? serverTopics.map(function(t){
+      return {
+        topic: t.topic || '',
+        chip: t.category || '오늘 트렌드',
+        meta: t.why || t.preview_hook || '',
+        preview_hook: t.preview_hook || '',
+      };
+    }).filter(function(x){ return x.topic; }) : [];
+
+    var picks = [];
+    var alt = _trendShuffleOffset % 2 === 1;  // 홀수 호출 → trending 비중↑
+    if(trendPool.length === 0){
+      // server 응답 없으면 클라 풀로만
+      picks = shuffleTrendPool(myPool).slice(0, 3);
+    } else {
+      // 셔플된 풀 둘에서 교차 선택
+      var myShuffled = shuffleTrendPool(myPool);
+      var trShuffled = shuffleTrendPool(trendPool);
+      if(alt){
+        picks = [trShuffled[0], myShuffled[0], trShuffled[1] || myShuffled[1]];
+      } else {
+        picks = [myShuffled[0], trShuffled[0], myShuffled[1] || trShuffled[1]];
+      }
+      picks = picks.filter(Boolean).slice(0, 3);
     }
-  } catch(_){}
-  // ② 관심사 없으면 즉시 폴백 렌더 (offset 따라 매번 다른 3개)
-  var fallback = pickDailyTrends();
-  renderDailyTrendsStatic(fallback, 'fallback');
-  // ③ "더보기" 클릭(offset > 0) 일 때는 server 호출 skip — 클라이언트 풀로만 회전.
-  //    첫 진입에만 server daily_trends 로 덮어쓰기.
-  if(_trendShuffleOffset > 0) return;
+    if(savedKey && discoverData[savedKey]){
+      createData._discTopic = savedKey;
+      window._pickedTopic = discoverData[savedKey].name;
+    }
+    renderDailyTrendsStatic(picks, trendPool.length ? 'fresh' : 'fallback');
+  }
+
+  // server daily_trends 캐시
+  if(window._serverTrendsCache && window._serverTrendsCache.ts > Date.now() - 5 * 60 * 1000){
+    mergeAndRender(window._serverTrendsCache.topics);
+    return;
+  }
+  // 첫 렌더는 즉시 (server 기다리지 않음)
+  mergeAndRender(window._serverTrendsCache ? window._serverTrendsCache.topics : []);
+  // server fetch 후 캐시 + 재렌더 (한 번만)
+  if(_trendShuffleOffset > 0 && window._serverTrendsCache) return;
   fetch('/api/trends/today', { credentials:'include' })
     .then(function(r){ return r.json(); })
     .then(function(j){
-      if(j && j.ok && Array.isArray(j.topics) && j.topics.length >= 3){
-        var picks = shuffleTrendPool(j.topics);
-        var mapped = picks.map(function(t){
-          return {
-            topic: t.topic || '',
-            chip: t.category || 'AI 추천',
-            meta: t.why || t.preview_hook || '',
-            preview_hook: t.preview_hook || '',
-          };
-        });
-        renderDailyTrendsStatic(mapped, j.fresh ? 'fresh' : 'stale');
+      if(j && j.ok && Array.isArray(j.topics) && j.topics.length >= 1){
+        // server 응답 캐시 + 재렌더
+        window._serverTrendsCache = { topics: j.topics, ts: Date.now() };
+        mergeAndRender(j.topics);
       }
     })
     .catch(function(){ /* 폴백 유지 */ });
@@ -5998,6 +6036,82 @@ var discoverData = {
       {hook:'1만원으로 살 수 있는 LP 추천', src:['IG'], meta:'🛒 클릭 5k'},
       {hook:'요즘 차트 1위, 진짜 이유', src:['X','Threads'], meta:'💬 공감 6k'}
     ]
+  },
+  kpop: {
+    name:'아이돌·K팝',
+    refs:[
+      {h:'@kpop.daily', f:'42만', s:'K-pop 데일리 컴백·빌보드 정리'},
+      {h:'@idol.outfit', f:'18만', s:'아이돌 공항패션·무대의상 분석'},
+      {h:'@stage.gif', f:'9.7만', s:'직캠 인기 컷 큐레이션'}
+    ],
+    trends:[
+      {hook:'르세라핌 신곡 진짜 이게 1위인 이유', src:['X','TikTok'], meta:'🔥 차트 분석'},
+      {hook:'블핑 제니 콜라보 굿즈 완판 정리', src:['IG','Threads'], meta:'🛒 정보 폭발'},
+      {hook:'아이돌 공항패션, 진짜 따라할 만한 룩', src:['IG'], meta:'✨ 저장 14k'},
+      {hook:'스밍 1위 만드는 진짜 노하우', src:['Threads'], meta:'💬 팬덤 공유'},
+      {hook:'올해 데뷔조 중 진짜 뜰 팀 5', src:['X','Reddit'], meta:'📈 예측 8k'},
+      {hook:'직캠 1억뷰 곡들의 공통점', src:['IG','TikTok'], meta:'❤️ 분석 7k'},
+      {hook:'그룹 로고에 숨겨진 의미', src:['Threads'], meta:'💾 저장 9k'},
+      {hook:'다음 컴백 D-7, 떡밥 정리', src:['X'], meta:'🔥 화제'},
+      {hook:'아이돌 본업 외 N잡, 누가 제일?', src:['IG'], meta:'📊 비교 6k'}
+    ]
+  },
+  movie: {
+    name:'영화·드라마',
+    refs:[
+      {h:'@cinema.kr', f:'24만', s:'개봉 영화 솔직 후기·해석'},
+      {h:'@drama.diary', f:'13만', s:'드라마 명대사 + 스틸컷'},
+      {h:'@netflix.pick', f:'8.6만', s:'OTT 신작 큐레이션'}
+    ],
+    trends:[
+      {hook:'이번 주 OTT 신작, 진짜 볼 만한 거', src:['IG','TikTok'], meta:'🎬 추천 9k'},
+      {hook:'올해 한국 영화 흥행 TOP 5 분석', src:['X','Threads'], meta:'📊 비교 7k'},
+      {hook:'드라마 결말, 진짜 의도된 떡밥들', src:['Reddit','IG'], meta:'💬 토론 11k'},
+      {hook:'넷플릭스 vs 티빙, 4월 신작 비교', src:['IG'], meta:'📈 공유 8k'},
+      {hook:'재개봉 영화, 극장 가서 봐야 할 이유', src:['Threads'], meta:'❤️ 공감 6k'},
+      {hook:'OST가 영화보다 더 떴던 작품 5', src:['IG','TikTok'], meta:'🎵 인기 7k'},
+      {hook:'30분 만에 보는 시리즈 핵심 정리', src:['Reddit'], meta:'💾 저장 12k'},
+      {hook:'평점 9점대 숨은 명작, 진짜 추천', src:['IG'], meta:'✨ 큐레 10k'},
+      {hook:'배우 인터뷰에서 새로 안 사실', src:['X','Threads'], meta:'💬 공감 5k'}
+    ]
+  },
+  psych: {
+    name:'심리·연애',
+    refs:[
+      {h:'@mind.note', f:'19만', s:'데일리 심리 인사이트 카드뉴스'},
+      {h:'@love.lab', f:'11만', s:'연애 케이스 스터디'},
+      {h:'@relate.daily', f:'7.4만', s:'관계 갈등 솔직 토크'}
+    ],
+    trends:[
+      {hook:'이별 후 진짜 회복하는 4단계', src:['IG','Threads'], meta:'❤️ 공감 18k'},
+      {hook:'MBTI별 연애 패턴, 진짜 맞을까', src:['X','TikTok'], meta:'🔥 토론 14k'},
+      {hook:'썸 끝낼 타이밍 정확히 알려줄게', src:['IG'], meta:'💬 댓글 11k'},
+      {hook:'자존감 낮을 때 진짜 효과 본 3가지', src:['Reddit','IG'], meta:'💾 저장 9k'},
+      {hook:'연인이랑 안 싸우는 5가지 룰', src:['Threads'], meta:'📈 공유 8k'},
+      {hook:'친구 관계 정리, 솔직히 후련해진 이유', src:['IG'], meta:'❤️ 공감 7k'},
+      {hook:'번아웃 회복 1주 루틴, 직접 해봄', src:['Reddit'], meta:'✨ 후기 6k'},
+      {hook:'독서로 끝낸 우울감, 진짜 책 5권', src:['IG'], meta:'📚 추천 5k'},
+      {hook:'심리 상담 받아본 후기 솔직히', src:['Threads','IG'], meta:'💬 공유 8k'}
+    ]
+  },
+  mystery: {
+    name:'미스터리·공포',
+    refs:[
+      {h:'@horror.tales', f:'21만', s:'실화 괴담·미스터리 큐레이션'},
+      {h:'@true.crime.kr', f:'14만', s:'국내외 미제·범죄 분석'},
+      {h:'@urban.legend', f:'8.2만', s:'한국 도시전설·괴담'}
+    ],
+    trends:[
+      {hook:'한국에서 진짜 있었던 미제사건 5', src:['IG','Reddit'], meta:'🔥 조회 22k'},
+      {hook:'직접 가본 진짜 무서운 장소 후기', src:['Threads','IG'], meta:'💬 공감 13k'},
+      {hook:'CCTV에 찍혔던 설명 안 되는 장면', src:['X','TikTok'], meta:'😱 화제 11k'},
+      {hook:'밤에 절대 들으면 안 되는 노래', src:['IG'], meta:'❤️ 저장 9k'},
+      {hook:'유튜브 명작 괴담 채널 BEST 5', src:['Reddit'], meta:'📈 추천 8k'},
+      {hook:'호텔에서 일어난 실화 괴담 모음', src:['IG','Threads'], meta:'💾 저장 10k'},
+      {hook:'대낮에 본 진짜 이상한 일들', src:['Threads'], meta:'💬 댓글 7k'},
+      {hook:'외국 도시전설 진짜 무서운 거', src:['Reddit'], meta:'🔥 공유 6k'},
+      {hook:'MBTI별 무서운 거 견디는 능력', src:['IG'], meta:'😆 공감 5k'}
+    ]
   }
 };
 
@@ -6262,6 +6376,7 @@ document.addEventListener('click', function(e){
 
 // ob-topic 키 → discoverData 키 매핑 (없는 건 가장 가까운 카테고리로)
 var _obTopicToDisc = { interior:'home', cafe:'food', trend:'life' };
+// kpop/movie/psych/mystery 는 discoverData 자체에 추가 (아래 동적 주입)
 function obFinish(){
   if(!_obState.topics.length || !_obState.tone || !_obState.goal){
     alert('주제·말투·목표를 모두 선택해줘');
@@ -9467,33 +9582,33 @@ function initEditor(){
 // 본문 슬라이드 중 첫 번째 일반 body 에 stock 영상 자동 삽입
 //   cover(0) / hook2(1) / cta(마지막) / checklist / number / toc 는 제외
 async function autoPlaceVideoInBody(){
-  if(!edtSlides || !edtSlides.length) return;
-  if(createData._videoAutoPlaced) return;  // 이미 삽입됨 — 중복 방지
+  console.log('[autoPlaceVideoInBody] called. edtSlides:', edtSlides?.length, 'autoPlaced:', createData._videoAutoPlaced);
+  if(!edtSlides || !edtSlides.length) { console.warn('[autoPlaceVideoInBody] no edtSlides'); return; }
+  if(createData._videoAutoPlaced) { console.log('[autoPlaceVideoInBody] already placed → skip'); return; }
   var bodySlides = createData.bodySlides || [];
-  // edtSlides[0]=cover, edtSlides[1]=hook2(or intro), edtSlides[N-1]=cta
-  // body 영역: edtSlides[2..N-2]
   var targetIdx = -1;
   for(var i = 2; i < edtSlides.length - 1; i++){
-    var bIdx = i - 1;  // bodySlides 인덱스 (parsed[0] = cover, parsed[i] = bodySlides[i-1])
+    var bIdx = i - 1;
     var b = bodySlides[bIdx];
     if(!b) continue;
     var role = b.role || 'body';
-    if(role === 'body'){ targetIdx = i; break; }  // 첫 일반 body 슬라이드
+    if(role === 'body'){ targetIdx = i; break; }
   }
-  if(targetIdx === -1) return;
+  console.log('[autoPlaceVideoInBody] targetIdx:', targetIdx);
+  if(targetIdx === -1) { console.warn('[autoPlaceVideoInBody] no body slide found'); return; }
   var slot = edtSlides[targetIdx].querySelector('.edt-el.img');
-  if(!slot) return;
-  // 이미 video 면 skip
-  if(slot.querySelector('video')) return;
-  // 이미지 로드되었으면 그 위에 영상 덮어쓰기
+  if(!slot) { console.warn('[autoPlaceVideoInBody] no img slot in target'); return; }
+  if(slot.querySelector('video')) { console.log('[autoPlaceVideoInBody] already has video'); return; }
   try {
     var h = await authHeaders();
     var cat = createData.category || '';
     var idx = parseInt(slot.dataset.slideIdx || String(targetIdx), 10);
     var kw = slot.dataset.keyword || '';
     var params = new URLSearchParams({ q: kw, category: cat, slide: String(idx) }).toString();
+    console.log('[autoPlaceVideoInBody] fetching video-search:', params);
     var res = await fetch('/api/cardnews/video-search?' + params, { headers: h, credentials:'include' });
     var j = await res.json();
+    console.log('[autoPlaceVideoInBody] response ok:', j?.ok, 'source:', j?.source, 'error:', j?.error);
     if(j && j.ok && j.url){
       setVideoSlot(slot, {
         url: j.url,
@@ -9504,8 +9619,11 @@ async function autoPlaceVideoInBody(){
       slot.dataset.attrSource = j.sourceLabel || '';
       slot.dataset.attrUrl = j.attributionUrl || '';
       createData._videoAutoPlaced = true;
+      console.log('[autoPlaceVideoInBody] video placed at slide', targetIdx);
+    } else {
+      console.warn('[autoPlaceVideoInBody] video search returned no usable result');
     }
-  } catch(e){ console.warn('[auto-video]', e); }
+  } catch(e){ console.error('[autoPlaceVideoInBody]', e); }
 }
 function renderEdtNav(){
   var n = document.getElementById('edt-nav'); if(!n) return;
