@@ -22,6 +22,90 @@ import {
 } from '@/lib/cardnews-prompt'
 import { NextRequest, NextResponse } from 'next/server'
 
+// daily_trends 항목 → 입력 주제와 관련된 실제 데이터 블록 생성 (Claude 본문에 인용용)
+//   1) 주제·카테고리 토큰화
+//   2) top5 + recommended_topics 의 title/excerpt 와 점수 매칭
+//   3) 상위 6개 + 카테고리 일치 항목을 [실제 수집 데이터] 블록으로 반환
+type DailyTrendsRow = {
+  top5?: Array<{ title?: string; source?: string; category?: string; engagement?: number; researchable?: boolean; hook_score?: number }>
+  recommended_topics?: Array<{ topic?: string; category?: string; why?: string; preview_hook?: string }>
+}
+const STOPWORDS = new Set([
+  '이거', '저거', '그거', '하는', '되는', '있는', '없는', '같은', '어떤', '무슨', '몇', '진짜', '정말', '완전',
+  '오늘', '어제', '내일', '올해', '이번', '지금', '요즘', '최근',
+  '~', '·', '의', '에', '를', '을', '가', '이', '은', '는', '도', '만', '와', '과', '로',
+  '가지', '개', '명', '번', 'top', 'best', 'vs', 'or', 'and',
+])
+function tokenize(text: string): string[] {
+  return (text.toLowerCase().match(/[가-힣a-z0-9]{2,}/g) || [])
+    .filter(t => !STOPWORDS.has(t) && t.length >= 2)
+}
+function scoreItem(topicTokens: Set<string>, title: string, excerpt: string, category?: string, topicCategory?: string): number {
+  let score = 0
+  const titleTokens = tokenize(title)
+  const excerptTokens = tokenize(excerpt)
+  for (const t of titleTokens) if (topicTokens.has(t)) score += 2
+  for (const t of excerptTokens) if (topicTokens.has(t)) score += 1
+  if (topicCategory && category && (category === topicCategory || category.startsWith(topicCategory.split('_')[0]))) {
+    score += 1.5  // 카테고리 일치 가산점
+  }
+  return score
+}
+async function buildCollectedDataBlock(sb: ReturnType<typeof adminClient>, topic: string, category: string): Promise<string> {
+  try {
+    // 최근 3일 daily_trends 조회 (오늘 데이터 없으면 어제까지 fallback)
+    const { data: rows } = await sb
+      .from('daily_trends')
+      .select('top5, recommended_topics, date_kst')
+      .order('date_kst', { ascending: false })
+      .limit(3)
+    if (!rows || rows.length === 0) return ''
+    const topicTokens = new Set(tokenize(topic))
+    if (topicTokens.size === 0) return ''
+    type Scored = { title: string; excerpt: string; source?: string; score: number }
+    const candidates: Scored[] = []
+    for (const row of rows as DailyTrendsRow[]) {
+      for (const t of (row.top5 || [])) {
+        const title = t.title || ''
+        if (!title) continue
+        candidates.push({
+          title,
+          excerpt: '',
+          source: t.source || 'trend',
+          score: scoreItem(topicTokens, title, '', t.category, category),
+        })
+      }
+      for (const r of (row.recommended_topics || [])) {
+        const title = r.topic || ''
+        if (!title) continue
+        candidates.push({
+          title,
+          excerpt: r.why || r.preview_hook || '',
+          source: 'recommended',
+          score: scoreItem(topicTokens, title, r.why || '', r.category, category),
+        })
+      }
+    }
+    // 점수 0 이상 + 상위 6개 + 중복 title 제거
+    const seen = new Set<string>()
+    const picks = candidates
+      .filter(c => c.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .filter(c => { if (seen.has(c.title)) return false; seen.add(c.title); return true })
+      .slice(0, 6)
+    if (picks.length === 0) return ''
+    const lines = picks.map(p => `- [${p.source}] ${p.title}${p.excerpt ? ` — ${p.excerpt}` : ''}`).join('\n')
+    return `
+
+[실제 수집 데이터 — 최근 3일치 트렌드 항목 중 주제 "${topic}" 와 매칭된 ${picks.length}개]
+${lines}
+
+위 항목의 사실·이름·수치·시점을 본문에 가능한 그대로 인용. 데이터에 없는 정보는 새로 만들지 말 것.`
+  } catch {
+    return ''
+  }
+}
+
 // Claude haiku 로 카테고리 분류 (regex fallback). 약 200~400ms
 async function classifyWithClaude(topic: string): Promise<CategoryKey> {
   try {
@@ -111,7 +195,15 @@ export async function POST(req: NextRequest) {
     ? '\n[스코프 자동 판단: kr] 한국 브랜드·서비스·지명 중심.'
     : '\n[스코프 자동 판단: mixed] 한국·글로벌 양쪽 정보 활용.'
 
-  const researchData = (body.researchData || '') + scopeHint
+  // ─────────────────────────────────────────────
+  // daily_trends 의 실제 수집 데이터에서 입력 주제와 관련된 항목을 뽑아 researchData 에 prepend
+  //   - top5: 조사·분석된 트렌드 (engagement 점수 포함)
+  //   - recommended_topics: 추천 주제 자체
+  //   매칭: 주제 토큰화 → title/excerpt 에 등장하는 항목 점수화 → 상위 6개
+  //   목표: Claude 가 본문에서 실제 사실/가격/이름을 직접 인용하게 만들기 (mirra.my 풍 알찬 본문)
+  // ─────────────────────────────────────────────
+  const collectedDataBlock = await buildCollectedDataBlock(sb, topic, category)
+  const researchData = (body.researchData || '') + scopeHint + collectedDataBlock
 
   const prompt = buildContentGenerationPrompt({
     accountConcept,
