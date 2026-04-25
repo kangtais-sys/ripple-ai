@@ -10120,10 +10120,82 @@ function hidePublishProgress(){
 // ────────── AI 생성 오버레이 ──────────
 var __genSteps = [];
 // 템플릿 썸네일을 실제 유저 hook 문구로 스타일링 — cs-3 진입 시 호출
+// 2.3: 8개 템플릿 시각을 hook 문구와 함께 미리보기로 렌더 — 각 템플릿 고유 레이아웃
 function renderTplThumbs(){
-  var hook = (createData.hook || '').replace(/^"|"$/g,'').slice(0, 18) || '나만의 후킹 문구';
-  var subtitle = (createData.coverSubtitle || (createData.hook ? '한 줄 부제목' : '오늘의 주제 한 줄')).slice(0, 16);
-  var labels = { clean:'CLEAN', bold:'BOLD', noir:'NOIR', luxury:'LUXURY', mag:'MAGAZINE', editorial:'EDITORIAL', mono:'MONO', pastel:'SOFT' };
+  var hook = (createData.hook || '').replace(/^"|"$/g,'').slice(0, 14) || '제목 한 줄';
+  var sub = (createData.coverSubtitle || (createData.hook ? '한 줄 부제목' : '오늘 주제')).slice(0, 12);
+  var cat = createData.category || 'etc';
+  var catLabel = (typeof CATEGORY_CHIP_LABEL !== 'undefined' && CATEGORY_CHIP_LABEL[cat]) ? CATEGORY_CHIP_LABEL[cat] : '라이프';
+  var hh = escapeHtml(hook);
+  var ss = escapeHtml(sub);
+  var ll = escapeHtml(catLabel);
+
+  function html(tpl){
+    if(tpl === 'clean'){ // CLEAN — 흰 + mint 좌측 바
+      return ''
+        + '<div style="position:absolute;left:6px;top:6px;width:30%;height:38%;background:linear-gradient(135deg,#E8E8E5,#F5F5F2)"></div>'
+        + '<div style="position:absolute;left:6px;bottom:6px;padding:1.5px 5px;background:rgba(255,255,255,.95);border:1px solid #00C9A7;font-size:6.5px;font-weight:800;color:#00C9A7;letter-spacing:.1em">'+ll+'</div>'
+        + '<div style="position:absolute;left:6px;bottom:38%;display:flex;align-items:flex-end;gap:4px"><div style="width:2.5px;height:24px;background:#00C9A7;flex-shrink:0"></div><div style="font-size:11px;font-weight:800;color:#111;line-height:1.1;letter-spacing:-.3px;font-family:Pretendard,sans-serif">'+hh+'</div></div>'
+        + '<div style="position:absolute;left:13px;bottom:24%;font-size:8px;color:#666;line-height:1.3">'+ss+'</div>';
+    }
+    if(tpl === 'bold'){ // DARK — 다크 그라데이션 + 형광 칩
+      return ''
+        + '<div style="position:absolute;inset:0;background:linear-gradient(to top,#0A0A0A 0%,#2A2A2A 65%,#5A5A5A 100%)"></div>'
+        + '<div style="position:absolute;left:6px;bottom:30%;padding:1.5px 5px;background:#CCFF00;color:#0A0A0A;font-size:6.5px;font-weight:900;letter-spacing:.15em">'+ll.toUpperCase()+'</div>'
+        + '<div style="position:absolute;left:6px;bottom:6px;color:#fff;font-size:11.5px;font-weight:800;line-height:1.1;letter-spacing:-.3px;font-family:Pretendard,sans-serif">'+hh+'</div>'
+        + '<div style="position:absolute;left:6px;bottom:5%;font-size:7.5px;color:rgba(255,255,255,.6);font-style:italic">'+ss+'</div>';
+    }
+    if(tpl === 'noir'){ // STATEMENT — 텍스트 중심 다크
+      return ''
+        + '<div style="position:absolute;inset:0;background:#1A1A1A"></div>'
+        + '<div style="position:absolute;left:4px;top:-2px;font-family:Gowun Batang,Noto Serif KR,serif;font-size:46px;color:#C9A84C;opacity:.18;line-height:.85">"</div>'
+        + '<div style="position:absolute;left:6px;top:24px;color:#fff;font-family:Gowun Batang,Noto Serif KR,serif;font-size:11px;line-height:1.3">'+hh+'</div>'
+        + '<div style="position:absolute;right:6px;bottom:6px;font-size:7px;color:#888;font-style:italic">— '+ss+'</div>'
+        + '<div style="position:absolute;left:6px;bottom:6px;border:1px solid #FFFFFF;padding:1px 5px;font-size:6.5px;font-weight:800;color:#FFFFFF;letter-spacing:.1em">'+ll+'</div>';
+    }
+    if(tpl === 'luxury'){ // RAW — 풀 이미지 다크
+      return ''
+        + '<div style="position:absolute;inset:0;background:linear-gradient(to top,#0D0D0D 0%,#3A2A1A 50%,#8A6A4A 100%)"></div>'
+        + '<div style="position:absolute;left:6px;top:6px;border:1px solid #fff;padding:1.5px 5px;font-size:6.5px;font-weight:800;color:#fff;letter-spacing:.1em">'+ll+'</div>'
+        + '<div style="position:absolute;left:6px;bottom:18%;font-family:Black Han Sans,Pretendard,sans-serif;font-size:13px;color:#fff;line-height:1;letter-spacing:-.3px">'+hh+'</div>'
+        + '<div style="position:absolute;left:6px;bottom:6px;font-size:7.5px;color:rgba(255,255,255,.7)">'+ss+'</div>';
+    }
+    if(tpl === 'mag'){ // SPLIT — 좌 이미지 / 우 다크 패널
+      return ''
+        + '<div style="position:absolute;left:0;top:0;width:48%;height:100%;background:linear-gradient(135deg,#888,#AAA)"></div>'
+        + '<div style="position:absolute;right:0;top:0;width:52%;height:100%;background:#111111"></div>'
+        + '<div style="position:absolute;right:6px;top:8px;padding:1.5px 5px;background:#00C9A7;color:#0A0A0A;font-size:6px;font-weight:800;letter-spacing:.1em">'+ll+'</div>'
+        + '<div style="position:absolute;right:6px;top:24px;width:46%;color:#fff;font-size:10.5px;font-weight:800;line-height:1.15;letter-spacing:-.3px">'+hh+'</div>'
+        + '<div style="position:absolute;right:6px;bottom:6px;width:46%;font-size:7.5px;color:rgba(255,255,255,.65)">'+ss+'</div>'
+        + '<div style="position:absolute;left:5px;bottom:5px;border:1px solid #fff;padding:1px 4px;font-size:6px;font-weight:800;color:#fff;letter-spacing:.1em">'+ll+'</div>';
+    }
+    if(tpl === 'editorial'){ // FILM — sepia + 베이지 라인
+      return ''
+        + '<div style="position:absolute;inset:0;background:linear-gradient(to top,#1A1512 0%,#5A4030 60%,#A88060 100%)"></div>'
+        + '<div style="position:absolute;left:0;right:0;top:6px;height:1.5px;background:#C4A882"></div>'
+        + '<div style="position:absolute;left:0;right:0;bottom:24px;height:1.5px;background:#C4A882"></div>'
+        + '<div style="position:absolute;right:6px;top:11px;font-size:5.5px;color:#C4A882;font-weight:800;letter-spacing:.18em">'+ll.toUpperCase()+'</div>'
+        + '<div style="position:absolute;left:6px;bottom:5px;color:#E8DFD0;font-family:Nanum Myeongjo,Gowun Batang,serif;font-size:11px;line-height:1.2">'+hh+'</div>'
+        + '<div style="position:absolute;right:6px;top:32%;font-size:6px;color:#C4A882;letter-spacing:.05em">2026.04</div>';
+    }
+    if(tpl === 'mono'){ // MONO — 그레이 + 흰 패널
+      return ''
+        + '<div style="position:absolute;inset:0;background:linear-gradient(to bottom,#888 0%,#888 55%,#FAFAFA 55%,#FAFAFA 100%);filter:grayscale(1)"></div>'
+        + '<div style="position:absolute;left:6px;top:6px;padding:1.5px 5px;background:#0D0D0D;color:#fff;font-size:6.5px;font-weight:800;letter-spacing:.1em">'+ll+'</div>'
+        + '<div style="position:absolute;left:6px;bottom:14px;color:#111;font-size:11px;font-weight:700;line-height:1.2;letter-spacing:-.3px">'+hh+'</div>'
+        + '<div style="position:absolute;right:6px;bottom:5px;font-size:6.5px;color:#999;letter-spacing:.05em">'+ss+'</div>';
+    }
+    if(tpl === 'pastel'){ // PASTEL — 코랄 + 크림 + 도트
+      return ''
+        + '<div style="position:absolute;inset:0;background:linear-gradient(to bottom,#FFD7C2 0%,#FFD7C2 55%,#FDF6F0 55%,#FDF6F0 100%)"></div>'
+        + '<div style="position:absolute;left:6px;top:6px;padding:1.5px 5px;background:#F4A5B0;color:#3D2B1F;font-size:6.5px;font-weight:800;letter-spacing:.1em;border-radius:3px">'+ll+'</div>'
+        + '<div style="position:absolute;left:6px;bottom:14px;color:#3D2B1F;font-family:Gowun Dodum,Pretendard,sans-serif;font-size:11px;font-weight:700;line-height:1.2;letter-spacing:-.3px">'+hh+'</div>'
+        + '<div style="position:absolute;left:6px;bottom:5px;font-size:7px;color:rgba(61,43,31,.6);font-family:Gowun Dodum,Pretendard,sans-serif">'+ss+'</div>'
+        + '<div style="position:absolute;right:6px;bottom:18px;display:flex;gap:2.5px"><div style="width:4px;height:4px;border-radius:50%;background:#F4A5B0"></div><div style="width:4px;height:4px;border-radius:50%;background:#C4B5FD"></div><div style="width:4px;height:4px;border-radius:50%;background:#A7F3D0"></div></div>';
+    }
+    return '';
+  }
+
   document.querySelectorAll('#tpl-grid .tpl-item').forEach(function(item){
     var oc = item.getAttribute('onclick') || '';
     var m = oc.match(/selectTpl\(this,'([^']+)'\)/);
@@ -10132,14 +10204,11 @@ function renderTplThumbs(){
     if(tpl === 'custom') return;
     var prev = item.querySelector('.tpl-prev');
     if(!prev) return;
-    var c = tplText(tpl);
-    var font = tplFont(tpl);
-    var italic = tplItalic(tpl);
-    var accent = tplAccent(tpl);
-    prev.innerHTML =
-      '<div style="font-size:8.5px;font-weight:800;color:' + accent + ';letter-spacing:.22em;margin-bottom:8px;text-transform:uppercase">' + labels[tpl] + '</div>' +
-      '<div style="font-family:' + font + ';font-size:13px;font-weight:' + tplWeight(tpl) + ';color:' + c + ';line-height:1.22;font-style:' + (italic?'italic':'normal') + ';letter-spacing:-.3px;margin-bottom:4px;word-break:keep-all;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden">' + escapeHtml(hook) + '</div>' +
-      '<div style="font-family:' + font + ';font-size:9px;font-weight:500;color:' + c + ';opacity:.66;line-height:1.35;word-break:keep-all;font-style:' + (italic?'italic':'normal')+ '">' + escapeHtml(subtitle) + '</div>';
+    item.style.background = 'transparent'; // 정적 background 제거 → 동적으로 prev 안에서 그림
+    item.style.position = 'relative';
+    item.style.overflow = 'hidden';
+    prev.style.cssText = 'position:absolute;inset:0;padding:0';
+    prev.innerHTML = html(tpl);
   });
 }
 // cs2 본문을 슬라이드별 카드로 렌더 — role별 다르게 표시
