@@ -2420,7 +2420,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
             <input type="color" value="#00C896" oninput="edtTextColor(this.value)">
           </div>
         </div>
-        <div class="edt-row-lbl" style="margin-top:10px;margin-bottom:4px">색상 스펙트럼</div>
+        <div class="edt-row-lbl edt-spectrum-lbl" style="margin-top:10px;margin-bottom:4px;display:none">색상 스펙트럼</div>
         <div class="edt-color-bar" id="edt-color-bar"></div>
       </div>
       <button class="edt-apply" onclick="edtApplyText()">적용</button>
@@ -8332,7 +8332,10 @@ function initEditor(){
       var tEl = makeTextEl(p.title || '사실 이게 핵심이었어', {x:textX,y:titleY,w:textW,size:26,color:c,weight:900,isTitle:true});
       tEl.style.zIndex = '5';
       sl.appendChild(tEl);
-      var bEl = makeTextEl(p.text || '직접 써보고 느낀 것만 적었어\n댓글에 궁금한 거 남겨줘', {x:textX,y:textY,w:textW,size:14,color:c,weight:500});
+      var bEl = makeTextEl(p.text || '직접 써보고 느낀 것만 적었어\n댓글에 궁금한 거 남겨줘', {
+        x:textX, y:textY, w:textW, size:14, color:c, weight:500,
+        fontFamily: "'Pretendard','Noto Sans KR',sans-serif"
+      });
       bEl.style.zIndex = '5';
       sl.appendChild(bEl);
       var pEl = makeTextEl(String(i+1).padStart(2,'0')+' / '+String(N).padStart(2,'0'), {x:6,y:93,w:20,size:10,color:c,weight:700});
@@ -8342,14 +8345,20 @@ function initEditor(){
       // 마지막 CTA — 큰 제목 + 문구 + 액션 pill 3개
       var ctaAccent = tplAccent(tpl);
       sl.appendChild(makeTextEl(p.title || '다음편도 올라옴', {x:6,y:22,w:88,size:30,color:c,weight:900,isTitle:true}));
-      sl.appendChild(makeTextEl(p.text || '팔로우하면 볼 수 있음\n광고 아님, 내 경험담', {x:6,y:48,w:88,size:15,color:c,weight:600}));
+      sl.appendChild(makeTextEl(p.text || '팔로우하면 볼 수 있음\n광고 아님, 내 경험담', {
+        x:6, y:48, w:88, size:15, color:c, weight:600,
+        fontFamily: "'Pretendard','Noto Sans KR',sans-serif"
+      }));
       sl.appendChild(makeCtaPillsEl({x:10,y:78,w:80,accent:ctaAccent,textColor:c}));
     } else if(isSummary){
       // 요약 — 이미지 없음
       var summaryEyebrow = summaryEyebrowPick();
       sl.appendChild(makeTextEl(summaryEyebrow, {x:6,y:12,w:88,size:20,color:c,weight:900}));
       sl.appendChild(makeTextEl(p.title || '핵심 결론', {x:6,y:32,w:88,size:28,color:c,weight:900,isTitle:true}));
-      sl.appendChild(makeTextEl(p.text || '', {x:6,y:60,w:88,size:14,color:c,weight:500}));
+      sl.appendChild(makeTextEl(p.text || '', {
+        x:6, y:60, w:88, size:14, color:c, weight:500,
+        fontFamily: "'Pretendard','Noto Sans KR',sans-serif"
+      }));
       sl.appendChild(makeTextEl(String(i+1).padStart(2,'0')+' / '+String(N).padStart(2,'0'), {x:6,y:93,w:20,size:10,color:c,weight:700}));
     } else {
       // 본론 — role 에 따라 레이아웃 분기
@@ -8418,7 +8427,11 @@ function initEditor(){
       dividerEl.className = 'edt-el edt-divider';
       dividerEl.style.cssText = 'position:absolute;left:' + textX2 + '%;top:' + dividerY + '%;width:' + Math.min(22, textW2/3) + '%;height:1px;background:' + c + ';opacity:.18;pointer-events:none;z-index:5';
       sl.appendChild(dividerEl);
-      var textEl = makeTextEl(p.text || '수치·출처 포함한 본문', {x:textX2,y:textY2,w:textW2,size:13,color:c,weight:500});
+      // 본문은 항상 Pretendard/Noto Sans KR (제목은 템플릿 폰트, 본문은 가독성 우선)
+      var textEl = makeTextEl(p.text || '본문을 직접 입력해주세요', {
+        x:textX2, y:textY2, w:textW2, size:13, color:c, weight:500,
+        fontFamily: "'Pretendard','Noto Sans KR',sans-serif"
+      });
       textEl.style.zIndex = '5';
       sl.appendChild(textEl);
       var pg2 = makeTextEl(String(i+1).padStart(2,'0')+' / '+String(N).padStart(2,'0'), {x:6,y:93,w:20,size:10,color:c,weight:700});
@@ -8767,7 +8780,27 @@ function detectFontKey(fam){
 function edtPanel(t){
   document.querySelectorAll('.edt-panel').forEach(function(e){ e.classList.remove('on'); });
   var p = document.getElementById('edt-panel-'+t);
-  if(p) p.classList.add('on');
+  if(!p) return;
+  p.classList.add('on');
+  positionEditPanel();
+}
+// 선택된 요소의 화면 위치를 보고 패널을 반대쪽에 배치
+function positionEditPanel(){
+  var p = document.querySelector('.edt-panel.on');
+  if(!p) return;
+  var sel = (typeof edtSel !== 'undefined' && edtSel) ? edtSel : null;
+  // 기본: 아래쪽 고정
+  p.style.top = 'auto';
+  p.style.bottom = 'calc(env(safe-area-inset-bottom, 0) + 12px)';
+  if(sel){
+    var rect = sel.getBoundingClientRect();
+    var vh = window.innerHeight;
+    // 선택 요소가 화면 하단 절반에 있으면 → 패널을 위로
+    if(rect.top > vh / 2){
+      p.style.top = 'calc(env(safe-area-inset-top, 0) + 8px)';
+      p.style.bottom = 'auto';
+    }
+  }
 }
 function edtClosePanel(){
   document.querySelectorAll('.edt-panel').forEach(function(e){ e.classList.remove('on'); });
@@ -9286,15 +9319,17 @@ function renderTplThumbs(){
       '<div style="font-family:' + font + ';font-size:9px;font-weight:500;color:' + c + ';opacity:.66;line-height:1.35;word-break:keep-all;font-style:' + (italic?'italic':'normal')+ '">' + escapeHtml(subtitle) + '</div>';
   });
 }
-// cs2 본문을 슬라이드별 카드로 렌더 (가독성 + 구분)
-//   bodySlides: [{role, title, text}, ...] — 2번 슬라이드부터 N번까지 (hook 제외)
+// cs2 본문을 슬라이드별 카드로 렌더 — role별 다르게 표시
+//   body/hook2/cta:  title + text
+//   checklist:       title + ✅/❌ 리스트
+//   number:          title + 큰 숫자 + 설명
+//   toc:             title + 번호 매긴 목차
 function renderBodyAsCards(bodySlides){
   var container = document.getElementById('cs2-body-list');
   if(!container) return;
   container.innerHTML = '';
-  var total = (bodySlides || []).length + 1; // hook 포함
   (bodySlides || []).forEach(function(b, i){
-    var idx = i + 2; // 슬라이드 번호
+    var idx = i + 2;
     var role = b.role || 'body';
     var isCta = (i === (bodySlides.length - 1));
     var label = role === 'hook2' ? '이중 후킹'
@@ -9312,13 +9347,40 @@ function renderBodyAsCards(bodySlides){
     head.innerHTML = '<div class="cs2-slide-num">' + idx + '</div>' +
       '<span>슬라이드 ' + idx + ' · ' + label + '</span>';
     card.appendChild(head);
-    var txt = document.createElement('div');
-    txt.className = 'cs2-slide-text';
-    txt.setAttribute('contenteditable', 'false');
-    // title + text 합쳐서 표시 (사용자가 편집 시 통째로)
-    var inner = (b.title ? b.title + '\n' : '') + (b.text || '');
-    txt.textContent = inner.trim();
-    card.appendChild(txt);
+    var body = document.createElement('div');
+    body.className = 'cs2-slide-text';
+    body.setAttribute('contenteditable', 'false');
+    // role 별 컨텐츠 조립
+    if(role === 'checklist' && Array.isArray(b.list) && b.list.length){
+      var listHtml = '';
+      if(b.title) listHtml += '<div style="font-weight:800;margin-bottom:6px;font-size:13px">' + escapeHtml(b.title) + '</div>';
+      listHtml += b.list.map(function(it){
+        var ic = it.ok ? '✅' : '❌';
+        return '<div style="display:flex;gap:6px;margin:3px 0"><span style="flex-shrink:0">' + ic + '</span><span>' + escapeHtml(it.text || '') + '</span></div>';
+      }).join('');
+      body.innerHTML = listHtml;
+    } else if(role === 'number' && b.big_number){
+      body.innerHTML =
+        (b.title ? '<div style="font-weight:800;font-size:12px;color:var(--t3);margin-bottom:4px">' + escapeHtml(b.title) + '</div>' : '') +
+        '<div style="font-size:30px;font-weight:900;color:var(--mint-d);letter-spacing:-1px;line-height:1.1;margin:6px 0">' + escapeHtml(b.big_number) + '</div>' +
+        '<div style="font-size:12px;color:var(--t2);font-weight:500">' + escapeHtml(b.sub || b.text || '') + '</div>';
+    } else if(role === 'toc' && Array.isArray(b.items) && b.items.length){
+      var tocHtml = b.title ? '<div style="font-weight:800;margin-bottom:6px;font-size:13px">' + escapeHtml(b.title) + '</div>' : '';
+      tocHtml += b.items.map(function(it, k){
+        return '<div style="display:flex;gap:8px;margin:3px 0"><span style="font-weight:900;color:var(--mint-d);min-width:22px">' + String(k+1).padStart(2,'0') + '</span><span>' + escapeHtml(String(it).replace(/^\d+\s*[\.:·]?\s*/,'')) + '</span></div>';
+      }).join('');
+      body.innerHTML = tocHtml;
+    } else {
+      // 기본 body — title + text
+      var inner = (b.title ? b.title + '\n' : '') + (b.text || '');
+      var trimmed = inner.trim();
+      if(trimmed){
+        body.textContent = trimmed;
+      } else {
+        body.innerHTML = '<span style="color:var(--t3);font-style:italic">(본문이 비어있어요. 더블탭해서 직접 작성해주세요)</span>';
+      }
+    }
+    card.appendChild(body);
     container.appendChild(card);
   });
 }
