@@ -248,10 +248,32 @@ export async function fetchYonhapLife(): Promise<FeedItem[]> {
 }
 
 // ─────────────────────────────────────────────
-// NewsAPI.org — everything?q=한국&language=ko&sortBy=popularity
-// (NEWS_API_KEY 필요, 무료 dev 1000건/일)
-// 무료 플랜은 top-headlines?country=kr 미지원 → everything 엔드포인트로 우회.
+// NewsAPI.org — 한국 관련 글로벌 뉴스 (NEWS_API_KEY 필요, 무료 dev 1000건/일)
+// 1차: top-headlines?sources=google-news&q=korea  (google news 가 가장 자주 갱신)
+// 2차: everything?q=kpop OR korea trend&language=en&sortBy=popularity  (1차 비면 fallback)
 // ─────────────────────────────────────────────
+type NewsApiArticle = {
+  title?: string
+  description?: string
+  url?: string
+  source?: { name?: string }
+}
+type NewsApiResp = { status?: string; totalResults?: number; articles?: NewsApiArticle[] }
+
+async function newsApiFetch(url: string, label: string): Promise<NewsApiArticle[]> {
+  const res = await fetch(url)
+  console.log(`[collectNewsAPI:${label}] response status:`, res.status)
+  if (!res.ok) {
+    const errBody = await res.text().catch(() => '')
+    console.warn(`[collectNewsAPI:${label}] error body:`, errBody.slice(0, 300))
+    return []
+  }
+  const data = await res.json() as NewsApiResp
+  const arts = data.articles || []
+  console.log(`[collectNewsAPI:${label}] articles count:`, arts.length, 'total:', data.totalResults)
+  return arts
+}
+
 export async function collectNewsAPI(): Promise<FeedItem[]> {
   const key = process.env.NEWS_API_KEY
   console.log('[collectNewsAPI] env key present:', !!key)
@@ -259,37 +281,29 @@ export async function collectNewsAPI(): Promise<FeedItem[]> {
     console.warn('[collectNewsAPI] missing NEWS_API_KEY → skip')
     return []
   }
+  let articles: NewsApiArticle[] = []
   try {
-    const url = `https://newsapi.org/v2/everything?q=${encodeURIComponent('한국')}&language=ko&sortBy=popularity&pageSize=20&apiKey=${key}`
-    const res = await fetch(url)
-    console.log('[collectNewsAPI] response status:', res.status)
-    if (!res.ok) {
-      const errBody = await res.text().catch(() => '')
-      console.warn('[collectNewsAPI] error body:', errBody.slice(0, 300))
-      return []
+    // 1차 시도: google-news 소스 + korea 키워드
+    const url1 = `https://newsapi.org/v2/top-headlines?sources=google-news&q=${encodeURIComponent('korea')}&apiKey=${key}`
+    articles = await newsApiFetch(url1, 'top-headlines')
+    // 1차가 비었으면 2차 시도
+    if (articles.length === 0) {
+      console.log('[collectNewsAPI] primary empty → trying everything fallback')
+      const url2 = `https://newsapi.org/v2/everything?q=${encodeURIComponent('kpop OR korea trend')}&language=en&sortBy=popularity&pageSize=20&apiKey=${key}`
+      articles = await newsApiFetch(url2, 'everything')
     }
-    const data = await res.json() as {
-      status?: string
-      totalResults?: number
-      articles?: Array<{
-        title?: string
-        description?: string
-        url?: string
-        source?: { name?: string }
-      }>
-    }
-    console.log('[collectNewsAPI] articles count:', (data.articles || []).length, 'total:', data.totalResults)
-    return (data.articles || []).map((a, i) => ({
-      source: `newsapi:${a.source?.name || 'ko'}`,
-      title: a.title || '',
-      excerpt: (a.description || '').slice(0, 200),
-      engagement: Math.max(0, 60 - i * 2),
-      url: a.url,
-    })).filter(x => x.title.length > 0)
   } catch (e) {
     console.error('[collectNewsAPI] exception:', e)
     return []
   }
+  console.log('[collectNewsAPI] final articles count:', articles.length)
+  return articles.map((a, i) => ({
+    source: `newsapi:${a.source?.name || 'kr'}`,
+    title: a.title || '',
+    excerpt: (a.description || '').slice(0, 200),
+    engagement: Math.max(0, 60 - i * 2),
+    url: a.url,
+  })).filter(x => x.title.length > 0)
 }
 
 // ─────────────────────────────────────────────
