@@ -8111,11 +8111,12 @@ async function autoLoadAllImageSlots(){
     if(slideData && Array.isArray(slideData.entities) && slideData.entities.length){
       for(var ei = 0; ei < slideData.entities.length; ei++){
         var ent = slideData.entities[ei];
-        if(!ent || !ent.name) continue;
+        if(!ent || (!ent.name && !ent.name_en)) continue;
         try {
-          var entRes = await fetch('/api/cardnews/entity-image?type=' + encodeURIComponent(ent.type || 'book') + '&name=' + encodeURIComponent(ent.name), {
-            headers: h, credentials:'include'
-          });
+          var entUrl = '/api/cardnews/entity-image?type=' + encodeURIComponent(ent.type || 'book');
+          if(ent.name) entUrl += '&name=' + encodeURIComponent(ent.name);
+          if(ent.name_en) entUrl += '&name_en=' + encodeURIComponent(ent.name_en);
+          var entRes = await fetch(entUrl, { headers: h, credentials:'include' });
           var entJ = await entRes.json();
           if(entJ && entJ.ok && entJ.url && !usedUrls[entJ.url]){
             entityResult = entJ;

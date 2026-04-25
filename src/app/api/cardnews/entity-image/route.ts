@@ -12,8 +12,9 @@ export async function GET(req: NextRequest) {
   const url = new URL(req.url)
   const type = (url.searchParams.get('type') || 'book') as EntityType
   const name = (url.searchParams.get('name') || '').trim()
-  if (!name) return NextResponse.json({ ok: false, error: 'name_required' }, { status: 400 })
-  const result = await fetchEntityImage({ type, name })
+  const nameEn = (url.searchParams.get('name_en') || '').trim()
+  if (!name && !nameEn) return NextResponse.json({ ok: false, error: 'name_required' }, { status: 400 })
+  const result = await fetchEntityImage({ type, name, name_en: nameEn })
   return NextResponse.json(result, {
     headers: result.ok ? { 'Cache-Control': 'public, max-age=86400' } : {},
   })

@@ -564,10 +564,24 @@ title/text 에 "슬라이드 N"·"N장" 같은 라벨 절대 쓰지 마. 이건 
 - type: "product" (특정 제품명 — 라네즈 워터슬리핑마스크, 아이허브 비타민C 등)
 - type: "brand" (브랜드 — 스타벅스, 올리브영, 무신사)
 - type: "place" (특정 장소 — 강남 삼원가든, 제주 협재해변)
-- name: 정확한 한국어/영어 명칭 (검색 가능한 형태)
+- name: 정확한 한국어 명칭
+- **name_en: 영어 원제·영문명** (책은 거의 모두 있음, 알면 반드시 명시)
+  · 《원씽》 → name_en: "The ONE Thing"
+  · 《미드나잇 라이브러리》 → name_en: "The Midnight Library"
+  · 《돈의 심리학》 → name_en: "The Psychology of Money"
+  · 라네즈 → name_en: "Laneige"
+  · 올리브영 → name_en: "Olive Young"
 
 → 이 정보로 백엔드가 실제 책표지·제품 이미지를 fetch 해서 슬롯에 넣음.
 → 모르겠으면 entities 배열은 비워둬. 지어내지 마.
+
+## 🔴 role 필드 사용 시 필수 추가 필드
+role 을 hook2/body/cta 외 다른 값으로 쓸 거면 해당 필드 **반드시** 채울 것:
+- role: "checklist" → "list": [{"ok": true|false, "text": "..."}] 3~6개 필수
+- role: "number"    → "big_number": "...", "sub": "..." 필수
+- role: "toc"       → "items": ["...", ...] 3~5개 필수
+
+이 필드들이 빠지면 슬라이드가 빈 화면으로 보임. 못 채울 거면 그냥 role: "body" 로 작성.
 `
 }
 

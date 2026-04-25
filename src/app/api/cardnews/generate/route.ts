@@ -169,14 +169,27 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // title·text 앞에 '[슬라이드 N]' 같은 라벨이 붙어있으면 제거 (시작 부분만, 본문 손상 방지)
+    // title·text 앞 [슬라이드 N] 라벨 제거 + role 별 필수 필드 검증
     if (Array.isArray(parsed.body)) {
       const prefixRe = /^\s*\[?\s*슬라이드\s*\d+\s*[·\]\-:]\s*/
-      parsed.body = parsed.body.map(b => ({
-        ...b,
-        title: (b.title || '').replace(prefixRe, '').trim(),
-        text: (b.text || '').replace(prefixRe, '').trim(),
-      }))
+      parsed.body = parsed.body.map(b => {
+        const cleaned: BodySlide = {
+          ...b,
+          title: (b.title || '').replace(prefixRe, '').trim(),
+          text: (b.text || '').replace(prefixRe, '').trim(),
+        }
+        // role 별 필수 필드 빠지면 일반 body 로 강등 (빈 슬라이드 방지)
+        if (cleaned.role === 'checklist' && (!Array.isArray(cleaned.list) || cleaned.list.length < 2)) {
+          cleaned.role = 'body'
+        }
+        if (cleaned.role === 'number' && !cleaned.big_number) {
+          cleaned.role = 'body'
+        }
+        if (cleaned.role === 'toc' && (!Array.isArray(cleaned.items) || cleaned.items.length < 2)) {
+          cleaned.role = 'body'
+        }
+        return cleaned
+      })
     }
 
     // 후킹 점수 서버측 재검증 (Claude 자체평가 참고)

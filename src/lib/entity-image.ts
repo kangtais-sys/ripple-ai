@@ -118,26 +118,52 @@ async function fetchOpenLibrary(name: string): Promise<EntityImageResult> {
 
 // ─────────────────────────────────────────────
 // 메인 디스패처
+//   name (한국어) 우선, name_en (영어 원제) 도 받아서 fallback
 // ─────────────────────────────────────────────
 export async function fetchEntityImage(args: {
   type: EntityType
   name: string
+  name_en?: string
 }): Promise<EntityImageResult> {
   const name = (args.name || '').trim()
-  if (!name) return { ok: false, error: 'no_name' }
+  const nameEn = (args.name_en || '').trim()
+  if (!name && !nameEn) return { ok: false, error: 'no_name' }
 
   if (args.type === 'book') {
-    // 한국 책·작가는 Wikipedia 한국어가 표지 가지고 있는 경우 多
-    const w = await fetchWikipedia(name, 'ko')
-    if (w.ok) return w
-    const g = await fetchGoogleBooks(name)
-    if (g.ok) return g
-    const o = await fetchOpenLibrary(name)
-    if (o.ok) return o
+    // 1) Wikipedia 한국어 — 한국 책·작가
+    if (name) {
+      const w = await fetchWikipedia(name, 'ko')
+      if (w.ok) return w
+    }
+    // 2) Google Books 한국어 (키 있으면 안정)
+    if (name) {
+      const g = await fetchGoogleBooks(name)
+      if (g.ok) return g
+    }
+    // 3) Google Books 영어 원제로 재시도
+    if (nameEn) {
+      const ge = await fetchGoogleBooks(nameEn)
+      if (ge.ok) return ge
+    }
+    // 4) Open Library — 영어 원제로 매칭률 매우 높음
+    if (nameEn) {
+      const oe = await fetchOpenLibrary(nameEn)
+      if (oe.ok) return oe
+    }
+    if (name) {
+      const o = await fetchOpenLibrary(name)
+      if (o.ok) return o
+    }
     return { ok: false, error: 'book_not_found' }
   }
-  // 제품·브랜드·장소 → Wikipedia 우선 (공식 정보)
-  const w = await fetchWikipedia(name, 'ko')
-  if (w.ok) return w
+  // 제품·브랜드·장소 → Wikipedia 한국어 → 영어 원제 → 영어
+  if (name) {
+    const w = await fetchWikipedia(name, 'ko')
+    if (w.ok) return w
+  }
+  if (nameEn) {
+    const we = await fetchWikipedia(nameEn, 'en')
+    if (we.ok) return we
+  }
   return { ok: false, error: 'entity_not_found' }
 }
