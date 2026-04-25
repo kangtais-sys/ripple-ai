@@ -8086,22 +8086,57 @@ function setImageSlot(wrap, url, meta){
     wrap.dataset.attrPhotographerUrl = '';
   }
 }
-// 편집 캔버스 전체 슬롯 자동 로드 — 중복 이미지 방지 + 직렬 호출 (다양한 결과)
+// 편집 캔버스 전체 슬롯 자동 로드
+//   우선순위:
+//     1) 슬라이드 데이터에 entities 가 있으면 → 실존 이미지 fetch (Google Books / Wikipedia)
+//     2) 실패하면 → Unsplash/Pexels/Pixabay 키워드 검색
 async function autoLoadAllImageSlots(){
   var slots = document.querySelectorAll('.edt-slide .edt-el.img');
   if(!slots.length) return;
   var cat = createData.category || '';
   var h = await authHeaders();
   var usedUrls = {};
-  // 직렬 호출 (병렬보다 느리지만 같은 API 쿼터 중복 소비 방지 + 각 결과 보고 다음 slot 은 다른 키워드 시도)
+  // bodySlides 의 entities 정보 (slide index → entities)
+  var bodySlides = createData.bodySlides || [];
   for(var i = 0; i < slots.length; i++){
     var slot = slots[i];
     if(slot.querySelector('img') || slot.querySelector('video')) continue;
     slot.dataset.loading = '1';
     var kw = slot.dataset.keyword || '';
     var idx = parseInt(slot.dataset.slideIdx || '0', 10);
+    // 1) entity 이미지 시도 (해당 슬라이드 entities 가 있으면)
+    //    slide 0 = cover, slide 1+ = bodySlides[idx - 1]
+    var entityResult = null;
+    var slideData = idx >= 1 ? bodySlides[idx - 1] : null;
+    if(slideData && Array.isArray(slideData.entities) && slideData.entities.length){
+      for(var ei = 0; ei < slideData.entities.length; ei++){
+        var ent = slideData.entities[ei];
+        if(!ent || !ent.name) continue;
+        try {
+          var entRes = await fetch('/api/cardnews/entity-image?type=' + encodeURIComponent(ent.type || 'book') + '&name=' + encodeURIComponent(ent.name), {
+            headers: h, credentials:'include'
+          });
+          var entJ = await entRes.json();
+          if(entJ && entJ.ok && entJ.url && !usedUrls[entJ.url]){
+            entityResult = entJ;
+            usedUrls[entJ.url] = true;
+            break;
+          }
+        } catch(e){ /* fallback */ }
+      }
+    }
+    if(entityResult){
+      setImageSlot(slot, entityResult.url, {
+        photographer: ent.name + ' (실제 이미지)',
+        sourceLabel: entityResult.source === 'google_books' ? 'Google Books'
+                   : entityResult.source === 'wikipedia' ? 'Wikipedia'
+                   : 'Open Library',
+        attributionUrl: '',
+      });
+      continue;
+    }
+    // 2) 키워드 기반 stock 이미지 (기존 플로우)
     var j = null;
-    // 최대 3회 재시도 (중복이면 다른 키워드 추가)
     for(var attempt = 0; attempt < 3; attempt++){
       var q = attempt === 0 ? kw : (kw + ' ' + ['close-up','scene','minimal'][attempt - 1]);
       var params = new URLSearchParams({ q: q, category: cat, slide: String(idx) }).toString();
@@ -8112,7 +8147,7 @@ async function autoLoadAllImageSlots(){
           usedUrls[j.url] = true;
           break;
         }
-        j = null; // 중복이면 다시 시도
+        j = null;
       } catch(e){ j = null; }
     }
     if(j && j.url){

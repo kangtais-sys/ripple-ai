@@ -91,6 +91,7 @@ export async function POST(req: NextRequest) {
     if (!match) return NextResponse.json({ error: 'parse failed', raw: text }, { status: 502 })
 
     type ChecklistItem = { ok?: boolean; text?: string }
+    type Entity = { type?: 'book' | 'product' | 'brand' | 'place'; name?: string }
     type BodySlide = {
       role?: string
       title?: string
@@ -99,6 +100,7 @@ export async function POST(req: NextRequest) {
       big_number?: string        // role=number
       sub?: string               // role=number
       items?: string[]           // role=toc
+      entities?: Entity[]        // 실존 책·제품·브랜드·장소 — 이미지 자동 매칭용
     }
     type Parsed = {
       hook?: string
