@@ -8318,33 +8318,19 @@ function makeTocEl(opts){
   return wrap;
 }
 // CTA 액션 — 심플 아이콘 row (덜 촌스럽게)
+// 2.3: pill 3개 → minimal hairline. "저장/댓글/팔로우" 직접 노출 X
+//   대신 얇은 구분선 + 작은 sign-off
 function makeCtaPillsEl(opts){
   var wrap = document.createElement('div');
-  wrap.className = 'edt-el edt-cta-pills';
-  wrap.style.cssText = 'position:absolute;left:' + opts.x + '%;top:' + opts.y + '%;width:' + opts.w + '%;display:flex;gap:14%;justify-content:center;pointer-events:none;z-index:6;font-family:Pretendard,sans-serif';
-  var items = [
-    { icon:'💬', label:'댓글' },
-    { icon:'🔖', label:'저장' },
-    { icon:'+', label:'팔로우', isFollow:true },
-  ];
-  items.forEach(function(p){
-    var cell = document.createElement('div');
-    cell.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:6px';
-    var ico = document.createElement('div');
-    if(p.isFollow){
-      ico.style.cssText = 'width:36px;height:36px;border-radius:50%;background:' + opts.accent + ';color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:900;line-height:1';
-      ico.textContent = p.icon;
-    } else {
-      ico.style.cssText = 'font-size:26px;line-height:1';
-      ico.textContent = p.icon;
-    }
-    var lbl = document.createElement('div');
-    lbl.style.cssText = 'font-size:10.5px;font-weight:700;color:' + opts.textColor + ';letter-spacing:-.2px';
-    lbl.textContent = p.label;
-    cell.appendChild(ico);
-    cell.appendChild(lbl);
-    wrap.appendChild(cell);
-  });
+  wrap.className = 'edt-el edt-cta-signoff';
+  wrap.style.cssText = 'position:absolute;left:' + opts.x + '%;top:' + opts.y + '%;width:' + opts.w + '%;display:flex;flex-direction:column;align-items:flex-start;gap:6px;pointer-events:none;z-index:6;font-family:Pretendard,sans-serif';
+  var line = document.createElement('div');
+  line.style.cssText = 'width:32px;height:1.5px;background:' + opts.accent + ';opacity:.85';
+  var label = document.createElement('div');
+  label.style.cssText = 'font-size:10.5px;font-weight:600;color:' + opts.textColor + ';letter-spacing:.18em;opacity:.7;text-transform:uppercase';
+  label.textContent = 'thanks for reading';
+  wrap.appendChild(line);
+  wrap.appendChild(label);
   return wrap;
 }
 // 수치·출처·책제목 자동 볼드 + 줄바꿈 힌트 (non-breaking space) 주입
@@ -8676,14 +8662,28 @@ function getImageBrightness(imgEl){
 function applyTextColorByImageBrightness(slotEl, imgEl){
   var slide = slotEl.closest('.edt-slide');
   if(!slide) return;
-  // 슬라이드 텍스트 요소들에만 적용 (이미지/영상 슬롯은 제외)
   var textEls = slide.querySelectorAll('.edt-el.text, .edt-el.eyebrow, .edt-el.cover-title, .edt-el.cover-sub');
   if(!textEls.length) return;
   var brightness = getImageBrightness(imgEl);
   var dark = brightness < 128;
+  applyDarkOrLight(textEls, dark);
+}
+// 템플릿 기준 텍스트 색 결정 (이미지 brightness 실패하거나 이미지 없는 슬라이드 용)
+function applyTextColorByTemplate(slotOrSlide){
+  var slide = slotOrSlide.classList && slotOrSlide.classList.contains('edt-slide')
+    ? slotOrSlide : (slotOrSlide.closest && slotOrSlide.closest('.edt-slide'));
+  if(!slide) return;
+  var textEls = slide.querySelectorAll('.edt-el.text, .edt-el.eyebrow, .edt-el.cover-title, .edt-el.cover-sub');
+  if(!textEls.length) return;
+  var bg = (slide.style.background || slide.style.backgroundColor || '').trim();
+  // RGB(R,G,B) 또는 #HEX 추출 → 밝기 추정
+  var dark = isDarkColor(bg);
+  applyDarkOrLight(textEls, dark);
+}
+// 공통 적용
+function applyDarkOrLight(textEls, dark){
   textEls.forEach(function(el){
-    // 유저가 직접 색 바꿨으면 (data-user-color) 건드리지 않음
-    if(el.dataset.userColor === '1') return;
+    if(el.dataset.userColor === '1') return; // 유저가 직접 색 바꿨으면 보호
     if(dark){
       el.style.color = '#FFFFFF';
       el.style.textShadow = '0 2px 8px rgba(0,0,0,0.6)';
@@ -8691,6 +8691,34 @@ function applyTextColorByImageBrightness(slotEl, imgEl){
       el.style.color = '#111111';
       el.style.textShadow = 'none';
     }
+  });
+}
+// hex/rgb → brightness < 128 판정
+function isDarkColor(cssColor){
+  if(!cssColor) return false;
+  var m = cssColor.match(/#([0-9A-Fa-f]{3,8})/);
+  if(m){
+    var hex = m[1];
+    if(hex.length === 3) hex = hex.split('').map(function(c){return c+c;}).join('');
+    var r = parseInt(hex.slice(0,2), 16);
+    var g = parseInt(hex.slice(2,4), 16);
+    var b = parseInt(hex.slice(4,6), 16);
+    return (r*0.299 + g*0.587 + b*0.114) < 128;
+  }
+  var rgb = cssColor.match(/rgba?\((\d+)\s*,\s*(\d+)\s*,\s*(\d+)/);
+  if(rgb){
+    var r2 = +rgb[1], g2 = +rgb[2], b2 = +rgb[3];
+    return (r2*0.299 + g2*0.587 + b2*0.114) < 128;
+  }
+  return false;
+}
+// 슬라이드 생성 직후/edtGoto 시 호출 — 모든 슬라이드 텍스트 색 동기화
+function applyAllSlidesTextColor(){
+  if(!edtSlides) return;
+  edtSlides.forEach(function(slide){
+    // 이미지가 있으면 onload 가 처리, 없으면 템플릿 배경 기준
+    var hasImg = slide.querySelector('.edt-el.img img');
+    if(!hasImg) applyTextColorByTemplate(slide);
   });
 }
 
@@ -8707,12 +8735,16 @@ function setImageSlot(wrap, url, meta){
   var img = document.createElement('img');
   img.src = url;
   img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;border-radius:0';
-  img.crossOrigin = 'anonymous';
-  // 로딩 성공 시 밝기 감지 → 슬라이드 텍스트 색상 자동 전환
+  // 2.3: crossOrigin 제거 — picsum 등 CORS 헤더 없는 소스도 로딩되게 (canvas brightness 는 best-effort)
+  // 로딩 성공 시 밝기 감지 (CORS 가능 이미지만 brightness 계산 성공, 안되면 템플릿 기준으로 fallback)
   img.onload = function(){
-    try { applyTextColorByImageBrightness(wrap, img); } catch(e){}
+    try { applyTextColorByImageBrightness(wrap, img); }
+    catch(e){
+      // 밝기 측정 실패 (대부분의 경우) → 템플릿 기준 폴백
+      try { applyTextColorByTemplate(wrap); } catch(e2){}
+    }
   };
-  // 1차 실패 → fallbackUrl(picsum 등) 시도, 그것도 실패하면 placeholder
+  // 1차 실패 → fallbackUrl(picsum 등) 시도, 그것도 실패하면 picsum 새로
   var triedFallback = false;
   img.onerror = function(){
     if(!triedFallback && meta && meta.fallbackUrl){
@@ -8722,7 +8754,6 @@ function setImageSlot(wrap, url, meta){
     }
     if(!triedFallback){
       triedFallback = true;
-      // 마지막 보루: picsum 무조건 성공
       img.src = 'https://picsum.photos/seed/ssobi-fallback-' + Math.floor(Math.random() * 1e6) + '/1080/1080';
       return;
     }
@@ -8987,8 +9018,6 @@ function initEditor(){
   // 7장 구조: 0=후킹(cover), 1=후킹심화(intro), 2..N-3=본론(body), N-2=요약(summary), N-1=CTA
   //   N<6 이면 summary 슬라이드 생략. N<4 이면 intro 슬라이드 생략.
   var N = parsed.length;
-  var hasIntro = N >= 4;
-  var hasSummary = N >= 6;
   var tpl = createData.template;
   var kws = Array.isArray(createData.imageKeywords) ? createData.imageKeywords : [];
   parsed.forEach(function(p, i){
@@ -8996,10 +9025,11 @@ function initEditor(){
     sl.className = 'edt-slide'+(i===0?' on':'');
     sl.style.background = tplBg(tpl);
     var isCover = i===0;
-    var isIntro = hasIntro && i===1;
-    var isSummary = hasSummary && i===N-2;
     var isEnding = i===N-1;
-    var kind = isCover ? 'cover' : isIntro ? 'intro' : isSummary ? 'summary' : isEnding ? 'cta' : 'body';
+    // 2.3: hook2/intro/summary 자동 변형 모드 제거 — 모든 본문은 일반 body 로 통일
+    var isIntro = false;
+    var isSummary = false;
+    var kind = isCover ? 'cover' : isEnding ? 'cta' : 'body';
     var layout = tplImageLayout(tpl, kind);
     var kw = kws[i] || p.title || titleTxt;
 
@@ -9170,10 +9200,13 @@ function initEditor(){
   renderEdtNav();
   // 텍스트 auto-fit — 첫 슬라이드(visible)만 지금 실행. 나머지는 edtGoto 로 넘어갈 때 실행.
   if(edtSlides[0]){ requestAnimationFrame(function(){ fitTextsInSlide(edtSlides[0]); }); }
+  // 슬라이드별 텍스트 색 동기화 (템플릿 배경 기준 — 이미지 로드 후엔 brightness 가 덮어씀)
+  setTimeout(applyAllSlidesTextColor, 50);
   // 이미지 로드 → 끝나면 본문 1장에 영상 자동 삽입 (race 방지)
   setTimeout(function(){
     autoLoadAllImageSlots().then(function(){
       autoPlaceVideoInBody();
+      applyAllSlidesTextColor();
     }).catch(function(){ autoPlaceVideoInBody(); });
   }, 100);
 }
