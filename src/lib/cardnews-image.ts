@@ -274,9 +274,20 @@ function cleanQuery(q: string): string {
 }
 
 // ─────────────────────────────────────────────
-// 메인 체인 — 키 있는 첫 번째 provider 가 성공하면 반환
-// Unsplash → Pexels → Pixabay. 전부 실패하면 프론트가 placeholder 렌더.
+// 메인 체인 — 다단계 fallback (실패율 최소화)
+//   1. Unsplash (카테고리 키워드)
+//   2. Pexels (카테고리 키워드)
+//   3. Pixabay (카테고리 키워드)
+//   4. Unsplash (대체 키워드 — 카테고리 generic)
+//   5. Pexels (대체 키워드)
+//   6. Unsplash (포괄 키워드 — "lifestyle aesthetic")
 // ─────────────────────────────────────────────
+const FALLBACK_QUERIES = [
+  'aesthetic lifestyle photography',
+  'minimal aesthetic',
+  'soft natural light',
+]
+
 export async function fetchCardnewsImage(args: {
   koKeyword?: string
   category?: CategoryKey
@@ -284,10 +295,19 @@ export async function fetchCardnewsImage(args: {
 }): Promise<ImageResult> {
   const enQuery = cleanQuery(toEnKeyword(args))
   const errs: string[] = []
+  // 1차: 카테고리 키워드로 3 provider 시도
   for (const provider of [fetchUnsplash, fetchPexels, fetchPixabay]) {
     const r = await provider(enQuery)
     if (r.ok) return r
-    errs.push(r.error)
+    errs.push(`${provider.name}:${r.error}`)
+  }
+  // 2차: 포괄 fallback 키워드 — 어떤 주제든 매칭되는 일반 감성 이미지
+  for (const fbQuery of FALLBACK_QUERIES) {
+    for (const provider of [fetchUnsplash, fetchPexels]) {
+      const r = await provider(fbQuery)
+      if (r.ok) return r
+      errs.push(`fb-${provider.name}:${r.error}`)
+    }
   }
   return { ok: false, error: 'all_failed', detail: errs.join(' | ') }
 }

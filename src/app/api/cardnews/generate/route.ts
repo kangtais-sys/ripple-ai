@@ -169,28 +169,46 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // title·text 앞 [슬라이드 N] 라벨 제거 + role 별 필수 필드 검증
+    // title·text 정제: [슬라이드 N] 라벨 제거 + 이모지 전면 제거 + role 강제 일반화
     if (Array.isArray(parsed.body)) {
       const prefixRe = /^\s*\[?\s*슬라이드\s*\d+\s*[·\]\-:]\s*/
-      parsed.body = parsed.body.map(b => {
-        const cleaned: BodySlide = {
+      // 이모지 정규식 (텍스트 내 모든 이모지/픽토그램/심볼 제거)
+      // CTA 슬라이드만 ❤️🔖➕💬 일부 액션 심볼 허용
+      const emojiRe = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{1F000}-\u{1F02F}\u{1F0A0}-\u{1F0FF}\u{1F100}-\u{1F1FF}\u{1F200}-\u{1F2FF}\u{1F300}-\u{1F5FF}\u{1F600}-\u{1F64F}\u{1F680}-\u{1F6FF}\u{1F700}-\u{1F77F}\u{1F780}-\u{1F7FF}\u{1F800}-\u{1F8FF}\u{1F900}-\u{1F9FF}\u{1FA00}-\u{1FA6F}\u{1FA70}-\u{1FAFF}]/gu
+      // CTA 에서 보존할 안전한 이모지 (저장·팔로우·댓글 액션 심볼)
+      const safeCta = /[❤️🔖➕💬👇✓✅]/g
+      parsed.body = parsed.body.map((b, idx) => {
+        const isLast = idx === parsed.body!.length - 1
+        const isCta = b.role === 'cta' || isLast
+        let title = (b.title || '').replace(prefixRe, '').trim()
+        let text = (b.text || '').replace(prefixRe, '').trim()
+        // 이모지 제거 (CTA 는 액션 심볼 보존)
+        if (!isCta) {
+          title = title.replace(emojiRe, '').replace(/\s{2,}/g, ' ').trim()
+          text = text.replace(emojiRe, '').replace(/\s{2,}/g, ' ').trim()
+        } else {
+          // CTA 도 일반 이모지 제거하되 ❤️🔖➕💬 만 보존
+          title = title.replace(emojiRe, m => safeCta.test(m) ? m : '').replace(/\s{2,}/g, ' ').trim()
+          text = text.replace(emojiRe, m => safeCta.test(m) ? m : '').replace(/\s{2,}/g, ' ').trim()
+        }
+        return {
           ...b,
-          title: (b.title || '').replace(prefixRe, '').trim(),
-          text: (b.text || '').replace(prefixRe, '').trim(),
+          // 모든 role 을 body / cta 둘 중 하나로 강제 (checklist/number/toc 제거)
+          role: isCta ? 'cta' : (b.role === 'hook2' ? 'hook2' : 'body'),
+          title,
+          text,
+          // 특수 필드 제거 (사용 안 함)
+          list: undefined,
+          big_number: undefined,
+          sub: undefined,
+          items: undefined,
         }
-        // role 별 필수 필드 빠지면 일반 body 로 강등 (빈 슬라이드 방지)
-        if (cleaned.role === 'checklist' && (!Array.isArray(cleaned.list) || cleaned.list.length < 2)) {
-          cleaned.role = 'body'
-        }
-        if (cleaned.role === 'number' && !cleaned.big_number) {
-          cleaned.role = 'body'
-        }
-        if (cleaned.role === 'toc' && (!Array.isArray(cleaned.items) || cleaned.items.length < 2)) {
-          cleaned.role = 'body'
-        }
-        return cleaned
       })
     }
+    // hook 과 cover_subtitle 의 이모지도 제거
+    const stripEmoji = (s?: string) => (s || '').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{1F000}-\u{1F9FF}]/gu, '').replace(/\s{2,}/g, ' ').trim()
+    parsed.hook = stripEmoji(parsed.hook)
+    parsed.cover_subtitle = stripEmoji(parsed.cover_subtitle)
 
     // 후킹 점수 서버측 재검증 (Claude 자체평가 참고)
     const serverScore = parsed.hook ? scoreHook(parsed.hook).total : 0
