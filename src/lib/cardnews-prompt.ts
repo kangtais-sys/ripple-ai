@@ -555,6 +555,11 @@ ${BANNED_PHRASES.map(p => `  · "${p}"`).join('\n')}
 {
   "hook": "후킹 제목 한 줄 (15자 이내)",
   "cover_subtitle": "부제목 한 줄 (20자 이내)",
+  "alt_hooks": [
+    { "type": "number",  "text": "숫자 충격형 후킹 (예: 강남 50만원 시술 vs 3만원 크림)" },
+    { "type": "fomo",    "text": "소외감형 후킹 (예: 이거 모르면 평생 손해)" },
+    { "type": "reverse", "text": "반전형 후킹 (예: 의사들이 절대 안 알려주는 것)" }
+  ],
   "hook_score": 8,
   "body": [
     { "role": "hook2",  "title": "이중 후킹 소제목", "text": "인스타 2번째 단독 노출 대비 다른 각도 후킹 2~3줄", "entities": [] },

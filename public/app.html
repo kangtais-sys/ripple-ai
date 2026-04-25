@@ -481,6 +481,20 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .create-step{display:none}.create-step.on{display:block}
 .trend-list{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
 .trend-list > .trend-card{width:100%;margin-bottom:0}
+/* ── 추천 카드 v2 (PART 3 spec) ── */
+.trend-card.v2{display:block !important;padding:14px 16px;background:#fff;border:1px solid var(--b);border-radius:16px;margin-bottom:10px;cursor:pointer;transition:all .15s;font-family:'Pretendard',sans-serif}
+.trend-card.v2:active{transform:scale(.99);border-color:var(--mint)}
+.tc-top{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.tc-chip{padding:3px 9px;border-radius:5px;background:var(--mint-l);color:var(--mint-d);font-size:10.5px;font-weight:800;letter-spacing:-.2px;flex-shrink:0}
+.tc-pattern{font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.05em;flex-shrink:0}
+.tc-trend{flex:1;height:5px;background:#F3F4F6;border-radius:3px;overflow:hidden;min-width:36px}
+.tc-trend-fill{height:100%;background:linear-gradient(90deg,var(--mint),var(--mint-d));border-radius:3px;transition:width .4s}
+.tc-trend-num{font-size:10.5px;font-weight:800;color:var(--mint-d);font-variant-numeric:tabular-nums;flex-shrink:0;min-width:22px;text-align:right}
+.tc-title{font-size:15.5px;font-weight:900;color:var(--t1);line-height:1.4;letter-spacing:-.4px;margin-bottom:10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:keep-all}
+.tc-badges{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.tc-badge{font-size:10.5px;font-weight:700;color:var(--t2);background:var(--bg);padding:3px 8px;border-radius:5px;letter-spacing:-.2px}
+.tc-stale{font-size:10px;font-weight:600;color:var(--t3);padding:3px 8px}
+.tc-action{font-size:12px;font-weight:800;color:var(--mint-d);letter-spacing:-.2px;display:flex;align-items:center;gap:4px;padding-top:8px;border-top:1px dashed var(--b)}
 /* 얇은 1줄 "처음이면" 바 */
 .first-bar{width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:16px;border:1px solid var(--b);background:linear-gradient(90deg,#F0FDF9,#EEF2FF);color:var(--t1);cursor:pointer;margin-bottom:14px;font-family:'Pretendard',sans-serif;transition:transform .1s,border-color .15s}
 .first-bar:active{transform:scale(.99);border-color:var(--mint)}
@@ -2229,6 +2243,14 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       </div>
       <button class="direct-gen" id="direct-gen-btn" disabled onclick="generatePrompt()" style="margin-top:10px">카드뉴스 생성하기</button>
     </div>
+  </div>
+
+  <!-- STEP B: 후킹 3개 후보 선택 -->
+  <div class="create-step" id="cs-hook-pick">
+    <div style="font-size:18px;font-weight:800;color:var(--t1);letter-spacing:-.4px;margin-bottom:6px">어떤 첫 문장이 더 끌려?</div>
+    <div style="font-size:12.5px;color:var(--t2);margin-bottom:16px;line-height:1.5">가장 마음에 드는 걸 골라줘. 이걸 기준으로 전체를 맞출게.</div>
+    <div id="hp-list" style="display:flex;flex-direction:column;gap:10px"></div>
+    <button class="btn-l" style="margin-top:14px;width:100%;background:#fff;border:1px solid var(--b);color:var(--t2);padding:12px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer" onclick="hpSkipPick()">원래 후킹으로 진행</button>
   </div>
 
   <!-- STEP 2: 생성된 프롬프트 확인 -->
@@ -5020,7 +5042,74 @@ function goStep(n){
   }
   window.scrollTo(0,0);
 }
-function createBack(){ if(createStep>1) goStep(createStep-1); }
+function createBack(){
+  if(createStep>1) return goStep(createStep-1);
+  // hook-pick 화면에서 뒤로가면 cs-1 로
+  var hp = document.getElementById('cs-hook-pick');
+  if(hp && hp.classList.contains('on')){
+    hp.classList.remove('on');
+    var s1 = document.getElementById('cs-1'); if(s1) s1.classList.add('on');
+    var back = document.getElementById('create-back'); if(back) back.style.display='none';
+  }
+}
+// hook 3개 후보 선택 (STEP B)
+var HOOK_PATTERN_LABEL = {
+  number:  { tag:'숫자 충격형',   icon:'#', desc:'숫자로 즉시 호기심' },
+  fomo:    { tag:'소외감형',     icon:'!', desc:'나만 모르는 듯한 긴장감' },
+  reverse: { tag:'반전형',       icon:'?', desc:'예상을 뒤엎는 한 마디' }
+};
+function showHookPicker(mainHook, altHooks){
+  document.querySelectorAll('.create-step').forEach(function(e){ e.classList.remove('on'); });
+  var step = document.getElementById('cs-hook-pick');
+  if(!step){ goStep(2); return; }
+  step.classList.add('on');
+  var back = document.getElementById('create-back');
+  if(back) back.style.display = 'flex';
+  var title = document.getElementById('create-hdr-title');
+  if(title) title.textContent = '첫 문장 선택';
+  // 옵션 = 메인 hook + alt_hooks (중복 제거, 최대 3개)
+  var opts = [];
+  if(mainHook){ opts.push({ type:'main', text: mainHook }); }
+  (altHooks||[]).forEach(function(a){
+    if(!a || !a.text) return;
+    if(opts.some(function(o){ return o.text.trim() === a.text.trim(); })) return;
+    opts.push({ type: a.type || 'number', text: a.text });
+  });
+  opts = opts.slice(0, 3);
+  var list = document.getElementById('hp-list');
+  list.innerHTML = '';
+  opts.forEach(function(o, i){
+    var pat = HOOK_PATTERN_LABEL[o.type] || { tag:'추천', icon:String(i+1), desc:'AI 추천 후킹' };
+    var card = document.createElement('button');
+    card.type = 'button';
+    card.className = 'hp-card';
+    card.style.cssText = 'all:unset;display:block;width:100%;background:#fff;border:1.5px solid var(--b);border-radius:14px;padding:16px 14px;cursor:pointer;transition:all .14s;text-align:left;box-sizing:border-box';
+    card.onmouseenter = function(){ card.style.borderColor = 'var(--mint)'; card.style.background = 'var(--mint-l)'; };
+    card.onmouseleave = function(){ card.style.borderColor = 'var(--b)'; card.style.background = '#fff'; };
+    card.onclick = function(){ pickHook(o.text); };
+    var safeText = (o.text||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    card.innerHTML =
+      '<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px">'+
+        '<span style="background:var(--mint);color:#fff;font-size:9px;font-weight:800;padding:3px 7px;border-radius:5px;letter-spacing:.3px">'+pat.tag+'</span>'+
+        '<span style="font-size:10.5px;color:var(--t3);font-weight:600">'+pat.desc+'</span>'+
+      '</div>'+
+      '<div style="font-size:15.5px;font-weight:800;color:var(--t1);line-height:1.45;letter-spacing:-.3px">'+safeText+'</div>';
+    list.appendChild(card);
+  });
+  window.scrollTo(0,0);
+}
+function pickHook(text){
+  if(!text) return;
+  createData.hook = text;
+  var el = document.getElementById('cs2-hook');
+  if(el) el.textContent = text;
+  // 선택된 hook 으로 첫 슬라이드(표지) 동기화
+  if(Array.isArray(createData.bodySlides) && createData.bodySlides[0]){
+    // bodySlides 는 본문(2장~)만 보유 — 표지는 hook 으로 별도 렌더라 추가 동기화 불필요
+  }
+  goStep(2);
+}
+function hpSkipPick(){ pickHook(createData.hook); }
 // 추천 주제 풀 — 매일 9시 3개 로테이션
 var DAILY_TOPIC_POOL = [
   // 뷰티/제품
@@ -5080,25 +5169,57 @@ function pickDailyTrends(){
 // 트렌드 카드 렌더
 //   1순위: /api/trends/today 에서 오늘 Claude가 TREND_RESEARCH_PROMPT 로 뽑은 추천
 //   2순위: DAILY_TOPIC_POOL 에서 seeded 셔플 (네트워크 실패 시 폴백)
+// 트렌드 지수 바 + hook 패턴 뱃지 + 카테고리 칩
+//   각 카드: 카테고리 칩 + 트렌드 점수 바 (0~100) + 제목 (2줄) + 뱃지 1~2 + 버튼
 function renderDailyTrendsStatic(picks, freshness){
   var container = document.getElementById('trend-carousel');
   if(!container) return;
   window.__DAILY_TRENDS = picks;
+  // 패턴별 기본 뱃지 매핑 (트렌드 카드 인덱스 → 패턴)
+  var hookPatterns = ['숫자 충격형', '소외감형', '반전형'];
+  var defaultBadges = [
+    ['저장 많음', '지금 뜨는 주제'],
+    ['팔로우 유도 강함'],
+    ['댓글 유도 강함', '캡처각'],
+  ];
   container.innerHTML = picks.map(function(t, i){
-    var chip = t.chip || (t.category ? t.category.replace(/_/g, ' ') : 'AI 추천');
-    var meta = t.meta || t.why || '';
-    return '<div class="trend-card" onclick="useTrend('+(i+1)+')">' +
-      '<div class="trend-rank r'+(i+1)+'">'+(i+1)+'</div>' +
-      '<div class="trend-body-wrap">' +
-        '<div class="trend-src"><span class="trend-src-chip src-reddit">'+escapeHtml(chip)+'</span>'+
-          (freshness === 'stale' ? '<span style="margin-left:6px;font-size:9px;color:var(--t3);font-weight:600">어제자</span>' : '')+
-        '</div>' +
-        '<div class="trend-hook">'+escapeHtml(t.topic)+'</div>' +
-        '<div class="trend-meta">'+escapeHtml(meta)+'</div>' +
+    var chip = t.chip || (t.category ? labelizeCategory(t.category) : 'AI 추천');
+    var trendScore = typeof t.trend_score === 'number' ? t.trend_score : (75 - i * 10);
+    var pattern = t.hook_type || hookPatterns[i] || hookPatterns[0];
+    var badges = Array.isArray(t.badges) && t.badges.length ? t.badges : defaultBadges[i] || ['추천'];
+    return '<div class="trend-card v2" onclick="useTrend('+(i+1)+')">' +
+      // 상단: 카테고리 칩 + 트렌드 지수 바
+      '<div class="tc-top">' +
+        '<span class="tc-chip">'+escapeHtml(chip)+'</span>' +
+        '<span class="tc-pattern">'+escapeHtml(pattern)+'</span>' +
+        '<div class="tc-trend"><div class="tc-trend-fill" style="width:'+Math.max(8, Math.min(100, trendScore))+'%"></div></div>' +
+        '<span class="tc-trend-num">'+Math.round(trendScore)+'</span>' +
       '</div>' +
-      '<div class="trend-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
+      // 중단: 제목 (2줄 허용)
+      '<div class="tc-title">'+escapeHtml(t.topic)+'</div>' +
+      // 뱃지 + freshness
+      '<div class="tc-badges">' +
+        badges.slice(0, 2).map(function(b){
+          var ico = b.indexOf('저장') >= 0 ? '✦' : b.indexOf('팔로우') >= 0 ? '↗' : b.indexOf('댓글') >= 0 ? '💬' : b.indexOf('뜨는') >= 0 ? '🔥' : b.indexOf('캡처') >= 0 ? '📸' : '✓';
+          return '<span class="tc-badge">'+ico+' '+escapeHtml(b)+'</span>';
+        }).join('') +
+        (freshness === 'stale' ? '<span class="tc-stale">어제자</span>' : '') +
+      '</div>' +
+      // 하단: 액션
+      '<div class="tc-action">→ 이 주제로 만들기</div>' +
     '</div>';
   }).join('');
+}
+
+// category key → 한글 표기
+function labelizeCategory(c){
+  return ({
+    beauty:'뷰티', beauty_treatment:'뷰티 시술', beauty_product:'뷰티 제품',
+    food:'음식', cafe:'카페', travel:'여행', travel_domestic:'국내여행', travel_abroad:'해외여행',
+    fashion:'패션', interior:'인테리어', book:'독서', baby:'육아', fit:'운동',
+    fitness:'운동', money:'재테크', money_tip:'재테크', life:'라이프', life_tip:'라이프',
+    trend:'트렌드', etc:'AI 추천',
+  })[c] || c;
 }
 // 같은 주제 풀에서 매번 다른 3개를 꺼내도록 "더보기" 호출 횟수 누적 시드
 var _trendShuffleOffset = 0;
@@ -5218,6 +5339,7 @@ async function generatePrompt(){
     createData.caption = j.caption || '';
     createData.imageKeywords = Array.isArray(j.image_keywords) ? j.image_keywords : [];
     createData.category = j.category || '';
+    createData.altHooks = Array.isArray(j.alt_hooks) ? j.alt_hooks : [];
     createData._lastJobId = j.job_id;
     createData._captionEdited = false;  // 새 생성 → 유저 편집 플래그 리셋
     createData._editorSource = null;     // 에디터 캔버스 재생성 강제
@@ -5226,7 +5348,12 @@ async function generatePrompt(){
     renderBodyAsCards(createData.bodySlides);
     document.getElementById('cs2-caption').textContent = j.caption || '';
     createData._lastSource = 'direct:'+topic;
-    goStep(2);
+    // alt_hooks 가 있으면 STEP B (3개 중 하나 고르는 화면) 노출
+    if(createData.altHooks && createData.altHooks.length >= 2){
+      showHookPicker(j.hook, createData.altHooks);
+    } else {
+      goStep(2);
+    }
   } catch(e) {
     // fallback: 로컬 템플릿
     console.warn('[cardnews] Claude 실패, 폴백 사용:', e);

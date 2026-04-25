@@ -102,9 +102,11 @@ export async function POST(req: NextRequest) {
       items?: string[]           // role=toc
       entities?: Entity[]        // 실존 책·제품·브랜드·장소 — 이미지 자동 매칭용
     }
+    type AltHook = { type?: 'number' | 'fomo' | 'reverse'; text?: string }
     type Parsed = {
       hook?: string
       cover_subtitle?: string
+      alt_hooks?: AltHook[]
       hook_score?: number
       body?: BodySlide[]
       caption?: string
@@ -264,6 +266,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       hook: parsed.hook || '',
       cover_subtitle: parsed.cover_subtitle || '',
+      alt_hooks: parsed.alt_hooks || [],
       hook_score: claudeScore,
       hook_score_server: serverScore,
       body: parsed.body || [],
