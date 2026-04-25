@@ -40,6 +40,8 @@ const CATEGORY_VIDEO_EN: Record<CategoryKey, string[]> = {
   review: ['product review', 'unboxing', 'product close up'],
   life_tip: ['daily lifestyle', 'morning routine', 'home life'],
   book: ['reading book', 'library aesthetic', 'book pages'],
+  baby: ['mother baby home', 'baby playing toys', 'newborn lifestyle'],
+  pet: ['dog playing home', 'cat stretching', 'pet lifestyle'],
   etc: ['daily lifestyle', 'aesthetic minimal', 'cozy moment'],
 }
 

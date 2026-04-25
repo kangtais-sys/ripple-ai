@@ -118,6 +118,16 @@ const CATEGORY_EN_KEYWORDS: Record<CategoryKey, string[]> = {
     'reading coffee aesthetic',
     'bookshelf aesthetic film',
   ],
+  baby: [
+    'mother and baby aesthetic photography',
+    'newborn lifestyle minimal',
+    'cozy family home aesthetic',
+  ],
+  pet: [
+    'pet lifestyle photography',
+    'cute dog cat aesthetic',
+    'cozy pet home minimal',
+  ],
   etc: [
     'daily aesthetic photography',
     'lifestyle aesthetic film',

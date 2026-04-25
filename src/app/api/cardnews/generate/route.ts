@@ -132,7 +132,7 @@ export async function POST(req: NextRequest) {
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 4096,
+        max_tokens: 8000,
         messages: [{ role: 'user', content: prompt }],
       }),
     })
@@ -196,7 +196,7 @@ export async function POST(req: NextRequest) {
         },
         body: JSON.stringify({
           model: 'claude-sonnet-4-20250514',
-          max_tokens: 4096,
+          max_tokens: 8000,
           messages: [{ role: 'user', content: retryPrompt }],
         }),
       })
@@ -231,6 +231,9 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // 메타 라벨 자동 제거: AI 가 본문에 박는 "(참고용)/(검증 필요)/(주관적)..." 시스템성 라벨 차단
+    //   괄호 안 키워드만 제거 — 비괄호 패턴은 본문 라인 통째 삭제 위험 있어 시스템 프롬프트로만 차단
+    const metaRe = /\s*[\(（[【]\s*(?:참고용|참고|검증\s*필요|검증필요|주관적|개인적\s*의견|개인적인\s*의견|개인의견|예시|예시일\s*뿐|단지\s*참고|일반적|보통|대략|아마도|출처\s*없음)\s*[\)）\]】]/g
     // title·text 정제: [슬라이드 N] 라벨 제거 + 이모지 전면 제거 + role 강제 일반화
     if (Array.isArray(parsed.body)) {
       const prefixRe = /^\s*\[?\s*슬라이드\s*\d+\s*[·\]\-:]\s*/
@@ -242,8 +245,8 @@ export async function POST(req: NextRequest) {
       parsed.body = parsed.body.map((b, idx) => {
         const isLast = idx === parsed.body!.length - 1
         const isCta = b.role === 'cta' || isLast
-        let title = (b.title || '').replace(prefixRe, '').trim()
-        let text = (b.text || '').replace(prefixRe, '').trim()
+        let title = (b.title || '').replace(prefixRe, '').replace(metaRe, '').trim()
+        let text = (b.text || '').replace(prefixRe, '').replace(metaRe, '').trim()
         // 이모지 제거 (CTA 는 액션 심볼 보존)
         if (!isCta) {
           title = title.replace(emojiRe, '').replace(/\s{2,}/g, ' ').trim()
@@ -267,8 +270,8 @@ export async function POST(req: NextRequest) {
         }
       })
     }
-    // hook 과 cover_subtitle 의 이모지도 제거
-    const stripEmoji = (s?: string) => (s || '').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{1F000}-\u{1F9FF}]/gu, '').replace(/\s{2,}/g, ' ').trim()
+    // hook 과 cover_subtitle 의 이모지·메타 라벨도 제거
+    const stripEmoji = (s?: string) => (s || '').replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{1F000}-\u{1F9FF}]/gu, '').replace(metaRe, '').replace(/\s{2,}/g, ' ').trim()
     parsed.hook = stripEmoji(parsed.hook)
     parsed.cover_subtitle = stripEmoji(parsed.cover_subtitle)
 
@@ -298,7 +301,7 @@ export async function POST(req: NextRequest) {
             },
             body: JSON.stringify({
               model: 'claude-sonnet-4-20250514',
-              max_tokens: 4096,
+              max_tokens: 8000,
               messages: [{ role: 'user', content: fixPrompt }],
             }),
           })
@@ -356,13 +359,21 @@ export async function POST(req: NextRequest) {
     const cat = (parsed.category as ReturnType<typeof classifyCategory>) || category
     const imagePlan = planSlideImages({ topic, category: cat, slideCount })
 
-    // 캡션 자동 조립 (Claude가 비웠을 경우)
+    // 캡션 자동 조립 (Claude가 비웠을 경우) + 메타 라벨 제거
     const caption = ensureCaption({
       rawCaption: parsed.caption,
       hook: parsed.hook || topic,
       bodySlides: parsed.body || [],
       category: cat,
-    })
+    }).replace(metaRe, '')
+    // 두 번째 retry(hook keyword) 후 body 가 갱신됐을 수 있어 한 번 더 스트립 (안전장치)
+    if (Array.isArray(parsed.body)) {
+      parsed.body = parsed.body.map(b => ({
+        ...b,
+        title: (b.title || '').replace(metaRe, '').trim(),
+        text: (b.text || '').replace(metaRe, '').trim(),
+      }))
+    }
 
     // DB에 잡 기록 (status draft)
     const { data: job } = await sb

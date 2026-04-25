@@ -28,7 +28,7 @@ export async function POST(req: Request) {
 
 판정 기준:
 - high (action=delete): "100% 효과", "무조건", "절대" 류 단정 보장 / "7일 5kg" 류 비현실적 수치 / 출처 없는 통계 ("연구에 따르면" 출처 없음) / 전문가 사칭 ("의사들이 추천하는") / "사람마다 다름" 류 정보 가치 0 문장
-- medium (action=mark): 출처 없는 가격·수치 (애매한 일반 정보) → "(참고용)" 표기 추가 권장
+- medium (action=flag): 출처 없는 가격·수치. UI 에서 issue 로 노출만 — 본문에 라벨 박지 말 것.
 - low: 통과
 
 본문:
@@ -62,19 +62,9 @@ JSON 만 출력. 다른 말 금지.`
     }
   } catch { /* 검증 실패 = 원본 그대로 통과 (비치명) */ }
 
-  // cleaned: high risk 문장은 (검증 필요) 표시, medium 은 (참고용) 표시
-  const cleaned = body.map((s, idx) => {
-    const slideIssues = issues.filter(i => i.slide === idx + 1)
-    let text = s.text || ''
-    for (const iss of slideIssues) {
-      if (!iss.claim) continue
-      const tag = iss.risk === 'high' ? ' (검증 필요)' : iss.risk === 'medium' ? ' (참고용)' : ''
-      if (tag && text.includes(iss.claim)) {
-        text = text.replace(iss.claim, iss.claim + tag)
-      }
-    }
-    return { ...s, text }
-  })
+  // cleaned: 본문에 메타 태그를 박지 않음. 위험 문장은 issues 로 프론트에 노출만 하고
+  //   본문 텍스트는 원본 그대로 — "(참고용)/(검증 필요)" 같은 라벨이 카드뉴스에 박히면 촌스러움.
+  const cleaned = body.map(s => ({ ...s, text: s.text || '' }))
 
   return NextResponse.json({ issues, cleaned })
 }

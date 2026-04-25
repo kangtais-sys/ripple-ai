@@ -15,7 +15,7 @@ export type CategoryKey =
   | 'food' | 'cafe' | 'travel_domestic' | 'travel_abroad'
   | 'fashion' | 'interior' | 'fitness'
   | 'money_tip' | 'price_compare' | 'trend'
-  | 'review' | 'life_tip' | 'book' | 'etc'
+  | 'review' | 'life_tip' | 'book' | 'baby' | 'pet' | 'etc'
 
 export type CategoryInfo = {
   name: string
@@ -165,6 +165,22 @@ export const CATEGORIES: Record<CategoryKey, CategoryInfo> = {
     researchFocus: ['책 제목', '작가', '유명 인용구', '출판 연도', '평점/베스트셀러 기록'],
     hashtags: ['#책스타그램', '#독서', '#북스타그램', '#책추천', '#밑줄'],
   },
+  baby: {
+    name: '육아·아기',
+    tone: '엄마 입장 솔직 톤. 실제 제품·연령·시기 명시',
+    imageDirection: '아기 + 부모 따뜻한 일상 사진 (제품 단독 X, 사용 장면 O)',
+    moodKeywords: ['mother and baby aesthetic', 'newborn lifestyle photography', 'cozy family home'],
+    researchFocus: ['연령대(신생아/돌/이유식)', '제품명·브랜드', '사용 시기', '주의사항', '엄마 후기'],
+    hashtags: ['#육아', '#육아맘', '#육아일기', '#베이비', '#아기'],
+  },
+  pet: {
+    name: '반려동물',
+    tone: '집사·견주 톤. 실제 제품·품종·증상 명시',
+    imageDirection: '반려동물 일상 클로즈업 (펫 + 손 / 펫 + 환경)',
+    moodKeywords: ['pet lifestyle photography', 'cute dog cat aesthetic', 'cozy pet home'],
+    researchFocus: ['품종·연령', '제품명', '동물병원 정보', '주의사항'],
+    hashtags: ['#반려동물', '#멍스타그램', '#냥스타그램', '#견주', '#집사'],
+  },
   etc: {
     name: '기타',
     tone: 'MZ 감성 일상 톤',
@@ -196,6 +212,8 @@ export function classifyCategory(topic: string): CategoryKey {
   if (/트렌드|유행|요즘|인기|MZ|Z세대|밈|핫/.test(topic)) return 'trend'
   if (/리뷰|후기|솔직|써본|사용기/.test(topic)) return 'review'
   if (/책|독서|소설|에세이|자기계발|베스트셀러|북스타그램|한 권|book|novel|reading/i.test(topic)) return 'book'
+  if (/육아|아기|아이|이유식|기저귀|분유|돌|신생아|어린이집|유치원|아기띠|유아|baby|toddler|infant/i.test(topic)) return 'baby'
+  if (/반려|강아지|고양이|개|냥|펫|멍|집사|견주|입양|사료|간식|동물병원|pet|dog|cat/i.test(topic)) return 'pet'
   if (/꿀팁|팁|방법|how to|하는 법/.test(topic)) return 'life_tip'
   return 'etc'
 }
@@ -397,31 +415,33 @@ export function detectScope(topic: string): ScopeKey {
 // ─────────────────────────────────────────────────────────────
 // 카테고리별 템플릿 추천 (자동 첫 선택 + 추천 배지)
 // ─────────────────────────────────────────────────────────────
-export type TemplateKey = 'clean' | 'bold' | 'mag' | 'editorial' | 'mono' | 'pastel' | 'noir' | 'luxury'
-// 2.1 시각 매핑 후 추천 (key: 시각)
-//   clean=CLEAN / bold=DARK / mag=SPLIT / editorial=FILM / mono=MONO / pastel=PASTEL / noir=STATEMENT / luxury=RAW
+// 2026-04 정리: 거친결(luxury) / 필름(editorial) 삭제 — 6개 템플릿만 유지.
+//   clean=베이직 / bold=자정 / mag=매거진 / mono=흑과백 / pastel=소프트 / noir=여백
+export type TemplateKey = 'clean' | 'bold' | 'mag' | 'mono' | 'pastel' | 'noir'
 const TEMPLATE_RECOMMEND: Record<CategoryKey, TemplateKey[]> = {
-  beauty_treatment:  ['clean'],            // CLEAN
-  beauty_product:    ['clean', 'pastel'],  // CLEAN | PASTEL
-  beauty_ingredient: ['clean'],            // CLEAN
-  beauty_trouble:    ['clean'],            // CLEAN
-  food:              ['editorial', 'bold'],// FILM | DARK
-  cafe:              ['editorial', 'pastel'], // FILM | PASTEL
-  travel_domestic:   ['editorial'],        // FILM
-  travel_abroad:     ['bold', 'editorial'],// DARK | FILM
-  fashion:           ['luxury', 'mag'],    // RAW | SPLIT
-  interior:          ['mono', 'pastel'],   // MONO | PASTEL
-  fitness:           ['bold', 'luxury'],   // DARK | RAW
-  money_tip:         ['bold'],             // DARK
-  price_compare:     ['bold', 'clean'],    // DARK | CLEAN
-  trend:             ['bold'],             // DARK
-  review:            ['luxury', 'mono'],   // RAW | MONO
-  life_tip:          ['clean'],            // CLEAN
-  book:              ['noir', 'mono'],     // STATEMENT | MONO
-  etc:               ['clean', 'editorial'],
+  beauty_treatment:  ['clean'],
+  beauty_product:    ['clean', 'pastel'],
+  beauty_ingredient: ['clean'],
+  beauty_trouble:    ['clean'],
+  food:              ['pastel', 'bold'],
+  cafe:              ['pastel', 'clean'],
+  travel_domestic:   ['mag', 'pastel'],
+  travel_abroad:     ['bold', 'mag'],
+  fashion:           ['mag', 'noir'],
+  interior:          ['mono', 'pastel'],
+  fitness:           ['bold', 'mono'],
+  money_tip:         ['bold'],
+  price_compare:     ['bold', 'clean'],
+  trend:             ['bold'],
+  review:            ['mono', 'clean'],
+  life_tip:          ['clean'],
+  book:              ['noir', 'mono'],
+  baby:              ['pastel', 'clean'],
+  pet:               ['pastel', 'clean'],
+  etc:               ['clean', 'pastel'],
 }
 export function recommendTemplates(category: CategoryKey): TemplateKey[] {
-  return TEMPLATE_RECOMMEND[category] || ['clean', 'editorial']
+  return TEMPLATE_RECOMMEND[category] || ['clean', 'pastel']
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -469,6 +489,13 @@ export function angleForSlide(idx: number, slideCount: number): string {
 // ═════════════════════════════════════════════════════════════
 export const TREND_RESEARCH_PROMPT = `너는 한국 MZ 세대 SNS 트렌드 큐레이터다.
 매일 밤 전날 수집된 데이터를 받아 다음 날 올릴 카드뉴스 주제 TOP 3를 추천한다.
+
+## 🔴 추천 주제의 결 (절대 룰)
+- ❌ 노멀하고 평범한 주제 금지: "5가지 스킨케어 꿀팁", "여행 가서 좋은 곳", "다이어트 방법" 같은 일반화 X
+- ✅ 스레드·레딧·X(트위터)·인스타에서 최근 24~72시간 내 engagement 폭발한 *지금 이 순간 핫한* 주제
+- ✅ 구체 브랜드/제품/장소/사건명이 들어간 주제 ("스벅 라이트노트 한정", "런베뮤 신메뉴", "다이소 전자레인지 1500원 냉동 볶음밥")
+- ✅ 대중이 의외라고 느끼는 반전·소수만 아는 정보 ("의사가 절대 안 사는 X", "10년 차가 처음 알게된 Y")
+- 후킹 점수 6 이하면 추천 X. 7~10 만.
 
 ## 소스 리스트 (이 중 뷰·반응 높은 TOP5 추출)
 [해외]
@@ -536,21 +563,29 @@ export function buildContentGenerationPrompt(args: {
   const info = CATEGORIES[cat]
   const ctaPick = CTA_PATTERNS[Math.floor(Math.random() * CTA_PATTERNS.length)]
   const sourceRuleBlock = buildSourceRuleBlock(cat)
-  const toneGuide = args.toneStyle ? `\n[학습된 유저 말투 — 부가 참고용만]\n${JSON.stringify(args.toneStyle, null, 2)}` : ''
   const toneInfo = args.contentTone && CONTENT_TONES[args.contentTone] ? CONTENT_TONES[args.contentTone] : null
+  // 유저가 만들기 탭에서 직접 선택한 어조가 있으면 학습된 말투(toneStyle)는 무시.
+  // 학습된 말투를 같이 주면 두 톤이 섞여서 사용자가 선택한 어조가 흐려짐.
+  const toneGuide = (!toneInfo && args.toneStyle)
+    ? `\n[학습된 유저 말투 — 부가 참고용만]\n${JSON.stringify(args.toneStyle, null, 2)}`
+    : ''
   const contentToneBlock = toneInfo
     ? `
 
-## 🎨 어조 강제 (최우선 · 다른 모든 지시보다 우선)
-유저가 선택한 어조: **${toneInfo.label}**
+## 🎨🎨🎨 어조 강제 (이 prompt 의 최상위 룰 · 다른 모든 지시보다 절대 우선)
 
+유저가 직접 선택한 어조: **${toneInfo.label}**
+
+작동 규칙:
 ${toneInfo.guide}
 
-톤 예시 (반드시 이 느낌으로):
+이 어조의 문장 예시 (반드시 이 느낌·이 종결어미·이 어휘로):
 ${toneInfo.examples}
 
-이 어조가 후킹·본문·CTA 전체에 일관되게 드러나야 함.
-어조에 어긋나면 재작성.
+⛔ 위반 시 즉시 재작성:
+  · hook / cover_subtitle / body 모든 슬라이드 / cta / caption — 6개 영역 전부에 이 어조가 일관되게 드러나야 함.
+  · 다른 톤(친근→다정/시크→재치 등)이 한 문장이라도 섞이면 실패.
+  · 학습된 사용자 말투가 별도로 있더라도 이 어조가 우선. 학습 말투는 어조 안에서만 살릴 것.
 `
     : ''
   const researchBlock = args.researchData?.trim()
@@ -560,7 +595,7 @@ ${toneInfo.examples}
   return `너는 ${args.accountConcept}다.
 아래 실제 조사된 정보로 카드뉴스 ${slideCount}장을 기획해.
 **절대 정보 지어내지 마. 모르면 모른다고 써.**
-
+${contentToneBlock}
 ## 🚨 주제 절대 변경 금지
 입력 주제: "${args.topic}"
 이 주제로만 작성. 다른 주제로 변형하면 즉시 실패.
@@ -575,7 +610,7 @@ ${toneInfo.examples}
   · 출처 없는 통계 (✗ "10명 중 9명이..." → ✓ "(서울대 2023 조사 기준)")
 
 위 주제는 후킹 약하게 가더라도 **안전 우선**. 거짓 정보로 후킹 점수 채우지 마.
-${contentToneBlock}
+
 ## 주제
 "${args.topic}"
 카테고리: ${info.name}
@@ -591,6 +626,11 @@ ${researchBlock}
   · body 배열은 네가 세상에 알려진 충분한 데이터로 반드시 채울 수 있어.
 - 각 슬라이드의 title·text 필드에 "슬라이드 N", "N장", "N번째 슬라이드" 같은 메타 라벨 절대 금지
   · 이건 내부 구조일 뿐. 유저가 읽을 카피만 써.
+- **🚫 시스템성 메타 라벨 본문 진입 절대 금지**
+  · "(참고용)", "(검증 필요)", "(주관적)", "(개인적 의견)", "(예시)", "(일반적)", "(보통)", "(아마도)", "(출처 없음)"
+  · "[출처:..]", "* 주의:", "※ 참고:" 같은 각주성 표기
+  · 사실 확신 없는 정보는 본문에서 통째로 빼고 다른 구체 정보로 대체할 것.
+  · 메타 라벨이 한 글자라도 본문에 들어가면 즉시 재작성.
 - **🚫 이모지 전면 금지** — hook / cover_subtitle / body / cta 어디에도 이모지 0개.
   · 😱 🤯 ✨ 💯 🔥 등 모든 이모티콘 / 픽토그램 / 심볼 사용 금지
   · 이모지 들어가는 순간 카드뉴스 톤이 떨어짐. 텍스트만으로 임팩트 만들어
@@ -793,6 +833,14 @@ title/text 에 "슬라이드 N"·"N장" 같은 라벨 절대 쓰지 마. 이건 
 
 → 이 정보로 백엔드가 실제 책표지·제품 이미지를 fetch 해서 슬롯에 넣음.
 → 모르겠으면 entities 배열은 비워둬. 지어내지 마.
+
+## 🔴 image_keywords 작성 룰 (각 슬라이드와 직접 연관된 영문 키워드)
+- 각 image_keywords[i] 는 body[i] 슬라이드에 **직접 등장하는 구체 명사**(브랜드·제품·장소·상황) + 카테고리 무드를 영어로 조합.
+- ❌ 일반 키워드: "lifestyle", "aesthetic", "background" 단독 금지.
+- ✅ 좋은 예 (본문 = "스타벅스 라이트노트 블론드 라떼"): "starbucks lightnote latte glass cup minimal aesthetic"
+- ✅ 좋은 예 (본문 = "이유식 6개월 단계별 식단"): "korean baby food bowl 6 months minimal flatlay"
+- ✅ 좋은 예 (본문 = "다이소 전자레인지 1500원 냉동 볶음밥"): "korean convenience frozen rice bowl microwave kitchen"
+- 슬라이드 본문에 명시된 단어가 키워드에 1개 이상 들어가야 함. 본문과 따로 노는 무드 컷 X.
 
 ## 🔴 role 필드 사용 시 필수 추가 필드
 role 을 hook2/body/cta 외 다른 값으로 쓸 거면 해당 필드 **반드시** 채울 것:
@@ -1039,17 +1087,45 @@ export function buildCaption(args: {
   return lines.join('\n')
 }
 
-// 서버 응답에서 캡션이 비어있을 때 fallback
+// 서버 응답 캡션이 비거나 부실하면 본문 압축 + 카테고리 해시태그 강제 부착
+//   - Claude 가 만든 캡션이 카테고리와 무관한 해시태그를 박는 경우(육아인데 #일상)도 잡아서 교체
 export function ensureCaption(args: {
   rawCaption?: string | null
   hook: string
   bodySlides: Array<{ title?: string; text?: string; entities?: Array<{ type?: string; name?: string }> }>
   category: CategoryKey
 }): string {
-  if (args.rawCaption && args.rawCaption.trim().length > 10) return args.rawCaption
-  return buildCaption({
-    hook: args.hook,
-    bodySlides: args.bodySlides,
-    category: args.category,
-  })
+  const info = CATEGORIES[args.category]
+  const catTags = info.hashtags.slice(0, 5).join(' ')
+
+  // 1) 캡션 자체가 너무 짧으면 fallback 으로 본문 압축형 캡션 생성
+  if (!args.rawCaption || args.rawCaption.trim().length < 30) {
+    return buildCaption({
+      hook: args.hook,
+      bodySlides: args.bodySlides,
+      category: args.category,
+    })
+  }
+
+  let cap = args.rawCaption.trim()
+
+  // 2) 카테고리 해시태그가 하나도 없으면 → 기존 해시태그 모두 제거하고 카테고리 해시태그 부착
+  const hasCatTag = info.hashtags.some(t => cap.includes(t))
+  if (!hasCatTag) {
+    cap = cap.replace(/#[^\s#]+/g, '').replace(/\n{3,}/g, '\n\n').trim()
+    cap = cap + '\n\n' + catTags
+  } else {
+    // 3) 일부 카테고리 태그 + 다른 무관 태그 섞여있으면 카테고리 태그만 남김
+    const allHashtags = (cap.match(/#[^\s#]+/g) || [])
+    const off = allHashtags.filter(t => !info.hashtags.includes(t))
+    if (off.length > 0) {
+      off.forEach(t => { cap = cap.split(t).join('') })
+      cap = cap.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim()
+      // 누락된 카테고리 태그 보충
+      const missing = info.hashtags.slice(0, 5).filter(t => !cap.includes(t))
+      if (missing.length) cap = cap.trimEnd() + ' ' + missing.join(' ')
+    }
+  }
+
+  return cap
 }

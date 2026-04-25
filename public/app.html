@@ -948,10 +948,10 @@ input:checked+.tsl::before{transform:translateX(18px)}
 
 /* template picker */
 .tpl-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
-.tpl-item{aspect-ratio:4/5;border-radius:14px;border:2px solid var(--b);overflow:hidden;cursor:pointer;position:relative;background:var(--s);transition:border-color .15s}
+.tpl-item{border-radius:0;border:2px solid var(--b);overflow:hidden;cursor:pointer;position:relative;background:var(--s);transition:border-color .15s;display:flex;flex-direction:column}
 .tpl-item.on{border-color:var(--mint)}
-.tpl-prev{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;text-align:center}
-.tpl-name{position:absolute;bottom:8px;left:8px;right:8px;font-size:11px;font-weight:800;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5);text-align:center}
+.tpl-prev{width:100%;aspect-ratio:1;position:relative;overflow:hidden;padding:0}
+.tpl-name{position:static;padding:9px 10px;font-size:12px;font-weight:800;color:var(--t1);text-shadow:none;text-align:left;background:#fff;border-top:1px solid var(--b);letter-spacing:.4px}
 .tpl-my{aspect-ratio:4/5;border-radius:14px;border:1.5px dashed var(--b);background:var(--bg);cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--t3)}
 .tpl-my svg{width:24px;height:24px;stroke:var(--t3);stroke-width:1.5}
 .tpl-my-txt{font-size:12px;font-weight:700;color:var(--t2)}
@@ -1017,8 +1017,14 @@ body.edt-fullscreen #create-back{display:none}
 .edt-size-badge{position:absolute;top:10px;left:10px;background:rgba(0,0,0,.55);backdrop-filter:blur(6px);color:#fff;font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;z-index:6;letter-spacing:.2px}
 .edt-slide{position:absolute;inset:0;display:none}
 .edt-slide.on{display:block}
-.edt-el{position:absolute;cursor:move;padding:4px 6px;border-radius:4px;user-select:none;touch-action:none}
-.edt-el.sel{outline:2px dashed var(--mint);outline-offset:2px}
+.edt-el{position:absolute;cursor:move;padding:0;border-radius:0;user-select:none;touch-action:none;outline:none;background:transparent}
+.edt-el.text[contenteditable=true]{outline:none!important;caret-color:var(--mint);background:transparent}
+/* 텍스트 요소만 박스 일체 비표시 — 글자 그 자체로 떠 있어야 함 */
+.edt-el.text:focus,.edt-el.text:focus-visible{outline:none!important;box-shadow:none}
+.edt-el.text.sel{outline:none}
+/* 이미지 슬롯은 sel 시 핸들/테두리 보여야 드래그·리사이즈 가능 */
+.edt-el.img.sel{outline:2px dashed var(--mint);outline-offset:2px}
+.edt-el.img.sel .edt-hnd{display:block}
 .edt-el.text{font-weight:700;color:var(--t1);line-height:1.7;white-space:pre-wrap;word-break:keep-all;text-align:left}
 .edt-style-row{display:flex;gap:6px;align-items:center;margin-top:10px;flex-wrap:wrap}
 /* 로딩 shimmer — 버튼에 은은한 좌→우 하이라이트 스윕 (텍스트는 그대로 유지) */
@@ -1105,7 +1111,10 @@ body.edt-fullscreen #create-back{display:none}
 .cs2-slide-card.cta .cs2-slide-num{background:#F59E0B}
 .cs2-slide-text{padding:14px 14px;font-size:13.5px;line-height:1.7;color:var(--t1);white-space:pre-wrap;min-height:60px;cursor:text;outline:none;font-family:'Pretendard','Noto Sans KR',sans-serif}
 .cs2-slide-text[contenteditable=true]:focus{background:var(--mint-l)}
-.edt-hnd{position:absolute;right:-6px;bottom:-6px;width:14px;height:14px;background:var(--mint);border:2px solid #fff;border-radius:50%;cursor:nwse-resize;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.edt-hnd{position:absolute;right:-6px;bottom:-6px;width:14px;height:14px;background:var(--mint);border:2px solid #fff;border-radius:50%;cursor:nwse-resize;box-shadow:0 1px 3px rgba(0,0,0,.2);display:none}
+.edt-el.sel .edt-hnd{display:block}
+.edt-el.text .edt-hnd{display:none!important}
+/* 텍스트는 글자 상자 모서리 안 보이고 이미지만 sel 시 코너 핸들 표시 */
 .edt-nav{display:flex;justify-content:center;gap:4px;margin-bottom:10px}
 .edt-dot{width:7px;height:7px;border-radius:50%;background:var(--b);cursor:pointer}
 .edt-dot.on{background:var(--dark);width:20px;border-radius:4px}
@@ -2270,15 +2279,22 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <span style="background:var(--mint);color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px">AI · 내 말투 학습</span>
       <span>내 말투로 작성된 캐러셀 프롬프트</span>
     </div>
-    <div style="background:var(--mint-l);border-radius:16px;padding:16px;margin-bottom:14px;border:1px solid #A7F3D0">
-      <div style="font-size:10px;font-weight:800;color:var(--mint-d);margin-bottom:6px;letter-spacing:.3px">✦ 후킹 멘트 <span style="color:var(--t3);font-weight:600;margin-left:4px">탭해서 수정</span></div>
-      <div id="cs2-hook" class="cs2-edit-field" contenteditable="false" style="font-size:16px;font-weight:800;color:var(--t1);line-height:1.4;margin-bottom:14px;letter-spacing:-.3px;padding:4px 6px;margin-left:-6px;margin-right:-6px;border-radius:6px;cursor:pointer">—</div>
-      <div style="font-size:10px;font-weight:800;color:var(--mint-d);margin-bottom:6px;letter-spacing:.3px">✦ 슬라이드별 본문 <span style="color:var(--t3);font-weight:600;margin-left:4px">탭해서 수정</span></div>
-      <div id="cs2-body-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">—</div>
+    <div style="font-size:10px;font-weight:800;color:var(--t3);margin-bottom:8px;letter-spacing:.3px;text-transform:uppercase">슬라이드별 프롬프트 <span style="font-weight:600;margin-left:4px">탭해서 수정</span></div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
+      <!-- 슬라이드 1: 후킹 제목 — 본문 카드와 동일한 외관 -->
+      <div class="cs2-slide-card cover" data-card="hook">
+        <div class="cs2-slide-head">
+          <div class="cs2-slide-num">1</div>
+          <span>슬라이드 1 · 후킹 제목</span>
+        </div>
+        <div class="cs2-slide-text" id="cs2-hook" contenteditable="false">—</div>
+      </div>
+      <!-- 슬라이드 2..N: 본문 카드 (renderBodyAsCards가 동적으로 채움) -->
+      <div id="cs2-body-list" style="display:flex;flex-direction:column;gap:8px">—</div>
       <div id="cs2-body" style="display:none" contenteditable="false">—</div>
-      <div style="font-size:10px;font-weight:800;color:var(--mint-d);margin-bottom:6px;letter-spacing:.3px">✦ 게시 캡션 <span style="color:var(--t3);font-weight:600;margin-left:4px">탭해서 수정</span></div>
-      <div id="cs2-caption" class="cs2-edit-field" contenteditable="false" style="font-size:12px;color:var(--t1);line-height:1.7;white-space:pre-line;background:#fff;border-radius:10px;padding:12px;cursor:pointer">—</div>
     </div>
+    <div style="font-size:10px;font-weight:800;color:var(--t3);margin-bottom:6px;letter-spacing:.3px;text-transform:uppercase">게시 캡션 <span style="font-weight:600;margin-left:4px">탭해서 수정</span></div>
+    <div id="cs2-caption" class="cs2-edit-field" contenteditable="false" style="font-size:12px;color:var(--t1);line-height:1.7;white-space:pre-line;background:#fff;border:1px solid var(--b);border-radius:10px;padding:12px;cursor:pointer;margin-bottom:14px">—</div>
     <div class="cs2-actions">
       <button class="cs2-act" id="cs2-edit-btn" onclick="cs2ToggleEdit()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -2333,75 +2349,35 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:6px">템플릿 선택</div>
     <div style="font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.55">클릭하면 바로 디자인이 적용돼요.</div>
     <div class="tpl-grid" id="tpl-grid">
-      <!-- CLEAN — 미니멀 화이트 + mint -->
-      <div class="tpl-item on" onclick="selectTpl(this,'clean')" style="background:#FFFFFF">
-        <div class="tpl-prev">
-          <div style="width:30%;height:14px;background:#E8E8E5;margin-bottom:10px;border-radius:1px"></div>
-          <div style="display:flex;align-items:center;gap:5px;margin-bottom:6px"><div style="width:3px;height:14px;background:#00C9A7"></div><div style="font-size:12px;font-weight:800;color:#111;line-height:1.1">간결한<br>한 줄.</div></div>
-          <div style="position:absolute;left:6px;bottom:6px;padding:2px 6px;background:rgba(255,255,255,.92);border:1px solid #00C9A7;font-size:7px;font-weight:800;color:#00C9A7;letter-spacing:.1em">뷰티</div>
-        </div>
-        <div class="tpl-name" style="color:var(--t1);text-shadow:none">CLEAN</div>
+      <!-- 베이직 (clean) — 화이트 미니멀 + mint -->
+      <div class="tpl-item on" onclick="selectTpl(this,'clean')">
+        <div class="tpl-prev"></div>
+        <div class="tpl-name">베이직</div>
       </div>
-      <!-- DARK — 다크 그라데이션 + 형광 -->
-      <div class="tpl-item" onclick="selectTpl(this,'bold')" style="background:linear-gradient(to top, #0A0A0A 0%, #2A2A2A 60%, #4A4A4A 100%)">
-        <div class="tpl-prev">
-          <div style="position:absolute;left:6px;bottom:30px;padding:2px 6px;background:#CCFF00;color:#0A0A0A;font-size:7px;font-weight:900;letter-spacing:.15em">TREND</div>
-          <div style="position:absolute;left:6px;bottom:6px;color:#fff;font-size:11px;font-weight:800;line-height:1.1">제목 굵게<br>두 줄까지</div>
-        </div>
-        <div class="tpl-name">DARK</div>
+      <!-- 자정 (bold) — 다크 + 형광 라임 -->
+      <div class="tpl-item" onclick="selectTpl(this,'bold')">
+        <div class="tpl-prev"></div>
+        <div class="tpl-name">트렌디</div>
       </div>
-      <!-- STATEMENT (key: noir) — 텍스트 중심 다크 -->
-      <div class="tpl-item" onclick="selectTpl(this,'noir')" style="background:#1A1A1A">
-        <div class="tpl-prev">
-          <div style="position:absolute;left:6px;top:0;font-family:'Gowun Batang','Noto Serif KR',serif;font-size:38px;color:#C9A84C;opacity:.15;line-height:.8">"</div>
-          <div style="position:absolute;left:8px;top:18px;font-family:'Gowun Batang','Noto Serif KR',serif;color:#fff;font-size:11px;line-height:1.3">긴 문장이<br>그 자체로<br>비주얼.</div>
-          <div style="position:absolute;right:6px;bottom:6px;font-size:7px;color:#888;font-style:italic">— 출처</div>
-        </div>
-        <div class="tpl-name">STATEMENT</div>
+      <!-- 여백 (noir) — 다크 + 골드 세리프 -->
+      <div class="tpl-item" onclick="selectTpl(this,'noir')">
+        <div class="tpl-prev"></div>
+        <div class="tpl-name">감성</div>
       </div>
-      <!-- RAW (key: luxury) — 풀 이미지 + 다크 하단 -->
-      <div class="tpl-item" onclick="selectTpl(this,'luxury')" style="background:linear-gradient(to top, #0D0D0D 0%, #6B5142 50%, #B89172 100%)">
-        <div class="tpl-prev">
-          <div style="position:absolute;left:6px;bottom:6px;color:#fff;font-family:'Black Han Sans','Pretendard',sans-serif;font-size:14px;line-height:1;letter-spacing:-.5px">RAW<br>STREET</div>
-          <div style="position:absolute;left:6px;top:6px;border:1px solid #fff;padding:2px 5px;font-size:7px;font-weight:800;color:#fff;letter-spacing:.1em">패션</div>
-        </div>
-        <div class="tpl-name">RAW</div>
+      <!-- 매거진 (mag) — 좌이미지 / 우 다크 패널 -->
+      <div class="tpl-item" onclick="selectTpl(this,'mag')">
+        <div class="tpl-prev"></div>
+        <div class="tpl-name">매거진</div>
       </div>
-      <!-- SPLIT (key: mag) — 좌이미지 / 우 다크 패널 -->
-      <div class="tpl-item" onclick="selectTpl(this,'mag')" style="background:linear-gradient(to right, #888 0%, #888 48%, #111 48%, #111 100%)">
-        <div class="tpl-prev">
-          <div style="position:absolute;right:6px;top:8px;padding:2px 6px;background:#00C9A7;color:#0A0A0A;font-size:7px;font-weight:800;letter-spacing:.1em">트렌드</div>
-          <div style="position:absolute;right:6px;top:24px;color:#fff;font-size:11px;font-weight:800;line-height:1.15">좌 이미지<br>우 텍스트</div>
-        </div>
-        <div class="tpl-name">SPLIT</div>
+      <!-- 흑과백 (mono) — 그레이 + 화이트 -->
+      <div class="tpl-item" onclick="selectTpl(this,'mono')">
+        <div class="tpl-prev"></div>
+        <div class="tpl-name">모노</div>
       </div>
-      <!-- FILM (key: editorial) — 필름 감성 + 베이지 라인 -->
-      <div class="tpl-item" onclick="selectTpl(this,'editorial')" style="background:linear-gradient(to top, #1A1512 0%, #6B5142 50%, #C4A882 100%)">
-        <div class="tpl-prev">
-          <div style="position:absolute;left:0;right:0;top:8px;height:1.5px;background:#C4A882"></div>
-          <div style="position:absolute;left:0;right:0;bottom:24px;height:1.5px;background:#C4A882"></div>
-          <div style="position:absolute;right:6px;top:14px;font-size:6px;color:#C4A882;font-weight:800;letter-spacing:.15em">TRAVEL</div>
-          <div style="position:absolute;left:6px;bottom:6px;color:#E8DFD0;font-family:'Nanum Myeongjo',serif;font-size:11px;line-height:1.2">필름 감성<br>여행 기록.</div>
-        </div>
-        <div class="tpl-name">FILM</div>
-      </div>
-      <!-- MONO — 흑백 + 흰 패널 -->
-      <div class="tpl-item" onclick="selectTpl(this,'mono')" style="background:linear-gradient(to bottom, #999 0%, #999 55%, #FAFAFA 55%, #FAFAFA 100%)">
-        <div class="tpl-prev">
-          <div style="position:absolute;left:6px;top:6px;padding:2px 6px;background:#0D0D0D;color:#fff;font-size:7px;font-weight:800;letter-spacing:.1em">취향</div>
-          <div style="position:absolute;left:6px;bottom:14px;color:#111;font-size:11px;font-weight:700;line-height:1.2">시크 모노<br>군더더기 X.</div>
-          <div style="position:absolute;right:6px;bottom:4px;font-size:6.5px;color:#999;letter-spacing:.05em">25 / 12</div>
-        </div>
-        <div class="tpl-name" style="color:var(--t1);text-shadow:none">MONO</div>
-      </div>
-      <!-- PASTEL — 따뜻한 크림 + 코랄 -->
-      <div class="tpl-item" onclick="selectTpl(this,'pastel')" style="background:linear-gradient(to bottom, #FFD7C2 0%, #FFD7C2 55%, #FDF6F0 55%, #FDF6F0 100%)">
-        <div class="tpl-prev">
-          <div style="position:absolute;left:6px;top:6px;padding:2px 6px;background:#F4A5B0;color:#3D2B1F;font-size:7px;font-weight:800;letter-spacing:.1em;border-radius:3px">홈·살림</div>
-          <div style="position:absolute;left:6px;bottom:6px;color:#3D2B1F;font-family:'Gowun Dodum',sans-serif;font-size:11px;font-weight:700;line-height:1.2">따뜻하고<br>사랑스러운.</div>
-          <div style="position:absolute;right:6px;bottom:18px;display:flex;gap:2.5px"><div style="width:4px;height:4px;border-radius:50%;background:#F4A5B0"></div><div style="width:4px;height:4px;border-radius:50%;background:#C4B5FD"></div><div style="width:4px;height:4px;border-radius:50%;background:#A7F3D0"></div></div>
-        </div>
-        <div class="tpl-name" style="color:var(--t1);text-shadow:none">PASTEL</div>
+      <!-- 소프트 (pastel) — 코랄 + 크림 + 둥근 폰트 -->
+      <div class="tpl-item" onclick="selectTpl(this,'pastel')">
+        <div class="tpl-prev"></div>
+        <div class="tpl-name">소프트</div>
       </div>
       <div class="tpl-my" onclick="openMyTpl()">
         <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
@@ -2422,8 +2398,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div style="font-size:11px;color:var(--t3);margin:2px 0 12px" id="edt-mode-hint">드래그로 위치 이동 · 모서리로 크기 조절 · 탭하면 편집</div>
 
     <div class="edt-wrap">
+      <div class="edt-size-badge" id="edt-size-badge" style="position:static;display:inline-block;margin:0 0 8px;background:var(--bg);color:var(--t3);font-size:10.5px;font-weight:700;padding:4px 9px;border-radius:6px;border:1px solid var(--b);letter-spacing:.2px;backdrop-filter:none">정사각 · 1080×1080</div>
       <div class="edt-canvas-wrap sz-sq" id="edt-canvas">
-        <div class="edt-size-badge" id="edt-size-badge">정사각 · 1080×1080</div>
         <div class="edt-arrows prev" onclick="edtNav(-1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
         <div class="edt-arrows next" onclick="edtNav(1)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       </div>
@@ -3499,7 +3475,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div class="ob-step on" id="ob-1">
       <div class="ob-progress"><span class="ob-progress-dot on"></span><span class="ob-progress-dot"></span><span class="ob-progress-dot"></span></div>
       <div class="ob-h1">어떤 주제로 계정을 키울 거야?</div>
-      <div class="ob-sub">관심 있는 주제를 1~3개 골라봐. 나중에 바꿀 수 있어.</div>
+      <div class="ob-sub">메인 주제 하나만 골라줘. 나중에 바꿀 수 있어.</div>
       <div class="ob-grid" id="ob-topics">
         <button type="button" class="ob-chip" data-topic="beauty">뷰티·피부</button>
         <button type="button" class="ob-chip" data-topic="food">음식·맛집</button>
@@ -5000,6 +4976,23 @@ function showDay(k){
 // ═══════════════ CREATE FLOW ═══════════════
 var createStep = 1;
 var createData = { hook:'', body:'', slides:7, size:'sq', template:'clean', channels:['ig'], contentTone:'friendly' };
+// 메타 라벨 제거 — 괄호로 묶인 시스템성 표기만 잡음.
+//   비괄호 패턴(* 참고: ...) 까지 잡으면 실제 본문 라인을 잘라먹어서 본문이 통째 사라지는 버그 발생.
+//   그래서 괄호 안 키워드만 처리. AI 가 비괄호로 박으면 후처리 대신 시스템 프롬프트 룰로 차단.
+var META_LABEL_RE = /\s*[\(（\[【「《]\s*(?:참고용|참고|참조|검증\s*필요|검증필요|확인\s*필요|확인필요|주관적|개인적\s*의견|개인의견|예시|예시일\s*뿐|단지\s*참고|일반적|보통|대략|아마도|추정|예상|TBD|출처\s*없음|출처\s*불명)\s*[\)）\]】」》]/g;
+function stripMetaLabels(s){
+  if(s == null) return s;
+  return String(s).replace(META_LABEL_RE, '').replace(/[ \t]{2,}/g, ' ').trim();
+}
+// 이전 세션에서 저장한 톤·관심 주제·기본 템플릿 복원
+try {
+  var _savedTone = localStorage.getItem('ssobi_content_tone');
+  if(_savedTone) createData.contentTone = _savedTone;
+  var _savedDisc = localStorage.getItem('ssobi_disc_topic');
+  if(_savedDisc) createData._discTopic = _savedDisc;
+  var _savedTpl = localStorage.getItem('ssobi_default_template');
+  if(_savedTpl) { createData.template = _savedTpl; createData._tplManualPick = true; }
+} catch(_){}
 function selectContentTone(btn){
   document.querySelectorAll('.tone-chip').forEach(function(c){
     c.classList.remove('on');
@@ -5014,7 +5007,22 @@ function selectContentTone(btn){
   btn.style.color = 'var(--mint-d)';
   btn.style.fontWeight = '800';
   createData.contentTone = btn.dataset.tone;
+  // 다음 세션에서도 유지
+  try { localStorage.setItem('ssobi_content_tone', btn.dataset.tone); } catch(_){}
 }
+// 페이지 로드 시 createData.contentTone 값에 맞춰 만들기 탭 .tone-chip 동기화
+function syncToneChip(){
+  var tone = createData.contentTone || 'friendly';
+  document.querySelectorAll('.tone-chip').forEach(function(c){
+    var on = c.dataset.tone === tone;
+    c.classList.toggle('on', on);
+    c.style.border = on ? '1.5px solid var(--mint)' : '1.5px solid var(--b)';
+    c.style.background = on ? 'var(--mint-l)' : '#fff';
+    c.style.color = on ? 'var(--mint-d)' : 'var(--t2)';
+    c.style.fontWeight = on ? '800' : '700';
+  });
+}
+document.addEventListener('DOMContentLoaded', syncToneChip);
 // 학습된 내 말투: 친근체, 이모지 (:) 🌿 😊 ✨), 반말X, 감사표현 자주, 체크리스트형
 var trendPresets = {
   1: {
@@ -5044,10 +5052,19 @@ function goStep(n){
   if(title){
     title.textContent = ({1:'만들기',2:'사이즈 설정',3:'템플릿 선택',4:'편집 & 미리보기',5:'게시·예약'})[n];
   }
-  // 템플릿 선택 화면 진입 시 썸네일을 실제 hook 문구로 갱신
+  // 템플릿 선택 화면 진입 시 썸네일 갱신 + 저장된 기본 템플릿 하이라이트
   if(n === 3){
     try { renderTplThumbs(); } catch(_){}
     try { applyTemplateRecommendation(); } catch(_){}
+    // 저장된 기본 템플릿이 있으면 해당 카드에 .on 표시 (createData.template 기준)
+    try {
+      var cur = createData.template;
+      document.querySelectorAll('#tpl-grid .tpl-item').forEach(function(it){
+        var oc = it.getAttribute('onclick') || '';
+        var m = oc.match(/selectTpl\(this,'([^']+)'\)/);
+        it.classList.toggle('on', !!m && m[1] === cur);
+      });
+    } catch(_){}
   }
   if(n===4) {
     // 기존 편집 상태가 있으면 보존 (미리보기/뒤로가기 시 리셋 방지)
@@ -5193,7 +5210,8 @@ function dailySeed(){
 }
 // 시드로 섞어서 3개 고르기 (deterministic)
 function pickDailyTrends(){
-  var seed = dailySeed();
+  // dailySeed + 더보기 클릭 횟수(_trendShuffleOffset) 합쳐 매번 다른 시작점
+  var seed = (dailySeed() + _trendShuffleOffset * 12347) & 0x7fffffff;
   var pool = DAILY_TOPIC_POOL.slice();
   // Fisher–Yates with seeded random
   var rnd = function(){
@@ -5289,10 +5307,12 @@ function renderDailyTrends(){
       return;
     }
   } catch(_){}
-  // ② 관심사 없으면 즉시 폴백 렌더 (네트워크 동안 빈 화면 방지)
+  // ② 관심사 없으면 즉시 폴백 렌더 (offset 따라 매번 다른 3개)
   var fallback = pickDailyTrends();
   renderDailyTrendsStatic(fallback, 'fallback');
-  // ③ 서버 추천 덮어쓰기 (매 호출마다 랜덤 3개 선택)
+  // ③ "더보기" 클릭(offset > 0) 일 때는 server 호출 skip — 클라이언트 풀로만 회전.
+  //    첫 진입에만 server daily_trends 로 덮어쓰기.
+  if(_trendShuffleOffset > 0) return;
   fetch('/api/trends/today', { credentials:'include' })
     .then(function(r){ return r.json(); })
     .then(function(j){
@@ -5357,6 +5377,18 @@ async function generatePrompt(){
     if(!res.ok || !j.hook){
       throw new Error(j.error || 'AI 생성 실패');
     }
+    // 클라이언트 단 메타 라벨 후처리 (서버에서 빠진 패턴 한 번 더 차단)
+    j.hook = stripMetaLabels(j.hook);
+    j.cover_subtitle = stripMetaLabels(j.cover_subtitle);
+    j.caption = stripMetaLabels(j.caption);
+    if(Array.isArray(j.body)){
+      j.body = j.body.map(function(b){
+        return Object.assign({}, b, {
+          title: stripMetaLabels(b.title || ''),
+          text: stripMetaLabels(b.text || ''),
+        });
+      });
+    }
     // body: [{title,text}, ...] → 텍스트 블록으로 플래튼 (슬라이드 2~N 번호)
     //   슬라이드 1 = 표지(hook) 는 cs2-hook 에 별도 표시, 본문에는 2부터 번호
     var bodyText = (j.body||[]).map(function(b, i){
@@ -5370,6 +5402,7 @@ async function generatePrompt(){
     createData.body = bodyText;
     createData.bodySlides = j.body || [];  // 원본 슬라이드 배열 보존 (발행 시 캐러셀용)
     createData.caption = j.caption || '';
+    createData._videoAutoPlaced = false;  // 새 생성 → 영상 자동 삽입 다시 시도
     createData.imageKeywords = Array.isArray(j.image_keywords) ? j.image_keywords : [];
     createData.category = j.category || '';
     createData.altHooks = Array.isArray(j.alt_hooks) ? j.alt_hooks : [];
@@ -5473,6 +5506,14 @@ async function regenPrompt(){
     });
     var j = await res.json();
     if(!res.ok || !j.hook) throw new Error(j.error || 'AI 재생성 실패');
+    // 클라이언트 단 메타 라벨 후처리
+    j.hook = stripMetaLabels(j.hook);
+    j.caption = stripMetaLabels(j.caption);
+    if(Array.isArray(j.body)){
+      j.body = j.body.map(function(b){
+        return Object.assign({}, b, { title: stripMetaLabels(b.title || ''), text: stripMetaLabels(b.text || '') });
+      });
+    }
     var bodyText = (j.body||[]).map(function(b, i){
       return '[슬라이드 '+(i+1)+'] '+(b.title||'')+'\n'+(b.text||'');
     }).join('\n\n');
@@ -5508,6 +5549,18 @@ async function regenPrompt(){
     }
   }
 }
+// 카드/필드 클릭 → 편집 모드 자동 진입 (탭하면 바로 수정 가능)
+document.addEventListener('click', function(e){
+  var hook = e.target.closest('#cs2-hook');
+  var cap = e.target.closest('#cs2-caption');
+  var body = e.target.closest('#cs2-body-list .cs2-slide-text');
+  var any = hook || cap || body;
+  if(!any) return;
+  if(any.getAttribute('contenteditable') === 'true') return;
+  cs2EnableEdit();
+  // 클릭한 곳에 캐럿 위치
+  setTimeout(function(){ any.focus(); }, 0);
+});
 // 편집 모드 토글 (cs2 프롬프트)
 function cs2ToggleEdit(){
   var editing = document.getElementById('cs2-hook').getAttribute('contenteditable')==='true';
@@ -5628,7 +5681,11 @@ function selectTpl(el, t, isAuto){
   document.querySelectorAll('#tpl-grid .tpl-item').forEach(function(e){ e.classList.remove('on'); });
   el.classList.add('on');
   createData.template = t;
-  if(!isAuto) createData._tplManualPick = true;
+  if(!isAuto){
+    createData._tplManualPick = true;
+    // 유저가 직접 고른 템플릿은 기본값으로 저장 → 다음부터는 자동 적용
+    try { localStorage.setItem('ssobi_default_template', t); } catch(_){}
+  }
   // 개인화 누적: 자주 쓰는 템플릿 학습 (debounce: 짧게 여러개 눌러도 마지막만 기록)
   clearTimeout(window._tplPrefTimer);
   window._tplPrefTimer = setTimeout(function(){
@@ -5684,9 +5741,15 @@ var discoverData = {
         link:'linktr.ee/seoul_beauty'}
     ],
     trends:[
-      {hook:'한국인이 절대 안 하는 7가지 스킨케어 실수 🌿', src:['Reddit','IG'], meta:'🔥 Hot · r/AsianBeauty 2.8k'},
-      {hook:'피부과 의사가 절대 안 사는 성분 3가지', src:['X','Threads'], meta:'📈 급상승 · 12k 인용'},
-      {hook:'2026 유행 글래스 스킨, 진짜 꿀팁', src:['TikTok','IG'], meta:'✨ #슬로우뷰티 8.4k'}
+      {hook:'30대가 결국 정착한 토너 4개', src:['Reddit','IG'], meta:'🔥 저장 12k'},
+      {hook:'피부과 의사가 절대 안 사는 성분 3가지', src:['X','Threads'], meta:'📈 인용 12k'},
+      {hook:'민감 피부, 메디큐브 vs 닥터지 솔직 비교', src:['IG','TikTok'], meta:'✨ 후기 폭발'},
+      {hook:'올영 세일 때만 사는 베스트 5선', src:['IG'], meta:'🛒 세일 트래픽 1위'},
+      {hook:'다이소 뷰티템, 이건 진짜 사야 함', src:['TikTok','Threads'], meta:'💬 공감 9k'},
+      {hook:'트러블 폭발기, 진짜 효과 본 한 달 후기', src:['Reddit'], meta:'📈 저장 7k'},
+      {hook:'5만원 이하 K-뷰티 풀세트 짜는 법', src:['IG'], meta:'🔥 카드뉴스 강세'},
+      {hook:'2026 봄 글래스 스킨, 한국인 버전', src:['TikTok','IG'], meta:'✨ #슬로우뷰티 8.4k'},
+      {hook:'한국인이 절대 안 하는 7가지 스킨케어 실수', src:['Reddit'], meta:'🔥 r/AsianBeauty 2.8k'}
     ]
   },
   fashion: {
@@ -5697,9 +5760,15 @@ var discoverData = {
       {h:'@daily.ootd.kr', f:'9.2만', s:'매일 한 장 OOTD · 예산별 룩북'}
     ],
     trends:[
-      {hook:'이번 봄 절대 사면 안 되는 옷 5가지', src:['X','IG'], meta:'🔥 트렌드 급상승'},
-      {hook:'돈 안 쓰고 세련돼 보이는 법 3가지', src:['Threads','IG'], meta:'📈 공유 15k'},
-      {hook:'2026 봄 스트리트, 한 장으로 끝', src:['TikTok','IG'], meta:'✨ #OOTD 6.2k'}
+      {hook:'키 작은 사람만 아는 진짜 잘 어울리는 비율', src:['Threads','IG'], meta:'💬 공감 18k'},
+      {hook:'무신사 베스트 1주차, 이건 진짜', src:['IG','X'], meta:'🛒 클릭 폭발'},
+      {hook:'자라 vs 코스, 같은 디자인 솔직 비교', src:['Reddit'], meta:'📈 후기 8k'},
+      {hook:'30대가 결국 사게 되는 가방 4개', src:['IG','Threads'], meta:'🔥 저장 11k'},
+      {hook:'9만원 이하 봄 트렌치, 실패 없는 4선', src:['TikTok','IG'], meta:'✨ #OOTD 7k'},
+      {hook:'단정한데 멋있어 보이는 직장인 룩 7가지', src:['IG'], meta:'📈 저장 급상승'},
+      {hook:'5만원으로 봄 데일리룩 풀코디', src:['TikTok'], meta:'💬 공유 9k'},
+      {hook:'후드티만 입어도 세련돼 보이는 법', src:['Threads','IG'], meta:'✨ 인용 6k'},
+      {hook:'이번 봄 절대 사면 안 되는 옷 5가지', src:['X','IG'], meta:'🔥 트렌드 급상승'}
     ]
   },
   food: {
@@ -5710,8 +5779,14 @@ var discoverData = {
       {h:'@seoul_eater', f:'22만', s:'서울 맛집 릴스 · 오픈런 정보'}
     ],
     trends:[
-      {hook:'한 번 해먹으면 끊을 수 없는 레시피 5', src:['Reddit','IG'], meta:'🔥 저장 폭발'},
-      {hook:'에어프라이어 진짜 쓸 만한 레시피', src:['TikTok'], meta:'📈 댓글 3.4k'},
+      {hook:'편의점 신메뉴, 진짜 맛있는 거 5개', src:['IG','Threads'], meta:'🔥 후기 폭발'},
+      {hook:'다이소 1500원 마라탕, 직접 만들어봄', src:['TikTok'], meta:'📈 조회 23k'},
+      {hook:'자취생이 매일 해먹는 5분 레시피', src:['Reddit','IG'], meta:'💾 저장 10k'},
+      {hook:'에어프라이어, 이건 무조건 해보세요', src:['TikTok'], meta:'💬 댓글 3.4k'},
+      {hook:'외식보다 싸고 더 맛있는 한 그릇', src:['IG','Reddit'], meta:'🔥 공유 8k'},
+      {hook:'백종원 레시피 진짜 따라해본 결과', src:['IG'], meta:'✨ 후기 9k'},
+      {hook:'1만원 이하 망원동 진짜 맛집 5', src:['IG','TikTok'], meta:'📍 위치 저장 많음'},
+      {hook:'직장인 도시락, 30분이면 끝나는 레시피', src:['Threads'], meta:'💬 공감 7k'},
       {hook:'요즘 애들은 카페 가면 이거 먹어요', src:['X','IG'], meta:'✨ #카페스타그램'}
     ]
   },
@@ -5723,9 +5798,15 @@ var discoverData = {
       {h:'@slow.seoul', f:'18만', s:'주말 루틴 · 집안 스타일링'}
     ],
     trends:[
-      {hook:'혼자 사는데 뭐가 제일 힘들어요?', src:['Threads','IG'], meta:'💬 공감 폭발'},
-      {hook:'주말 아침을 바꾸는 3가지 습관', src:['IG','Reddit'], meta:'📈 저장 8k'},
-      {hook:'이건 진짜 사길 잘했다 — 혼자 살기', src:['X','TikTok'], meta:'🔥 리뷰 쏟아짐'}
+      {hook:'1인 가구가 진짜 사길 잘한 가전 5', src:['Reddit','IG'], meta:'🔥 저장 14k'},
+      {hook:'다이소에서 사면 후회 안 하는 살림템', src:['TikTok','IG'], meta:'📈 클릭 9k'},
+      {hook:'잠 안 올 때, 진짜 효과 본 3가지', src:['Reddit'], meta:'💬 공감 11k'},
+      {hook:'무지출 데이, 한 달 시도해본 결과', src:['Threads','X'], meta:'✨ 후기 8k'},
+      {hook:'평일 점심을 바꾸는 작은 변화', src:['IG'], meta:'💾 저장 6k'},
+      {hook:'이사 갈 때 진짜 버려야 할 5가지', src:['Threads'], meta:'💬 공유 7k'},
+      {hook:'1만원 한도 살림 쇼핑, 이건 무조건', src:['IG','TikTok'], meta:'🛒 트래픽 폭발'},
+      {hook:'혼자 사는데 적적할 때 보는 콘텐츠', src:['X','IG'], meta:'❤️ 공감 9k'},
+      {hook:'평일 저녁 30분, 진짜 잘 보내는 법', src:['Threads','IG'], meta:'📈 저장 8k'}
     ]
   },
   fit: {
@@ -5736,9 +5817,15 @@ var discoverData = {
       {h:'@run.seoul', f:'6.8만', s:'러닝 루트 + 초보 팁'}
     ],
     trends:[
-      {hook:'헬스장 안 가도 되는 홈트 루틴 5', src:['Reddit','IG'], meta:'🔥 저장 9k'},
-      {hook:'다이어트 정체기 진짜 뚫는 법', src:['X','Threads'], meta:'📈 공감 12k'},
-      {hook:'필라테스 3개월, 내 몸은 이렇게', src:['TikTok','IG'], meta:'✨ before/after'}
+      {hook:'헬스 초보가 절대 하면 안 되는 것 3', src:['Reddit','IG'], meta:'📈 저장 10k'},
+      {hook:'다이어트 정체기 진짜 뚫는 법', src:['X','Threads'], meta:'💬 공감 12k'},
+      {hook:'매일 30분, 4주 후 이렇게 변했어요', src:['TikTok','IG'], meta:'✨ before/after'},
+      {hook:'단백질 셰이크 vs 그릭요거트, 어떤 게', src:['Reddit'], meta:'🔥 후기 7k'},
+      {hook:'헬스장 안 가도 살 빠지는 홈트 루틴', src:['IG'], meta:'💾 저장 9k'},
+      {hook:'필라테스 3개월, 몸 변화 솔직 기록', src:['IG','TikTok'], meta:'✨ before/after'},
+      {hook:'운동 진짜 못하는 사람용 5분 코어', src:['Threads'], meta:'❤️ 공감 8k'},
+      {hook:'요가 매트 5만원 이하 진짜 추천', src:['IG'], meta:'🛒 클릭 6k'},
+      {hook:'다이어트 도시락, 일주일 식단 정리', src:['Reddit','IG'], meta:'📈 저장 11k'}
     ]
   },
   baby: {
@@ -5750,8 +5837,14 @@ var discoverData = {
     ],
     trends:[
       {hook:'신생아맘이 절대 안 사도 되는 물건 5', src:['IG','Threads'], meta:'💬 공감 18k'},
-      {hook:'아이 재우는 3가지 과학적 방법', src:['Reddit'], meta:'📈 저장 5k'},
-      {hook:'반찬 고민 끝, 1주일 이유식 플래너', src:['TikTok','IG'], meta:'✨ 다운 많음'}
+      {hook:'6개월 이유식, 한 끼 5분 끝나는 레시피', src:['IG','TikTok'], meta:'✨ 다운 14k'},
+      {hook:'아이 잠투정 진짜 잡는 3가지 방법', src:['Reddit'], meta:'📈 저장 9k'},
+      {hook:'다이소 육아템, 진짜 쓸만한 5', src:['IG'], meta:'🛒 클릭 12k'},
+      {hook:'100일까지 산 것 vs 안 산 것 정리', src:['Threads'], meta:'❤️ 공감 11k'},
+      {hook:'어린이집 첫날, 엄마가 준비할 것', src:['IG','Reddit'], meta:'💾 저장 7k'},
+      {hook:'기저귀 브랜드 비교 후기, 6개월 사용', src:['IG'], meta:'📊 비교 8k'},
+      {hook:'12개월 식단표, 우리 아기 잘 먹은 거', src:['IG','TikTok'], meta:'✨ 다운 9k'},
+      {hook:'영유아 검진, 놓치면 안 되는 것', src:['Reddit'], meta:'🔥 공유 6k'}
     ]
   },
   pet: {
@@ -5763,8 +5856,14 @@ var discoverData = {
     ],
     trends:[
       {hook:'고양이가 이 행동하면 무조건 병원', src:['Reddit','IG'], meta:'🔥 저장 11k'},
-      {hook:'강아지 산책, 이것만 바꿔도 달라져요', src:['X','TikTok'], meta:'📈 공감 7k'},
-      {hook:'반려동물 가성비템 진짜 추천 5', src:['IG'], meta:'✨ 공구 주목'}
+      {hook:'노령견 식단 바꿨더니 일어난 변화', src:['IG'], meta:'❤️ 공감 8k'},
+      {hook:'코스트코 펫푸드 진짜 괜찮나 후기', src:['Reddit','IG'], meta:'📈 비교 7k'},
+      {hook:'강아지 사료, 5천원 vs 3만원 진짜 차이', src:['Threads'], meta:'💬 댓글 12k'},
+      {hook:'고양이 화장실 위생, 진짜 중요한 것', src:['Reddit'], meta:'💾 저장 5k'},
+      {hook:'반려동물 보험, 가입 전 꼭 알 것', src:['IG','Threads'], meta:'📊 비교 9k'},
+      {hook:'펫 호텔 vs 펫시터, 솔직 비교', src:['IG','Reddit'], meta:'✨ 후기 6k'},
+      {hook:'고양이가 좋아하는 장난감 BEST 3', src:['IG','TikTok'], meta:'🛒 클릭 8k'},
+      {hook:'강아지 산책, 이것만 바꿔도 달라져요', src:['X','TikTok'], meta:'📈 공감 7k'}
     ]
   },
   money: {
@@ -5775,9 +5874,15 @@ var discoverData = {
       {h:'@sidejob.lab', f:'8.7만', s:'N잡 도전기 + 후기'}
     ],
     trends:[
-      {hook:'월급 루틴 — 돈 모이는 통장 쪼개기', src:['Reddit','Threads'], meta:'🔥 저장 폭발'},
+      {hook:'월급 200으로 100 모은 30대 루틴', src:['Reddit','Threads'], meta:'🔥 저장 16k'},
+      {hook:'카카오페이 vs 토스, 진짜 비교', src:['Threads','X'], meta:'📊 비교 9k'},
+      {hook:'30대가 진짜 가입한 보험 정리', src:['IG'], meta:'💾 저장 11k'},
       {hook:'2026 하반기 ETF 뭘 사야 하나', src:['X'], meta:'📈 리트윗 6k'},
-      {hook:'부업으로 월 50 만드는 법', src:['IG','TikTok'], meta:'💬 댓글 많음'}
+      {hook:'적금 vs ETF, 같은 금액 1년 결과', src:['Reddit'], meta:'📊 비교 8k'},
+      {hook:'부업으로 월 50 만드는 법, 1년 후기', src:['IG','TikTok'], meta:'💬 댓글 14k'},
+      {hook:'가계부 앱 5개 직접 써본 후기', src:['IG'], meta:'✨ 비교 7k'},
+      {hook:'짠테크 1년, 통장에 남은 금액', src:['Threads','IG'], meta:'❤️ 공감 10k'},
+      {hook:'신용카드 1장만 남기는 법', src:['Reddit','X'], meta:'📈 공유 8k'}
     ]
   },
   travel: {
@@ -5788,9 +5893,15 @@ var discoverData = {
       {h:'@weekend.trip', f:'6.5만', s:'1박2일 국내 여행 큐레이션'}
     ],
     trends:[
-      {hook:'이번 주말 당일치기, 이 곳', src:['IG','TikTok'], meta:'예약 급증'},
-      {hook:'항공권 싸게 사는 3가지 꿀팁', src:['Threads','Reddit'], meta:'저장 많음'},
-      {hook:'혼자 여행, 뭐가 제일 좋았어요?', src:['X'], meta:'공감 8k'}
+      {hook:'1박2일 국내 여행, 예산 10만원 코스', src:['IG','TikTok'], meta:'🛒 예약 급증'},
+      {hook:'항공권 진짜 싸게 사는 3가지 꿀팁', src:['Threads','Reddit'], meta:'💾 저장 12k'},
+      {hook:'도쿄 3박4일, 50만원으로 가능?', src:['X','IG'], meta:'📈 공유 9k'},
+      {hook:'제주 비수기 vs 성수기 솔직 비교', src:['IG'], meta:'📊 비교 8k'},
+      {hook:'부산 24시간 코스, 검증된 일정', src:['IG','TikTok'], meta:'📍 저장 11k'},
+      {hook:'호텔 등급 vs 게스트하우스, 후기', src:['Reddit'], meta:'✨ 후기 6k'},
+      {hook:'혼자 여행, 처음 가본 사람 가이드', src:['X','Threads'], meta:'❤️ 공감 8k'},
+      {hook:'캐리어 vs 백팩, 5박 여행 비교', src:['Reddit','IG'], meta:'📊 비교 5k'},
+      {hook:'여행에서 진짜 쓸만한 앱 5', src:['IG'], meta:'🔥 저장 7k'}
     ]
   },
   home: {
@@ -5801,9 +5912,15 @@ var discoverData = {
       {h:'@seoul.apt', f:'11만', s:'셀프 시공 리뷰 + 가구 매칭'}
     ],
     trends:[
-      {hook:'6평 원룸 이렇게 바꿨어요', src:['IG','Reddit'], meta:'저장 폭발'},
-      {hook:'이케아 조합, 진짜 괜찮은 3가지', src:['TikTok','IG'], meta:'공유 11k'},
-      {hook:'월세방에서 꼭 바꿔야 할 것', src:['Threads'], meta:'공감 많음'}
+      {hook:'6평 원룸을 카페처럼 바꾸는 법', src:['IG','Reddit'], meta:'🔥 저장 14k'},
+      {hook:'이케아에서 사면 안 되는 아이템 4', src:['Threads','X'], meta:'💬 공감 10k'},
+      {hook:'무인양품 vs 다이소, 살림템 비교', src:['IG','TikTok'], meta:'📊 비교 8k'},
+      {hook:'다이소만으로 바꾸는 화장실', src:['IG'], meta:'🛒 클릭 9k'},
+      {hook:'자취방 꾸미기 4단계, 예산 10만원', src:['IG','TikTok'], meta:'💾 저장 11k'},
+      {hook:'옷장 정리, 이 순서대로 하면 끝', src:['Threads'], meta:'❤️ 공감 7k'},
+      {hook:'침실 무드등 5만원 이하 베스트', src:['IG'], meta:'🛒 클릭 6k'},
+      {hook:'좁은 부엌 정리, 이거 하나면 끝', src:['IG','Reddit'], meta:'📈 공유 8k'},
+      {hook:'자취 첫 달, 꼭 사야 하는 것', src:['IG','TikTok'], meta:'💾 저장 12k'}
     ]
   },
   sports: {
@@ -5814,9 +5931,15 @@ var discoverData = {
       {h:'@cycle.map', f:'4.2만', s:'자전거 코스 큐레이션'}
     ],
     trends:[
-      {hook:'러닝 초보, 3주 만에 5km 성공법', src:['Reddit','IG'], meta:'저장 많음'},
-      {hook:'요즘 뜨는 취미 스포츠 TOP 5', src:['X','TikTok'], meta:'공감 급상승'},
-      {hook:'장비 하나로 바뀌는 운동 결과', src:['IG'], meta:'리뷰 주목'}
+      {hook:'러닝 초보, 3주 만에 5km 성공법', src:['Reddit','IG'], meta:'💾 저장 9k'},
+      {hook:'러닝화 5만원 vs 15만원, 진짜 차이', src:['Threads'], meta:'📊 비교 7k'},
+      {hook:'테니스 입문 1개월, 진짜 필요한 장비', src:['IG'], meta:'💬 공감 5k'},
+      {hook:'요즘 뜨는 취미 스포츠 TOP 5', src:['X','TikTok'], meta:'📈 공감 급상승'},
+      {hook:'자전거 코스, 한강에서 잘 가본 5', src:['IG','Reddit'], meta:'📍 저장 6k'},
+      {hook:'클라이밍 1년, 솔직 후기', src:['IG'], meta:'❤️ 공감 8k'},
+      {hook:'골프 입문 비용, 1년 정리', src:['Threads'], meta:'📊 비교 7k'},
+      {hook:'필라테스 vs 요가, 솔직 비교', src:['IG','TikTok'], meta:'📈 공유 5k'},
+      {hook:'러닝크루 들어가서 배운 3가지', src:['Reddit'], meta:'❤️ 공감 4k'}
     ]
   },
   tech: {
@@ -5827,9 +5950,15 @@ var discoverData = {
       {h:'@notion.master', f:'8.9만', s:'노션 템플릿 + Q&A'}
     ],
     trends:[
-      {hook:'2026년 꼭 써야 할 AI 앱 5', src:['X','Reddit'], meta:'리트윗 15k'},
-      {hook:'아이폰 설정 바꾸면 배터리 2배', src:['TikTok','IG'], meta:'저장 폭발'},
-      {hook:'집중 못 할 때 쓰는 앱 3개', src:['Threads'], meta:'공감 9k'}
+      {hook:'2026년 꼭 써야 할 AI 앱 5', src:['X','Reddit'], meta:'🔥 리트윗 15k'},
+      {hook:'아이폰 설정 바꾸면 배터리 2배', src:['TikTok','IG'], meta:'💾 저장 폭발'},
+      {hook:'노션 vs 옵시디언 6개월 비교', src:['Reddit','IG'], meta:'📊 비교 8k'},
+      {hook:'집중 못 할 때 쓰는 앱 3개', src:['Threads'], meta:'❤️ 공감 9k'},
+      {hook:'생산성 진짜 올린 워크플로우', src:['IG','X'], meta:'📈 공유 7k'},
+      {hook:'갤럭시 vs 아이폰, 진짜 차이 4가지', src:['Threads'], meta:'💬 댓글 11k'},
+      {hook:'무료 AI 도구 진짜 쓸만한 5', src:['Reddit'], meta:'💾 저장 10k'},
+      {hook:'에어팟 vs 갤럭시 버즈, 솔직 비교', src:['IG'], meta:'📊 비교 6k'},
+      {hook:'M4 맥북, 사야 할 사람 vs 아닌 사람', src:['Threads','X'], meta:'🔥 공유 9k'}
     ]
   },
   book: {
@@ -5840,9 +5969,15 @@ var discoverData = {
       {h:'@self.help.log', f:'9.4만', s:'자기계발서 요약 + 실천 일지'}
     ],
     trends:[
-      {hook:'이 책 안 읽었으면 큰일날 뻔', src:['IG','Threads'], meta:'저장 많음'},
-      {hook:'2026 상반기 베스트셀러 진짜 이유', src:['X'], meta:'공감 7k'},
-      {hook:'한 권으로 인생 바뀐 사람들', src:['Reddit'], meta:'댓글 폭발'}
+      {hook:'이 책 안 읽었으면 큰일날 뻔', src:['IG','Threads'], meta:'💾 저장 8k'},
+      {hook:'30대가 결국 사는 책 4권', src:['IG'], meta:'🔥 저장 11k'},
+      {hook:'분야별 입문 책 BEST 정리', src:['Reddit'], meta:'📊 큐레이션 7k'},
+      {hook:'2026 상반기 베스트셀러 진짜 이유', src:['X'], meta:'❤️ 공감 7k'},
+      {hook:'한 권으로 인생 바뀐 사람들', src:['Reddit'], meta:'💬 댓글 폭발'},
+      {hook:'영어 원서 입문, 추천 책 6권', src:['IG'], meta:'💾 저장 6k'},
+      {hook:'독서 노트, 진짜 하면 좋은 양식', src:['Threads'], meta:'📈 공유 5k'},
+      {hook:'베스트셀러 vs 스테디셀러, 차이', src:['Reddit'], meta:'📊 비교 4k'},
+      {hook:'출퇴근 30분, 들을 만한 오디오북', src:['IG','TikTok'], meta:'❤️ 공감 6k'}
     ]
   },
   music: {
@@ -5853,9 +5988,15 @@ var discoverData = {
       {h:'@new.release', f:'9.8만', s:'신보 리뷰 · 앨범 평론'}
     ],
     trends:[
-      {hook:'출근길에 꼭 듣게 되는 곡 10', src:['IG','TikTok'], meta:'공유 급증'},
-      {hook:'요즘 인디씬, 이 아티스트 주목', src:['X','Threads'], meta:'리트윗 많음'},
-      {hook:'운동할 때 BPM 이게 최적', src:['Reddit'], meta:'저장 급상승'}
+      {hook:'출근길에 꼭 듣게 되는 곡 10', src:['IG','TikTok'], meta:'📈 공유 급증'},
+      {hook:'요즘 인디씬, 이 아티스트 주목', src:['X','Threads'], meta:'🔥 리트윗 많음'},
+      {hook:'운동할 때 BPM 이게 최적', src:['Reddit'], meta:'💾 저장 급상승'},
+      {hook:'잠 안 올 때 진짜 효과 본 노래', src:['IG'], meta:'❤️ 공감 9k'},
+      {hook:'드라이브 플레이리스트 BEST 8', src:['IG','TikTok'], meta:'📈 공유 7k'},
+      {hook:'카페에서 듣기 좋은 음악 10', src:['IG'], meta:'💾 저장 6k'},
+      {hook:'명품 헤드폰 솔직 비교, 5종', src:['Reddit'], meta:'📊 비교 8k'},
+      {hook:'1만원으로 살 수 있는 LP 추천', src:['IG'], meta:'🛒 클릭 5k'},
+      {hook:'요즘 차트 1위, 진짜 이유', src:['X','Threads'], meta:'💬 공감 6k'}
     ]
   }
 };
@@ -6085,24 +6226,18 @@ function obSyncNextButtons(){
   if(b3) b3.disabled = !_obState.goal;
 }
 
-// 칩 클릭 핸들러 — 이벤트 위임
+// 칩 클릭 핸들러 — 이벤트 위임 (단일 선택만 — 같은 칩 다시 누르면 해제)
 document.addEventListener('click', function(e){
   var chip = e.target.closest('#ob-topics .ob-chip');
   if(chip){
     var t = chip.dataset.topic;
-    var i = _obState.topics.indexOf(t);
-    if(i >= 0){
-      _obState.topics.splice(i, 1);
-      chip.classList.remove('on');
-    } else if(_obState.topics.length < 3){
-      _obState.topics.push(t);
-      chip.classList.add('on');
+    var alreadyOn = _obState.topics.indexOf(t) >= 0;
+    // 모든 칩 해제
+    document.querySelectorAll('#ob-topics .ob-chip').forEach(function(c){ c.classList.remove('on'); });
+    if(alreadyOn){
+      _obState.topics = [];
     } else {
-      // 3개 한도 — 가장 오래된 거 제거 후 새로 추가
-      var oldest = _obState.topics.shift();
-      var oldChip = document.querySelector('#ob-topics .ob-chip[data-topic="' + oldest + '"]');
-      if(oldChip) oldChip.classList.remove('on');
-      _obState.topics.push(t);
+      _obState.topics = [t];
       chip.classList.add('on');
     }
     obSyncNextButtons();
@@ -6125,6 +6260,8 @@ document.addEventListener('click', function(e){
   }
 });
 
+// ob-topic 키 → discoverData 키 매핑 (없는 건 가장 가까운 카테고리로)
+var _obTopicToDisc = { interior:'home', cafe:'food', trend:'life' };
 function obFinish(){
   if(!_obState.topics.length || !_obState.tone || !_obState.goal){
     alert('주제·말투·목표를 모두 선택해줘');
@@ -6132,16 +6269,25 @@ function obFinish(){
   }
   // 1) localStorage 즉시 저장 (네트워크 실패 무관)
   try { localStorage.setItem('ssobi_onboarding', JSON.stringify(_obState)); } catch(_){}
-  // 2) 카드뉴스 생성 톤 자동 적용
+  // 2) 카드뉴스 생성 톤 — 메모리 + localStorage (다음 세션 복원)
   if(window.createData) createData.contentTone = _obState.tone;
-  // 3) Supabase user_profile 저장 (서버) — 비차단
+  try { localStorage.setItem('ssobi_content_tone', _obState.tone); } catch(_){}
+  // 3) 첫 주제를 discoverData 키로 매핑 → 만들기 탭 추천 풀 교체
+  var firstTopic = _obState.topics[0];
+  var discKey = (window.discoverData && discoverData[firstTopic]) ? firstTopic : (_obTopicToDisc[firstTopic] || '');
+  if(discKey && window.discoverData && discoverData[discKey]){
+    try { localStorage.setItem('ssobi_disc_topic', discKey); } catch(_){}
+    if(window.createData) createData._discTopic = discKey;
+    window._pickedTopic = discoverData[discKey].name;
+  }
+  // 4) Supabase user_profile 저장 (서버) — 비차단
   authHeaders().then(function(h){
     fetch('/api/user/onboarding', {
       method: 'POST', headers: h, credentials: 'include',
       body: JSON.stringify(_obState),
     }).catch(function(){});
   }).catch(function(){});
-  // 4) 만들기 탭 추천 카드 갱신
+  // 5) 만들기 탭 추천 카드 갱신 (선택한 주제 풀로 교체됨)
   if(typeof refreshTrends === 'function') refreshTrends();
   // 5) 톤 chip UI 동기화
   document.querySelectorAll('.tone-chip').forEach(function(b){
@@ -8055,16 +8201,15 @@ function tplAccent(t){
 //   none        — 이미지 없음 (템플릿 배경만)
 function tplImageLayout(tpl, kind){
   if(kind === 'summary' || kind === 'cta') return 'none';
-  // 템플릿별 기본
+  // 템플릿별 기본 — 풀이미지(full) 폐지: 모든 템플릿이 박스 이미지 사용
+  // 자정·여백·흑과백도 작은 박스 이미지로 변경 (사용자 피드백 2026-04-25)
   var byTpl = {
     clean:     { cover:'half-top',  intro:'half-top',  body:'half-top' },
-    bold:      { cover:'full',      intro:'full',      body:'full' },
-    mag:       { cover:'half-top',  intro:'half-left', body:'half-left' },
-    editorial: { cover:'small-top', intro:'half-top',  body:'small-top' },
-    mono:      { cover:'full',      intro:'full',      body:'full' },
+    bold:      { cover:'small-top', intro:'small-top', body:'small-top' },
+    mag:       { cover:'half-left', intro:'half-left', body:'half-left' },  // 매거진 첫장도 세로 분할
+    mono:      { cover:'half-top',  intro:'half-top',  body:'half-top' },
     pastel:    { cover:'half-top',  intro:'half-top',  body:'half-top' },
-    noir:      { cover:'full',      intro:'full',      body:'full' },
-    luxury:    { cover:'small-top', intro:'small-top', body:'small-top' },
+    noir:      { cover:'small-top', intro:'small-top', body:'small-top' },
   };
   return (byTpl[tpl] && byTpl[tpl][kind]) || 'half-top';
 }
@@ -8192,44 +8337,10 @@ function makeCategoryChip(label, opts){
   return el;
 }
 
-// ═══ 템플릿별 데코 요소 배치 (spec 2.1 — 워터마크 제거, 카테고리 칩 통일) ═══
+// ═══ 템플릿별 데코 요소 배치 (spec 2.2 — 카테고리 칩/브랜드 라벨 모두 제거) ═══
 function tplDecoForSlide(tpl, kind, idx, accent, textColor){
   var decos = [];
-  // 카테고리 칩 — 모든 슬라이드 좌하단 (CTA 제외)
-  var cat = (createData && createData.category) || 'etc';
-  var catLabel = CATEGORY_CHIP_LABEL[cat] || '라이프';
-  var isCta = kind === 'cta';
-  if(!isCta){
-    // 템플릿별 칩 색상 차별화
-    var chipOpts;
-    if(tpl === 'clean' || tpl === 'pastel' || tpl === 'mag'){
-      chipOpts = { bg:'rgba(255,255,255,0.92)', color:'#1A1A1A', position:'left-bottom', x:5, y:5 };
-    } else if(tpl === 'mono'){
-      chipOpts = { bg:'#0D0D0D', color:'#FFFFFF', position:'left-top', x:5, y:5 };
-    } else if(tpl === 'bold'){
-      // DARK — 형광 포인트 칩
-      var fluo = cat.indexOf('beauty') === 0 ? '#00FFB2' : (cat === 'trend' ? '#CCFF00' : (cat === 'money_tip' ? '#FFE500' : '#CCFF00'));
-      chipOpts = { bg:fluo, color:'#0A0A0A', position:'left-bottom', x:5, y:5 };
-    } else if(tpl === 'editorial'){
-      // FILM — 따뜻한 베이지 보더
-      chipOpts = { bg:'rgba(196,168,130,0.95)', color:'#1A1512', position:'left-bottom', x:5, y:5 };
-    } else if(tpl === 'noir'){
-      // STATEMENT — 단색 다크 + 흰 테두리
-      chipOpts = { bg:'transparent', color:'#FFFFFF', position:'left-bottom', x:5, y:5 };
-    } else if(tpl === 'luxury'){
-      // RAW — 흰 테두리 투명 칩
-      chipOpts = { bg:'transparent', color:'#FFFFFF', position:'left-bottom', x:5, y:5 };
-    } else {
-      chipOpts = { bg:'rgba(0,0,0,0.55)', color:'#FFFFFF', position:'left-bottom', x:5, y:5 };
-    }
-    var chip = makeCategoryChip(catLabel, chipOpts);
-    // 투명 배경 칩에 테두리
-    if(chipOpts.bg === 'transparent'){
-      chip.style.cssText += ';border:1px solid '+chipOpts.color;
-    }
-    decos.push(chip);
-  }
-  // 템플릿별 추가 데코 (단, 브랜드명 라벨은 모두 제거)
+  // 템플릿별 추가 데코 (카테고리 칩 / 브랜드 라벨 모두 제거)
   if(tpl === 'bold'){
     if(kind === 'body' || kind === 'cover'){
       decos.push(makeBigOutlineNumber(String(idx).padStart(2,'0'), {x:55, y:-15, size:240, color:'#FFFFFF', opacity:0.06}));
@@ -8327,8 +8438,8 @@ function makeCtaPillsEl(opts){
   var line = document.createElement('div');
   line.style.cssText = 'width:32px;height:1.5px;background:' + opts.accent + ';opacity:.85';
   var label = document.createElement('div');
-  label.style.cssText = 'font-size:10.5px;font-weight:600;color:' + opts.textColor + ';letter-spacing:.18em;opacity:.7;text-transform:uppercase';
-  label.textContent = 'thanks for reading';
+  label.style.cssText = 'font-size:11px;font-weight:700;color:' + opts.textColor + ';letter-spacing:.04em;opacity:.85';
+  label.textContent = '저장해두면 언젠가 도움 돼';
   wrap.appendChild(line);
   wrap.appendChild(label);
   return wrap;
@@ -8357,7 +8468,9 @@ function makeTextEl(text, opts){
   div.className = 'edt-el text';
   div.style.left = opts.x+'%';
   div.style.top = opts.y+'%';
-  div.style.width = opts.w+'%';
+  // 글자상자 범위 안 보이게 — width 자동 (글자 길이만큼만 차지) + maxWidth 로 슬라이드 밖 안 넘김
+  div.style.width = 'auto';
+  div.style.maxWidth = opts.w+'%';
   div.style.fontSize = opts.size+'px';
   div.style.color = opts.color;
   div.style.fontWeight = opts.weight || tplWeight(createData.template);
@@ -8388,8 +8501,26 @@ function makeImageSlotEl(keyword, opts){
   wrap.dataset.slideIdx = String(opts.slideIdx || 0);
   renderImageSlotSpinner(wrap);
   attachEdt(wrap);
-  // 탭 → 업로드 (버튼 없음, 슬롯 전체가 교체 영역)
+  // 첫 클릭 = 선택(드래그·리사이즈 활성), 같은 슬롯 두 번째 탭(또는 더블탭) = 업로드
+  // 사용자 피드백: 클릭 한 번에 업로드 창이 떠서 위치/크기 조정 못함
   wrap.addEventListener('click', function(e){
+    if(e.target.closest('.edt-hnd')) return;
+    if(wrap.dataset.loading === '1') return;
+    // 이미 선택 상태면 = 두 번째 탭 = 업로드
+    if(wrap.classList.contains('sel') && wrap.dataset.armed === '1'){
+      wrap.dataset.armed = '';
+      openUploadForSlot(wrap);
+      return;
+    }
+    // 첫 탭 — 같은 슬라이드 다른 sel 해제 + 이 슬롯 sel + 1.5초 안에 다시 탭하면 업로드
+    var slide = wrap.closest('.edt-slide');
+    if(slide){ slide.querySelectorAll('.edt-el.sel').forEach(function(s){ s.classList.remove('sel'); }); }
+    wrap.classList.add('sel');
+    wrap.dataset.armed = '1';
+    setTimeout(function(){ wrap.dataset.armed = ''; }, 1500);
+  });
+  // 더블탭 즉시 업로드 (PC dblclick + 모바일은 위 click 두 번 트리거로도 동작)
+  wrap.addEventListener('dblclick', function(e){
     if(e.target.closest('.edt-hnd')) return;
     if(wrap.dataset.loading === '1') return;
     openUploadForSlot(wrap);
@@ -8642,38 +8773,89 @@ function setVideoSlot(wrap, meta){
   wrap.dataset.attrUrl = '';
 }
 // 이미지 하단 1/3 평균 밝기 (0~255) — 텍스트 색 자동 전환
+// CORS 실패 시 throw — 호출부가 catch 해서 템플릿 기준으로 폴백
 function getImageBrightness(imgEl){
-  try {
-    var canvas = document.createElement('canvas');
-    var ctx = canvas.getContext('2d');
-    canvas.width = 50; canvas.height = 50;
-    ctx.drawImage(imgEl,
-      0, imgEl.naturalHeight * 0.6, imgEl.naturalWidth, imgEl.naturalHeight * 0.4,
-      0, 0, 50, 50);
-    var data = ctx.getImageData(0, 0, 50, 50).data;
-    var sum = 0;
-    for(var i = 0; i < data.length; i += 4){
-      sum += data[i] * 0.299 + data[i+1] * 0.587 + data[i+2] * 0.114;
-    }
-    return sum / (50 * 50);
-  } catch(e){ return 128; } // CORS 등 실패 시 중립값
+  var canvas = document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
+  canvas.width = 50; canvas.height = 50;
+  ctx.drawImage(imgEl,
+    0, imgEl.naturalHeight * 0.6, imgEl.naturalWidth, imgEl.naturalHeight * 0.4,
+    0, 0, 50, 50);
+  var data = ctx.getImageData(0, 0, 50, 50).data;
+  var sum = 0;
+  for(var i = 0; i < data.length; i += 4){
+    sum += data[i] * 0.299 + data[i+1] * 0.587 + data[i+2] * 0.114;
+  }
+  return sum / (50 * 50);
+}
+// CORS-enabled probe 로 brightness 측정 후 콜백
+//   원본 이미지(crossOrigin 없음)는 그대로 표시되고, 별도 probe 가 같은 URL 을
+//   crossOrigin='anonymous' 로 다시 fetch 해서 픽셀을 읽음. 실패 시 콜백에 null.
+function probeImageBrightness(url, cb){
+  if(!url){ cb(null); return; }
+  var probe = new Image();
+  probe.crossOrigin = 'anonymous';
+  var done = false;
+  var finish = function(b){ if(done) return; done = true; cb(b); };
+  probe.onload = function(){
+    try { finish(getImageBrightness(probe)); }
+    catch(e){ finish(null); }
+  };
+  probe.onerror = function(){ finish(null); };
+  // 5초 타임아웃 폴백
+  setTimeout(function(){ finish(null); }, 5000);
+  probe.src = url;
 }
 // 슬라이드 텍스트 색 자동 전환 (밝기 < 128 → 흰색 + 그림자 / >= 128 → 검정)
+//   2.4: 텍스트 요소 위치별로 판단 — 이미지 위 텍스트는 이미지 밝기 기준,
+//   이미지 밖 텍스트는 슬라이드 템플릿 배경 기준. (작은 이미지가 어둡다고 흰 배경 위 흰 글씨 X)
 function applyTextColorByImageBrightness(slotEl, imgEl){
-  var slide = slotEl.closest('.edt-slide');
+  var slide = slotEl.closest ? slotEl.closest('.edt-slide') : null;
+  if(!slide && slotEl.classList && slotEl.classList.contains('edt-slide')) slide = slotEl;
   if(!slide) return;
-  var textEls = slide.querySelectorAll('.edt-el.text, .edt-el.eyebrow, .edt-el.cover-title, .edt-el.cover-sub');
+  applyPerTextColor(slide);
+}
+// 슬라이드 안 모든 텍스트를 위치 기준으로 색 결정
+//   - 텍스트가 이미지 슬롯 위에 떠 있으면: 반투명 검정 박스 + 흰 글씨 (가독성 확보)
+//   - 텍스트가 이미지 바깥 (슬라이드 배경 위)이면: 슬라이드 배경 명도에 맞는 색
+function applyPerTextColor(slide){
+  var textEls = slide.querySelectorAll('.edt-el.text, .edt-el.edt-eyebrow');
   if(!textEls.length) return;
-  var brightness = getImageBrightness(imgEl);
-  var dark = brightness < 128;
-  applyDarkOrLight(textEls, dark);
+  var imgs = slide.querySelectorAll('.edt-el.img');
+  var bgDark = isDarkColor(slide.style.background || slide.style.backgroundColor || '');
+  textEls.forEach(function(el){
+    if(el.dataset.userColor === '1') return;
+    var tR = el.getBoundingClientRect();
+    var cx = (tR.left + tR.right) / 2;
+    var cy = (tR.top + tR.bottom) / 2;
+    var hostImg = null;
+    imgs.forEach(function(img){
+      var iR = img.getBoundingClientRect();
+      if(iR.width === 0) return;
+      if(cx >= iR.left && cx <= iR.right && cy >= iR.top && cy <= iR.bottom) hostImg = img;
+    });
+    // 글자상자 범위 보이는 박스 표현은 사용자가 싫어함 — 색만 결정, 박스/패딩 추가 X
+    el.style.background = '';
+    el.style.padding = '';
+    el.style.borderRadius = '';
+    if(hostImg){
+      // 이미지 위 → 이미지 밝기 기준 글자색 (어두우면 흰 글씨 + 텍스트 그림자, 밝으면 검정)
+      var b = hostImg.dataset.brightness ? parseFloat(hostImg.dataset.brightness) : NaN;
+      var imgIsDark = !isNaN(b) ? b < 128 : true;
+      applyDarkOrLight([el], imgIsDark);
+    } else {
+      // 이미지 바깥 → 슬라이드 배경 명도 기준
+      el.style.textShadow = '';
+      applyDarkOrLight([el], bgDark);
+    }
+  });
 }
 // 템플릿 기준 텍스트 색 결정 (이미지 brightness 실패하거나 이미지 없는 슬라이드 용)
 function applyTextColorByTemplate(slotOrSlide){
   var slide = slotOrSlide.classList && slotOrSlide.classList.contains('edt-slide')
     ? slotOrSlide : (slotOrSlide.closest && slotOrSlide.closest('.edt-slide'));
   if(!slide) return;
-  var textEls = slide.querySelectorAll('.edt-el.text, .edt-el.eyebrow, .edt-el.cover-title, .edt-el.cover-sub');
+  var textEls = slide.querySelectorAll('.edt-el.text, .edt-el.edt-eyebrow');
   if(!textEls.length) return;
   var bg = (slide.style.background || slide.style.backgroundColor || '').trim();
   // RGB(R,G,B) 또는 #HEX 추출 → 밝기 추정
@@ -8735,14 +8917,16 @@ function setImageSlot(wrap, url, meta){
   var img = document.createElement('img');
   img.src = url;
   img.style.cssText = 'width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;border-radius:0';
-  // 2.3: crossOrigin 제거 — picsum 등 CORS 헤더 없는 소스도 로딩되게 (canvas brightness 는 best-effort)
-  // 로딩 성공 시 밝기 감지 (CORS 가능 이미지만 brightness 계산 성공, 안되면 템플릿 기준으로 fallback)
+  // 표시용 이미지는 crossOrigin 없이 로드 (어떤 소스든 표시되게).
+  // 밝기 감지는 별도 probe 가 crossOrigin='anonymous' 로 같은 URL 을 다시 받아서 측정.
+  // probe 실패 시 템플릿 기준 색으로 폴백 → 어두운 사진엔 흰 글씨, 밝은 사진엔 검정 글씨.
   img.onload = function(){
-    try { applyTextColorByImageBrightness(wrap, img); }
-    catch(e){
-      // 밝기 측정 실패 (대부분의 경우) → 템플릿 기준 폴백
-      try { applyTextColorByTemplate(wrap); } catch(e2){}
-    }
+    probeImageBrightness(url, function(brightness){
+      if(brightness != null) wrap.dataset.brightness = String(brightness);
+      else delete wrap.dataset.brightness;
+      var slide = wrap.closest('.edt-slide');
+      if(slide){ try { applyPerTextColor(slide); } catch(e){} }
+    });
   };
   // 1차 실패 → fallbackUrl(picsum 등) 시도, 그것도 실패하면 picsum 새로
   var triedFallback = false;
@@ -8869,9 +9053,10 @@ async function autoLoadAllImageSlots(){
         fallbackUrl: j.fallbackUrl,
       });
     } else {
-      // 3) 최후 보장: picsum.photos — 무조건 이미지 반환
-      var picsum = 'https://picsum.photos/seed/ssobi-' + idx + '-' + (Date.now() % 100000) + '/1080/1080';
-      setImageSlot(slot, picsum, { photographer:'Picsum', sourceLabel:'Picsum', attributionUrl:'https://picsum.photos' });
+      // 적절한 이미지를 찾지 못하면 placeholder — 무관한 picsum 랜덤 이미지 노출 차단
+      // (사용자가 직접 업로드해서 정확한 이미지 채우게 유도)
+      slot.dataset.loading = '';
+      renderImageSlotPlaceholder(slot);
     }
   }
   // 모든 슬롯 병렬 처리 (3장 이상에서 안정성·속도 차이 큼)
@@ -9031,6 +9216,7 @@ function initEditor(){
     var isSummary = false;
     var kind = isCover ? 'cover' : isEnding ? 'cta' : 'body';
     var layout = tplImageLayout(tpl, kind);
+    sl.dataset.layout = layout;  // applyPerTextColor 가 풀이미지 여부 판별
     var kw = kws[i] || p.title || titleTxt;
 
     // 이미지 슬롯 배치 (layout 에 따라 위치/크기 다름)
@@ -9054,25 +9240,34 @@ function initEditor(){
 
     // 텍스트 영역 위치 (layout 별로 다름) — 전부 z-index:5 (오버레이 위)
     var t = {};
+    var coverX, coverW;
+    if(layout === 'half-left'){
+      // 매거진: 좌이미지 / 우 텍스트 — 첫장도 동일하게
+      coverX = 52; coverW = 44;
+    } else {
+      coverX = 6; coverW = 88;
+    }
     if(isCover){
       if(layout === 'full'){
-        t = { hookY:52, subY:78, pageY:92, hookSize:38, hookWeight:900 };
+        t = { hookY:50, subY:78, pageY:92, hookSize:44, hookWeight:900 };
       } else if(layout === 'half-top'){
-        t = { hookY:58, subY:82, pageY:93, hookSize:32, hookWeight:900 };
-      } else { // small-top / half-left
-        t = { hookY:44, subY:70, pageY:93, hookSize:28, hookWeight:900 };
+        t = { hookY:56, subY:82, pageY:93, hookSize:38, hookWeight:900 };
+      } else if(layout === 'half-left'){
+        t = { hookY:18, subY:54, pageY:93, hookSize:30, hookWeight:900 };
+      } else { // small-top
+        t = { hookY:42, subY:70, pageY:93, hookSize:34, hookWeight:900 };
       }
-      var hookEl = makeTextEl(titleTxt, {x:6,y:t.hookY,w:88,size:t.hookSize,color:c,weight:t.hookWeight,isTitle:true});
+      var hookEl = makeTextEl(titleTxt, {x:coverX,y:t.hookY,w:coverW,size:t.hookSize,color:c,weight:t.hookWeight,isTitle:true});
       hookEl.style.zIndex = '5';
       sl.appendChild(hookEl);
       // 부제목: Claude 응답의 cover_subtitle 우선, 없으면 첫 본문 첫 줄 fallback
       var sub = (createData.coverSubtitle || (p.text || '').split('\n')[0] || '').slice(0, 32);
       if(sub){
-        var subEl = makeTextEl(sub, {x:6,y:t.subY,w:88,size:15,color:c,weight:600});
+        var subEl = makeTextEl(sub, {x:coverX,y:t.subY,w:coverW,size:18,color:c,weight:600});
         subEl.style.zIndex = '5';
         sl.appendChild(subEl);
       }
-      var pgEl = makeTextEl(String(1).padStart(2,'0')+' / '+String(N).padStart(2,'0'), {x:6,y:t.pageY,w:20,size:10,color:c,weight:700});
+      var pgEl = makeTextEl(String(1).padStart(2,'0')+' / '+String(N).padStart(2,'0'), {x:coverX,y:t.pageY,w:20,size:10,color:c,weight:700});
       pgEl.style.zIndex = '5';
       sl.appendChild(pgEl);
     } else if(isIntro){
@@ -9088,7 +9283,7 @@ function initEditor(){
       tEl.style.zIndex = '5';
       sl.appendChild(tEl);
       var bEl = makeTextEl(p.text || '직접 써보고 느낀 것만 적었어\n댓글에 궁금한 거 남겨줘', {
-        x:textX, y:textY, w:textW, size:14, color:c, weight:500,
+        x:textX, y:textY, w:textW, size:21, color:c, weight:500,
         fontFamily: "'Pretendard','Noto Sans KR',sans-serif"
       });
       bEl.style.zIndex = '5';
@@ -9101,7 +9296,7 @@ function initEditor(){
       var ctaAccent = tplAccent(tpl);
       sl.appendChild(makeTextEl(p.title || '다음편도 올라옴', {x:6,y:22,w:88,size:30,color:c,weight:900,isTitle:true}));
       sl.appendChild(makeTextEl(p.text || '팔로우하면 볼 수 있음\n광고 아님, 내 경험담', {
-        x:6, y:48, w:88, size:15, color:c, weight:600,
+        x:6, y:48, w:88, size:22, color:c, weight:600,
         fontFamily: "'Pretendard','Noto Sans KR',sans-serif"
       }));
       sl.appendChild(makeCtaPillsEl({x:10,y:78,w:80,accent:ctaAccent,textColor:c}));
@@ -9148,37 +9343,105 @@ function initEditor(){
       } else {
         nY = 10; titleY2 = 16; textY2 = 42; textX2 = 6; textW2 = 88;
       }
-      // 번호: 작게 · mono 느낌 · accent 컬러 · 라벨 형식 ("— 01")
-      var numEl = makeTextEl('— ' + String(i).padStart(2,'0'), {
+      // 번호 표기 — 템플릿마다 형식·폰트·크기 차별화 (사용자 피드백: 다 똑같이 보임)
+      var nn = String(i).padStart(2,'0');
+      var numText, numSize, numWeight, numFont, numLetter;
+      if(tpl === 'clean'){             // 담백: 미니멀 라벨
+        numText = '—  ' + nn;          numSize = 11; numWeight = 800; numLetter = '.2em';
+        numFont = "'IBM Plex Sans KR','Pretendard',sans-serif";
+      } else if(tpl === 'bold'){        // 자정: 형광 라벨 (대문자 영문 느낌)
+        numText = 'NO.' + nn;          numSize = 12; numWeight = 900; numLetter = '.3em';
+        numFont = "'IBM Plex Sans KR','Pretendard',sans-serif";
+      } else if(tpl === 'noir'){        // 여백: 인용구 — 번호 대신 우측 작은 라인
+        numText = '·';                  numSize = 22; numWeight = 400; numLetter = '0';
+        numFont = "'Gowun Batang','Noto Serif KR',serif";
+      } else if(tpl === 'luxury'){      // 거친결: 거대 sans 번호
+        numText = nn;                   numSize = 30; numWeight = 900; numLetter = '-.04em';
+        numFont = "'Black Han Sans','Pretendard',sans-serif";
+      } else if(tpl === 'mag'){         // 매거진: Nº01 표기
+        numText = 'Nº ' + nn;           numSize = 11; numWeight = 700; numLetter = '.06em';
+        numFont = "'Pretendard','Noto Sans KR',sans-serif";
+      } else if(tpl === 'editorial'){   // 필름: "01 — 26.04" 날짜 같이
+        numText = nn + '  ·  26.04';    numSize = 10; numWeight = 700; numLetter = '.18em';
+        numFont = "'IBM Plex Sans KR','Pretendard',sans-serif";
+      } else if(tpl === 'mono'){        // 흑과백: 단순 큰 숫자 워터마크
+        numText = nn;                   numSize = 14; numWeight = 900; numLetter = '0';
+        numFont = "'Pretendard','Noto Sans KR',sans-serif";
+      } else if(tpl === 'pastel'){      // 설탕: 둥근 점 + 번호
+        numText = '○  ' + nn;           numSize = 12; numWeight = 700; numLetter = '.1em';
+        numFont = "'Gowun Dodum','Pretendard',sans-serif";
+      } else {
+        numText = '—  ' + nn;           numSize = 11; numWeight = 800; numLetter = '.2em';
+        numFont = "'IBM Plex Sans KR','Pretendard',sans-serif";
+      }
+      var numEl = makeTextEl(numText, {
         x: textX2, y: nY, w: 30,
-        size: 11, color: bodyAccent, weight: 800,
-        fontFamily: "'IBM Plex Sans KR','Pretendard',sans-serif"
+        size: numSize, color: bodyAccent, weight: numWeight, fontFamily: numFont
       });
-      numEl.style.letterSpacing = '.2em';
+      numEl.style.letterSpacing = numLetter;
       numEl.dataset.noAutofit = '1';
       numEl.style.zIndex = '5';
       sl.appendChild(numEl);
       // 제목: 굵게, 큰 글씨
       var titleEl = makeTextEl(p.title || '포인트', {
         x: textX2, y: titleY2, w: textW2,
-        size: 24, color: c, weight: 900, isTitle: true
+        size: 36, color: c, weight: 900, isTitle: true
       });
-      titleEl.style.letterSpacing = '-.4px';
+      titleEl.style.letterSpacing = '-.6px';
       titleEl.style.zIndex = '5';
       sl.appendChild(titleEl);
-      // 얇은 구분선 (제목과 본문 사이)
-      var dividerY = Math.min(textY2 - 4, titleY2 + 18);
-      var dividerEl = document.createElement('div');
-      dividerEl.className = 'edt-el edt-divider';
-      dividerEl.style.cssText = 'position:absolute;left:' + textX2 + '%;top:' + dividerY + '%;width:' + Math.min(22, textW2/3) + '%;height:1px;background:' + c + ';opacity:.18;pointer-events:none;z-index:5';
-      sl.appendChild(dividerEl);
-      // 본문은 항상 Pretendard/Noto Sans KR (제목은 템플릿 폰트, 본문은 가독성 우선)
+      // 본문 폰트: 무드를 위해 일부 템플릿은 템플릿 폰트, 나머지는 가독성용 Pretendard
+      var bodyFont = (tpl === 'pastel' || tpl === 'noir')
+        ? tplFont(tpl)
+        : "'Pretendard','Noto Sans KR',sans-serif";
       var textEl = makeTextEl(p.text || '본문을 직접 입력해주세요', {
-        x:textX2, y:textY2, w:textW2, size:13, color:c, weight:500,
-        fontFamily: "'Pretendard','Noto Sans KR',sans-serif"
+        x:textX2, y:textY2, w:textW2, size:21, color:c, weight:500,
+        fontFamily: bodyFont
       });
       textEl.style.zIndex = '5';
       sl.appendChild(textEl);
+      // 템플릿마다 데코 형태를 다르게 — 세로 바 / 사각형 / 도트 / 가로 라인 / 없음
+      var decoEl = document.createElement('div');
+      decoEl.className = 'edt-deco edt-tpl-mark';
+      decoEl.style.position = 'absolute';
+      decoEl.style.pointerEvents = 'none';
+      decoEl.style.zIndex = '4';
+      decoEl.style.background = bodyAccent;
+      if(tpl === 'clean'){            // 베이직: 좌측 세로 바
+        decoEl.style.left = '1.5%';
+        decoEl.style.top = (titleY2 - 2) + '%';
+        decoEl.style.width = '3px';
+        decoEl.style.height = Math.max(28, (textY2 + 18 - titleY2)) + '%';
+      } else if(tpl === 'bold'){      // 트렌디: 좌상단 작은 형광 사각형
+        decoEl.style.left = '6%';
+        decoEl.style.top = (nY - 4) + '%';
+        decoEl.style.width = '12px';
+        decoEl.style.height = '12px';
+        decoEl.style.borderRadius = '0';
+      } else if(tpl === 'noir'){      // 감성: 제목 위 짧은 가로 골드 라인
+        decoEl.style.left = textX2 + '%';
+        decoEl.style.top = (nY + 6) + '%';
+        decoEl.style.width = '32px';
+        decoEl.style.height = '1.5px';
+        decoEl.style.opacity = '.85';
+      } else if(tpl === 'mag'){       // 매거진: vbar 없음 (layout 자체가 분할)
+        decoEl = null;
+      } else if(tpl === 'mono'){      // 모노: 좌상단 검정 사각 도트
+        decoEl.style.left = '6%';
+        decoEl.style.top = (nY - 3) + '%';
+        decoEl.style.width = '8px';
+        decoEl.style.height = '8px';
+        decoEl.style.background = c;  // 본문 텍스트 색 = 검정
+      } else if(tpl === 'pastel'){    // 소프트: 작은 코랄 동그라미
+        decoEl.style.left = '6%';
+        decoEl.style.top = (nY - 3) + '%';
+        decoEl.style.width = '10px';
+        decoEl.style.height = '10px';
+        decoEl.style.borderRadius = '50%';
+      } else {
+        decoEl = null;
+      }
+      if(decoEl) sl.appendChild(decoEl);
       var pg2 = makeTextEl(String(i+1).padStart(2,'0')+' / '+String(N).padStart(2,'0'), {x:6,y:93,w:20,size:10,color:c,weight:700});
       pg2.style.zIndex = '5';
       sl.appendChild(pg2);
@@ -10109,79 +10372,60 @@ function hidePublishProgress(){
 
 // ────────── AI 생성 오버레이 ──────────
 var __genSteps = [];
-// 템플릿 썸네일을 실제 유저 hook 문구로 스타일링 — cs-3 진입 시 호출
-// 2.3: 8개 템플릿 시각을 hook 문구와 함께 미리보기로 렌더 — 각 템플릿 고유 레이아웃
+// 템플릿 썸네일 — 무드만 전달하는 고정 샘플 (유저 후킹 멘트는 글자수 잘림 → 사용 안 함)
+// 카테고리 칩도 노출하지 않음. 8개 템플릿 각자 고유 분위기.
 function renderTplThumbs(){
-  var hook = (createData.hook || '').replace(/^"|"$/g,'').slice(0, 14) || '제목 한 줄';
-  var sub = (createData.coverSubtitle || (createData.hook ? '한 줄 부제목' : '오늘 주제')).slice(0, 12);
-  var cat = createData.category || 'etc';
-  var catLabel = (typeof CATEGORY_CHIP_LABEL !== 'undefined' && CATEGORY_CHIP_LABEL[cat]) ? CATEGORY_CHIP_LABEL[cat] : '라이프';
-  var hh = escapeHtml(hook);
-  var ss = escapeHtml(sub);
-  var ll = escapeHtml(catLabel);
-
   function html(tpl){
-    if(tpl === 'clean'){ // CLEAN — 흰 + mint 좌측 바
+    if(tpl === 'clean'){ // CLEAN — 화이트 미니멀, mint 포인트
       return ''
-        + '<div style="position:absolute;left:6px;top:6px;width:30%;height:38%;background:linear-gradient(135deg,#E8E8E5,#F5F5F2)"></div>'
-        + '<div style="position:absolute;left:6px;bottom:6px;padding:1.5px 5px;background:rgba(255,255,255,.95);border:1px solid #00C9A7;font-size:6.5px;font-weight:800;color:#00C9A7;letter-spacing:.1em">'+ll+'</div>'
-        + '<div style="position:absolute;left:6px;bottom:38%;display:flex;align-items:flex-end;gap:4px"><div style="width:2.5px;height:24px;background:#00C9A7;flex-shrink:0"></div><div style="font-size:11px;font-weight:800;color:#111;line-height:1.1;letter-spacing:-.3px;font-family:Pretendard,sans-serif">'+hh+'</div></div>'
-        + '<div style="position:absolute;left:13px;bottom:24%;font-size:8px;color:#666;line-height:1.3">'+ss+'</div>';
+        + '<div style="position:absolute;inset:0;background:radial-gradient(120% 80% at 100% 0%,#F0FAF6 0%,#FFFFFF 55%)"></div>'
+        + '<div style="position:absolute;left:8%;top:8%;width:32%;height:34%;background:linear-gradient(135deg,#E8F1EC,#F5F5F2)"></div>'
+        + '<div style="position:absolute;left:46%;top:10%;width:22%;height:2px;background:#00C9A7;opacity:.7"></div>'
+        + '<div style="position:absolute;left:8%;bottom:30%;display:flex;align-items:flex-end;gap:7px"><div style="width:3px;height:38px;background:#00C9A7;flex-shrink:0"></div><div style="font-size:18px;font-weight:800;color:#111;line-height:1.05;letter-spacing:-.4px;font-family:Pretendard,sans-serif">조용히,<br>천천히.</div></div>'
+        + '<div style="position:absolute;left:14%;bottom:18%;font-size:11px;color:#888;line-height:1.3;letter-spacing:.04em">매일의 작은 기록</div>'
+        + '<div style="position:absolute;left:8%;bottom:7%;font-size:9px;color:#00C9A7;font-weight:800;letter-spacing:.25em">— CLEAN</div>';
     }
-    if(tpl === 'bold'){ // DARK — 다크 그라데이션 + 형광 칩
+    if(tpl === 'bold'){ // 트렌디 — 형광 포인트, 임팩트 (HOT 칩과 제목이 겹치지 않게 분리)
       return ''
-        + '<div style="position:absolute;inset:0;background:linear-gradient(to top,#0A0A0A 0%,#2A2A2A 65%,#5A5A5A 100%)"></div>'
-        + '<div style="position:absolute;left:6px;bottom:30%;padding:1.5px 5px;background:#CCFF00;color:#0A0A0A;font-size:6.5px;font-weight:900;letter-spacing:.15em">'+ll.toUpperCase()+'</div>'
-        + '<div style="position:absolute;left:6px;bottom:6px;color:#fff;font-size:11.5px;font-weight:800;line-height:1.1;letter-spacing:-.3px;font-family:Pretendard,sans-serif">'+hh+'</div>'
-        + '<div style="position:absolute;left:6px;bottom:5%;font-size:7.5px;color:rgba(255,255,255,.6);font-style:italic">'+ss+'</div>';
+        + '<div style="position:absolute;inset:0;background:linear-gradient(160deg,#0A0A0A 0%,#1A1A1A 55%,#2E2E2E 100%)"></div>'
+        + '<div style="position:absolute;right:-8%;top:-8%;width:60%;height:60%;background:radial-gradient(circle,rgba(204,255,0,.18) 0%,transparent 60%);pointer-events:none"></div>'
+        + '<div style="position:absolute;left:8%;top:9%;font-size:9px;color:#CCFF00;font-weight:900;letter-spacing:.3em">TRENDING NOW</div>'
+        + '<div style="position:absolute;left:8%;top:20%;padding:3px 8px;background:#CCFF00;color:#0A0A0A;font-size:10px;font-weight:900;letter-spacing:.15em">HOT</div>'
+        + '<div style="position:absolute;left:8%;bottom:9%;color:#fff;font-size:22px;font-weight:900;line-height:.95;letter-spacing:-.7px;font-family:Pretendard,sans-serif">지금<br>떠오르는<br><span style="color:#CCFF00">것.</span></div>';
     }
-    if(tpl === 'noir'){ // STATEMENT — 텍스트 중심 다크
+    if(tpl === 'noir'){ // STATEMENT — 인용구 중심
       return ''
-        + '<div style="position:absolute;inset:0;background:#1A1A1A"></div>'
-        + '<div style="position:absolute;left:4px;top:-2px;font-family:Gowun Batang,Noto Serif KR,serif;font-size:46px;color:#C9A84C;opacity:.18;line-height:.85">"</div>'
-        + '<div style="position:absolute;left:6px;top:24px;color:#fff;font-family:Gowun Batang,Noto Serif KR,serif;font-size:11px;line-height:1.3">'+hh+'</div>'
-        + '<div style="position:absolute;right:6px;bottom:6px;font-size:7px;color:#888;font-style:italic">— '+ss+'</div>'
-        + '<div style="position:absolute;left:6px;bottom:6px;border:1px solid #FFFFFF;padding:1px 5px;font-size:6.5px;font-weight:800;color:#FFFFFF;letter-spacing:.1em">'+ll+'</div>';
+        + '<div style="position:absolute;inset:0;background:radial-gradient(120% 100% at 30% 30%,#262220 0%,#1A1A1A 60%,#0E0E0E 100%)"></div>'
+        + '<div style="position:absolute;left:6%;top:-6%;font-family:Gowun Batang,Noto Serif KR,serif;font-size:78px;color:#C9A84C;opacity:.22;line-height:.8">"</div>'
+        + '<div style="position:absolute;right:6%;bottom:14%;font-family:Gowun Batang,Noto Serif KR,serif;font-size:78px;color:#C9A84C;opacity:.22;line-height:.8;transform:rotate(180deg)">"</div>'
+        + '<div style="position:absolute;left:10%;top:32%;color:#F5EFE6;font-family:Gowun Batang,Noto Serif KR,serif;font-size:17px;line-height:1.4;letter-spacing:-.2px">덜어낼수록<br>더 선명해진다.</div>'
+        + '<div style="position:absolute;left:10%;bottom:8%;font-size:9px;color:#C9A84C;letter-spacing:.3em;font-weight:800">— STATEMENT</div>';
     }
-    if(tpl === 'luxury'){ // RAW — 풀 이미지 다크
+    if(tpl === 'mag'){ // SPLIT — 좌 이미지 / 우 다크 매거진
       return ''
-        + '<div style="position:absolute;inset:0;background:linear-gradient(to top,#0D0D0D 0%,#3A2A1A 50%,#8A6A4A 100%)"></div>'
-        + '<div style="position:absolute;left:6px;top:6px;border:1px solid #fff;padding:1.5px 5px;font-size:6.5px;font-weight:800;color:#fff;letter-spacing:.1em">'+ll+'</div>'
-        + '<div style="position:absolute;left:6px;bottom:18%;font-family:Black Han Sans,Pretendard,sans-serif;font-size:13px;color:#fff;line-height:1;letter-spacing:-.3px">'+hh+'</div>'
-        + '<div style="position:absolute;left:6px;bottom:6px;font-size:7.5px;color:rgba(255,255,255,.7)">'+ss+'</div>';
+        + '<div style="position:absolute;left:0;top:0;width:48%;height:100%;background:linear-gradient(135deg,#9A938A 0%,#C4BBAE 45%,#DDD2C0 100%)"></div>'
+        + '<div style="position:absolute;left:0;top:0;width:48%;height:100%;background:radial-gradient(60% 40% at 50% 50%,rgba(255,255,255,.18) 0%,transparent 70%)"></div>'
+        + '<div style="position:absolute;right:0;top:0;width:52%;height:100%;background:linear-gradient(180deg,#0F0F0F 0%,#1A1A1A 100%)"></div>'
+        + '<div style="position:absolute;right:8%;top:11%;font-size:9px;color:#00C9A7;font-weight:900;letter-spacing:.3em">EDITORIAL</div>'
+        + '<div style="position:absolute;right:8%;top:23%;width:42%;color:#fff;font-size:18px;font-weight:800;line-height:1.1;letter-spacing:-.4px;font-family:Pretendard,sans-serif">취향이<br>기록되는<br>방식.</div>'
+        + '<div style="position:absolute;right:8%;bottom:8%;width:42%;font-size:10px;color:rgba(255,255,255,.6);letter-spacing:.04em">NO. 04 · WINTER</div>';
     }
-    if(tpl === 'mag'){ // SPLIT — 좌 이미지 / 우 다크 패널
+    if(tpl === 'mono'){ // MONO — 흑백 강한 대비
       return ''
-        + '<div style="position:absolute;left:0;top:0;width:48%;height:100%;background:linear-gradient(135deg,#888,#AAA)"></div>'
-        + '<div style="position:absolute;right:0;top:0;width:52%;height:100%;background:#111111"></div>'
-        + '<div style="position:absolute;right:6px;top:8px;padding:1.5px 5px;background:#00C9A7;color:#0A0A0A;font-size:6px;font-weight:800;letter-spacing:.1em">'+ll+'</div>'
-        + '<div style="position:absolute;right:6px;top:24px;width:46%;color:#fff;font-size:10.5px;font-weight:800;line-height:1.15;letter-spacing:-.3px">'+hh+'</div>'
-        + '<div style="position:absolute;right:6px;bottom:6px;width:46%;font-size:7.5px;color:rgba(255,255,255,.65)">'+ss+'</div>'
-        + '<div style="position:absolute;left:5px;bottom:5px;border:1px solid #fff;padding:1px 4px;font-size:6px;font-weight:800;color:#fff;letter-spacing:.1em">'+ll+'</div>';
+        + '<div style="position:absolute;inset:0;background:linear-gradient(to bottom,#7A7A7A 0%,#5A5A5A 50%,#FAFAFA 50%,#FAFAFA 100%);filter:grayscale(1)"></div>'
+        + '<div style="position:absolute;inset:0;background:radial-gradient(60% 40% at 50% 25%,rgba(255,255,255,.25) 0%,transparent 70%);pointer-events:none"></div>'
+        + '<div style="position:absolute;left:8%;top:9%;padding:3px 8px;background:#0D0D0D;color:#fff;font-size:10px;font-weight:900;letter-spacing:.3em">MONO</div>'
+        + '<div style="position:absolute;left:8%;bottom:24%;color:#0D0D0D;font-size:20px;font-weight:800;line-height:1.05;letter-spacing:-.5px;font-family:Pretendard,sans-serif">군더더기<br>없이.</div>'
+        + '<div style="position:absolute;right:8%;bottom:8%;font-size:10px;color:#0D0D0D;letter-spacing:.25em;font-weight:700">— BLACK / WHITE</div>';
     }
-    if(tpl === 'editorial'){ // FILM — sepia + 베이지 라인
+    if(tpl === 'pastel'){ // PASTEL — 따뜻한 크림 + 코랄
       return ''
-        + '<div style="position:absolute;inset:0;background:linear-gradient(to top,#1A1512 0%,#5A4030 60%,#A88060 100%)"></div>'
-        + '<div style="position:absolute;left:0;right:0;top:6px;height:1.5px;background:#C4A882"></div>'
-        + '<div style="position:absolute;left:0;right:0;bottom:24px;height:1.5px;background:#C4A882"></div>'
-        + '<div style="position:absolute;right:6px;top:11px;font-size:5.5px;color:#C4A882;font-weight:800;letter-spacing:.18em">'+ll.toUpperCase()+'</div>'
-        + '<div style="position:absolute;left:6px;bottom:5px;color:#E8DFD0;font-family:Nanum Myeongjo,Gowun Batang,serif;font-size:11px;line-height:1.2">'+hh+'</div>'
-        + '<div style="position:absolute;right:6px;top:32%;font-size:6px;color:#C4A882;letter-spacing:.05em">2026.04</div>';
-    }
-    if(tpl === 'mono'){ // MONO — 그레이 + 흰 패널
-      return ''
-        + '<div style="position:absolute;inset:0;background:linear-gradient(to bottom,#888 0%,#888 55%,#FAFAFA 55%,#FAFAFA 100%);filter:grayscale(1)"></div>'
-        + '<div style="position:absolute;left:6px;top:6px;padding:1.5px 5px;background:#0D0D0D;color:#fff;font-size:6.5px;font-weight:800;letter-spacing:.1em">'+ll+'</div>'
-        + '<div style="position:absolute;left:6px;bottom:14px;color:#111;font-size:11px;font-weight:700;line-height:1.2;letter-spacing:-.3px">'+hh+'</div>'
-        + '<div style="position:absolute;right:6px;bottom:5px;font-size:6.5px;color:#999;letter-spacing:.05em">'+ss+'</div>';
-    }
-    if(tpl === 'pastel'){ // PASTEL — 코랄 + 크림 + 도트
-      return ''
-        + '<div style="position:absolute;inset:0;background:linear-gradient(to bottom,#FFD7C2 0%,#FFD7C2 55%,#FDF6F0 55%,#FDF6F0 100%)"></div>'
-        + '<div style="position:absolute;left:6px;top:6px;padding:1.5px 5px;background:#F4A5B0;color:#3D2B1F;font-size:6.5px;font-weight:800;letter-spacing:.1em;border-radius:3px">'+ll+'</div>'
-        + '<div style="position:absolute;left:6px;bottom:14px;color:#3D2B1F;font-family:Gowun Dodum,Pretendard,sans-serif;font-size:11px;font-weight:700;line-height:1.2;letter-spacing:-.3px">'+hh+'</div>'
-        + '<div style="position:absolute;left:6px;bottom:5px;font-size:7px;color:rgba(61,43,31,.6);font-family:Gowun Dodum,Pretendard,sans-serif">'+ss+'</div>'
-        + '<div style="position:absolute;right:6px;bottom:18px;display:flex;gap:2.5px"><div style="width:4px;height:4px;border-radius:50%;background:#F4A5B0"></div><div style="width:4px;height:4px;border-radius:50%;background:#C4B5FD"></div><div style="width:4px;height:4px;border-radius:50%;background:#A7F3D0"></div></div>';
+        + '<div style="position:absolute;inset:0;background:linear-gradient(160deg,#FFD7C2 0%,#FBE4D2 50%,#FDF6F0 100%)"></div>'
+        + '<div style="position:absolute;right:-15%;top:-15%;width:55%;height:55%;border-radius:50%;background:radial-gradient(circle,rgba(244,165,176,.5) 0%,transparent 65%)"></div>'
+        + '<div style="position:absolute;left:8%;top:9%;font-size:9px;color:#A6645A;font-weight:800;letter-spacing:.3em">DAILY · SOFT</div>'
+        + '<div style="position:absolute;left:8%;bottom:24%;color:#3D2B1F;font-family:Gowun Dodum,Pretendard,sans-serif;font-size:20px;font-weight:700;line-height:1.1;letter-spacing:-.4px">달콤한<br>일상의 결.</div>'
+        + '<div style="position:absolute;left:8%;bottom:10%;font-size:11px;color:rgba(61,43,31,.6);font-family:Gowun Dodum,Pretendard,sans-serif">따뜻하게, 천천히</div>'
+        + '<div style="position:absolute;right:8%;bottom:30%;display:flex;gap:5px"><div style="width:8px;height:8px;border-radius:50%;background:#F4A5B0"></div><div style="width:8px;height:8px;border-radius:50%;background:#C4B5FD"></div><div style="width:8px;height:8px;border-radius:50%;background:#A7F3D0"></div></div>';
     }
     return '';
   }
@@ -10194,10 +10438,9 @@ function renderTplThumbs(){
     if(tpl === 'custom') return;
     var prev = item.querySelector('.tpl-prev');
     if(!prev) return;
-    item.style.background = 'transparent'; // 정적 background 제거 → 동적으로 prev 안에서 그림
-    item.style.position = 'relative';
-    item.style.overflow = 'hidden';
-    prev.style.cssText = 'position:absolute;inset:0;padding:0';
+    item.style.background = 'transparent';
+    // prev 는 CSS 에서 width:100% / aspect-ratio:1 / position:relative 로 자리잡음 — inline 덮어쓰기 X
+    prev.removeAttribute('style');
     prev.innerHTML = html(tpl);
   });
 }
