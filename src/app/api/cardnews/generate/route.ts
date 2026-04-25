@@ -14,8 +14,50 @@ import {
   planSlideImages,
   ensureCaption,
   scoreHook,
+  scoreSavability,
+  scoreViral,
+  detectScope,
+  recommendTemplates,
+  type CategoryKey,
 } from '@/lib/cardnews-prompt'
 import { NextRequest, NextResponse } from 'next/server'
+
+// Claude haiku 로 카테고리 분류 (regex fallback). 약 200~400ms
+async function classifyWithClaude(topic: string): Promise<CategoryKey> {
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY!,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 80,
+        messages: [{
+          role: 'user',
+          content: `주제를 읽고 아래 18개 중 가장 적합한 카테고리 1개를 JSON 으로만 반환. 설명 없이 {"category": "..."} 형식만.
+
+카테고리: beauty_treatment / beauty_product / beauty_ingredient / beauty_trouble / food / cafe / travel_domestic / travel_abroad / fashion / interior / fitness / money_tip / price_compare / trend / review / life_tip / book / etc
+
+주제: "${topic}"`,
+        }],
+      }),
+    })
+    if (!res.ok) return classifyCategory(topic)
+    const data = await res.json()
+    const text = data.content?.[0]?.text || ''
+    const match = text.match(/\{[\s\S]*\}/)
+    if (!match) return classifyCategory(topic)
+    const parsed = JSON.parse(match[0]) as { category?: string }
+    const valid: CategoryKey[] = ['beauty_treatment','beauty_product','beauty_ingredient','beauty_trouble','food','cafe','travel_domestic','travel_abroad','fashion','interior','fitness','money_tip','price_compare','trend','review','life_tip','book','etc']
+    if (parsed.category && valid.includes(parsed.category as CategoryKey)) return parsed.category as CategoryKey
+    return classifyCategory(topic)
+  } catch {
+    return classifyCategory(topic)
+  }
+}
 
 export async function POST(req: NextRequest) {
   const user = await getUserFromRequest(req)
@@ -55,15 +97,30 @@ export async function POST(req: NextRequest) {
     || (tone?.brand_context as string)
     || '한국 MZ 세대 SNS 크리에이터'
 
+  // 카테고리: Claude 위임 (실패 시 regex fallback)
+  const category = await classifyWithClaude(topic)
+  // 스코프: 키워드 기반 (가벼움)
+  const scope = detectScope(topic)
+  // 추천 템플릿 (카테고리 자동 추천)
+  const recommendedTemplates = recommendTemplates(category)
+
+  // 스코프 힌트 — 리서치 데이터에 추가 (소스 라우팅 가이드)
+  const scopeHint = scope === 'global'
+    ? '\n[스코프 자동 판단: global] 외국 브랜드·도시·영문 키워드가 감지됨. 글로벌 정보 우선 사용.'
+    : scope === 'kr'
+    ? '\n[스코프 자동 판단: kr] 한국 브랜드·서비스·지명 중심.'
+    : '\n[스코프 자동 판단: mixed] 한국·글로벌 양쪽 정보 활용.'
+
+  const researchData = (body.researchData || '') + scopeHint
+
   const prompt = buildContentGenerationPrompt({
     accountConcept,
     topic,
-    researchData: body.researchData || '',
+    researchData,
     slideCount,
     toneStyle: style,
     contentTone,
   })
-  const category = classifyCategory(topic)
 
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -91,11 +148,12 @@ export async function POST(req: NextRequest) {
     if (!match) return NextResponse.json({ error: 'parse failed', raw: text }, { status: 502 })
 
     type ChecklistItem = { ok?: boolean; text?: string }
-    type Entity = { type?: 'book' | 'product' | 'brand' | 'place'; name?: string }
+    type Entity = { type?: 'book' | 'product' | 'brand' | 'place'; name?: string; name_en?: string }
     type BodySlide = {
       role?: string
       title?: string
       text?: string
+      narrative_bridge?: string  // 다음 슬라이드로 이어주는 한 줄
       list?: ChecklistItem[]     // role=checklist
       big_number?: string        // role=number
       sub?: string               // role=number
@@ -108,6 +166,8 @@ export async function POST(req: NextRequest) {
       cover_subtitle?: string
       alt_hooks?: AltHook[]
       hook_score?: number
+      viral_score?: number
+      savability_score?: number
       body?: BodySlide[]
       caption?: string
       category?: string
@@ -215,6 +275,35 @@ export async function POST(req: NextRequest) {
     // 후킹 점수 서버측 재검증 (Claude 자체평가 참고)
     const serverScore = parsed.hook ? scoreHook(parsed.hook).total : 0
     const claudeScore = typeof parsed.hook_score === 'number' ? parsed.hook_score : 0
+    // 저장 가치 / 바이럴 서버측 평가 (Claude self-score 보조 검증)
+    const bodyTexts = (parsed.body || []).filter(b => b.role !== 'cta').map(b => `${b.title || ''} ${b.text || ''}`)
+    const ctaText = (parsed.body || []).find(b => b.role === 'cta')?.text || ''
+    const savServer = scoreSavability(bodyTexts).total
+    const viralServer = scoreViral(parsed.hook || '', ctaText).total
+    const savClaude = typeof parsed.savability_score === 'number' ? parsed.savability_score : 0
+    const viralClaude = typeof parsed.viral_score === 'number' ? parsed.viral_score : 0
+
+    // 팩트 검증 (high-risk claim 마킹) — 비치명, 실패해도 통과
+    let factIssues: Array<{ slide: number; claim: string; risk: string; action: string }> = []
+    try {
+      const fcRes = await fetch(`${process.env.NEXT_PUBLIC_APP_URL || 'https://ssobi.ai'}/api/cardnews/fact-check`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          authorization: req.headers.get('authorization') || '',
+          cookie: req.headers.get('cookie') || '',
+        },
+        body: JSON.stringify({ body: parsed.body || [] }),
+      })
+      if (fcRes.ok) {
+        const fc = await fcRes.json() as { issues?: typeof factIssues; cleaned?: BodySlide[] }
+        factIssues = fc.issues || []
+        // high risk 자동 마킹된 cleaned 적용
+        if (Array.isArray(fc.cleaned) && fc.cleaned.length === parsed.body?.length) {
+          parsed.body = parsed.body.map((b, i) => ({ ...b, text: fc.cleaned![i]?.text || b.text }))
+        }
+      }
+    } catch { /* skip */ }
 
     // 이미지 계획 생성 (Pinterest/올영/Gemini 라우팅 근거)
     const cat = (parsed.category as ReturnType<typeof classifyCategory>) || category
@@ -244,10 +333,17 @@ export async function POST(req: NextRequest) {
           model: 'claude-sonnet-4-20250514',
           tokens: data.usage || null,
           category: cat,
+          scope,
           image_keywords: parsed.image_keywords || [],
           image_plan: imagePlan,
           hook_score_claude: claudeScore,
           hook_score_server: serverScore,
+          savability_score_claude: savClaude,
+          savability_score_server: savServer,
+          viral_score_claude: viralClaude,
+          viral_score_server: viralServer,
+          fact_issues: factIssues,
+          recommended_templates: recommendedTemplates,
         },
       })
       .select('id')
@@ -287,9 +383,16 @@ export async function POST(req: NextRequest) {
       alt_hooks: parsed.alt_hooks || [],
       hook_score: claudeScore,
       hook_score_server: serverScore,
+      viral_score: viralClaude,
+      viral_score_server: viralServer,
+      savability_score: savClaude,
+      savability_score_server: savServer,
       body: parsed.body || [],
       caption,
       category: cat,
+      scope,
+      recommended_templates: recommendedTemplates,
+      fact_issues: factIssues,
       image_keywords: parsed.image_keywords || [],
       image_plan: imagePlan,
       job_id: job?.id,

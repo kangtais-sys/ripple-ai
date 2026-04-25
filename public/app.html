@@ -5025,7 +5025,10 @@ function goStep(n){
     title.textContent = ({1:'만들기',2:'사이즈 설정',3:'템플릿 선택',4:'편집 & 미리보기',5:'게시·예약'})[n];
   }
   // 템플릿 선택 화면 진입 시 썸네일을 실제 hook 문구로 갱신
-  if(n === 3){ try { renderTplThumbs(); } catch(_){} }
+  if(n === 3){
+    try { renderTplThumbs(); } catch(_){}
+    try { applyTemplateRecommendation(); } catch(_){}
+  }
   if(n===4) {
     // 기존 편집 상태가 있으면 보존 (미리보기/뒤로가기 시 리셋 방지)
     //   edtSlides 가 비어있을 때만 새로 생성
@@ -5357,6 +5360,9 @@ async function generatePrompt(){
     createData.imageKeywords = Array.isArray(j.image_keywords) ? j.image_keywords : [];
     createData.category = j.category || '';
     createData.altHooks = Array.isArray(j.alt_hooks) ? j.alt_hooks : [];
+    createData.recommendedTemplates = Array.isArray(j.recommended_templates) ? j.recommended_templates : [];
+    createData.factIssues = Array.isArray(j.fact_issues) ? j.fact_issues : [];
+    createData.scope = j.scope || 'mixed';
     createData._lastJobId = j.job_id;
     createData._captionEdited = false;  // 새 생성 → 유저 편집 플래그 리셋
     createData._editorSource = null;     // 에디터 캔버스 재생성 강제
@@ -5566,7 +5572,42 @@ function selectSize(el, s){
   el.classList.add('on');
   createData.size = s;
 }
-function selectTpl(el, t){
+// 카테고리 → 추천 템플릿 자동 적용 + 추천 배지 표시
+function applyTemplateRecommendation(){
+  var rec = createData.recommendedTemplates || [];
+  if(!rec.length) return;
+  // 기존 추천 배지 제거
+  document.querySelectorAll('#tpl-grid .tpl-item .tpl-rec-badge').forEach(function(b){ b.remove(); });
+  document.querySelectorAll('#tpl-grid .tpl-item').forEach(function(item){
+    var match = (item.getAttribute('onclick') || '').match(/selectTpl\(this,'([^']+)'\)/);
+    if(!match) return;
+    var key = match[1];
+    var idx = rec.indexOf(key);
+    if(idx >= 0){
+      var badge = document.createElement('div');
+      badge.className = 'tpl-rec-badge';
+      badge.style.cssText = 'position:absolute;top:6px;right:6px;background:var(--mint);color:#fff;font-size:9px;font-weight:800;padding:2.5px 7px;border-radius:5px;letter-spacing:.2px;z-index:2;pointer-events:none';
+      badge.textContent = idx === 0 ? '추천' : '추천';
+      item.style.position = 'relative';
+      item.appendChild(badge);
+    }
+  });
+  // 유저가 아직 템플릿 선택 안했거나 default(clean) 면 첫 추천으로 자동 선택
+  var first = rec[0];
+  var alreadyManual = createData._tplManualPick;
+  if(first && !alreadyManual){
+    var grid = document.getElementById('tpl-grid');
+    if(grid){
+      var target = null;
+      grid.querySelectorAll('.tpl-item').forEach(function(item){
+        var m = (item.getAttribute('onclick') || '').match(/selectTpl\(this,'([^']+)'\)/);
+        if(m && m[1] === first) target = item;
+      });
+      if(target){ selectTpl(target, first, true); }
+    }
+  }
+}
+function selectTpl(el, t, isAuto){
   // 템플릿 변경 시 편집 캔버스 재빌드 트리거
   if(createData.template !== t){
     createData._editorSource = null;
@@ -5574,6 +5615,7 @@ function selectTpl(el, t){
   document.querySelectorAll('#tpl-grid .tpl-item').forEach(function(e){ e.classList.remove('on'); });
   el.classList.add('on');
   createData.template = t;
+  if(!isAuto) createData._tplManualPick = true;
   // 개인화 누적: 자주 쓰는 템플릿 학습 (debounce: 짧게 여러개 눌러도 마지막만 기록)
   clearTimeout(window._tplPrefTimer);
   window._tplPrefTimer = setTimeout(function(){
@@ -8655,11 +8697,21 @@ async function autoLoadAllImageSlots(){
       });
       continue;
     }
-    // 2) 키워드 기반 stock 이미지 (기존 플로우)
+    // 2) 키워드 기반 stock 이미지 (기존 플로우 + 슬라이드별 angle)
+    var SLIDE_ANGLES_FE = [
+      'wide cinematic establishing shot',
+      'dramatic close-up moody',
+      'lifestyle scene natural light',
+      'flat lay overhead clean',
+      'detail texture macro',
+      'person using candid',
+      ''
+    ];
+    var slideAngle = SLIDE_ANGLES_FE[idx] || '';
     var j = null;
     for(var attempt = 0; attempt < 3; attempt++){
       var q = attempt === 0 ? kw : (kw + ' ' + ['close-up','scene','minimal'][attempt - 1]);
-      var params = new URLSearchParams({ q: q, category: cat, slide: String(idx) }).toString();
+      var params = new URLSearchParams({ q: q, category: cat, slide: String(idx), angle: slideAngle }).toString();
       try {
         var res = await fetch('/api/cardnews/image-search?' + params, { headers: h, credentials:'include' });
         j = await res.json();

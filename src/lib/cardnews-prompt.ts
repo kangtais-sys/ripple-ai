@@ -311,6 +311,151 @@ export function scoreHook(hook: string): HookScore {
   return { hasNumber, unpredictable, tagWorthy, noBanned, total }
 }
 
+// ─────────────────────────────────────────────────────────────
+// 저장 가치 점수 (10점, 7점 미만 본문 재작성)
+// 즉시 적용 +2 / 실수치 +2 / 실명 +2 / 비교구조 +2 / 출처 +2
+// ─────────────────────────────────────────────────────────────
+export type SavabilityScore = {
+  hasAction: boolean
+  hasNumber: boolean
+  hasNamedEntity: boolean
+  hasComparison: boolean
+  hasSource: boolean
+  total: number
+}
+export function scoreSavability(bodyTexts: string[]): SavabilityScore {
+  const merged = bodyTexts.join('\n')
+  const hasAction = /\d+\s*(분|시간|회|번|일|주|개월|kg|ml|단계)|아침|저녁|매일|먼저|다음|마지막/.test(merged)
+  const hasNumber = (merged.match(/\d{2,}/g) || []).length >= 2
+  const hasNamedEntity = /[A-Z][a-z]+|《.+?》|[가-힣]{2,}(브랜드|올리브영|무신사|쿠팡|네이버|스타벅스|이니스프리|YES24|교보문고)/.test(merged)
+  const hasComparison = /vs|비교|대신|보다|차이|먼저.*다음|첫.*둘.*셋/.test(merged)
+  const hasSource = /\((출처|기준|평균가|베스트|랭킹|2024|2025|2026|국세청|식약처|관세청|복지부)/.test(merged)
+  const total =
+    (hasAction ? 2 : 0) +
+    (hasNumber ? 2 : 0) +
+    (hasNamedEntity ? 2 : 0) +
+    (hasComparison ? 2 : 0) +
+    (hasSource ? 2 : 0)
+  return { hasAction, hasNumber, hasNamedEntity, hasComparison, hasSource, total }
+}
+
+// ─────────────────────────────────────────────────────────────
+// 바이럴 점수 (10점, 6점 미만 hook/cta 재작성)
+// 손해 느낌 +3 / 저장 안하면 못찾을 +3 / 친구 보내고 싶음 +2 / 댓글 욕구 +2
+// ─────────────────────────────────────────────────────────────
+export type ViralScore = {
+  lossAversion: boolean
+  saveUrgency: boolean
+  shareWorthy: boolean
+  commentBait: boolean
+  total: number
+}
+export function scoreViral(hook: string, ctaText: string): ViralScore {
+  const haystack = `${hook} ${ctaText}`
+  const lossAversion = /손해|놓치|아까|모르면|못받|모르고|알았으면|미리/.test(haystack)
+  const saveUrgency = /저장|기록|보관|나중에|찾기|놓침/.test(haystack)
+  const shareWorthy = /태그|보내|공유|친구|아는 사람|같이/.test(haystack)
+  const commentBait = /댓글|남겨|알려줘|뭐가|어떻|추천해/.test(haystack)
+  const total =
+    (lossAversion ? 3 : 0) +
+    (saveUrgency ? 3 : 0) +
+    (shareWorthy ? 2 : 0) +
+    (commentBait ? 2 : 0)
+  return { lossAversion, saveUrgency, shareWorthy, commentBait, total }
+}
+
+// ─────────────────────────────────────────────────────────────
+// 스코프 감지 (한국/글로벌 자동 판단) — 리서치 소스 라우팅에 사용
+// ─────────────────────────────────────────────────────────────
+export type ScopeKey = 'kr' | 'global' | 'mixed'
+const GLOBAL_BRANDS = ['nike','zara','uniqlo','ikea','netflix','amazon','apple','dyson','lush','fenty','drunk elephant','cerave','the ordinary','glossier','aesop','tatcha','skims','adidas','h&m','sephora']
+const GLOBAL_PLACES = ['파리','뉴욕','도쿄','런던','방콕','발리','LA','NYC','바르셀로나','로마','시드니','오사카','후쿠오카','상하이','베이징','싱가포르','하노이']
+const KR_BRANDS = ['올리브영','무신사','쿠팡','네이버','카카오','배민','이니스프리','아이오페','에뛰드','마녀공장','지그재그','29CM','스타일난다','휠라코리아','롯데','신세계','이마트']
+const KR_PLACES = ['강남','홍대','성수','이태원','제주','부산','경주','강릉','전주','속초','대구','광주','인천','수원']
+
+export function detectScope(topic: string): ScopeKey {
+  const t = topic.toLowerCase()
+  const kr = t
+  const hasGlobalBrand = GLOBAL_BRANDS.some(b => t.includes(b))
+  const hasGlobalPlace = GLOBAL_PLACES.some(p => kr.includes(p.toLowerCase()))
+  const hasEnglish = /[a-zA-Z]{4,}/.test(topic)
+  const hasKrBrand = KR_BRANDS.some(b => topic.includes(b))
+  const hasKrPlace = KR_PLACES.some(p => topic.includes(p))
+  // travel 카테고리는 명시적 — 함수 호출자가 카테고리로 강제 가능
+  if (/해외|국외|abroad|overseas|외국/.test(topic)) return 'global'
+  if (/국내|내수|local/.test(topic)) return 'kr'
+  const globalScore = (hasGlobalBrand ? 2 : 0) + (hasGlobalPlace ? 2 : 0) + (hasEnglish ? 1 : 0)
+  const krScore = (hasKrBrand ? 2 : 0) + (hasKrPlace ? 2 : 0) + 1 // 한국 서비스 기본 가중치
+  if (globalScore > krScore) return 'global'
+  if (krScore > globalScore + 1) return 'kr'
+  return 'mixed'
+}
+
+// ─────────────────────────────────────────────────────────────
+// 카테고리별 템플릿 추천 (자동 첫 선택 + 추천 배지)
+// ─────────────────────────────────────────────────────────────
+export type TemplateKey = 'clean' | 'bold' | 'mag' | 'editorial' | 'mono' | 'pastel' | 'noir' | 'luxury'
+const TEMPLATE_RECOMMEND: Record<CategoryKey, TemplateKey[]> = {
+  beauty_product:    ['clean', 'pastel'],
+  beauty_treatment:  ['luxury', 'noir'],
+  beauty_ingredient: ['clean', 'mono'],
+  beauty_trouble:    ['pastel', 'clean'],
+  food:              ['bold', 'mag'],
+  cafe:              ['pastel', 'clean'],
+  travel_domestic:   ['editorial', 'clean'],
+  travel_abroad:     ['mag', 'noir'],
+  fashion:           ['mag', 'editorial'],
+  interior:          ['clean', 'mono'],
+  fitness:           ['bold', 'mono'],
+  money_tip:         ['mono', 'editorial'],
+  book:              ['editorial', 'mag'],
+  trend:             ['bold', 'mag'],
+  life_tip:          ['clean', 'pastel'],
+  price_compare:     ['mono', 'bold'],
+  review:            ['clean', 'mono'],
+  etc:               ['clean', 'editorial'],
+}
+export function recommendTemplates(category: CategoryKey): TemplateKey[] {
+  return TEMPLATE_RECOMMEND[category] || ['clean', 'editorial']
+}
+
+// ─────────────────────────────────────────────────────────────
+// 카테고리별 specific source 강제 (생성 프롬프트에 주입)
+// ─────────────────────────────────────────────────────────────
+type SourceRule = { required: string[]; forbidden: string[] }
+const CATEGORY_SOURCE_RULES: Partial<Record<CategoryKey, SourceRule>> = {
+  beauty_product:    { required: ['제품명', '가격', '평점', '성분'],            forbidden: ['효과 보장', '피부 타입 무관'] },
+  beauty_treatment:  { required: ['시술명', '평균가격', '지속기간'],             forbidden: ['100% 효과', '부작용 없음'] },
+  food:              { required: ['가게명 또는 음식명', '가격대', '출처'],        forbidden: ['맛있음 단독', '강추 단독'] },
+  book:              { required: ['책 제목', '저자', '판매량 또는 순위'],         forbidden: ['꼭 읽어야 할', '인생책 단독'] },
+  money_tip:         { required: ['상품명', '금리/혜택 수치', '조건'],            forbidden: ['무조건 이득', '무조건 추천'] },
+  fashion:           { required: ['브랜드명', '가격', '구매처'],                  forbidden: ['무조건 예쁨', '살 빠져 보임'] },
+  travel_abroad:     { required: ['도시명', '항공 최저가 또는 숙박 가격대', '시즌'], forbidden: ['무조건 추천', '출처 없는 치안 정보'] },
+  fitness:           { required: ['운동명', '횟수/시간', '효과 수치 또는 출처'],   forbidden: ['빠르게 살 빠짐', '출처 없는 칼로리'] },
+}
+export function buildSourceRuleBlock(category: CategoryKey): string {
+  const rule = CATEGORY_SOURCE_RULES[category]
+  if (!rule) return ''
+  return `\n## 🔵 카테고리 강제 규칙 (${CATEGORIES[category].name})\n- 본문에 반드시 포함: ${rule.required.join(' / ')}\n- 절대 사용 금지: ${rule.forbidden.map(f => `"${f}"`).join(', ')}\n`
+}
+
+// ─────────────────────────────────────────────────────────────
+// 슬라이드별 이미지 angle (cinematic 다변화)
+// ─────────────────────────────────────────────────────────────
+export const SLIDE_ANGLES = [
+  'wide cinematic establishing shot',
+  'dramatic close-up moody',
+  'lifestyle scene natural light',
+  'flat lay overhead clean',
+  'detail texture macro',
+  'person using candid',
+  '', // 마지막 CTA — 이미지 없음
+]
+export function angleForSlide(idx: number, slideCount: number): string {
+  if (idx === slideCount - 1) return ''
+  return SLIDE_ANGLES[idx] || SLIDE_ANGLES[2]
+}
+
 // ═════════════════════════════════════════════════════════════
 // ═════════════════════════════════════════════════════════════
 //                 1. TREND_RESEARCH_PROMPT
@@ -385,6 +530,7 @@ export function buildContentGenerationPrompt(args: {
   const cat = classifyCategory(args.topic)
   const info = CATEGORIES[cat]
   const ctaPick = CTA_PATTERNS[Math.floor(Math.random() * CTA_PATTERNS.length)]
+  const sourceRuleBlock = buildSourceRuleBlock(cat)
   const toneGuide = args.toneStyle ? `\n[학습된 유저 말투 — 부가 참고용만]\n${JSON.stringify(args.toneStyle, null, 2)}` : ''
   const toneInfo = args.contentTone && CONTENT_TONES[args.contentTone] ? CONTENT_TONES[args.contentTone] : null
   const contentToneBlock = toneInfo
@@ -429,7 +575,7 @@ ${contentToneBlock}
 "${args.topic}"
 카테고리: ${info.name}
 카테고리 어조 지침: ${info.tone}${toneGuide}
-
+${sourceRuleBlock}
 ## 조사된 실제 정보
 ${researchBlock}
 
@@ -512,6 +658,20 @@ ${BANNED_PHRASES.map(p => `  · "${p}"`).join('\n')}
 - "❤️ 저장" / "👉 팔로우" / "💬 댓글" 중 **구체 액션 2~3개** 포함
 - 단순 인사말 금지 ("감사합니다" 금지)
 
+## 🔗 narrative 흐름 강제 (슬라이드 연결)
+각 본문 슬라이드는 단독으로 읽혀도 되지만, **순서대로 보면 자연스럽게 이어져야** 함.
+각 슬라이드에 narrative_bridge 필드 추가 — 다음 슬라이드로 넘기는 마지막 한 줄.
+다음 슬라이드 첫 줄은 그 bridge 를 자연스럽게 이어받아 시작.
+
+흐름 템플릿 (예시):
+- 1장(hook): "왜?" 질문 심기
+- 2장(hook2): "사실은 이거야" 반전
+- 3장: 문제 구체화 + "해결책이 있어"
+- 4장: 해결책 1 (가장 충격적인 것 먼저)
+- 5장: 해결책 2 + 비교
+- 6장: 해결책 3 + 실전 적용
+- 7장(cta): "이거 아는 사람 몇 없어" + 저장 유도
+
 ## 후킹 점수 자체 평가
 1장 생성 후 점수 체크 (만점 10):
   · 숫자/가격 포함 여부 (+3)
@@ -519,6 +679,13 @@ ${BANNED_PHRASES.map(p => `  · "${p}"`).join('\n')}
   · 친구한테 태그하고 싶음 (+3)
   · 금지어 없음 (+2)
 → 7점 미만이면 hook 재작성 (내부에서 최대 2회). 최종만 출력.
+
+## 🚀 바이럴 점수 자체 평가 (만점 10, 6점 미만 hook/cta 재작성)
+  · "이거 몰랐으면 손해" 느낌 (+3)
+  · 저장 안 하면 못 찾을 것 같은 느낌 (+3)
+  · 친구한테 보내고 싶은 내용 (+2)
+  · 댓글 달고 싶은 질문/공감 포인트 (+2)
+→ 6점 미만이면 hook + cta 다시 써. viral_score 필드로 점수 출력.
 
 ## 🔥 저장·공유 가치 자체 평가 (가장 중요 · 콘텐츠의 본질)
 **카드뉴스의 목적은 "저장 + 공유" 다.** 후킹만 좋고 내용 부실하면 0점.
@@ -561,12 +728,14 @@ ${BANNED_PHRASES.map(p => `  · "${p}"`).join('\n')}
     { "type": "reverse", "text": "반전형 후킹 (예: 의사들이 절대 안 알려주는 것)" }
   ],
   "hook_score": 8,
+  "viral_score": 7,
+  "savability_score": 8,
   "body": [
-    { "role": "hook2",  "title": "이중 후킹 소제목", "text": "인스타 2번째 단독 노출 대비 다른 각도 후킹 2~3줄", "entities": [] },
-    { "role": "body",   "title": "본문 소제목 1",  "text": "수치·책·가격·출처 포함된 4~6줄\\n줄바꿈 필수", "entities": [{"type":"book","name":"원씽"}] },
-    { "role": "body",   "title": "본문 소제목 2",  "text": "...", "entities": [{"type":"product","name":"제품 정확한 이름"}] },
-    { "role": "body",   "title": "본문 소제목 3",  "text": "..." },
-    { "role": "body",   "title": "본문 소제목 4",  "text": "..." },
+    { "role": "hook2",  "title": "이중 후킹 소제목", "text": "인스타 2번째 단독 노출 대비 다른 각도 후킹 2~3줄", "narrative_bridge": "그럼 실제로는?", "entities": [] },
+    { "role": "body",   "title": "본문 소제목 1",  "text": "수치·책·가격·출처 포함된 4~6줄\\n줄바꿈 필수", "narrative_bridge": "근데 가격만 보면 안 돼", "entities": [{"type":"book","name":"원씽","name_en":"The ONE Thing"}] },
+    { "role": "body",   "title": "본문 소제목 2",  "text": "...", "narrative_bridge": "더 중요한 건 이거야", "entities": [{"type":"product","name":"제품 정확한 이름","name_en":"Product Brand"}] },
+    { "role": "body",   "title": "본문 소제목 3",  "text": "...", "narrative_bridge": "마지막 결정타." },
+    { "role": "body",   "title": "본문 소제목 4",  "text": "...", "narrative_bridge": "이거 아는 사람 적어." },
     { "role": "cta",    "title": "CTA 후킹",      "text": "${ctaPick.replace(/\n/g, '\\n')}" }
   ],
   "category": "${cat}",
@@ -695,6 +864,7 @@ export type SlideImagePlan = {
   pinterestQuery?: string
   oliveYoungQuery?: string
   geminiPrompt?: string           // fallback 전용
+  angle?: string                  // 슬라이드별 cinematic angle (image-search 라우터가 적용)
 }
 export function planSlideImages(args: {
   topic: string
@@ -703,6 +873,7 @@ export function planSlideImages(args: {
 }): SlideImagePlan[] {
   const plans: SlideImagePlan[] = []
   for (let i = 0; i < args.slideCount; i++) {
+    const angle = angleForSlide(i, args.slideCount)
     if (i === args.slideCount - 1) {
       plans.push({ mode: 'fixed' })  // 마지막 CTA 고정
       continue
@@ -712,6 +883,7 @@ export function planSlideImages(args: {
         mode: 'oliveyoung',
         oliveYoungQuery: args.topic,
         geminiPrompt: buildGeminiImagenPrompt(args.topic),
+        angle,
       })
       continue
     }
@@ -719,6 +891,7 @@ export function planSlideImages(args: {
       mode: 'pinterest',
       pinterestQuery: buildPinterestQuery({ idx: i, topic: args.topic, category: args.category }),
       geminiPrompt: buildGeminiImagenPrompt(args.topic),
+      angle,
     })
   }
   return plans

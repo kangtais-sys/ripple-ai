@@ -14,11 +14,13 @@ export async function GET(req: NextRequest) {
   const q = (url.searchParams.get('q') || '').trim()
   const category = (url.searchParams.get('category') || '') as CategoryKey
   const slideIdx = parseInt(url.searchParams.get('slide') || '0', 10) || 0
+  const angle = (url.searchParams.get('angle') || '').trim() || undefined
 
   const result = await fetchCardnewsImage({
     koKeyword: q,
     category,
     slideIdx,
+    angle,
   })
 
   if (result.ok) {

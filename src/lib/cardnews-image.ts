@@ -124,21 +124,44 @@ const CATEGORY_EN_KEYWORDS: Record<CategoryKey, string[]> = {
   ],
 }
 
+// 슬라이드별 angle (cinematic 다변화) — 본문 슬라이드 다양성 확보
+const SLIDE_ANGLE_KEYWORDS = [
+  'wide cinematic establishing shot',
+  'dramatic close-up moody',
+  'lifestyle scene natural light',
+  'flat lay overhead clean',
+  'detail texture macro',
+  'person using candid',
+  '',
+]
+// angle 충돌 시 변환 (중복 회피)
+const ANGLE_VARIANTS: Record<string, string> = {
+  'close-up': 'detail',
+  'scene': 'lifestyle',
+  'wide': 'panoramic',
+}
+
 // 한국어 검색어 → 영어 aesthetic 키워드로 변환
-//   category 가 있으면 카테고리별 3개 중 slideIdx 로 고름 + 원본 주제 키워드 1개 보강
+//   category 가 있으면 카테고리별 3개 중 slideIdx 로 고름 + slide angle 추가
 export function toEnKeyword(args: {
   koKeyword?: string
   category?: CategoryKey
   slideIdx?: number
+  angle?: string                 // 명시 angle 키워드 (없으면 slideIdx 로 자동)
+  variant?: boolean              // 중복 회피 시 true → angle 변형
 }): string {
   const cat = args.category || 'etc'
   const pool = CATEGORY_EN_KEYWORDS[cat] || CATEGORY_EN_KEYWORDS.etc
   const base = pool[(args.slideIdx ?? 0) % pool.length]
+  let angle = args.angle ?? (args.slideIdx != null ? SLIDE_ANGLE_KEYWORDS[args.slideIdx] || '' : '')
+  if (args.variant && angle) {
+    for (const [k, v] of Object.entries(ANGLE_VARIANTS)) angle = angle.replace(k, v)
+  }
   // 원본이 이미 영어면 그대로 쓸 수 있지만 aesthetic 키워드 보강
   const ko = (args.koKeyword || '').trim()
   const isLatin = ko.length > 0 && /^[\x00-\x7F\s]+$/.test(ko)
-  if (isLatin && ko.length > 3) return `${ko} aesthetic`
-  return base
+  if (isLatin && ko.length > 3) return `${ko} ${angle || 'aesthetic'}`.trim()
+  return angle ? `${angle} ${base}` : base
 }
 
 // UTM 파라미터 — Unsplash API 가이드라인 필수 (Production 승인 요건)
@@ -292,22 +315,39 @@ export async function fetchCardnewsImage(args: {
   koKeyword?: string
   category?: CategoryKey
   slideIdx?: number
+  angle?: string                 // 슬라이드별 cinematic angle
+  usedUrls?: Set<string>          // 중복 회피
 }): Promise<ImageResult> {
   const enQuery = cleanQuery(toEnKeyword(args))
   const errs: string[] = []
-  // 1차: 카테고리 키워드로 3 provider 시도
-  for (const provider of [fetchUnsplash, fetchPexels, fetchPixabay]) {
-    const r = await provider(enQuery)
-    if (r.ok) return r
-    errs.push(`${provider.name}:${r.error}`)
-  }
-  // 2차: 포괄 fallback 키워드 — 어떤 주제든 매칭되는 일반 감성 이미지
-  for (const fbQuery of FALLBACK_QUERIES) {
-    for (const provider of [fetchUnsplash, fetchPexels]) {
-      const r = await provider(fbQuery)
-      if (r.ok) return r
-      errs.push(`fb-${provider.name}:${r.error}`)
+  const used = args.usedUrls
+  const tryProvider = async (q: string, fns: Array<(q: string) => Promise<ImageResult>>) => {
+    for (const provider of fns) {
+      const r = await provider(q)
+      if (r.ok && (!used || !used.has(r.url))) {
+        if (used) used.add(r.url)
+        return r
+      }
+      if (!r.ok) errs.push(`${provider.name}:${r.error}`)
+      else errs.push(`${provider.name}:duplicate`)
     }
+    return null
+  }
+  // 1차: 카테고리 + angle
+  let r = await tryProvider(enQuery, [fetchUnsplash, fetchPexels, fetchPixabay])
+  if (r) return r
+  // 1.5차: angle variant 로 변환 후 재시도 (중복 회피)
+  if (args.angle || args.slideIdx != null) {
+    const variantQuery = cleanQuery(toEnKeyword({ ...args, variant: true }))
+    if (variantQuery !== enQuery) {
+      r = await tryProvider(variantQuery, [fetchUnsplash, fetchPexels])
+      if (r) return r
+    }
+  }
+  // 2차: 포괄 fallback
+  for (const fbQuery of FALLBACK_QUERIES) {
+    r = await tryProvider(fbQuery, [fetchUnsplash, fetchPexels])
+    if (r) return r
   }
   return { ok: false, error: 'all_failed', detail: errs.join(' | ') }
 }
