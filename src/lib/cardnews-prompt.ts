@@ -395,24 +395,26 @@ export function detectScope(topic: string): ScopeKey {
 // 카테고리별 템플릿 추천 (자동 첫 선택 + 추천 배지)
 // ─────────────────────────────────────────────────────────────
 export type TemplateKey = 'clean' | 'bold' | 'mag' | 'editorial' | 'mono' | 'pastel' | 'noir' | 'luxury'
+// 2.1 시각 매핑 후 추천 (key: 시각)
+//   clean=CLEAN / bold=DARK / mag=SPLIT / editorial=FILM / mono=MONO / pastel=PASTEL / noir=STATEMENT / luxury=RAW
 const TEMPLATE_RECOMMEND: Record<CategoryKey, TemplateKey[]> = {
-  beauty_product:    ['clean', 'pastel'],
-  beauty_treatment:  ['luxury', 'noir'],
-  beauty_ingredient: ['clean', 'mono'],
-  beauty_trouble:    ['pastel', 'clean'],
-  food:              ['bold', 'mag'],
-  cafe:              ['pastel', 'clean'],
-  travel_domestic:   ['editorial', 'clean'],
-  travel_abroad:     ['mag', 'noir'],
-  fashion:           ['mag', 'editorial'],
-  interior:          ['clean', 'mono'],
-  fitness:           ['bold', 'mono'],
-  money_tip:         ['mono', 'editorial'],
-  book:              ['editorial', 'mag'],
-  trend:             ['bold', 'mag'],
-  life_tip:          ['clean', 'pastel'],
-  price_compare:     ['mono', 'bold'],
-  review:            ['clean', 'mono'],
+  beauty_treatment:  ['clean'],            // CLEAN
+  beauty_product:    ['clean', 'pastel'],  // CLEAN | PASTEL
+  beauty_ingredient: ['clean'],            // CLEAN
+  beauty_trouble:    ['clean'],            // CLEAN
+  food:              ['editorial', 'bold'],// FILM | DARK
+  cafe:              ['editorial', 'pastel'], // FILM | PASTEL
+  travel_domestic:   ['editorial'],        // FILM
+  travel_abroad:     ['bold', 'editorial'],// DARK | FILM
+  fashion:           ['luxury', 'mag'],    // RAW | SPLIT
+  interior:          ['mono', 'pastel'],   // MONO | PASTEL
+  fitness:           ['bold', 'luxury'],   // DARK | RAW
+  money_tip:         ['bold'],             // DARK
+  price_compare:     ['bold', 'clean'],    // DARK | CLEAN
+  trend:             ['bold'],             // DARK
+  review:            ['luxury', 'mono'],   // RAW | MONO
+  life_tip:          ['clean'],            // CLEAN
+  book:              ['noir', 'mono'],     // STATEMENT | MONO
   etc:               ['clean', 'editorial'],
 }
 export function recommendTemplates(category: CategoryKey): TemplateKey[] {
@@ -637,16 +639,22 @@ ${BANNED_PHRASES.map(p => `  · "${p}"`).join('\n')}
 - body[1]~body[${slideCount - 3}] 이 여기 해당
 - **"저장·공유할 만한" 퀄리티만 작성**. 두루뭉술하거나 흔한 내용은 그 슬라이드를 삭제하고 다른 포인트로 대체
 - title: 6자 이내 소제목 (예: "10억 만든", "새벽 기상법")
-- **text: 반드시 5~7줄 (각 줄 18~35자) · 총 130~250자**
-  · 너무 짧으면 정보 부족 → 저장 가치 X. **5줄 미만이면 무조건 재작성**.
-  · 정보를 충분히 담아야 함. 한 슬라이드가 그 자체로 완결된 정보
+- **text: 반드시 3~4줄 (각 줄 15~28자) · 총 60~100자**
+  · 모바일 가독성 우선. 짧고 강하게.
+  · 길어지면 자동 잘림 → **5줄 이상이면 재작성**.
+  · 한 줄 = 한 임팩트. 출처 한 줄은 별도.
 - **줄바꿈(\\n) 반드시 사용. 한 줄 = 한 의미** — 절대 한 덩어리로 쓰지 마
-  · (나쁨, 정보 부족) "매일 10분 걷기"
-  · (나쁨, 한덩어리) "매일 10분 걷기부터 시작해서 심박수 120-140 유지하면 6주 만에..."
-  · (좋음) "매일 아침 6시 30분 기상\\n공복에 미지근한 물 500ml\\n10분 동안 가볍게 걷기 시작\\n심박수 120-140 유지가 핵심\\n6주 차에 5km 비공식 기록 단축\\n(러닝 입문자 평균 기준)"
+  · (나쁨) "매일 10분 걷기부터 시작해서 심박수 120-140 유지하면 6주 만에..."
+  · (좋음) "순서 틀리면 돈 낭비\\n레티놀 + 비타민C = 자극\\n나이아신 아침, 레티놀 저녁\\n(화해 성분 기준)"
 - 숫자·책제목·브랜드·가격·시간 중 **최소 2개** 필수
 - 출처 한 줄 필수 (예: "(YES24 베스트셀러 10주)", "(올리브영 평균가)")
 - 비교 구조 권장: A vs B vs C
+
+### 🎯 hook ↔ body 일치 강제
+- hook 에서 언급한 핵심 주장(숫자·제품·장소·인물·가격)은 body 슬라이드 중 최소 1장에 **반드시** 구체적으로 등장
+  · hook 이 "강남 50만원 시술 vs 3만원 크림" 이면 → body 안에 그 3만원 크림의 **실명·구매처** 명시 필수
+  · hook 이 "교토 현지인만 가는 카페 5곳" 이면 → body 슬라이드에 그 5곳 중 최소 3곳의 **카페명** 명시 필수
+- hook 에서 약속한 정보가 body 에 없으면 콘텐츠가 사기 — 절대 금지
 
 **모든 본문은 role="body" 만 사용** — checklist/number/toc 옵션 제거됨. 일관된 본문 슬라이드만.
 

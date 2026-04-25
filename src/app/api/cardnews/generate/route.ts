@@ -272,6 +272,53 @@ export async function POST(req: NextRequest) {
     parsed.hook = stripEmoji(parsed.hook)
     parsed.cover_subtitle = stripEmoji(parsed.cover_subtitle)
 
+    // hook ↔ body 일치 검증: hook 의 의미 키워드(숫자/한글 명사 ≥3자) 가 body 어디에도 없으면 1회 재요청
+    let parsedNN: Parsed = parsed
+    if (parsedNN.hook && Array.isArray(parsedNN.body)) {
+      const hookKeywords = (parsedNN.hook!
+        .replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '')
+        .match(/\d+|[가-힣A-Za-z]{3,}/g) || [])
+        .filter(k => !['이거','진짜','대박','오늘','이건','그게','그래','그런','어떻','어디','얼마','정말','내가','나는','우리','때문','하지','했어','였어','드디어','정말로'].includes(k))
+        .slice(0, 4)
+      const bodyMerged = parsedNN.body!
+        .filter(b => b.role !== 'cta')
+        .map(b => `${b.title || ''} ${b.text || ''}`)
+        .join(' ')
+      const missing = hookKeywords.filter((kw: string) => !bodyMerged.includes(kw))
+      // hook 의 핵심 키워드 50% 이상이 body 에 없으면 재요청 (1회만)
+      if (hookKeywords.length >= 2 && missing.length / hookKeywords.length >= 0.5) {
+        try {
+          const fixPrompt = `${prompt}\n\n━━━ 추가 강제 조건: hook "${parsedNN.hook}" 에서 언급한 다음 키워드들은 body 슬라이드에 반드시 구체적으로 등장해야 한다: ${hookKeywords.join(', ')}\n각 키워드의 실제 이름·가격·위치 같은 구체 정보를 body 에 넣어. JSON 형식만 출력.`
+          const fixRes = await fetch('https://api.anthropic.com/v1/messages', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-api-key': process.env.ANTHROPIC_API_KEY!,
+              'anthropic-version': '2023-06-01',
+            },
+            body: JSON.stringify({
+              model: 'claude-sonnet-4-20250514',
+              max_tokens: 4096,
+              messages: [{ role: 'user', content: fixPrompt }],
+            }),
+          })
+          if (fixRes.ok) {
+            const fixData = await fixRes.json()
+            const fixText = fixData.content?.[0]?.text || ''
+            const fixMatch = fixText.match(/\{[\s\S]*\}/)
+            if (fixMatch) {
+              const fixed = parseJson(fixMatch[0])
+              if (fixed && Array.isArray(fixed.body) && fixed.body.length === parsedNN.body!.length) {
+                parsedNN.hook = fixed.hook || parsedNN.hook
+                parsedNN.body = fixed.body
+                parsedNN.alt_hooks = fixed.alt_hooks || parsedNN.alt_hooks
+              }
+            }
+          }
+        } catch { /* 재요청 실패 시 원본 통과 */ }
+      }
+    }
+
     // 후킹 점수 서버측 재검증 (Claude 자체평가 참고)
     const serverScore = parsed.hook ? scoreHook(parsed.hook).total : 0
     const claudeScore = typeof parsed.hook_score === 'number' ? parsed.hook_score : 0

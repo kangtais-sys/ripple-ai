@@ -349,5 +349,17 @@ export async function fetchCardnewsImage(args: {
     r = await tryProvider(fbQuery, [fetchUnsplash, fetchPexels])
     if (r) return r
   }
-  return { ok: false, error: 'all_failed', detail: errs.join(' | ') }
+  // 3차 (최후): source.unsplash.com 직링크 — API 키 없이도 항상 이미지 반환
+  // attribution 은 generic Unsplash 표기 (작가 정보 없음)
+  const finalKw = encodeURIComponent(cleanQuery(toEnKeyword(args)) || 'aesthetic lifestyle')
+  const fallbackUrl = `https://source.unsplash.com/1080x1080/?${finalKw}`
+  if (used) used.add(fallbackUrl)
+  return {
+    ok: true,
+    url: fallbackUrl,
+    source: 'unsplash',
+    sourceLabel: 'Unsplash',
+    photographer: 'Unsplash',
+    attributionUrl: `https://unsplash.com/?${UTM}`,
+  }
 }

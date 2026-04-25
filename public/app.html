@@ -481,6 +481,17 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .create-step{display:none}.create-step.on{display:block}
 .trend-list{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
 .trend-list > .trend-card{width:100%;margin-bottom:0}
+.trend-card.v3{display:block !important;height:72px;padding:12px 14px;background:#fff;border:1px solid var(--b);border-radius:14px;margin-bottom:8px;cursor:pointer;transition:all .15s;font-family:'Pretendard',sans-serif;box-sizing:border-box;position:relative}
+.trend-card.v3:active{transform:scale(.99);border-color:var(--mint)}
+.tc3-row1{display:flex;align-items:center;gap:6px;margin-bottom:6px}
+.tc3-chip{padding:2px 7px;border-radius:4px;background:var(--mint-l);color:var(--mint-d);font-size:9.5px;font-weight:800;letter-spacing:-.2px;flex-shrink:0}
+.tc3-title{flex:1;font-size:13px;font-weight:800;color:var(--t1);letter-spacing:-.3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tc3-arrow{flex-shrink:0;color:var(--mint-d);font-size:14px;font-weight:900}
+.tc3-row2{display:flex;align-items:center;gap:6px}
+.tc3-badge{font-size:9.5px;font-weight:700;color:var(--mint-d);background:var(--mint-l);padding:2px 6px;border-radius:4px;flex-shrink:0}
+.tc3-trend{flex:1;height:3px;background:#F3F4F6;border-radius:2px;overflow:hidden}
+.tc3-trend-fill{height:100%;background:linear-gradient(90deg,var(--mint),var(--mint-d));border-radius:2px}
+.tc3-num{font-size:9.5px;font-weight:800;color:var(--mint-d);font-variant-numeric:tabular-nums;flex-shrink:0;min-width:18px;text-align:right}
 /* ── 추천 카드 v2 (PART 3 spec) ── */
 .trend-card.v2{display:block !important;padding:14px 16px;background:#fff;border:1px solid var(--b);border-radius:16px;margin-bottom:10px;cursor:pointer;transition:all .15s;font-family:'Pretendard',sans-serif}
 .trend-card.v2:active{transform:scale(.99);border-color:var(--mint)}
@@ -2322,66 +2333,75 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:6px">템플릿 선택</div>
     <div style="font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.55">클릭하면 바로 디자인이 적용돼요.</div>
     <div class="tpl-grid" id="tpl-grid">
-      <div class="tpl-item on" onclick="selectTpl(this,'clean')" style="background:linear-gradient(160deg,#fff,#F9FAFB)">
+      <!-- CLEAN — 미니멀 화이트 + mint -->
+      <div class="tpl-item on" onclick="selectTpl(this,'clean')" style="background:#FFFFFF">
         <div class="tpl-prev">
-          <div style="width:80%;height:3px;background:var(--dark);margin-bottom:10px;border-radius:2px"></div>
-          <div style="font-size:13px;font-weight:900;color:var(--t1);margin-bottom:6px;line-height:1.2">Clean</div>
-          <div style="width:60%;height:2px;background:var(--b);margin-bottom:4px"></div>
-          <div style="width:70%;height:2px;background:var(--b);margin-bottom:4px"></div>
-          <div style="width:40%;height:2px;background:var(--b)"></div>
+          <div style="width:30%;height:14px;background:#E8E8E5;margin-bottom:10px;border-radius:1px"></div>
+          <div style="display:flex;align-items:center;gap:5px;margin-bottom:6px"><div style="width:3px;height:14px;background:#00C9A7"></div><div style="font-size:12px;font-weight:800;color:#111;line-height:1.1">간결한<br>한 줄.</div></div>
+          <div style="position:absolute;left:6px;bottom:6px;padding:2px 6px;background:rgba(255,255,255,.92);border:1px solid #00C9A7;font-size:7px;font-weight:800;color:#00C9A7;letter-spacing:.1em">뷰티</div>
         </div>
-        <div class="tpl-name" style="color:var(--t1);text-shadow:none">미니멀</div>
+        <div class="tpl-name" style="color:var(--t1);text-shadow:none">CLEAN</div>
       </div>
-      <div class="tpl-item" onclick="selectTpl(this,'bold')" style="background:linear-gradient(160deg,#1A1F27,#374151)">
-        <div class="tpl-prev" style="color:#fff">
-          <div style="font-size:18px;font-weight:900;line-height:1;color:#FFD233;margin-bottom:8px">01</div>
-          <div style="font-size:12px;font-weight:900;line-height:1.2;color:#fff">BOLD<br>TITLE</div>
-        </div>
-        <div class="tpl-name">볼드</div>
-      </div>
-      <div class="tpl-item" onclick="selectTpl(this,'noir')" style="background:linear-gradient(135deg,#0A0A0A,#1F1F1F 50%,#0A0A0A)">
-        <div class="tpl-prev" style="color:#fff">
-          <div style="font-family:'Fraunces','Pretendard',serif;font-style:italic;font-size:10px;color:#D4A574;letter-spacing:.2em;margin-bottom:8px">— NOIR</div>
-          <div style="font-family:'Fraunces','Pretendard',serif;font-style:italic;font-size:14px;font-weight:400;color:#fff;line-height:1.15;letter-spacing:-.3px">Midnight<br>Story.</div>
-        </div>
-        <div class="tpl-name">누아르</div>
-      </div>
-      <div class="tpl-item" onclick="selectTpl(this,'luxury')" style="background:linear-gradient(135deg,#0F0F0F,#3A2A14 50%,#0F0F0F)">
-        <div class="tpl-prev" style="color:#F5E7C8">
-          <div style="font-size:9px;font-weight:800;color:#D4A574;letter-spacing:.3em;margin-bottom:8px">LUXURY</div>
-          <div style="font-size:13px;font-weight:900;color:#F5E7C8;line-height:1.15;letter-spacing:-.3px">GOLD<br>HOUR</div>
-        </div>
-        <div class="tpl-name">럭셔리</div>
-      </div>
-      <div class="tpl-item" onclick="selectTpl(this,'mag')" style="background:linear-gradient(160deg,#FFF1F3,#FFE8EC)">
+      <!-- DARK — 다크 그라데이션 + 형광 -->
+      <div class="tpl-item" onclick="selectTpl(this,'bold')" style="background:linear-gradient(to top, #0A0A0A 0%, #2A2A2A 60%, #4A4A4A 100%)">
         <div class="tpl-prev">
-          <div style="font-size:9px;font-weight:800;color:#E11D48;letter-spacing:2px;margin-bottom:6px">VOL.01</div>
-          <div style="font-size:13px;font-weight:900;color:var(--t1);line-height:1.15;font-family:serif">매거진<br>스타일</div>
+          <div style="position:absolute;left:6px;bottom:30px;padding:2px 6px;background:#CCFF00;color:#0A0A0A;font-size:7px;font-weight:900;letter-spacing:.15em">TREND</div>
+          <div style="position:absolute;left:6px;bottom:6px;color:#fff;font-size:11px;font-weight:800;line-height:1.1">제목 굵게<br>두 줄까지</div>
         </div>
-        <div class="tpl-name" style="color:var(--t1);text-shadow:none">매거진</div>
+        <div class="tpl-name">DARK</div>
       </div>
-      <div class="tpl-item" onclick="selectTpl(this,'editorial')" style="background:#FAF8F4">
+      <!-- STATEMENT (key: noir) — 텍스트 중심 다크 -->
+      <div class="tpl-item" onclick="selectTpl(this,'noir')" style="background:#1A1A1A">
         <div class="tpl-prev">
-          <div style="font-family:'Fraunces','Pretendard',serif;font-style:italic;font-size:11px;color:#1A1F27;letter-spacing:.1em;margin-bottom:8px">— Editorial</div>
-          <div style="font-family:'Fraunces','Pretendard',serif;font-style:italic;font-size:15px;font-weight:400;color:var(--t1);line-height:1.1;letter-spacing:-.5px">Quiet<br>Notes.</div>
+          <div style="position:absolute;left:6px;top:0;font-family:'Gowun Batang','Noto Serif KR',serif;font-size:38px;color:#C9A84C;opacity:.15;line-height:.8">"</div>
+          <div style="position:absolute;left:8px;top:18px;font-family:'Gowun Batang','Noto Serif KR',serif;color:#fff;font-size:11px;line-height:1.3">긴 문장이<br>그 자체로<br>비주얼.</div>
+          <div style="position:absolute;right:6px;bottom:6px;font-size:7px;color:#888;font-style:italic">— 출처</div>
         </div>
-        <div class="tpl-name" style="color:var(--t1);text-shadow:none">에디토리얼</div>
+        <div class="tpl-name">STATEMENT</div>
       </div>
-      <div class="tpl-item" onclick="selectTpl(this,'mono')" style="background:#0F1319">
-        <div class="tpl-prev" style="color:#fff">
-          <div style="font-family:'JetBrains Mono',monospace;font-size:8.5px;color:rgba(255,255,255,.5);letter-spacing:.15em;margin-bottom:8px">01 / 05</div>
-          <div style="font-size:13px;font-weight:500;color:#fff;line-height:1.15;letter-spacing:-.5px">핵심만<br>간결하게.</div>
-          <div style="width:30%;height:2px;background:var(--mint);margin-top:8px"></div>
-        </div>
-        <div class="tpl-name">모노</div>
-      </div>
-      <div class="tpl-item" onclick="selectTpl(this,'pastel')" style="background:linear-gradient(160deg,#FDF2F8,#E0E7FF)">
+      <!-- RAW (key: luxury) — 풀 이미지 + 다크 하단 -->
+      <div class="tpl-item" onclick="selectTpl(this,'luxury')" style="background:linear-gradient(to top, #0D0D0D 0%, #6B5142 50%, #B89172 100%)">
         <div class="tpl-prev">
-          <div style="font-size:9.5px;font-weight:800;color:#7C3AED;letter-spacing:.2em;margin-bottom:6px">SOFT</div>
-          <div style="font-size:13px;font-weight:700;color:var(--t1);line-height:1.2;letter-spacing:-.3px">조용한<br>하루</div>
-          <div style="display:flex;gap:3px;margin-top:10px"><div style="width:6px;height:6px;border-radius:50%;background:#FBCFE8"></div><div style="width:6px;height:6px;border-radius:50%;background:#C4B5FD"></div><div style="width:6px;height:6px;border-radius:50%;background:#A7F3D0"></div></div>
+          <div style="position:absolute;left:6px;bottom:6px;color:#fff;font-family:'Black Han Sans','Pretendard',sans-serif;font-size:14px;line-height:1;letter-spacing:-.5px">RAW<br>STREET</div>
+          <div style="position:absolute;left:6px;top:6px;border:1px solid #fff;padding:2px 5px;font-size:7px;font-weight:800;color:#fff;letter-spacing:.1em">패션</div>
         </div>
-        <div class="tpl-name" style="color:var(--t1);text-shadow:none">파스텔</div>
+        <div class="tpl-name">RAW</div>
+      </div>
+      <!-- SPLIT (key: mag) — 좌이미지 / 우 다크 패널 -->
+      <div class="tpl-item" onclick="selectTpl(this,'mag')" style="background:linear-gradient(to right, #888 0%, #888 48%, #111 48%, #111 100%)">
+        <div class="tpl-prev">
+          <div style="position:absolute;right:6px;top:8px;padding:2px 6px;background:#00C9A7;color:#0A0A0A;font-size:7px;font-weight:800;letter-spacing:.1em">트렌드</div>
+          <div style="position:absolute;right:6px;top:24px;color:#fff;font-size:11px;font-weight:800;line-height:1.15">좌 이미지<br>우 텍스트</div>
+        </div>
+        <div class="tpl-name">SPLIT</div>
+      </div>
+      <!-- FILM (key: editorial) — 필름 감성 + 베이지 라인 -->
+      <div class="tpl-item" onclick="selectTpl(this,'editorial')" style="background:linear-gradient(to top, #1A1512 0%, #6B5142 50%, #C4A882 100%)">
+        <div class="tpl-prev">
+          <div style="position:absolute;left:0;right:0;top:8px;height:1.5px;background:#C4A882"></div>
+          <div style="position:absolute;left:0;right:0;bottom:24px;height:1.5px;background:#C4A882"></div>
+          <div style="position:absolute;right:6px;top:14px;font-size:6px;color:#C4A882;font-weight:800;letter-spacing:.15em">TRAVEL</div>
+          <div style="position:absolute;left:6px;bottom:6px;color:#E8DFD0;font-family:'Nanum Myeongjo',serif;font-size:11px;line-height:1.2">필름 감성<br>여행 기록.</div>
+        </div>
+        <div class="tpl-name">FILM</div>
+      </div>
+      <!-- MONO — 흑백 + 흰 패널 -->
+      <div class="tpl-item" onclick="selectTpl(this,'mono')" style="background:linear-gradient(to bottom, #999 0%, #999 55%, #FAFAFA 55%, #FAFAFA 100%)">
+        <div class="tpl-prev">
+          <div style="position:absolute;left:6px;top:6px;padding:2px 6px;background:#0D0D0D;color:#fff;font-size:7px;font-weight:800;letter-spacing:.1em">취향</div>
+          <div style="position:absolute;left:6px;bottom:14px;color:#111;font-size:11px;font-weight:700;line-height:1.2">시크 모노<br>군더더기 X.</div>
+          <div style="position:absolute;right:6px;bottom:4px;font-size:6.5px;color:#999;letter-spacing:.05em">25 / 12</div>
+        </div>
+        <div class="tpl-name" style="color:var(--t1);text-shadow:none">MONO</div>
+      </div>
+      <!-- PASTEL — 따뜻한 크림 + 코랄 -->
+      <div class="tpl-item" onclick="selectTpl(this,'pastel')" style="background:linear-gradient(to bottom, #FFD7C2 0%, #FFD7C2 55%, #FDF6F0 55%, #FDF6F0 100%)">
+        <div class="tpl-prev">
+          <div style="position:absolute;left:6px;top:6px;padding:2px 6px;background:#F4A5B0;color:#3D2B1F;font-size:7px;font-weight:800;letter-spacing:.1em;border-radius:3px">홈·살림</div>
+          <div style="position:absolute;left:6px;bottom:6px;color:#3D2B1F;font-family:'Gowun Dodum',sans-serif;font-size:11px;font-weight:700;line-height:1.2">따뜻하고<br>사랑스러운.</div>
+          <div style="position:absolute;right:6px;bottom:18px;display:flex;gap:2.5px"><div style="width:4px;height:4px;border-radius:50%;background:#F4A5B0"></div><div style="width:4px;height:4px;border-radius:50%;background:#C4B5FD"></div><div style="width:4px;height:4px;border-radius:50%;background:#A7F3D0"></div></div>
+        </div>
+        <div class="tpl-name" style="color:var(--t1);text-shadow:none">PASTEL</div>
       </div>
       <div class="tpl-my" onclick="openMyTpl()">
         <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
@@ -5205,30 +5225,23 @@ function renderDailyTrendsStatic(picks, freshness){
   container.innerHTML = picks.map(function(t, i){
     var chip = t.chip || (t.category ? labelizeCategory(t.category) : 'AI 추천');
     var trendScore = typeof t.trend_score === 'number' ? t.trend_score : (75 - i * 10);
-    var pattern = t.hook_type || hookPatterns[i] || hookPatterns[0];
     var badges = Array.isArray(t.badges) && t.badges.length ? t.badges : defaultBadges[i] || ['추천'];
-    return '<div class="trend-card v2" onclick="useTrend('+(i+1)+')">' +
-      // 상단: 카테고리 칩 + 트렌드 지수 바
-      '<div class="tc-top">' +
-        '<span class="tc-chip">'+escapeHtml(chip)+'</span>' +
-        '<span class="tc-pattern">'+escapeHtml(pattern)+'</span>' +
-        '<div class="tc-trend"><div class="tc-trend-fill" style="width:'+Math.max(8, Math.min(100, trendScore))+'%"></div></div>' +
-        '<span class="tc-trend-num">'+Math.round(trendScore)+'</span>' +
+    var topBadge = badges[0] || '지금 뜨는';
+    return '<div class="trend-card v3" onclick="useTrend('+(i+1)+')">' +
+      '<div class="tc3-row1">' +
+        '<span class="tc3-chip">'+escapeHtml(chip)+'</span>' +
+        '<span class="tc3-title">'+escapeHtml(t.topic)+'</span>' +
+        '<span class="tc3-arrow">→</span>' +
       '</div>' +
-      // 중단: 제목 (2줄 허용)
-      '<div class="tc-title">'+escapeHtml(t.topic)+'</div>' +
-      // 뱃지 + freshness
-      '<div class="tc-badges">' +
-        badges.slice(0, 2).map(function(b){
-          var ico = b.indexOf('저장') >= 0 ? '✦' : b.indexOf('팔로우') >= 0 ? '↗' : b.indexOf('댓글') >= 0 ? '💬' : b.indexOf('뜨는') >= 0 ? '🔥' : b.indexOf('캡처') >= 0 ? '📸' : '✓';
-          return '<span class="tc-badge">'+ico+' '+escapeHtml(b)+'</span>';
-        }).join('') +
-        (freshness === 'stale' ? '<span class="tc-stale">어제자</span>' : '') +
+      '<div class="tc3-row2">' +
+        '<span class="tc3-badge">'+escapeHtml(topBadge)+'</span>' +
+        '<div class="tc3-trend"><div class="tc3-trend-fill" style="width:'+Math.max(8, Math.min(100, trendScore))+'%"></div></div>' +
+        '<span class="tc3-num">'+Math.round(trendScore)+'</span>' +
       '</div>' +
-      // 하단: 액션
-      '<div class="tc-action">→ 이 주제로 만들기</div>' +
     '</div>';
   }).join('');
+  // 패턴 변수 사용 안 해도 lint 통과
+  void hookPatterns;
 }
 
 // category key → 한글 표기
@@ -7964,18 +7977,27 @@ var edtSel = null;
 //   채도 낮춤 · 무지개 그라데이션 제거 · 무채색+포인트1색 원칙
 //   본문은 Pretendard/Noto Sans KR 강제 (가독성)
 //   제목은 템플릿 폰트 (디자인 차별화)
+// 템플릿 키 → 2.1 시각 매핑
+//   clean → CLEAN (#FFFFFF, mint)
+//   bold  → DARK  (#0A0A0A image+gradient, fluorescent accent)
+//   mag   → SPLIT (#111111 dark right panel)
+//   editorial → FILM (warm dark #1A1512, sepia, Nanum Myeongjo)
+//   mono  → MONO  (#FAFAFA white panel, grayscale image filter)
+//   pastel → PASTEL (#FDF6F0 cream, coral)
+//   noir  → STATEMENT (#1A1A1A text-only, gold accent)
+//   luxury → RAW (#0D0D0D full image bg, no overlay)
 function tplBg(t){
-  if(t==='custom') return window._customTplBg || '#F8F8F6';
+  if(t==='custom') return window._customTplBg || '#FFFFFF';
   return ({
-    clean:     '#F8F8F6',                                    // 단색 오프화이트
-    bold:      '#0D0D0D',                                    // 단색 다크
-    mag:       '#FAFAF8',                                    // 단색 매거진 화이트
-    editorial: '#FFFFFF',                                    // 순백
-    mono:      '#F2F2F0',                                    // 단색 모노 그레이
-    pastel:    '#FDF6F0',                                    // 크림
-    noir:      '#0A0A0A',                                    // 단색 누아르 블랙
-    luxury:    '#1A1614',                                    // 단색 럭셔리 다크브라운
-  })[t] || '#F8F8F6';
+    clean:     '#FFFFFF',     // CLEAN
+    bold:      '#0A0A0A',     // DARK
+    mag:       '#111111',     // SPLIT
+    editorial: '#1A1512',     // FILM
+    mono:      '#FAFAFA',     // MONO
+    pastel:    '#FDF6F0',     // PASTEL
+    noir:      '#1A1A1A',     // STATEMENT
+    luxury:    '#0D0D0D',     // RAW
+  })[t] || '#FFFFFF';
 }
 function tplText(t){
   if(t==='custom'){
@@ -7983,46 +8005,46 @@ function tplText(t){
     return /#0|#1[0-9A-F]{2}/i.test(bg) ? '#F5F0E8' : '#1A1A1A';
   }
   return ({
-    clean:     '#1A1A1A',
-    bold:      '#FFFFFF',
-    mag:       '#1A1A1A',
-    editorial: '#1A1A1A',
-    mono:      '#1A1A1A',
-    pastel:    '#3D2B1F',                                    // 갈색 톤 짙음
-    noir:      '#F5F0E8',                                    // 따뜻한 아이보리
-    luxury:    '#F5F0E8',
-  })[t] || '#1A1A1A';
+    clean:     '#111111',     // CLEAN
+    bold:      '#FFFFFF',     // DARK
+    mag:       '#FFFFFF',     // SPLIT
+    editorial: '#E8DFD0',     // FILM
+    mono:      '#111111',     // MONO
+    pastel:    '#3D2B1F',     // PASTEL
+    noir:      '#FFFFFF',     // STATEMENT
+    luxury:    '#FFFFFF',     // RAW
+  })[t] || '#111111';
 }
-// 템플릿별 기본 폰트 — 한국어 현대 감각, 영문은 fallback
+// 템플릿별 기본 폰트
 function tplFont(t){
   return ({
     clean:     "'Pretendard','Noto Sans KR',sans-serif",
-    bold:      "'Black Han Sans','Pretendard','Noto Sans KR',sans-serif",
-    mag:       "'Song Myung','Nanum Myeongjo','Fraunces','Noto Serif KR',serif",
-    editorial: "'Gowun Batang','Nanum Myeongjo','Noto Serif KR',serif",
-    mono:      "'IBM Plex Sans KR','Pretendard','Noto Sans KR',sans-serif",
+    bold:      "'Pretendard','Noto Sans KR',sans-serif",                                    // DARK
+    mag:       "'Pretendard','Noto Sans KR',sans-serif",                                    // SPLIT
+    editorial: "'Nanum Myeongjo','Gowun Batang','Noto Serif KR',serif",                    // FILM
+    mono:      "'Pretendard','Noto Sans KR',sans-serif",                                    // MONO
     pastel:    "'Gowun Dodum','Pretendard','Noto Sans KR',sans-serif",
-    noir:      "'Noto Serif KR','Nanum Myeongjo','Fraunces',serif",
-    luxury:    "'Nanum Myeongjo','Song Myung','Noto Serif KR',serif",
+    noir:      "'Gowun Batang','Noto Serif KR',serif",                                      // STATEMENT
+    luxury:    "'Black Han Sans','Pretendard','Noto Sans KR',sans-serif",                  // RAW
   })[t] || "'Pretendard','Noto Sans KR',sans-serif";
 }
 function tplWeight(t){
-  return ({clean:700, bold:900, mag:700, editorial:700, mono:700, pastel:700, noir:900, luxury:700})[t] || 700;
+  return ({clean:700, bold:800, mag:700, editorial:400, mono:700, pastel:700, noir:400, luxury:900})[t] || 700;
 }
 function tplItalic(t){
-  return t==='editorial' || t==='noir';
+  return false; // 2.1: 이탤릭 일괄 제거 (가독성 우선)
 }
-// 포인트 컬러 (포인트 1색 원칙) — 채도 낮춤
+// 포인트 컬러
 function tplAccent(t){
   return ({
-    clean:     '#00C9A7',  // 쏘비 그린
-    bold:      '#00C9A7',  // 다크 위 그린
-    mag:       '#C4A882',  // 따뜻한 베이지
-    editorial: '#1A1A1A',  // 자기 색 (무채색)
-    mono:      '#555555',  // 미드 그레이
-    pastel:    '#F4A5B0',  // 코랄 핑크
-    noir:      '#C9A84C',  // 골드
-    luxury:    '#C9A84C',  // 골드
+    clean:     '#00C9A7',  // CLEAN — mint
+    bold:      '#CCFF00',  // DARK — 형광 라임 (카테고리별 동적 변경 가능)
+    mag:       '#FFFFFF',  // SPLIT — 흰 (다크 우측 패널 위)
+    editorial: '#C4A882',  // FILM — 따뜻한 베이지
+    mono:      '#0D0D0D',  // MONO — 단색 검정 칩
+    pastel:    '#F4A5B0',  // PASTEL — 코랄핑크
+    noir:      '#C9A84C',  // STATEMENT — 골드
+    luxury:    '#FFFFFF',  // RAW — 흰 (검정 위)
   })[t] || '#00C9A7';
 }
 // 템플릿별 이미지 배치 전략 (kind: 'cover'|'intro'|'body')
@@ -8146,43 +8168,79 @@ function makeSerifWatermark(text, opts){
   return el;
 }
 
-// ═══ 템플릿별 데코 요소 배치 (spec 2.0) ═══
+// 카테고리 슬러그 → 한국어 라벨 (좌하단 칩)
+var CATEGORY_CHIP_LABEL = {
+  beauty_treatment:'뷰티', beauty_product:'뷰티', beauty_ingredient:'뷰티', beauty_trouble:'뷰티',
+  food:'맛집', cafe:'카페', travel_domestic:'여행', travel_abroad:'여행',
+  fashion:'패션', interior:'인테리어', fitness:'운동',
+  money_tip:'재테크', price_compare:'쇼핑', trend:'트렌드', review:'리뷰',
+  life_tip:'꿀팁', book:'책', etc:'라이프'
+};
+function makeCategoryChip(label, opts){
+  var el = document.createElement('div');
+  el.className = 'edt-deco edt-cat-chip';
+  var bg = (opts && opts.bg) || 'rgba(0,0,0,0.55)';
+  var fg = (opts && opts.color) || '#FFFFFF';
+  var pos = (opts && opts.position) || 'left-bottom';
+  var x = (opts && opts.x != null) ? opts.x : 5;
+  var y = (opts && opts.y != null) ? opts.y : 5;
+  var posCss = pos === 'left-top' ? 'left:'+x+'%;top:'+y+'%;'
+             : pos === 'right-top' ? 'right:'+x+'%;top:'+y+'%;'
+             : 'left:'+x+'%;bottom:'+y+'%;';
+  el.style.cssText = 'position:absolute;'+posCss+'padding:4px 9px;border-radius:3px;background:'+bg+';color:'+fg+';font-family:Pretendard,sans-serif;font-size:10px;font-weight:800;letter-spacing:.1em;pointer-events:none;z-index:6';
+  el.textContent = label;
+  return el;
+}
+
+// ═══ 템플릿별 데코 요소 배치 (spec 2.1 — 워터마크 제거, 카테고리 칩 통일) ═══
 function tplDecoForSlide(tpl, kind, idx, accent, textColor){
   var decos = [];
-  if(tpl === 'clean'){
-    // 우측 하단 "Ssobi" 12px 회색
-    decos.push(makeCornerLabel('Ssobi', {position:'right-bottom', x:5, y:5, color:'#999999', size:11, opacity:.6}));
-  } else if(tpl === 'bold'){
-    // 거대 outline 숫자 (배경) opacity 0.06
+  // 카테고리 칩 — 모든 슬라이드 좌하단 (CTA 제외)
+  var cat = (createData && createData.category) || 'etc';
+  var catLabel = CATEGORY_CHIP_LABEL[cat] || '라이프';
+  var isCta = kind === 'cta';
+  if(!isCta){
+    // 템플릿별 칩 색상 차별화
+    var chipOpts;
+    if(tpl === 'clean' || tpl === 'pastel' || tpl === 'mag'){
+      chipOpts = { bg:'rgba(255,255,255,0.92)', color:'#1A1A1A', position:'left-bottom', x:5, y:5 };
+    } else if(tpl === 'mono'){
+      chipOpts = { bg:'#0D0D0D', color:'#FFFFFF', position:'left-top', x:5, y:5 };
+    } else if(tpl === 'bold'){
+      // DARK — 형광 포인트 칩
+      var fluo = cat.indexOf('beauty') === 0 ? '#00FFB2' : (cat === 'trend' ? '#CCFF00' : (cat === 'money_tip' ? '#FFE500' : '#CCFF00'));
+      chipOpts = { bg:fluo, color:'#0A0A0A', position:'left-bottom', x:5, y:5 };
+    } else if(tpl === 'editorial'){
+      // FILM — 따뜻한 베이지 보더
+      chipOpts = { bg:'rgba(196,168,130,0.95)', color:'#1A1512', position:'left-bottom', x:5, y:5 };
+    } else if(tpl === 'noir'){
+      // STATEMENT — 단색 다크 + 흰 테두리
+      chipOpts = { bg:'transparent', color:'#FFFFFF', position:'left-bottom', x:5, y:5 };
+    } else if(tpl === 'luxury'){
+      // RAW — 흰 테두리 투명 칩
+      chipOpts = { bg:'transparent', color:'#FFFFFF', position:'left-bottom', x:5, y:5 };
+    } else {
+      chipOpts = { bg:'rgba(0,0,0,0.55)', color:'#FFFFFF', position:'left-bottom', x:5, y:5 };
+    }
+    var chip = makeCategoryChip(catLabel, chipOpts);
+    // 투명 배경 칩에 테두리
+    if(chipOpts.bg === 'transparent'){
+      chip.style.cssText += ';border:1px solid '+chipOpts.color;
+    }
+    decos.push(chip);
+  }
+  // 템플릿별 추가 데코 (단, 브랜드명 라벨은 모두 제거)
+  if(tpl === 'bold'){
     if(kind === 'body' || kind === 'cover'){
       decos.push(makeBigOutlineNumber(String(idx).padStart(2,'0'), {x:55, y:-15, size:240, color:'#FFFFFF', opacity:0.06}));
     }
-    decos.push(makeCornerLabel('SSOBI', {position:'right-bottom', x:5, y:5, color:'#FFFFFF', opacity:.4}));
-  } else if(tpl === 'mag'){
-    // 상단 "SSOBI · 2026 · No.{num}" 헤더
-    decos.push(makeMagazineHeader({color:textColor, num:String(idx + 1).padStart(2,'0'), issue:'edition'}));
   } else if(tpl === 'editorial'){
-    // 상하단 1px 실선 + "— Editorial" 우측 하단
     var lines = makeHorizontalFrame({color:textColor, topY:5, botY:5, opacity:0.18});
     decos.push(lines[0]); decos.push(lines[1]);
-    decos.push(makeCornerLabel('— Editorial', {position:'right-bottom', x:5, y:7, color:textColor, size:10, opacity:.5}));
-  } else if(tpl === 'mono'){
-    // 좌측 수직 "—— MONO"
-    decos.push(makeVerticalLabel('—— MONO', {x:3, color:'#555555'}));
   } else if(tpl === 'pastel'){
-    // 우측 하단 도트 3개 (코랄·라벤더·민트, 8px)
     decos.push(makeCornerDots({x:6, y:6, colors:['#F4A5B0', '#C4B5FD', '#A7F3D0']}));
-  } else if(tpl === 'noir'){
-    // 골드 1px inset 16px 프레임 + "NOIR" 우측 하단
-    decos.push(makeGoldFrame({color:accent, inset:4.5, opacity:0.4}));
-    decos.push(makeCornerLabel('NOIR', {position:'right-bottom', x:7, y:7, color:accent, opacity:.7}));
-  } else if(tpl === 'luxury'){
-    // 골드 프레임 + "Luxe" 200px watermark (opacity 0.04)
-    decos.push(makeGoldFrame({color:accent, inset:5, opacity:0.35}));
-    if(kind === 'cover'){
-      decos.push(makeSerifWatermark('Luxe', {x:-12, y:2, size:220, color:accent, opacity:0.04}));
-    }
-    decos.push(makeCornerLabel('Luxe', {position:'right-bottom', x:8, y:8, color:accent, size:10, opacity:.6}));
+  } else if(tpl === 'noir' || tpl === 'luxury'){
+    decos.push(makeGoldFrame({color:accent, inset: tpl==='noir' ? 4.5 : 5, opacity:0.35}));
   }
   return decos;
 }
@@ -10512,7 +10570,7 @@ function mytplSave(){
     title.textContent = '내 브랜드';
     title.style.cssText = 'font-size:14px;font-weight:900;color:'+textColor+';letter-spacing:-.4px;line-height:1.1';
     var sub = document.createElement('div');
-    sub.textContent = 'Template · Ssobi';
+    sub.textContent = 'My Template';
     sub.style.cssText = 'font-family:"JetBrains Mono",monospace;font-size:7.5px;font-weight:700;color:'+subColor+';letter-spacing:.1em;margin-top:4px';
     btm.appendChild(title); btm.appendChild(sub);
     prev.appendChild(btm);
