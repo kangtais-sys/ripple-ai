@@ -11,6 +11,10 @@
     {
       "path": "/api/cron/trend-research",
       "schedule": "0 14 * * *"
+    },
+    {
+      "path": "/api/cron/refresh-recommendations",
+      "schedule": "0 21 * * *"
     }
   ],
   "rewrites": [

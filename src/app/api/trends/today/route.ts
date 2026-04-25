@@ -1,24 +1,45 @@
-// GET /api/trends/today  (인증 불필요 · 공용 추천)
-// 오늘 날짜의 recommended_topics 3개 반환. 없으면 최근 7일 내 가장 최신 것.
-// 프론트 만들기 탭 "FOR YOU · 오늘 주제" 섹션에서 사용
+// GET /api/trends/today  (인증 있으면 개인화, 없으면 공용)
+// 1) 로그인 유저 + onboarding 완료 → user_daily_recs 우선
+// 2) 폴백: daily_trends.recommended_topics
+// 3) 폴백 폴백: 최근 7일 내 가장 최신 daily_trends
 import { createClient } from '@supabase/supabase-js'
-import { NextResponse } from 'next/server'
+import { getUserFromRequest } from '@/lib/auth-helper'
+import { NextRequest, NextResponse } from 'next/server'
 
 export const runtime = 'nodejs'
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   const sb = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { persistSession: false } }
   )
 
-  // KST 오늘 날짜
   const now = new Date()
   const kstNow = new Date(now.getTime() + (9 * 60 - now.getTimezoneOffset()) * 60 * 1000)
   const todayKst = kstNow.toISOString().slice(0, 10)
 
-  // 오늘 → 못 찾으면 최근 7일 내 가장 최신
+  // 1) 개인화 (로그인 + 온보딩 완료)
+  const user = await getUserFromRequest(req).catch(() => null)
+  if (user) {
+    const { data: personal } = await sb
+      .from('user_daily_recs')
+      .select('date_kst, topics')
+      .eq('user_id', user.id)
+      .eq('date_kst', todayKst)
+      .maybeSingle()
+    if (personal?.topics && Array.isArray(personal.topics) && personal.topics.length > 0) {
+      return NextResponse.json({
+        ok: true,
+        fresh: true,
+        personalized: true,
+        date_kst: personal.date_kst,
+        topics: personal.topics,
+      })
+    }
+  }
+
+  // 2) 공용 오늘
   const { data: today } = await sb
     .from('daily_trends')
     .select('date_kst, recommended_topics, generated_at')
@@ -29,12 +50,13 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       fresh: true,
+      personalized: false,
       date_kst: today.date_kst,
       topics: today.recommended_topics,
     })
   }
 
-  // 폴백: 최근 7일 내 가장 최신
+  // 3) 최근 7일 폴백
   const sevenAgo = new Date(kstNow.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
   const { data: recent } = await sb
     .from('daily_trends')
@@ -48,6 +70,7 @@ export async function GET() {
     return NextResponse.json({
       ok: true,
       fresh: false,
+      personalized: false,
       date_kst: recent.date_kst,
       topics: recent.recommended_topics,
     })
