@@ -19,6 +19,7 @@ export type ImageResult =
   | {
       ok: true
       url: string
+      fallbackUrl?: string              // url 로딩 실패 시 프론트가 자동 대체할 URL (picsum 등)
       source: 'unsplash' | 'pexels' | 'pixabay'
       sourceLabel: 'Unsplash' | 'Pexels' | 'Pixabay'
       photographer?: string
@@ -168,6 +169,17 @@ export function toEnKeyword(args: {
 // https://help.unsplash.com/en/articles/2511245
 const UTM = 'utm_source=ssobi&utm_medium=referral'
 
+// 3초 타임아웃 fetch 헬퍼 — 멈춘 provider 가 다음 fallback 차단 못하게
+async function fetchWithTimeout(url: string, options: RequestInit = {}, timeoutMs = 3000): Promise<Response> {
+  const ctrl = new AbortController()
+  const timer = setTimeout(() => ctrl.abort(), timeoutMs)
+  try {
+    return await fetch(url, { ...options, signal: ctrl.signal })
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
 // ─────────────────────────────────────────────
 // 각 provider — 키 없으면 { ok:false } 즉시 반환
 // ─────────────────────────────────────────────
@@ -175,7 +187,7 @@ async function fetchUnsplash(q: string): Promise<ImageResult> {
   const key = process.env.UNSPLASH_ACCESS_KEY
   if (!key) return { ok: false, error: 'unsplash_no_key' }
   try {
-    const res = await fetch(
+    const res = await fetchWithTimeout(
       `https://api.unsplash.com/search/photos?query=${encodeURIComponent(q)}&per_page=10&orientation=squarish&content_filter=high`,
       { headers: { Authorization: `Client-ID ${key}`, 'Accept-Version': 'v1' } }
     )
@@ -217,7 +229,7 @@ async function fetchPexels(q: string): Promise<ImageResult> {
   const key = process.env.PEXELS_API_KEY
   if (!key) return { ok: false, error: 'pexels_no_key' }
   try {
-    const res = await fetch(
+    const res = await fetchWithTimeout(
       `https://api.pexels.com/v1/search?query=${encodeURIComponent(q)}&per_page=10&orientation=square&size=medium`,
       { headers: { Authorization: key } }
     )
@@ -255,7 +267,7 @@ async function fetchPixabay(q: string): Promise<ImageResult> {
   const key = process.env.PIXABAY_API_KEY
   if (!key) return { ok: false, error: 'pixabay_no_key' }
   try {
-    const res = await fetch(
+    const res = await fetchWithTimeout(
       `https://pixabay.com/api/?key=${key}&q=${encodeURIComponent(q)}&image_type=photo&orientation=horizontal&per_page=20&safesearch=true&order=popular`
     )
     if (!res.ok) return { ok: false, error: 'pixabay_http', detail: `${res.status}` }
@@ -349,17 +361,23 @@ export async function fetchCardnewsImage(args: {
     r = await tryProvider(fbQuery, [fetchUnsplash, fetchPexels])
     if (r) return r
   }
-  // 3차 (최후): source.unsplash.com 직링크 — API 키 없이도 항상 이미지 반환
-  // attribution 은 generic Unsplash 표기 (작가 정보 없음)
+  // 3차: source.unsplash.com 직링크 — API 키 없이도 동작
   const finalKw = encodeURIComponent(cleanQuery(toEnKeyword(args)) || 'aesthetic lifestyle')
-  const fallbackUrl = `https://source.unsplash.com/1080x1080/?${finalKw}`
-  if (used) used.add(fallbackUrl)
+  const slideSeed = (args.slideIdx ?? 0)
+  const sourceUrl = `https://source.unsplash.com/1080x1080/?${finalKw}&sig=${slideSeed}`
+  if (used) used.add(sourceUrl)
+  // source.unsplash.com 은 redirect 이므로 200 보장 못함 — 대신 picsum 으로 백업
+  // 4차 (최후 보장): picsum.photos — 항상 200 OK, 무조건 이미지 반환
+  // 슬라이드 인덱스로 seed → 같은 카드뉴스 안에서도 슬라이드별 다른 이미지
+  const picsumUrl = `https://picsum.photos/seed/ssobi-${slideSeed}-${Date.now() % 100000}/1080/1080`
+  // 우선 source.unsplash 시도, HEAD 체크 없이 그냥 반환 (브라우저가 onerror 시 picsum 시도하도록 둘 다 반환)
   return {
     ok: true,
-    url: fallbackUrl,
+    url: sourceUrl,
+    fallbackUrl: picsumUrl,
     source: 'unsplash',
     sourceLabel: 'Unsplash',
     photographer: 'Unsplash',
     attributionUrl: `https://unsplash.com/?${UTM}`,
-  }
+  } as ImageResult
 }

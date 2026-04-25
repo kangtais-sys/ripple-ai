@@ -656,6 +656,19 @@ ${BANNED_PHRASES.map(p => `  · "${p}"`).join('\n')}
   · hook 이 "교토 현지인만 가는 카페 5곳" 이면 → body 슬라이드에 그 5곳 중 최소 3곳의 **카페명** 명시 필수
 - hook 에서 약속한 정보가 body 에 없으면 콘텐츠가 사기 — 절대 금지
 
+### 🔢 hook 숫자 ↔ 실제 항목 수 일치 (베스트 N선 / N가지 / N개 류)
+- 본 카드뉴스 body 슬라이드 수 = ${slideCount - 1} 개 (hook 1장 + body ${slideCount - 1}장 = 총 ${slideCount}장)
+- 그 중 hook2 1장 + cta 1장 제외 → **본격 항목 슬라이드는 ${slideCount - 3} 개**
+- hook 에서 "베스트 N", "N가지", "N개", "N선", "TOP N" 처럼 **숫자 N을 약속**할 거면:
+  · N ≤ ${(slideCount - 3) * 3} 이내로만 약속 (슬라이드당 최대 3개 항목까지 허용)
+  · 약속한 N 개 항목이 **반드시 body 안에 모두 등장** — 누락 절대 금지
+  · 슬라이드당 1~3개 항목 자유 배치 (1장에 1개 = 깊이, 1장에 2~3개 = 압축)
+- 예시 (slideCount=7 → body 항목 슬라이드 4개):
+  · "베스트 4선" → body 4장 각 1개씩 (가장 자연스러움)
+  · "베스트 8선" → body 4장에 각 2개씩
+  · "베스트 12선" → body 4장에 각 3개씩 (정보 압축)
+- hook 에 숫자 약속 안 하는 게 더 나으면 안 해도 됨 (예: "꼭 알아야 할 것")
+
 **모든 본문은 role="body" 만 사용** — checklist/number/toc 옵션 제거됨. 일관된 본문 슬라이드만.
 
 ### ${slideCount}번 슬라이드 (마지막) — 저장·팔로우·댓글 유도 CTA
@@ -938,54 +951,100 @@ export const CAPTION_PROMPT = `캡션 구조:
   · 개수는 정확히 5개 이하
 `
 
+// 카테고리별 캡션 본문 포맷터 — body 슬라이드를 캡션에 자동 정리
+//   글귀/책/명언 → 번호 목록 ("01. 글귀 — 출처")
+//   여행/카페/맛집 → 장소 목록 ("📍 장소 — 한 줄")
+//   정보/팁 → 불릿 ("• 핵심 한 줄")
+type BodySlideForCaption = { title?: string; text?: string; entities?: Array<{ type?: string; name?: string }> }
+
+function formatCaptionBody(category: CategoryKey, bodySlides: BodySlideForCaption[]): string {
+  // CTA·hook2 제외 — 본격 본문만 (앞 1개 = hook2, 마지막 = cta 가정)
+  const main = bodySlides
+    .slice(1, -1)
+    .filter(s => (s.text || '').trim().length > 0)
+  if (main.length === 0) return ''
+
+  const isQuote = category === 'book' || /명언|글귀|문장|시/.test(bodySlides.map(s => s.title || '').join(' '))
+  const isPlace = category === 'food' || category === 'cafe' || category === 'travel_domestic' || category === 'travel_abroad'
+
+  if (isQuote) {
+    return main.map((s, i) => {
+      const num = String(i + 1).padStart(2, '0')
+      const text = (s.text || '').trim().replace(/\s+/g, ' ')
+      // 출처 추출: 괄호 안 또는 entity 의 name
+      const sourceMatch = text.match(/\(([^)]+)\)/)
+      const cleanText = text.replace(/\([^)]+\)/g, '').trim()
+      const source = sourceMatch ? sourceMatch[1] : (s.entities?.[0]?.name || '')
+      return `${num}. ${cleanText}${source ? `\n— ${source}` : ''}`
+    }).join('\n\n')
+  }
+
+  if (isPlace) {
+    return main.map(s => {
+      const title = (s.title || '').trim().replace(/\s+/g, ' ')
+      const firstLine = (s.text || '').split('\n')[0].trim()
+      const place = title || (s.entities?.find(e => e.type === 'place' || e.type === 'brand')?.name)
+      if (!place) return `• ${firstLine}`
+      return `📍 ${place} — ${firstLine.replace(/\([^)]+\)/g, '').trim()}`
+    }).join('\n')
+  }
+
+  // 정보·팁 카테고리 — 본문 첫 줄을 불릿으로 정리
+  return main.map(s => {
+    const title = (s.title || '').trim()
+    const firstLine = (s.text || '').split('\n')[0].trim()
+    return title ? `• ${title}\n  ${firstLine}` : `• ${firstLine}`
+  }).join('\n\n')
+}
+
 // 서버/프론트에서 hook/body 에서 캡션을 조립할 때 사용
 export function buildCaption(args: {
   hook: string
-  bodyTexts: string[]          // 3~5장 본문 2~3줄씩
+  bodySlides?: BodySlideForCaption[]    // 신규: 슬라이드 전체 (포맷터에 사용)
+  bodyTexts?: string[]                  // 호환: 텍스트만
   category: CategoryKey
-  dmKeyword?: string           // DM 유도 키워드 (예: '후기')
+  dmKeyword?: string
 }): string {
   const info = CATEGORIES[args.category]
   const ctaRaw = CAPTION_CTA_PATTERNS[Math.floor(Math.random() * CAPTION_CTA_PATTERNS.length)]
   const cta = ctaRaw.replace('[키워드]', args.dmKeyword || '후기')
-  const body = args.bodyTexts
-    .filter(Boolean)
-    .slice(0, 3)
-    .map(t => t.trim().replace(/\s+/g, ' '))
-    .join('\n')
-  // 공통 일반 태그 제거, 카테고리 전용 5개만
+
+  let bodyBlock = ''
+  if (args.bodySlides && args.bodySlides.length > 0) {
+    bodyBlock = formatCaptionBody(args.category, args.bodySlides)
+  } else if (args.bodyTexts && args.bodyTexts.length > 0) {
+    bodyBlock = args.bodyTexts
+      .filter(Boolean)
+      .slice(0, 3)
+      .map(t => t.trim().replace(/\s+/g, ' '))
+      .join('\n')
+  }
+
   const tags = info.hashtags
     .filter((t, i, a) => t.startsWith('#') && a.indexOf(t) === i)
     .slice(0, 5)
     .join(' ')
-  return [
-    args.hook.trim(),
-    '',
-    '',
-    body,
-    '',
-    cta,
-    '',
-    '',
-    tags,
-  ].join('\n')
+
+  const lines = [args.hook.trim(), '', '']
+  if (bodyBlock) {
+    lines.push(bodyBlock)
+    lines.push('')
+  }
+  lines.push(cta, '', '', tags)
+  return lines.join('\n')
 }
 
 // 서버 응답에서 캡션이 비어있을 때 fallback
 export function ensureCaption(args: {
   rawCaption?: string | null
   hook: string
-  bodySlides: Array<{ title?: string; text?: string }>
+  bodySlides: Array<{ title?: string; text?: string; entities?: Array<{ type?: string; name?: string }> }>
   category: CategoryKey
 }): string {
   if (args.rawCaption && args.rawCaption.trim().length > 10) return args.rawCaption
-  const bodyTexts = (args.bodySlides || [])
-    .slice(1, 4)
-    .map(s => s.text || '')
-    .filter(Boolean)
   return buildCaption({
     hook: args.hook,
-    bodyTexts,
+    bodySlides: args.bodySlides,
     category: args.category,
   })
 }
