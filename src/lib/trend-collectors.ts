@@ -1,15 +1,18 @@
 // 트렌드 수집기 — 매일 23:00 cron 이 실행
-// 2026-04 업데이트: 더쿠/클리앙 RSS 차단 → YouTube Trending KR + 한국 뉴스 RSS 로 교체
-//                  네이버 데이터랩 → NewsAPI.org 로 교체
+// 2026-04 Phase 2 업데이트: 카테고리별 RSS 9개 추가 (사전 검증 통과 분만)
 //
-// 활성 소스:
-//   ✅ Google Trends Korea RSS  (trending/rss?geo=KR)
-//   ✅ Signal.bz 실시간 검색어  (네이버/다음/줌/네이트 통합)
-//   ✅ Hacker News Algolia API
-//   ✅ YouTube Trending KR + 한경/매경 뉴스 RSS  (collectKoreanTrends, YOUTUBE_API_KEY)
-//   ✅ Lifehacker RSS  (라이프 팁 글로벌)
-//   ✅ 연합뉴스 문화·생활 RSS  (국내 라이프)
-//   ✅ NewsAPI.org top-headlines KR  (collectNewsAPI, NEWS_API_KEY)
+// 기존 7개:
+//   ✅ Google Trends Korea / Signal.bz / Hacker News / collectKoreanTrends (YT+한경+매경)
+//   ✅ Lifehacker / 연합뉴스 / NewsAPI.org
+// 신규 9개 (Phase 2):
+//   ✅ Harper's Bazaar (beauty)  · Who What Wear (fashion) · WWD (fashion) · Refinery29 (life)
+//   ✅ Apartment Therapy / Design Milk (interior)
+//   ✅ Women's Health / Runner's World (fitness)
+//   ✅ NerdWallet (money)
+//
+// 제외(검증 실패): Allure/Vogue/Bon Appétit/Arch Digest (atom 형식 items 1) /
+//                  Byrdie/Lonely Planet/Investopedia (4xx) / 머니투데이/W Korea (404) /
+//                  Eater/Food52/YES24 (items 0/429)
 //
 // 공통 주의: 바깥 사이트라 레이아웃·정책 바뀌면 실패 가능 → 전부 soft-fail.
 
@@ -307,13 +310,67 @@ export async function collectNewsAPI(): Promise<FeedItem[]> {
 }
 
 // ─────────────────────────────────────────────
+// Phase 2 — 카테고리별 보강 RSS (사전 검증 통과 9개)
+//   각 RSS 는 fetchYonhapLife 패턴과 동일 — title/excerpt/link 모두 추출, soft-fail
+// ─────────────────────────────────────────────
+async function rssToFeedItems(url: string, source: string, baseEngagement: number, limit = 10): Promise<FeedItem[]> {
+  const xml = await safeText(url)
+  if (!xml) return []
+  return parseRssItems(xml, limit).map((it, i) => ({
+    source,
+    title: it.title,
+    excerpt: it.excerpt,
+    engagement: Math.max(0, baseEngagement - i * 2),
+    url: it.link,
+  }))
+}
+
+// 뷰티
+export async function fetchHarpersBazaar(): Promise<FeedItem[]> {
+  return rssToFeedItems('https://www.harpersbazaar.com/rss/all.xml', 'harpers_bazaar:beauty', 50, 12)
+}
+// 패션
+export async function fetchWhoWhatWear(): Promise<FeedItem[]> {
+  return rssToFeedItems('https://www.whowhatwear.com/rss', 'whowhatwear:fashion', 50, 12)
+}
+export async function fetchWWD(): Promise<FeedItem[]> {
+  return rssToFeedItems('https://wwd.com/feed/', 'wwd:fashion', 45, 10)
+}
+// 라이프·패션 mix
+export async function fetchRefinery29(): Promise<FeedItem[]> {
+  return rssToFeedItems('https://www.refinery29.com/rss.xml', 'refinery29:life', 45, 10)
+}
+// 인테리어
+export async function fetchApartmentTherapy(): Promise<FeedItem[]> {
+  return rssToFeedItems('https://www.apartmenttherapy.com/main.rss', 'apartmenttherapy:interior', 50, 12)
+}
+export async function fetchDesignMilk(): Promise<FeedItem[]> {
+  return rssToFeedItems('https://design-milk.com/feed/', 'designmilk:interior', 45, 10)
+}
+// 피트니스
+export async function fetchWomensHealth(): Promise<FeedItem[]> {
+  return rssToFeedItems('https://www.womenshealthmag.com/rss/all.xml', 'womenshealth:fitness', 50, 12)
+}
+export async function fetchRunnersWorld(): Promise<FeedItem[]> {
+  return rssToFeedItems('https://www.runnersworld.com/rss/all.xml', 'runnersworld:fitness', 45, 10)
+}
+// 재테크
+export async function fetchNerdWallet(): Promise<FeedItem[]> {
+  return rssToFeedItems('https://www.nerdwallet.com/blog/feed/', 'nerdwallet:money', 45, 10)
+}
+
+// ─────────────────────────────────────────────
 // 통합 수집기 — 병렬 실행, 실패는 빈 배열로 흡수
 // ─────────────────────────────────────────────
 export async function collectAllTrends(): Promise<{
   items: FeedItem[]
   stats: Record<string, number>
 }> {
-  const [googleTrends, signalbz, hn, koreanTrends, lh, yna, newsApi] = await Promise.all([
+  const [
+    googleTrends, signalbz, hn, koreanTrends, lh, yna, newsApi,
+    bazaar, whowhatwear, wwd, refinery29, aptTherapy, designMilk,
+    womensHealth, runnersWorld, nerdWallet,
+  ] = await Promise.all([
     fetchGoogleTrendsKR().catch(() => [] as FeedItem[]),
     fetchSignalBz().catch(() => [] as FeedItem[]),
     fetchHackerNews().catch(() => [] as FeedItem[]),
@@ -321,10 +378,21 @@ export async function collectAllTrends(): Promise<{
     fetchLifehacker().catch(() => [] as FeedItem[]),
     fetchYonhapLife().catch(() => [] as FeedItem[]),
     collectNewsAPI().catch(() => [] as FeedItem[]),
+    // Phase 2 신규
+    fetchHarpersBazaar().catch(() => [] as FeedItem[]),
+    fetchWhoWhatWear().catch(() => [] as FeedItem[]),
+    fetchWWD().catch(() => [] as FeedItem[]),
+    fetchRefinery29().catch(() => [] as FeedItem[]),
+    fetchApartmentTherapy().catch(() => [] as FeedItem[]),
+    fetchDesignMilk().catch(() => [] as FeedItem[]),
+    fetchWomensHealth().catch(() => [] as FeedItem[]),
+    fetchRunnersWorld().catch(() => [] as FeedItem[]),
+    fetchNerdWallet().catch(() => [] as FeedItem[]),
   ])
   const items = [
-    ...googleTrends, ...signalbz,
-    ...hn, ...koreanTrends, ...lh, ...yna, ...newsApi,
+    ...googleTrends, ...signalbz, ...hn, ...koreanTrends, ...lh, ...yna, ...newsApi,
+    ...bazaar, ...whowhatwear, ...wwd, ...refinery29, ...aptTherapy, ...designMilk,
+    ...womensHealth, ...runnersWorld, ...nerdWallet,
   ]
   return {
     items,
@@ -336,6 +404,15 @@ export async function collectAllTrends(): Promise<{
       lifehacker: lh.length,
       yonhap: yna.length,
       news_api: newsApi.length,
+      harpers_bazaar: bazaar.length,
+      whowhatwear: whowhatwear.length,
+      wwd: wwd.length,
+      refinery29: refinery29.length,
+      apartment_therapy: aptTherapy.length,
+      design_milk: designMilk.length,
+      womens_health: womensHealth.length,
+      runners_world: runnersWorld.length,
+      nerdwallet: nerdWallet.length,
       total: items.length,
     },
   }
