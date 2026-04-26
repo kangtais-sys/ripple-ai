@@ -135,10 +135,9 @@ export async function fetchHackerNews(): Promise<FeedItem[]> {
 }
 
 // ─────────────────────────────────────────────
-// 한국 트렌드 — YouTube Trending KR + 한경/매경 뉴스 RSS
-// 2026-04 디버그: 네이버 뉴스 RSS(news.naver.com/rss/ranking.xml) 폐지로 404
-//                대신 한경(hankyung)·매경(mk) 메인 RSS 사용 (둘 다 200, items 50)
-// 사용자 요청한 "YouTube Trending KR + 한국 뉴스" 결합형.
+// 한국 트렌드 — YouTube Trending KR + 한경 뉴스 RSS
+// 2026-04 디버그: 네이버 뉴스 RSS 폐지(404) → 한경 사용
+// 매경(mk)은 옛 기사 섞여 시점 일관성 깨져서 제외 (2026-04-26)
 // ─────────────────────────────────────────────
 export async function collectKoreanTrends(): Promise<FeedItem[]> {
   const items: FeedItem[] = []
@@ -180,16 +179,12 @@ export async function collectKoreanTrends(): Promise<FeedItem[]> {
     console.warn('[collectKoreanTrends] missing YOUTUBE_API_KEY → youtube skip')
   }
 
-  // 2) 한국 뉴스 RSS — 네이버 뉴스 RSS 폐지(404) → 한경 + 매경
-  const [hkXml, mkXml] = await Promise.all([
-    safeText('https://www.hankyung.com/feed/all-news'),
-    safeText('https://www.mk.co.kr/rss/30000001/'),
-  ])
+  // 2) 한국 뉴스 RSS — 한경만 사용 (매경 제외: 옛 기사 섞여 시점 일관성 깨짐)
+  const hkXml = await safeText('https://www.hankyung.com/feed/all-news')
   console.log('[collectKoreanTrends] hankyung fetched:', !!hkXml, 'len', hkXml?.length || 0)
-  console.log('[collectKoreanTrends] mk fetched:', !!mkXml, 'len', mkXml?.length || 0)
 
   if (hkXml) {
-    const hkParsed = parseRssItems(hkXml, 8)
+    const hkParsed = parseRssItems(hkXml, 10)
     console.log('[collectKoreanTrends] hankyung parsed items:', hkParsed.length, 'first:', hkParsed[0]?.title?.slice(0, 60) || '(none)')
     hkParsed.forEach((it, i) => {
       items.push({
@@ -201,22 +196,7 @@ export async function collectKoreanTrends(): Promise<FeedItem[]> {
       })
     })
   } else {
-    console.warn('[collectKoreanTrends] hankyung fetch failed')
-  }
-  if (mkXml) {
-    const mkParsed = parseRssItems(mkXml, 8)
-    console.log('[collectKoreanTrends] mk parsed items:', mkParsed.length, 'first:', mkParsed[0]?.title?.slice(0, 60) || '(none)')
-    mkParsed.forEach((it, i) => {
-      items.push({
-        source: 'mk:news',
-        title: it.title,
-        excerpt: it.excerpt,
-        engagement: Math.max(0, 45 - i * 2),
-        url: it.link,
-      })
-    })
-  } else {
-    console.warn('[collectKoreanTrends] mk fetch failed')
+    console.warn('[collectKoreanTrends] hankyung fetch failed (Vercel data center IP 가능성)')
   }
 
   console.log('[collectKoreanTrends] total items:', items.length)
