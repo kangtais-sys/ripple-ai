@@ -29,6 +29,20 @@ import { NextRequest, NextResponse } from 'next/server'
 type DailyTrendsRow = {
   top5?: Array<{ title?: string; source?: string; category?: string; engagement?: number; researchable?: boolean; hook_score?: number }>
   recommended_topics?: Array<{ topic?: string; category?: string; why?: string; preview_hook?: string }>
+  topics_by_category?: Record<string, Array<{ topic?: string; why?: string; preview_hook?: string }>>
+}
+// CategoryKey('beauty_treatment' 등) → topics_by_category 에서 사용한 단순 키('beauty' 등)로 매핑
+function simplifyCategoryKey(cat: string): string {
+  if (cat.startsWith('beauty')) return 'beauty'
+  if (cat.startsWith('travel')) return 'travel'
+  if (cat === 'food' || cat === 'cafe') return cat
+  if (cat === 'money_tip' || cat === 'price_compare') return 'money'
+  if (cat === 'life_tip') return 'life'
+  if (cat === 'review') return 'trend'
+  if (cat === 'fashion' || cat === 'interior' || cat === 'fitness'
+      || cat === 'trend' || cat === 'book' || cat === 'baby' || cat === 'pet'
+      || cat === 'kpop' || cat === 'movie' || cat === 'music' || cat === 'psych' || cat === 'mystery') return cat
+  return 'trend'
 }
 const STOPWORDS = new Set([
   '이거', '저거', '그거', '하는', '되는', '있는', '없는', '같은', '어떤', '무슨', '몇', '진짜', '정말', '완전',
@@ -56,7 +70,7 @@ async function buildCollectedDataBlock(sb: ReturnType<typeof adminClient>, topic
     // 최근 3일 daily_trends 조회 (오늘 데이터 없으면 어제까지 fallback)
     const { data: rows } = await sb
       .from('daily_trends')
-      .select('top5, recommended_topics, date_kst')
+      .select('top5, recommended_topics, topics_by_category, date_kst')
       .order('date_kst', { ascending: false })
       .limit(3)
     if (!rows || rows.length === 0) return ''
@@ -64,7 +78,21 @@ async function buildCollectedDataBlock(sb: ReturnType<typeof adminClient>, topic
     if (topicTokens.size === 0) return ''
     type Scored = { title: string; excerpt: string; source?: string; score: number }
     const candidates: Scored[] = []
+    const simpleKey = simplifyCategoryKey(category)
     for (const row of rows as DailyTrendsRow[]) {
+      // 1) topics_by_category[simpleKey] — 카테고리 정확 매칭 (가장 강한 신호)
+      const catList = row.topics_by_category?.[simpleKey] || []
+      for (const r of catList) {
+        const title = r.topic || ''
+        if (!title) continue
+        candidates.push({
+          title,
+          excerpt: r.why || r.preview_hook || '',
+          source: 'category',
+          score: scoreItem(topicTokens, title, r.why || '', simpleKey, simpleKey) + 3,  // 카테고리 일치 보너스
+        })
+      }
+      // 2) top5 — 글로벌 핫 트렌드 (점수 매칭)
       for (const t of (row.top5 || [])) {
         const title = t.title || ''
         if (!title) continue
@@ -75,6 +103,7 @@ async function buildCollectedDataBlock(sb: ReturnType<typeof adminClient>, topic
           score: scoreItem(topicTokens, title, '', t.category, category),
         })
       }
+      // 3) recommended_topics — 카테고리 무관 추천
       for (const r of (row.recommended_topics || [])) {
         const title = r.topic || ''
         if (!title) continue
@@ -86,18 +115,18 @@ async function buildCollectedDataBlock(sb: ReturnType<typeof adminClient>, topic
         })
       }
     }
-    // 점수 0 이상 + 상위 6개 + 중복 title 제거
+    // 점수 > 0 + 상위 8개 + 중복 title 제거
     const seen = new Set<string>()
     const picks = candidates
       .filter(c => c.score > 0)
       .sort((a, b) => b.score - a.score)
       .filter(c => { if (seen.has(c.title)) return false; seen.add(c.title); return true })
-      .slice(0, 6)
+      .slice(0, 8)
     if (picks.length === 0) return ''
     const lines = picks.map(p => `- [${p.source}] ${p.title}${p.excerpt ? ` — ${p.excerpt}` : ''}`).join('\n')
     return `
 
-[실제 수집 데이터 — 최근 3일치 트렌드 항목 중 주제 "${topic}" 와 매칭된 ${picks.length}개]
+[실제 수집 데이터 — 최근 3일치 트렌드 항목 중 주제 "${topic}" (카테고리 ${simpleKey}) 와 매칭된 ${picks.length}개]
 ${lines}
 
 위 항목의 사실·이름·수치·시점을 본문에 가능한 그대로 인용. 데이터에 없는 정보는 새로 만들지 말 것.`

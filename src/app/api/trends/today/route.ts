@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
   // 2) 공용 오늘
   const { data: today } = await sb
     .from('daily_trends')
-    .select('date_kst, recommended_topics, generated_at')
+    .select('date_kst, recommended_topics, topics_by_category, generated_at')
     .eq('date_kst', todayKst)
     .maybeSingle()
 
@@ -53,6 +53,7 @@ export async function GET(req: NextRequest) {
       personalized: false,
       date_kst: today.date_kst,
       topics: today.recommended_topics,
+      topics_by_category: today.topics_by_category || {},
     })
   }
 
@@ -60,7 +61,7 @@ export async function GET(req: NextRequest) {
   const sevenAgo = new Date(kstNow.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
   const { data: recent } = await sb
     .from('daily_trends')
-    .select('date_kst, recommended_topics, generated_at')
+    .select('date_kst, recommended_topics, topics_by_category, generated_at')
     .gte('date_kst', sevenAgo)
     .order('date_kst', { ascending: false })
     .limit(1)
@@ -73,6 +74,7 @@ export async function GET(req: NextRequest) {
       personalized: false,
       date_kst: recent.date_kst,
       topics: recent.recommended_topics,
+      topics_by_category: recent.topics_by_category || {},
     })
   }
 

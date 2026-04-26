@@ -5308,68 +5308,90 @@ function shuffleTrendPool(pool){
 function renderDailyTrends(){
   var container = document.getElementById('trend-carousel');
   if(!container) return;
-  // 하이브리드 전략: 매번 호출 시 클라이언트 풀 + server daily_trends 결합.
-  //   짝수번째 호출 → 카테고리 풀 위주 (2 my + 1 trending)
-  //   홀수번째 호출 → trending 위주 (1 my + 2 trending)
-  //   server 응답 캐시 (window._serverTrends) 로 재호출 부담 X
+  // 하이브리드: 클라 풀 + server topics_by_category[내카테고리] + server recommended_topics 3중
+  //   호출 0: 내카테고리 트렌드 위주 (server cat 2 + 클라 1)
+  //   호출 1: 글로벌 hot 위주 (recommended 2 + 내카테고리 1)
+  //   호출 2: 클라 풀 위주 (클라 2 + server 1)
+  //   회전하면서 다양성 + 신선함 둘 다 잡음
   var savedKey = '';
   try { savedKey = localStorage.getItem('ssobi_disc_topic') || ''; } catch(_){}
+  // 내 카테고리 키 → server topics_by_category 키 매핑 (단순화)
+  function mapCatKey(k){
+    if(!k) return 'trend';
+    var simple = { fit:'fitness', home:'interior', sports:'fitness', tech:'trend' };
+    return simple[k] || k;
+  }
 
-  function mergeAndRender(serverTopics){
+  function mergeAndRender(serverData){
+    serverData = serverData || {};
+    var serverTopics = Array.isArray(serverData.topics) ? serverData.topics : [];
+    var topicsByCat = (serverData.topics_by_category && typeof serverData.topics_by_category === 'object') ? serverData.topics_by_category : {};
+
     var myPool = (savedKey && discoverData[savedKey])
       ? discoverData[savedKey].trends.map(function(t){
           return { topic: t.hook, chip: discoverData[savedKey].name, meta: t.meta, src: t.src };
         })
-      : pickDailyTrends();  // 관심 주제 없으면 일반 폴백 풀
+      : pickDailyTrends();
 
-    var trendPool = Array.isArray(serverTopics) ? serverTopics.map(function(t){
+    // 내 카테고리 server 트렌드
+    var catKey = mapCatKey(savedKey);
+    var catList = Array.isArray(topicsByCat[catKey]) ? topicsByCat[catKey] : [];
+    var catPool = catList.map(function(t){
       return {
         topic: t.topic || '',
-        chip: t.category || '오늘 트렌드',
+        chip: (savedKey && discoverData[savedKey]) ? discoverData[savedKey].name : '오늘',
         meta: t.why || t.preview_hook || '',
-        preview_hook: t.preview_hook || '',
       };
-    }).filter(function(x){ return x.topic; }) : [];
+    }).filter(function(x){ return x.topic; });
 
-    var picks = [];
-    var alt = _trendShuffleOffset % 2 === 1;  // 홀수 호출 → trending 비중↑
-    if(trendPool.length === 0){
-      // server 응답 없으면 클라 풀로만
-      picks = shuffleTrendPool(myPool).slice(0, 3);
-    } else {
-      // 셔플된 풀 둘에서 교차 선택
-      var myShuffled = shuffleTrendPool(myPool);
-      var trShuffled = shuffleTrendPool(trendPool);
-      if(alt){
-        picks = [trShuffled[0], myShuffled[0], trShuffled[1] || myShuffled[1]];
-      } else {
-        picks = [myShuffled[0], trShuffled[0], myShuffled[1] || trShuffled[1]];
-      }
-      picks = picks.filter(Boolean).slice(0, 3);
+    // 글로벌 hot (카테고리 무관)
+    var hotPool = serverTopics.map(function(t){
+      return {
+        topic: t.topic || '',
+        chip: t.category || '오늘 핫',
+        meta: t.why || t.preview_hook || '',
+      };
+    }).filter(function(x){ return x.topic; });
+
+    var phase = _trendShuffleOffset % 3;
+    var sCat = shuffleTrendPool(catPool);
+    var sHot = shuffleTrendPool(hotPool);
+    var sMy  = shuffleTrendPool(myPool);
+    var picks;
+    if(phase === 0)      picks = [sCat[0] || sMy[0], sCat[1] || sHot[0], sMy[0]];
+    else if(phase === 1) picks = [sHot[0] || sCat[0], sHot[1] || sMy[0], sCat[0] || sMy[1]];
+    else                 picks = [sMy[0], sMy[1], sCat[0] || sHot[0]];
+    picks = picks.filter(Boolean);
+    // 빈 슬롯은 클라 풀로 채움
+    while(picks.length < 3 && sMy.length){
+      var add = sMy.shift();
+      if(add && !picks.find(function(p){ return p.topic === add.topic; })) picks.push(add);
     }
+    picks = picks.slice(0, 3);
+
     if(savedKey && discoverData[savedKey]){
       createData._discTopic = savedKey;
       window._pickedTopic = discoverData[savedKey].name;
     }
-    renderDailyTrendsStatic(picks, trendPool.length ? 'fresh' : 'fallback');
+    var freshness = (catPool.length || hotPool.length) ? 'fresh' : 'fallback';
+    renderDailyTrendsStatic(picks, freshness);
   }
 
-  // server daily_trends 캐시
+  // server 캐시 (5분)
   if(window._serverTrendsCache && window._serverTrendsCache.ts > Date.now() - 5 * 60 * 1000){
-    mergeAndRender(window._serverTrendsCache.topics);
+    mergeAndRender(window._serverTrendsCache.data);
     return;
   }
   // 첫 렌더는 즉시 (server 기다리지 않음)
-  mergeAndRender(window._serverTrendsCache ? window._serverTrendsCache.topics : []);
-  // server fetch 후 캐시 + 재렌더 (한 번만)
+  mergeAndRender(window._serverTrendsCache ? window._serverTrendsCache.data : null);
+  // 더보기 클릭 시에도 캐시 무효화됐으면 fetch
   if(_trendShuffleOffset > 0 && window._serverTrendsCache) return;
   fetch('/api/trends/today', { credentials:'include' })
     .then(function(r){ return r.json(); })
     .then(function(j){
-      if(j && j.ok && Array.isArray(j.topics) && j.topics.length >= 1){
-        // server 응답 캐시 + 재렌더
-        window._serverTrendsCache = { topics: j.topics, ts: Date.now() };
-        mergeAndRender(j.topics);
+      if(j && j.ok){
+        window._serverTrendsCache = { data: j, ts: Date.now() };
+        mergeAndRender(j);
       }
     })
     .catch(function(){ /* 폴백 유지 */ });

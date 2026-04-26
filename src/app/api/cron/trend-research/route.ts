@@ -25,17 +25,55 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: false, reason: 'no_feed_items', stats })
   }
 
-  // 2) Claude 호출
+  // 2) Claude 호출 — 카테고리별 풀 + 통합 recommended 둘 다 요청
   const userPrompt = `${TREND_RESEARCH_PROMPT}
 
 ## 입력 데이터 (rawFeedItems)
 ${JSON.stringify(top20, null, 2)}
+
+## 출력 형식 (JSON 만, 다른 텍스트 X)
+{
+  "top5": [
+    { "title": "...", "source": "...", "engagement": 80, "category": "...", "researchable": true, "hook_score": 9 }
+  ],
+  "recommended_topics": [
+    { "topic": "후킹 문구 15자 이내", "category": "trend|beauty|fashion|food|cafe|travel|interior|fitness|money|book|baby|pet|kpop|movie|music|psych|mystery|life", "why": "왜 지금 뜨는지 한 줄", "preview_hook": "10자 이내 짧은 후킹" }
+  ],
+  "topics_by_category": {
+    "beauty":   [{ "topic": "...", "why": "...", "preview_hook": "..." }, ...3개],
+    "fashion":  [...3개],
+    "food":     [...3개],
+    "cafe":     [...3개],
+    "travel":   [...3개],
+    "interior": [...3개],
+    "fitness":  [...3개],
+    "money":    [...3개],
+    "book":     [...3개],
+    "baby":     [...3개],
+    "pet":      [...3개],
+    "kpop":     [...3개],
+    "movie":    [...3개],
+    "music":    [...3개],
+    "psych":    [...3개],
+    "mystery":  [...3개],
+    "life":     [...3개],
+    "trend":    [...3개]
+  }
+}
+
+룰:
+- recommended_topics 3개: 카테고리 무관 오늘 가장 핫한 주제. hook_score 9~10 만.
+- topics_by_category: 18개 카테고리 각 정확히 3개. 입력 데이터에 해당 카테고리 정보가 약하면 모델 일반 지식으로 보강해 작성.
+- topic 은 항상 한국어 자연어. 영문 제목은 한국 SNS 톤으로 의역.
+- why 한 줄 (왜 지금 뜨는지 · 50자 이내)
+- preview_hook 10자 이내, 카드뉴스 첫 슬라이드 후킹 자체로 사용 가능
 `
 
   let claudeResp: unknown = null
   let parsed: {
     top5?: Array<Record<string, unknown>>
     recommended_topics?: Array<Record<string, unknown>>
+    topics_by_category?: Record<string, Array<Record<string, unknown>>>
   } = {}
   try {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
@@ -47,7 +85,7 @@ ${JSON.stringify(top20, null, 2)}
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 3000,
+        max_tokens: 8000,
         messages: [{ role: 'user', content: userPrompt }],
       }),
     })
@@ -78,6 +116,7 @@ ${JSON.stringify(top20, null, 2)}
       generated_at: new Date().toISOString(),
       top5: parsed.top5 || [],
       recommended_topics: parsed.recommended_topics || [],
+      topics_by_category: parsed.topics_by_category || {},
       raw_feed_snapshot: top20,
       meta: {
         stats,
@@ -94,6 +133,7 @@ ${JSON.stringify(top20, null, 2)}
     ok: true,
     date_kst: dateKst,
     recommended_topics: parsed.recommended_topics || [],
+    topics_by_category_keys: Object.keys(parsed.topics_by_category || {}),
     stats,
   })
 }
