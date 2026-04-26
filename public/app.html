@@ -2259,7 +2259,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
           <span style="font-weight:800">내 말투 ·</span>
           <span id="direct-tone-name" style="font-weight:600">친근한</span>
         </div>
-        <button type="button" id="direct-tone-toggle" onclick="toggleToneChips()" style="padding:5px 10px;border-radius:100px;background:#fff;border:1px solid var(--b);font-size:10.5px;font-weight:700;color:var(--t2);cursor:pointer">이번 카드만 다른 톤</button>
+        <button type="button" id="direct-tone-toggle" onclick="toggleToneChips()" style="padding:5px 10px;border-radius:100px;background:#fff;border:1px solid var(--b);font-size:10.5px;font-weight:700;color:var(--t2);cursor:pointer">변경</button>
       </div>
       <!-- 톤 chip 6개 (default hidden, 토글로 표시) -->
       <div id="tone-chip-grid" style="display:none;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px">
@@ -5004,6 +5004,9 @@ function selectContentTone(btn){
   btn.style.color = 'var(--mint-d)';
   btn.style.fontWeight = '800';
   createData.contentTone = btn.dataset.tone;
+  // "내 말투 · ___" 라벨도 동기화
+  var nameEl = document.getElementById('direct-tone-name');
+  if(nameEl) nameEl.textContent = (typeof TONE_LABELS !== 'undefined' && TONE_LABELS[btn.dataset.tone]) || btn.dataset.tone;
   // 다음 세션에서도 유지
   try { localStorage.setItem('ssobi_content_tone', btn.dataset.tone); } catch(_){}
 }
@@ -5032,7 +5035,7 @@ function toggleToneChips(){
   if(!grid) return;
   var hidden = grid.style.display === 'none' || !grid.style.display;
   grid.style.display = hidden ? 'grid' : 'none';
-  if(btn) btn.textContent = hidden ? '내 말투로 돌아가기' : '이번 카드만 다른 톤';
+  if(btn) btn.textContent = hidden ? '닫기' : '변경';
 }
 // 학습된 내 말투: 친근체, 이모지 (:) 🌿 😊 ✨), 반말X, 감사표현 자주, 체크리스트형
 var trendPresets = {
