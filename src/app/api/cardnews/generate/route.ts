@@ -20,6 +20,7 @@ import {
   recommendTemplates,
   type CategoryKey,
 } from '@/lib/cardnews-prompt'
+import { buildTavilySearchBlock } from '@/lib/tavily-search'
 import { NextRequest, NextResponse } from 'next/server'
 
 // daily_trends 항목 → 입력 주제와 관련된 실제 데이터 블록 생성 (Claude 본문에 인용용)
@@ -225,14 +226,20 @@ export async function POST(req: NextRequest) {
     : '\n[스코프 자동 판단: mixed] 한국·글로벌 양쪽 정보 활용.'
 
   // ─────────────────────────────────────────────
-  // daily_trends 의 실제 수집 데이터에서 입력 주제와 관련된 항목을 뽑아 researchData 에 prepend
-  //   - top5: 조사·분석된 트렌드 (engagement 점수 포함)
-  //   - recommended_topics: 추천 주제 자체
-  //   매칭: 주제 토큰화 → title/excerpt 에 등장하는 항목 점수화 → 상위 6개
-  //   목표: Claude 가 본문에서 실제 사실/가격/이름을 직접 인용하게 만들기 (mirra.my 풍 알찬 본문)
+  // researchData 통합 — 3 소스 합쳐서 prepend (mirra.my 풍 알찬 본문)
+  //   1) daily_trends 의 사전 수집 데이터 (cron 기반, 매일 23시 갱신)
+  //   2) Tavily 실시간 검색 (쿼리 4개 병렬, 한국 도메인 우선) — 가장 신선
+  //   3) scopeHint (KR/global)
+  //   둘 다 병렬로 fetch → 어느 한쪽 실패해도 다른 쪽으로 보강
   // ─────────────────────────────────────────────
-  const collectedDataBlock = await buildCollectedDataBlock(sb, topic, category)
-  const researchData = (body.researchData || '') + scopeHint + collectedDataBlock
+  const [collectedDataBlock, tavilyBlock] = await Promise.all([
+    buildCollectedDataBlock(sb, topic, category),
+    buildTavilySearchBlock({ topic, category, contentTone }).catch(e => {
+      console.warn('[generate] tavily failed:', e)
+      return ''
+    }),
+  ])
+  const researchData = (body.researchData || '') + scopeHint + collectedDataBlock + tavilyBlock
 
   const prompt = buildContentGenerationPrompt({
     accountConcept,
