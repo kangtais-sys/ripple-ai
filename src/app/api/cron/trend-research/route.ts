@@ -37,10 +37,10 @@ ${JSON.stringify(top20, null, 2)}
     { "title": "...", "source": "...", "engagement": 80, "category": "...", "researchable": true, "hook_score": 9 }
   ],
   "recommended_topics": [
-    { "topic": "후킹 문구 15자 이내", "category": "trend|beauty|fashion|food|cafe|travel|interior|fitness|money|book|baby|pet|kpop|movie|music|psych|mystery|life", "why": "왜 지금 뜨는지 한 줄", "preview_hook": "10자 이내 짧은 후킹" }
+    { "topic": "후킹 문구 15자 이내", "category": "trend|beauty|fashion|food|cafe|travel|interior|fitness|money|book|baby|pet|kpop|movie|music|psych|mystery|life", "why": "왜 지금 뜨는지 한 줄", "preview_hook": "10자 이내 짧은 후킹", "body_preview": "카드뉴스 첫 슬라이드 본문 톤으로 2~3줄 (60~100자). 구체 사실/이름/수치 포함. 사용자가 카드 클릭 전에 어떤 내용인지 확 들어오게." }
   ],
   "topics_by_category": {
-    "beauty":   [{ "topic": "...", "why": "...", "preview_hook": "..." }, ...3개],
+    "beauty":   [{ "topic": "...", "why": "...", "preview_hook": "...", "body_preview": "2~3줄" }, ...3개],
     "fashion":  [...3개],
     "food":     [...3개],
     "cafe":     [...3개],
@@ -67,6 +67,9 @@ ${JSON.stringify(top20, null, 2)}
 - topic 은 항상 한국어 자연어. 영문 제목은 한국 SNS 톤으로 의역.
 - why 한 줄 (왜 지금 뜨는지 · 50자 이내)
 - preview_hook 10자 이내, 카드뉴스 첫 슬라이드 후킹 자체로 사용 가능
+- **body_preview 60~100자, 2~3줄 본문 미리보기** — 카드 클릭 전에 어떤 내용인지 확 보여주는 부분. 구체 브랜드/이름/수치 포함. SNS 자연체.
+  · 좋은 예: "스타벅스 봄 한정 라이트노트, 출시 7일 만에 완판. 컴포즈·메가커피도 비슷한 라떼 출시 임박. 이번 주말이 마지막 기회."
+  · 나쁜 예: "스타벅스 봄 신메뉴가 화제입니다." (정보 없음, 형식적)
 `
 
   let claudeResp: unknown = null
@@ -85,7 +88,7 @@ ${JSON.stringify(top20, null, 2)}
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 8000,
+        max_tokens: 16000,  // body_preview 추가로 출력량 증가
         messages: [{ role: 'user', content: userPrompt }],
       }),
     })
