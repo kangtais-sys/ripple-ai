@@ -211,6 +211,7 @@ export async function buildTavilySearchBlock(args: {
 [실시간 검색 결과 — Tavily ${queries.length}개 쿼리, ${picked.length}개 결과]
 ${lines}
 
-위 항목의 사실·이름·수치·시점을 본문에 그대로 인용. 출처 도메인은 짧게 표기 (예: "스벅 라이트노트 1주 만에 완판" — brunch.co.kr).
+위 항목의 사실·이름·수치·시점은 body 에 그대로 인용 (단 출처 도메인은 본문에 박지 말 것).
+가장 핵심이 된 출처 1개만 caption 끝에 "출처: <domain>" 한 줄로 표기.
 검색 결과에 없는 정보는 만들지 말 것. 비어 있으면 그 슬라이드는 다른 구체 정보로 채울 것.`
 }
