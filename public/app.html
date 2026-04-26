@@ -2187,10 +2187,10 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <!-- STEP 1: 추천 TOP3 + 직접 입력 -->
   <div class="create-step on" id="cs-1">
 
-    <!-- 처음이면 여기부터 (얇은 바) -->
+    <!-- 주제·말투 변경 (얇은 바, 이미 정해진 유저용) -->
     <button class="first-bar" onclick="openOnboarding()">
       <span class="first-bar-ico">✨</span>
-      <span class="first-bar-txt" id="first-bar-txt">처음 SNS를 시작한다면? <strong>주제·말투·목표 세팅</strong></span>
+      <span class="first-bar-txt" id="first-bar-txt">내 주제로 추천 받는 중 <strong>· 변경하기</strong></span>
       <span class="first-bar-arr">→</span>
     </button>
 
@@ -2253,7 +2253,16 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       </div>
       <div style="font-size:11.5px;color:var(--t2);line-height:1.55;margin-bottom:10px">주제 한 줄 적으면 <b style="color:var(--t1)">내 말투</b>로 카드뉴스·캡션을 자동 생성해요.</div>
       <textarea class="direct-ta" id="direct-topic" placeholder="예: 우울할 때 보기 좋은 책 속 글귀 추천 (출처 포함) / 아이돌 메이크업 트렌드 Best 3 / 민감 피부 봄철 루틴 / 이번주 공구 정리" oninput="toggleDirectBtn()" onkeyup="toggleDirectBtn()" oncompositionupdate="toggleDirectBtn()" oncompositionend="toggleDirectBtn()" onchange="toggleDirectBtn()"></textarea>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px">
+      <!-- 내 말투 표시 + 일회성 변경 토글 (이중 선택 제거, 온보딩에서 정한 톤 기본) -->
+      <div id="direct-tone-summary" style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding:9px 12px;border-radius:10px;background:var(--mint-l);border:1px solid #A7F3D0">
+        <div style="font-size:11.5px;color:var(--mint-d);line-height:1.5">
+          <span style="font-weight:800">내 말투 ·</span>
+          <span id="direct-tone-name" style="font-weight:600">친근한</span>
+        </div>
+        <button type="button" id="direct-tone-toggle" onclick="toggleToneChips()" style="padding:5px 10px;border-radius:100px;background:#fff;border:1px solid var(--b);font-size:10.5px;font-weight:700;color:var(--t2);cursor:pointer">이번 카드만 다른 톤</button>
+      </div>
+      <!-- 톤 chip 6개 (default hidden, 토글로 표시) -->
+      <div id="tone-chip-grid" style="display:none;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px">
         <button type="button" class="tone-chip" data-tone="warm"         onclick="selectContentTone(this)" style="padding:9px;border-radius:10px;border:1.5px solid var(--b);background:#fff;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;transition:all .12s">다정한</button>
         <button type="button" class="tone-chip on" data-tone="friendly"  onclick="selectContentTone(this)" style="padding:9px;border-radius:10px;border:1.5px solid var(--mint);background:var(--mint-l);font-size:12px;font-weight:800;color:var(--mint-d);cursor:pointer;transition:all .12s">친근한</button>
         <button type="button" class="tone-chip" data-tone="professional" onclick="selectContentTone(this)" style="padding:9px;border-radius:10px;border:1.5px solid var(--b);background:#fff;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;transition:all .12s">전문적</button>
@@ -4998,7 +5007,9 @@ function selectContentTone(btn){
   // 다음 세션에서도 유지
   try { localStorage.setItem('ssobi_content_tone', btn.dataset.tone); } catch(_){}
 }
-// 페이지 로드 시 createData.contentTone 값에 맞춰 만들기 탭 .tone-chip 동기화
+// 톤 키 → 한국어 라벨
+var TONE_LABELS = { warm:'다정한', friendly:'친근한', professional:'전문적', honest:'솔직한', witty:'재치있는', chic:'시크한' };
+// 페이지 로드 시 createData.contentTone 값에 맞춰 만들기 탭 .tone-chip 동기화 + 라벨 표시
 function syncToneChip(){
   var tone = createData.contentTone || 'friendly';
   document.querySelectorAll('.tone-chip').forEach(function(c){
@@ -5009,8 +5020,20 @@ function syncToneChip(){
     c.style.color = on ? 'var(--mint-d)' : 'var(--t2)';
     c.style.fontWeight = on ? '800' : '700';
   });
+  // 만들기 탭 "내 말투 · ___" 라벨 동기화
+  var nameEl = document.getElementById('direct-tone-name');
+  if(nameEl) nameEl.textContent = TONE_LABELS[tone] || tone;
 }
 document.addEventListener('DOMContentLoaded', syncToneChip);
+// 톤 chip grid 표시/숨김 토글
+function toggleToneChips(){
+  var grid = document.getElementById('tone-chip-grid');
+  var btn = document.getElementById('direct-tone-toggle');
+  if(!grid) return;
+  var hidden = grid.style.display === 'none' || !grid.style.display;
+  grid.style.display = hidden ? 'grid' : 'none';
+  if(btn) btn.textContent = hidden ? '내 말투로 돌아가기' : '이번 카드만 다른 톤';
+}
 // 학습된 내 말투: 친근체, 이모지 (:) 🌿 😊 ✨), 반말X, 감사표현 자주, 체크리스트형
 var trendPresets = {
   1: {
@@ -12481,6 +12504,18 @@ async function checkAuth() {
     go('home');
     loadDashboardData();
     bootstrapUser();
+    // 가입 직후 또는 온보딩 미완료 → 통합 온보딩 자동 트리거 (주제·말투)
+    //   localStorage.ssobi_onboarding 에 topics/tone 둘 다 있으면 skip
+    setTimeout(function(){
+      try {
+        var saved = JSON.parse(localStorage.getItem('ssobi_onboarding') || '{}');
+        if(!saved.topics?.length || !saved.tone){
+          if(typeof openOnboarding === 'function') openOnboarding();
+        }
+      } catch(_){
+        if(typeof openOnboarding === 'function') openOnboarding();
+      }
+    }, 800);
   } else if (hash === 'signup') {
     go('signup');
   } else if (hash === 'login') {
