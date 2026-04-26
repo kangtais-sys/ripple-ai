@@ -135,9 +135,9 @@ export async function fetchHackerNews(): Promise<FeedItem[]> {
 }
 
 // ─────────────────────────────────────────────
-// 한국 트렌드 — YouTube Trending KR + 한경 뉴스 RSS
-// 2026-04 디버그: 네이버 뉴스 RSS 폐지(404) → 한경 사용
-// 매경(mk)은 옛 기사 섞여 시점 일관성 깨져서 제외 (2026-04-26)
+// 한국 트렌드 — YouTube Trending KR + 4개 매체 RSS
+// 2026-04 진화: 네이버 뉴스 RSS 폐지(404) / 매경 옛 기사 / 한경 Vercel 차단
+//              → 한겨레·경향·동아·오마이뉴스 4매체로 다양화 (검증 통과)
 // ─────────────────────────────────────────────
 export async function collectKoreanTrends(): Promise<FeedItem[]> {
   const items: FeedItem[] = []
@@ -179,28 +179,35 @@ export async function collectKoreanTrends(): Promise<FeedItem[]> {
     console.warn('[collectKoreanTrends] missing YOUTUBE_API_KEY → youtube skip')
   }
 
-  // 2) 한국 뉴스 RSS — 한경만 사용 (매경 제외: 옛 기사 섞여 시점 일관성 깨짐)
-  const hkXml = await safeText('https://www.hankyung.com/feed/all-news')
-  console.log('[collectKoreanTrends] hankyung fetched:', !!hkXml, 'len', hkXml?.length || 0)
-
-  if (hkXml) {
-    const hkParsed = parseRssItems(hkXml, 10)
-    console.log('[collectKoreanTrends] hankyung parsed items:', hkParsed.length, 'first:', hkParsed[0]?.title?.slice(0, 60) || '(none)')
-    hkParsed.forEach((it, i) => {
+  // 2) 한국 뉴스 RSS — 4매체 병렬 (한겨레·경향·동아·오마이뉴스) 각 5개씩
+  const krSources: Array<{ src: string; url: string; baseEng: number }> = [
+    { src: 'hani:news',     url: 'https://www.hani.co.kr/rss/',                    baseEng: 50 },
+    { src: 'khan:news',     url: 'https://www.khan.co.kr/rss/rssdata/total_news.xml', baseEng: 48 },
+    { src: 'donga:news',    url: 'https://www.donga.com/news/rss',                 baseEng: 45 },
+    { src: 'ohmynews:news', url: 'https://rss.ohmynews.com/rss/ohmynews.xml',      baseEng: 42 },
+  ]
+  const krResults = await Promise.all(krSources.map(s => safeText(s.url)))
+  krResults.forEach((xml, idx) => {
+    const cfg = krSources[idx]
+    if (!xml) {
+      console.warn(`[collectKoreanTrends] ${cfg.src} fetch failed`)
+      return
+    }
+    const parsed = parseRssItems(xml, 5)
+    console.log(`[collectKoreanTrends] ${cfg.src} parsed items:`, parsed.length, 'first:', parsed[0]?.title?.slice(0, 60) || '(none)')
+    parsed.forEach((it, i) => {
       items.push({
-        source: 'hankyung:news',
+        source: cfg.src,
         title: it.title,
         excerpt: it.excerpt,
-        engagement: Math.max(0, 45 - i * 2),
+        engagement: Math.max(0, cfg.baseEng - i * 2),
         url: it.link,
       })
     })
-  } else {
-    console.warn('[collectKoreanTrends] hankyung fetch failed (Vercel data center IP 가능성)')
-  }
+  })
 
   console.log('[collectKoreanTrends] total items:', items.length)
-  return items.slice(0, 30)
+  return items.slice(0, 40)
 }
 
 // ─────────────────────────────────────────────
