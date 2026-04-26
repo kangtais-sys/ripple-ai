@@ -1,4 +1,7 @@
+import { createClient } from '@supabase/supabase-js'
+
 // 트렌드 수집기 — 매일 23:00 cron 이 실행
+// 2026-04 Phase 3 업데이트: Instagram Hashtag 급상승 감지 추가 (ig_accounts 동적 토큰)
 // 2026-04 Phase 2 업데이트: 카테고리별 RSS 9개 추가 (사전 검증 통과 분만)
 //
 // 기존 7개:
@@ -360,16 +363,155 @@ export async function fetchNerdWallet(): Promise<FeedItem[]> {
 }
 
 // ─────────────────────────────────────────────
+// Phase 3 — Instagram Hashtag 급상승 감지 (2026-04)
+//   ig_accounts 테이블에서 활성 토큰 자동 조회 (만료 안 된 첫 행, 실패 시 다음 행 fallback)
+//   카테고리별 5 hashtag × 8 카테고리 = 40 hashtag 의 media_count 추적
+//   instagram_hashtag_counts 테이블에 일별 카운트 저장 → 어제 대비 급상승 top2/카테고리 반환
+//   Meta Graph API rate limit (앱당 200/h) 안전: 한번에 80 호출 (search 40 + count 40)
+// ─────────────────────────────────────────────
+const HASHTAGS_BY_CATEGORY: Record<string, string[]> = {
+  beauty: ['올리브영', '피부관리', '스킨케어루틴', '뷰티템', '화장품추천'],
+  fashion: ['오오티디', '데일리룩', '코디추천', '무신사', '패션'],
+  food: ['맛집추천', '홈쿡', '카페투어', '맛스타그램', '오늘뭐먹지'],
+  travel: ['국내여행', '해외여행', '여행스타그램', '여행추천', '주말여행'],
+  life: ['생활꿀팁', '자취생활', '인테리어', '살림', '일상'],
+  fitness: ['홈트', '운동일상', '헬스', '다이어트', '운동'],
+  money: ['재테크', '주식', '부업', '절약', '돈모으기'],
+  book: ['독서', '책추천', '북스타그램', '읽은책', '오늘의책'],
+}
+
+type IgTokenRow = { ig_user_id: string; access_token: string; token_expires_at: string | null }
+
+async function getActiveIgToken(): Promise<IgTokenRow | null> {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!supabaseUrl || !supabaseKey) return null
+  const sb = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false } })
+  const nowIso = new Date().toISOString()
+  // 만료 안 된 토큰 우선, 최신 등록순
+  const { data } = await sb
+    .from('ig_accounts')
+    .select('ig_user_id, access_token, token_expires_at')
+    .not('access_token', 'is', null)
+    .or(`token_expires_at.is.null,token_expires_at.gte.${nowIso}`)
+    .order('created_at', { ascending: false })
+    .limit(5)
+  if (!data || data.length === 0) return null
+  // 첫 행이 작동 안 하면 호출부에서 다음 row 시도. 일단 첫 row 반환.
+  return data[0] as IgTokenRow
+}
+
+export async function collectInstagramHashtagTrends(): Promise<FeedItem[]> {
+  console.log('[collectInstagramHashtagTrends] start')
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  if (!supabaseUrl || !supabaseKey) {
+    console.warn('[collectInstagramHashtagTrends] missing supabase env')
+    return []
+  }
+  const sb = createClient(supabaseUrl, supabaseKey, { auth: { persistSession: false } })
+  const tokenRow = await getActiveIgToken()
+  if (!tokenRow) {
+    console.warn('[collectInstagramHashtagTrends] no active ig token in ig_accounts')
+    return []
+  }
+  const { ig_user_id: igUserId, access_token: token } = tokenRow
+  console.log('[collectInstagramHashtagTrends] using ig_user_id:', igUserId.slice(0, 8) + '...')
+
+  const today = new Date()
+  const todayStr = today.toISOString().slice(0, 10)
+  const yesterday = new Date(today.getTime() - 86400000)
+  const yesterdayStr = yesterday.toISOString().slice(0, 10)
+
+  const results: FeedItem[] = []
+
+  for (const [category, tags] of Object.entries(HASHTAGS_BY_CATEGORY)) {
+    const categoryResults: { tag: string; today: number; yesterday: number; increase: number }[] = []
+    for (const tag of tags) {
+      try {
+        // 1) hashtag_id 검색
+        const searchUrl = `https://graph.facebook.com/v19.0/ig_hashtag_search?user_id=${igUserId}&q=${encodeURIComponent(tag)}&access_token=${token}`
+        const searchData = await safeJson<{ data?: Array<{ id?: string }> }>(searchUrl)
+        const hashtagId = searchData?.data?.[0]?.id
+        if (!hashtagId) continue
+
+        // 2) media_count 조회
+        const countUrl = `https://graph.facebook.com/v19.0/${hashtagId}?fields=name,media_count&access_token=${token}`
+        const countData = await safeJson<{ media_count?: number }>(countUrl)
+        const todayCount = countData?.media_count ?? 0
+        if (todayCount === 0) continue
+
+        // 3) 어제 카운트 조회
+        const { data: ydayRow } = await sb
+          .from('instagram_hashtag_counts')
+          .select('media_count')
+          .eq('hashtag', tag)
+          .eq('date_kst', yesterdayStr)
+          .maybeSingle()
+        const yesterdayCount = (ydayRow as { media_count?: number } | null)?.media_count ?? todayCount
+        const increase = todayCount - yesterdayCount
+
+        // 4) 오늘 카운트 upsert
+        await sb.from('instagram_hashtag_counts').upsert({
+          hashtag: tag,
+          media_count: todayCount,
+          date_kst: todayStr,
+        })
+
+        categoryResults.push({ tag, today: todayCount, yesterday: yesterdayCount, increase })
+      } catch (e) {
+        console.warn(`[collectInstagramHashtagTrends] ${tag} error:`, e)
+      }
+    }
+
+    // 카테고리별 증가량 top 2 (첫날엔 increase=0 이라 0개 — fallback 으로 today count 기준 top 2)
+    const sorted = categoryResults
+      .sort((a, b) => b.increase - a.increase)
+    const picks = sorted.filter(r => r.increase > 0).slice(0, 2)
+    // 첫날 또는 증가 0 이면 today count 상위 1개 라도 보여주기
+    if (picks.length === 0 && categoryResults.length > 0) {
+      const top = [...categoryResults].sort((a, b) => b.today - a.today)[0]
+      results.push({
+        source: `instagram_hashtag:${category}`,
+        title: `#${top.tag} (${top.today.toLocaleString()}개 게시물)`,
+        excerpt: `${category} 카테고리 인기 해시태그`,
+        engagement: 30,
+      })
+    } else {
+      picks.forEach(({ tag, increase, today }) => {
+        results.push({
+          source: `instagram_hashtag:${category}`,
+          title: `#${tag} 급상승 (+${increase.toLocaleString()})`,
+          excerpt: `오늘 ${today.toLocaleString()}개 게시물 · 어제 대비 +${increase.toLocaleString()}`,
+          engagement: Math.min(100, 50 + Math.log10(Math.max(1, increase)) * 10),
+        })
+      })
+    }
+  }
+
+  console.log('[collectInstagramHashtagTrends] total items:', results.length)
+  return results
+}
+
+// ─────────────────────────────────────────────
 // 통합 수집기 — 병렬 실행, 실패는 빈 배열로 흡수
 // ─────────────────────────────────────────────
 export async function collectAllTrends(): Promise<{
   items: FeedItem[]
   stats: Record<string, number>
 }> {
+  // Instagram Hashtag 는 외부 + DB 다중 호출이라 60초 안전 타임아웃 (메인 cron 영향 차단)
+  const igHashtagWithTimeout = new Promise<FeedItem[]>((resolve) => {
+    const t = setTimeout(() => { console.warn('[collectAllTrends] ig_hashtag timeout 60s'); resolve([]) }, 60000)
+    collectInstagramHashtagTrends()
+      .then(r => { clearTimeout(t); resolve(r) })
+      .catch(e => { clearTimeout(t); console.warn('[collectAllTrends] ig_hashtag error:', e); resolve([]) })
+  })
+
   const [
     googleTrends, signalbz, hn, koreanTrends, lh, yna, newsApi,
     bazaar, whowhatwear, wwd, refinery29, aptTherapy, designMilk,
-    womensHealth, runnersWorld, nerdWallet,
+    womensHealth, runnersWorld, nerdWallet, igHashtag,
   ] = await Promise.all([
     fetchGoogleTrendsKR().catch(() => [] as FeedItem[]),
     fetchSignalBz().catch(() => [] as FeedItem[]),
@@ -388,11 +530,13 @@ export async function collectAllTrends(): Promise<{
     fetchWomensHealth().catch(() => [] as FeedItem[]),
     fetchRunnersWorld().catch(() => [] as FeedItem[]),
     fetchNerdWallet().catch(() => [] as FeedItem[]),
+    // Phase 3 신규 — Instagram Hashtag 급상승 (timeout-wrapped)
+    igHashtagWithTimeout,
   ])
   const items = [
     ...googleTrends, ...signalbz, ...hn, ...koreanTrends, ...lh, ...yna, ...newsApi,
     ...bazaar, ...whowhatwear, ...wwd, ...refinery29, ...aptTherapy, ...designMilk,
-    ...womensHealth, ...runnersWorld, ...nerdWallet,
+    ...womensHealth, ...runnersWorld, ...nerdWallet, ...igHashtag,
   ]
   return {
     items,
@@ -413,6 +557,7 @@ export async function collectAllTrends(): Promise<{
       womens_health: womensHealth.length,
       runners_world: runnersWorld.length,
       nerdwallet: nerdWallet.length,
+      ig_hashtag: igHashtag.length,
       total: items.length,
     },
   }
