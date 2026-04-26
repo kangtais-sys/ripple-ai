@@ -135,79 +135,49 @@ export async function fetchHackerNews(): Promise<FeedItem[]> {
 }
 
 // ─────────────────────────────────────────────
-// 한국 트렌드 — YouTube Trending KR + 4개 매체 RSS
-// 2026-04 진화: 네이버 뉴스 RSS 폐지(404) / 매경 옛 기사 / 한경 Vercel 차단
-//              → 한겨레·경향·동아·오마이뉴스 4매체로 다양화 (검증 통과)
+// 한국 트렌드 — YouTube Trending KR 만 유지 (한국 뉴스 매체 전부 제거 2026-04-26)
+// 정치·사회 뉴스는 K-MZ 라이프 카드뉴스 주제와 결이 안 맞음.
+// 다른 소스들(글로벌 RSS / NewsAPI / Signal.bz / IG Hashtag)이 충분히 커버.
 // ─────────────────────────────────────────────
 export async function collectKoreanTrends(): Promise<FeedItem[]> {
   const items: FeedItem[] = []
-
-  // 1) YouTube Trending KR (영상 제목 20개) — YOUTUBE_API_KEY 필요
   const ytKey = process.env.YOUTUBE_API_KEY
   console.log('[collectKoreanTrends] youtube key present:', !!ytKey)
-  if (ytKey) {
-    try {
-      const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&regionCode=KR&maxResults=20&key=${ytKey}`
-      const res = await fetch(url)
-      console.log('[collectKoreanTrends] youtube response status:', res.status)
-      if (res.ok) {
-        const data = await res.json() as {
-          items?: Array<{
-            id?: string
-            snippet?: { title?: string; description?: string; channelTitle?: string; tags?: string[] }
-          }>
-        }
-        ;(data.items || []).forEach((v, i) => {
-          const t = v.snippet?.title?.trim()
-          if (!t) return
-          items.push({
-            source: 'youtube:trending_kr',
-            title: t,
-            excerpt: (v.snippet?.description || '').slice(0, 200),
-            engagement: Math.max(0, 80 - i * 2),
-            url: v.id ? `https://www.youtube.com/watch?v=${v.id}` : undefined,
-          })
-        })
-      } else {
-        const errBody = await res.text().catch(() => '')
-        console.warn('[collectKoreanTrends] youtube error body:', errBody.slice(0, 300))
-      }
-    } catch (e) {
-      console.error('[collectKoreanTrends] youtube exception:', e)
-    }
-  } else {
-    console.warn('[collectKoreanTrends] missing YOUTUBE_API_KEY → youtube skip')
+  if (!ytKey) {
+    console.warn('[collectKoreanTrends] missing YOUTUBE_API_KEY → skip')
+    return []
   }
-
-  // 2) 한국 뉴스 RSS — 4매체 병렬 (한겨레·경향·동아·오마이뉴스) 각 5개씩
-  const krSources: Array<{ src: string; url: string; baseEng: number }> = [
-    { src: 'hani:news',     url: 'https://www.hani.co.kr/rss/',                    baseEng: 50 },
-    { src: 'khan:news',     url: 'https://www.khan.co.kr/rss/rssdata/total_news.xml', baseEng: 48 },
-    { src: 'donga:news',    url: 'https://www.donga.com/news/rss',                 baseEng: 45 },
-    { src: 'ohmynews:news', url: 'https://rss.ohmynews.com/rss/ohmynews.xml',      baseEng: 42 },
-  ]
-  const krResults = await Promise.all(krSources.map(s => safeText(s.url)))
-  krResults.forEach((xml, idx) => {
-    const cfg = krSources[idx]
-    if (!xml) {
-      console.warn(`[collectKoreanTrends] ${cfg.src} fetch failed`)
-      return
-    }
-    const parsed = parseRssItems(xml, 5)
-    console.log(`[collectKoreanTrends] ${cfg.src} parsed items:`, parsed.length, 'first:', parsed[0]?.title?.slice(0, 60) || '(none)')
-    parsed.forEach((it, i) => {
-      items.push({
-        source: cfg.src,
-        title: it.title,
-        excerpt: it.excerpt,
-        engagement: Math.max(0, cfg.baseEng - i * 2),
-        url: it.link,
+  try {
+    const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&regionCode=KR&maxResults=20&key=${ytKey}`
+    const res = await fetch(url)
+    console.log('[collectKoreanTrends] youtube response status:', res.status)
+    if (res.ok) {
+      const data = await res.json() as {
+        items?: Array<{
+          id?: string
+          snippet?: { title?: string; description?: string; channelTitle?: string; tags?: string[] }
+        }>
+      }
+      ;(data.items || []).forEach((v, i) => {
+        const t = v.snippet?.title?.trim()
+        if (!t) return
+        items.push({
+          source: 'youtube:trending_kr',
+          title: t,
+          excerpt: (v.snippet?.description || '').slice(0, 200),
+          engagement: Math.max(0, 80 - i * 2),
+          url: v.id ? `https://www.youtube.com/watch?v=${v.id}` : undefined,
+        })
       })
-    })
-  })
-
+    } else {
+      const errBody = await res.text().catch(() => '')
+      console.warn('[collectKoreanTrends] youtube error body:', errBody.slice(0, 300))
+    }
+  } catch (e) {
+    console.error('[collectKoreanTrends] youtube exception:', e)
+  }
   console.log('[collectKoreanTrends] total items:', items.length)
-  return items.slice(0, 40)
+  return items
 }
 
 // ─────────────────────────────────────────────
