@@ -5338,21 +5338,29 @@ function renderDailyTrends(){
       };
     }).filter(function(x){ return x.topic; });
 
-    var phase = _trendShuffleOffset % 3;
+    // server 데이터 (body_preview 포함) 우선 — 모든 카드에 본문 미리보기 보장
+    // 카테고리 풀(catPool) + 글로벌 hot(hotPool) 합쳐서 3개. 부족하면 클라 풀(myPool) fallback
     var sCat = shuffleTrendPool(catPool);
     var sHot = shuffleTrendPool(hotPool);
     var sMy  = shuffleTrendPool(myPool);
-    var picks;
-    if(phase === 0)      picks = [sCat[0] || sMy[0], sCat[1] || sHot[0], sMy[0]];
-    else if(phase === 1) picks = [sHot[0] || sCat[0], sHot[1] || sMy[0], sCat[0] || sMy[1]];
-    else                 picks = [sMy[0], sMy[1], sCat[0] || sHot[0]];
-    picks = picks.filter(Boolean);
-    // 빈 슬롯은 클라 풀로 채움
-    while(picks.length < 3 && sMy.length){
-      var add = sMy.shift();
-      if(add && !picks.find(function(p){ return p.topic === add.topic; })) picks.push(add);
+    var serverMix = [];
+    var seen = {};
+    function pushUnique(arr){
+      for(var i = 0; i < arr.length; i++){
+        var t = arr[i]; if(!t || !t.topic || seen[t.topic]) continue;
+        seen[t.topic] = 1; serverMix.push(t);
+        if(serverMix.length >= 3) return;
+      }
     }
-    picks = picks.slice(0, 3);
+    // _trendShuffleOffset 짝수: 카테고리 위주 / 홀수: hot 위주
+    if(_trendShuffleOffset % 2 === 0){
+      pushUnique(sCat); pushUnique(sHot);
+    } else {
+      pushUnique(sHot); pushUnique(sCat);
+    }
+    // 부족하면 클라 풀에서 보충 (body_preview 없지만 hook 만이라도)
+    if(serverMix.length < 3) pushUnique(sMy);
+    var picks = serverMix.slice(0, 3);
 
     if(savedKey && discoverData[savedKey]){
       createData._discTopic = savedKey;
@@ -5467,12 +5475,8 @@ async function generatePrompt(){
     renderBodyAsCards(createData.bodySlides);
     document.getElementById('cs2-caption').textContent = j.caption || '';
     createData._lastSource = 'direct:'+topic;
-    // alt_hooks 가 있으면 STEP B (3개 중 하나 고르는 화면) 노출
-    if(createData.altHooks && createData.altHooks.length >= 2){
-      showHookPicker(j.hook, createData.altHooks);
-    } else {
-      goStep(2);
-    }
+    // 첫 문장(후킹) 선택 단계 제거 — 추천 주제 자체가 후킹 문구라 추가 선택 불필요
+    goStep(2);
   } catch(e) {
     // fallback: 로컬 템플릿 — bodySlides 도 채워서 cs-2 카드 렌더 보장
     console.warn('[cardnews] Claude 실패, 폴백 사용:', e);

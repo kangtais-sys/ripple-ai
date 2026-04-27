@@ -627,9 +627,11 @@ ${researchBlock}
 - 데이터에 없는 가격·날짜·이름은 만들지 말 것.
 - 6개 슬라이드 중 최소 4개에 수집/검색 항목 1개 이상 인용 = 가산점.
 
-## 📏 본문 길이 룰 (확장)
+## 📏 본문 길이 / 줄바꿈 룰
 - 각 본문 슬라이드 text 필드 = **5~7줄**, 줄당 12~18자 권장.
-- 임팩트 핵심 + 구체 예시 1줄 + 한 줄 더 깊이감 있는 인사이트 (이전보다 한 줄 더).
+- 임팩트 핵심 + 구체 예시 1줄 + 한 줄 더 깊이감 있는 인사이트.
+- **줄바꿈 (\\n) 1~2 문장마다 필수**. SNS 가독성 위해 한 호흡으로 읽히게 끊어줄 것.
+  · 예: "스타벅스 라이트노트 출시 7일 만에 완판.\\n블론드 라떼 톤이 의외로 단맛 X.\\n2주 안에 컴포즈도 비슷한 라떼 출시 예정."
 - 너무 짧으면 본문 없이 헤드라인만 같은 느낌 → 5줄 미만 금지.
 
 ## 📝 caption 강화 룰 (자세한 내용은 캡션에)
@@ -637,6 +639,15 @@ ${researchBlock}
 - 구조: 후킹 1줄 → 본문 핵심 압축 2~3줄 (몰랐던 디테일·맥락) → CTA 1줄 → 해시태그 → (선택) 출처 1줄
 - caption 길이 = 250~400자 (이전보다 풍부하게)
 - 본문에서 뺀 가격/시점/맥락/배경 정보는 caption 에 담기.
+
+## 🔖 해시태그 룰 (주제와 무관한 일반 태그 금지)
+- 해시태그 5~7개. 모두 주제와 직접 연관되어야 함.
+- **우선순위 1**: 본문에 등장한 **구체 브랜드/제품/장소/인물** 이름을 해시태그로 변환
+  · 예: 본문 "스타벅스 라이트노트" → #스타벅스 #스벅신메뉴 #라이트노트
+  · 예: 본문 "다이소 1500원 마라탕" → #다이소 #자취요리 #1500원마라탕
+- **우선순위 2**: 카테고리 일반 해시태그 1~2개 (info.hashtags 참고용)
+- ❌ 주제와 무관한 광범위 태그 금지: "#일상" "#데일리" "#기록" 같은 게 카페·뷰티·운동 주제에 박히면 X
+- 캡션 해시태그가 본문 내용을 반영해야 한다 = 검색 했을 때 적합한 사람한테 노출되는 게 목표.
 
 ## 🎯 후킹 공식 6패턴 (제목 hook 작성 시 반드시 1개 이상 적용)
 1. **대비형**: "[기존 믿음] 대신 [새로운 발견], [핵심 효과]"
@@ -1141,7 +1152,13 @@ export function buildCaption(args: {
 }
 
 // 서버 응답 캡션이 비거나 부실하면 본문 압축 + 카테고리 해시태그 강제 부착
-//   - Claude 가 만든 캡션이 카테고리와 무관한 해시태그를 박는 경우(육아인데 #일상)도 잡아서 교체
+// 광범위 일반 해시태그 (#일상/#데일리/#기록 같은 거) 가 카페·뷰티·운동 주제에 박히면 자동 제거
+//   주제와 무관한 generic tag 차단 + 카테고리 hashtag 보장
+const GENERIC_TAGS = new Set([
+  '#일상', '#데일리', '#daily', '#기록', '#오늘', '#소통', '#좋아요', '#팔로우',
+  '#인스타', '#instagram', '#instagood', '#instadaily', '#follow', '#like',
+  '#소통해요', '#좋반', '#맞팔', '#일상스타그램',
+])
 export function ensureCaption(args: {
   rawCaption?: string | null
   hook: string
@@ -1149,7 +1166,7 @@ export function ensureCaption(args: {
   category: CategoryKey
 }): string {
   const info = CATEGORIES[args.category]
-  const catTags = info.hashtags.slice(0, 5).join(' ')
+  const catTags = info.hashtags.slice(0, 3).join(' ')
 
   // 1) 캡션 자체가 너무 짧으면 fallback 으로 본문 압축형 캡션 생성
   if (!args.rawCaption || args.rawCaption.trim().length < 30) {
@@ -1162,22 +1179,19 @@ export function ensureCaption(args: {
 
   let cap = args.rawCaption.trim()
 
-  // 2) 카테고리 해시태그가 하나도 없으면 → 기존 해시태그 모두 제거하고 카테고리 해시태그 부착
+  // 2) 광범위 generic tag 자동 제거 — 주제와 무관한데 박힌 거
+  const allHashtagsRaw = (cap.match(/#[^\s#]+/g) || [])
+  allHashtagsRaw.forEach(t => {
+    if (GENERIC_TAGS.has(t.toLowerCase()) || GENERIC_TAGS.has(t)) {
+      cap = cap.split(t).join('')
+    }
+  })
+  cap = cap.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim()
+
+  // 3) 카테고리 해시태그가 하나도 없으면 카테고리 hashtag 부착 (Claude 가 본문 구체 태그를 잘 만들었다면 이미 있을 것)
   const hasCatTag = info.hashtags.some(t => cap.includes(t))
   if (!hasCatTag) {
-    cap = cap.replace(/#[^\s#]+/g, '').replace(/\n{3,}/g, '\n\n').trim()
-    cap = cap + '\n\n' + catTags
-  } else {
-    // 3) 일부 카테고리 태그 + 다른 무관 태그 섞여있으면 카테고리 태그만 남김
-    const allHashtags = (cap.match(/#[^\s#]+/g) || [])
-    const off = allHashtags.filter(t => !info.hashtags.includes(t))
-    if (off.length > 0) {
-      off.forEach(t => { cap = cap.split(t).join('') })
-      cap = cap.replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim()
-      // 누락된 카테고리 태그 보충
-      const missing = info.hashtags.slice(0, 5).filter(t => !cap.includes(t))
-      if (missing.length) cap = cap.trimEnd() + ' ' + missing.join(' ')
-    }
+    cap = cap.trimEnd() + (cap.match(/#[^\s#]+\s*$/) ? ' ' : '\n\n') + catTags
   }
 
   return cap
