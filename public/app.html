@@ -5279,6 +5279,33 @@ function refreshTrends(){
   // (cron 데이터는 같은 날 안 바뀌니 fetch 다시 할 필요 없음. 깜빡거림 방지)
   renderDailyTrends();
 }
+// 같은 카테고리 안에서 풀 부족 시 실시간 생성 (mirra 스타일 무한 확장)
+//   호출 후 _serverTrendsCache.data.topics_by_category[catKey] 에 push 해서 다음 클릭 때 자동 활용
+function fetchMoreTrends(catKey){
+  if(window._fetchingMoreTrends) return;
+  window._fetchingMoreTrends = true;
+  var exclude = Object.keys(window._shownTrendTopics || {});
+  fetch('/api/trends/more', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ category: catKey, exclude: exclude, count: 10 }),
+    credentials: 'include',
+  })
+    .then(function(r){ return r.json(); })
+    .then(function(j){
+      if(j && j.ok && Array.isArray(j.topics) && j.topics.length > 0){
+        // 캐시에 신규 토픽 머지
+        if(!window._serverTrendsCache) window._serverTrendsCache = { data: { topics_by_category: {} }, ts: Date.now() };
+        if(!window._serverTrendsCache.data.topics_by_category) window._serverTrendsCache.data.topics_by_category = {};
+        var existing = window._serverTrendsCache.data.topics_by_category[catKey] || [];
+        window._serverTrendsCache.data.topics_by_category[catKey] = existing.concat(j.topics);
+        // 다음 렌더에서 새 풀 반영되도록 다시 렌더
+        renderDailyTrends();
+      }
+    })
+    .catch(function(){ /* 실패해도 기존 풀로 동작 */ })
+    .finally(function(){ window._fetchingMoreTrends = false; });
+}
 function shuffleTrendPool(pool){
   // 1씩 회전하는 sliding window — 풀 N개면 N번 클릭해야 같은 3개 다시 나옴.
   // 풀 9개 → 9가지 starting point × 3개 = 매번 다름 (8회까지 모두 새 조합).
@@ -5343,11 +5370,9 @@ function renderDailyTrends(){
       };
     }).filter(function(x){ return x.topic; });
 
-    // 풀 구성 — server 데이터만 (모두 body_preview 있음 → 본문 일관 표시)
-    //   1) catPool (사용자 카테고리, 3) 우선
-    //   2) hotPool (글로벌 hot, 3) 보완
-    //   3) 다른 server 카테고리 펼쳐서 다양성 확보 (모두 body 있음)
-    //   클라 myPool 은 body 가 없어서 제외 — "어떤 카드는 본문 나오고 어떤 건 안 나오는" 문제 해결
+    // 풀 구성 — savedKey 있으면 같은 카테고리 안에서만 (mirra 스타일)
+    //   풀 부족하면 /api/trends/more 로 실시간 추가 생성
+    //   다른 카테고리 fallback 은 사용 안 함 (사용자가 골랐으면 그 카테고리만)
     var serverPool = [];
     var seenTopic = {};
     function addToPool(arr){
@@ -5358,33 +5383,40 @@ function renderDailyTrends(){
     }
     if(savedKey){
       addToPool(catPool);
-      addToPool(hotPool);
+      // 클라 풀에 같은 카테고리 추가 토픽 있으면 보충 (cron 부족 시 임시)
+      addToPool(myPool.map(function(t){
+        return { topic: t.topic, chip: t.chip, meta: '' };
+      }));
     } else {
       addToPool(hotPool);
       addToPool(catPool);
+      // 글로벌 fallback 은 모든 카테고리 합치기
+      Object.keys(topicsByCat).forEach(function(k){
+        var arr = (Array.isArray(topicsByCat[k]) ? topicsByCat[k] : []).map(function(t){
+          return {
+            topic: t.topic || '',
+            chip: labelizeCategory(k),
+            meta: t.body_preview || t.why || t.preview_hook || '',
+          };
+        }).filter(function(x){ return x.topic; });
+        addToPool(arr);
+      });
     }
-    // 다른 카테고리도 섞어서 풀 키우기 (body 항상 있음)
-    Object.keys(topicsByCat).forEach(function(k){
-      if(k === catKey) return;
-      var arr = (Array.isArray(topicsByCat[k]) ? topicsByCat[k] : []).map(function(t){
-        return {
-          topic: t.topic || '',
-          chip: labelizeCategory(k),
-          meta: t.body_preview || t.why || t.preview_hook || '',
-        };
-      }).filter(function(x){ return x.topic && x.meta; });
-      addToPool(arr);
-    });
-    // body 없는 server item 은 제외 (일관성)
-    serverPool = serverPool.filter(function(x){ return x.meta; });
 
     // 이전에 보여줬던 토픽 제외 — 다른주제보기 클릭 시 항상 새 카드
     window._shownTrendTopics = window._shownTrendTopics || {};
     var unshown = serverPool.filter(function(t){ return !window._shownTrendTopics[t.topic]; });
     if(unshown.length < 3){
-      // 풀 다 소진 → 리셋 후 처음부터
-      window._shownTrendTopics = {};
-      unshown = serverPool;
+      // 풀 소진 → 실시간 생성 시도 (savedKey 있을 때만)
+      if(savedKey && !window._fetchingMoreTrends){
+        fetchMoreTrends(catKey);
+        // fetch 도는 동안엔 일단 리셋 후 기존 풀에서 다시
+        window._shownTrendTopics = {};
+        unshown = serverPool;
+      } else {
+        window._shownTrendTopics = {};
+        unshown = serverPool;
+      }
     }
     var picks = shuffleTrendPool(unshown).slice(0, 3);
     picks.forEach(function(p){ window._shownTrendTopics[p.topic] = 1; });
