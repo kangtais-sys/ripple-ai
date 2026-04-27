@@ -5406,17 +5406,14 @@ function renderDailyTrends(){
     // 이전에 보여줬던 토픽 제외 — 다른주제보기 클릭 시 항상 새 카드
     window._shownTrendTopics = window._shownTrendTopics || {};
     var unshown = serverPool.filter(function(t){ return !window._shownTrendTopics[t.topic]; });
+    // 풀 6개 이하 + savedKey 있으면 미리 prefetch (다음 클릭 때 새 풀 준비)
+    if(savedKey && unshown.length <= 6 && !window._fetchingMoreTrends){
+      fetchMoreTrends(catKey);
+    }
     if(unshown.length < 3){
-      // 풀 소진 → 실시간 생성 시도 (savedKey 있을 때만)
-      if(savedKey && !window._fetchingMoreTrends){
-        fetchMoreTrends(catKey);
-        // fetch 도는 동안엔 일단 리셋 후 기존 풀에서 다시
-        window._shownTrendTopics = {};
-        unshown = serverPool;
-      } else {
-        window._shownTrendTopics = {};
-        unshown = serverPool;
-      }
+      // 풀 진짜 소진 → 리셋 후 기존 풀 재사용 (이미 prefetch 도는 중일 거임)
+      window._shownTrendTopics = {};
+      unshown = serverPool;
     }
     var picks = shuffleTrendPool(unshown).slice(0, 3);
     picks.forEach(function(p){ window._shownTrendTopics[p.topic] = 1; });

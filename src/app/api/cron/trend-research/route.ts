@@ -40,30 +40,30 @@ ${JSON.stringify(top20, null, 2)}
     { "topic": "후킹 문구 15자 이내", "category": "trend|beauty|fashion|food|cafe|travel|interior|fitness|money|book|baby|pet|kpop|movie|music|psych|mystery|life", "why": "왜 지금 뜨는지 한 줄", "preview_hook": "10자 이내 짧은 후킹", "body_preview": "카드뉴스 첫 슬라이드 본문 톤으로 2~3줄 (60~100자). 구체 사실/이름/수치 포함. 사용자가 카드 클릭 전에 어떤 내용인지 확 들어오게." }
   ],
   "topics_by_category": {
-    "beauty":   [{ "topic": "...", "why": "...", "preview_hook": "...", "body_preview": "2~3줄" }, ...10개],
-    "fashion":  [...10개],
-    "food":     [...10개],
-    "cafe":     [...10개],
-    "travel":   [...10개],
-    "interior": [...10개],
-    "fitness":  [...10개],
-    "money":    [...10개],
-    "book":     [...10개],
-    "baby":     [...10개],
-    "pet":      [...10개],
-    "kpop":     [...10개],
-    "movie":    [...10개],
-    "music":    [...10개],
-    "psych":    [...10개],
-    "mystery":  [...10개],
-    "life":     [...10개],
-    "trend":    [...10개]
+    "beauty":   [{ "topic": "...", "why": "...", "preview_hook": "...", "body_preview": "2~3줄" }, ...5개],
+    "fashion":  [...5개],
+    "food":     [...5개],
+    "cafe":     [...5개],
+    "travel":   [...5개],
+    "interior": [...5개],
+    "fitness":  [...5개],
+    "money":    [...5개],
+    "book":     [...5개],
+    "baby":     [...5개],
+    "pet":      [...5개],
+    "kpop":     [...5개],
+    "movie":    [...5개],
+    "music":    [...5개],
+    "psych":    [...5개],
+    "mystery":  [...5개],
+    "life":     [...5개],
+    "trend":    [...5개]
   }
 }
 
 룰:
 - recommended_topics 3개: 카테고리 무관 오늘 가장 핫한 주제. hook_score 9~10 만.
-- topics_by_category: 18개 카테고리 각 정확히 10개. 같은 카테고리 안에서도 서브토픽 다양하게 (제품 / 시술 / 트렌드 / 비교 / 후기 / 가성비 / 실패담 / 순위 등 골고루). 입력 데이터에 해당 카테고리 정보가 약하면 모델 일반 지식으로 보강해 작성.
+- topics_by_category: 18개 카테고리 각 정확히 5개. 같은 카테고리 안에서도 서브토픽 다양하게 (제품 / 시술 / 트렌드 / 비교 / 후기 / 가성비 / 실패담 / 순위 등 골고루). 입력 데이터에 해당 카테고리 정보가 약하면 모델 일반 지식으로 보강해 작성. (5개로 baseline 만 만들고, 사용자가 더 보고 싶어하면 클라가 /api/trends/more 로 추가 생성함)
 - topic 은 항상 한국어 자연어. 영문 제목은 한국 SNS 톤으로 의역.
 - **topic 은 후킹 6패턴 중 1개 적용**: 대비형 / 숫자+연도형 / 역추적형 / 비밀공개형 / 경험자 증언형 / 순위 리스트형
   · 단순 정보 나열 금지: "스킨케어 방법 소개" X / "30대가 결국 정착한 토너 4개" O
@@ -97,7 +97,7 @@ ${JSON.stringify(top20, null, 2)}
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 32000,  // 18 카테고리 × 10개 × body_preview ≈ 25k 출력 토큰
+        max_tokens: 20000,  // 18 카테고리 × 5개 × body_preview ≈ 15k 출력 토큰 (300s timeout 안에 맞춤)
         messages: [{ role: 'user', content: userPrompt }],
       }),
     })
