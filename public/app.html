@@ -5242,13 +5242,18 @@ function renderDailyTrendsStatic(picks, freshness){
   var container = document.getElementById('trend-carousel');
   if(!container) return;
   window.__DAILY_TRENDS = picks;
+  // 사용자가 이미 카테고리 골랐으면 chip 은 같은 카테고리일 때만 숨김 (다른 카테고리 fallback 카드는 chip 으로 구분)
+  var savedKey = '';
+  try { savedKey = localStorage.getItem('ssobi_disc_topic') || ''; } catch(_){}
+  var myCatLabel = (savedKey && discoverData[savedKey]) ? discoverData[savedKey].name : '';
   container.innerHTML = picks.map(function(t, i){
     var chip = t.chip || (t.category ? labelizeCategory(t.category) : 'AI 추천');
     var preview = (t.preview_hook || t.why || t.meta || '').trim();
     // 클라 풀의 메타 라벨 ("🔥 저장 12k" 류)은 본문 미리보기로 부적합 → 제거
     if(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}❤️📈💾💬✨🔥📊📍🛒📚]/u.test(preview)) preview = '';
+    var showChip = !(myCatLabel && chip === myCatLabel);
     return '<div class="trend-card v4" onclick="useTrend('+(i+1)+')">' +
-      '<span class="tcv-chip">'+escapeHtml(chip)+'</span>' +
+      (showChip ? '<span class="tcv-chip">'+escapeHtml(chip)+'</span>' : '') +
       '<div class="tcv-hook">'+escapeHtml(t.topic || '')+'</div>' +
       (preview ? '<div class="tcv-preview">'+escapeHtml(preview)+'</div>' : '') +
     '</div>';
@@ -5338,29 +5343,51 @@ function renderDailyTrends(){
       };
     }).filter(function(x){ return x.topic; });
 
-    // 풀 결합 — 카테고리 선택됐으면 server cat + 클라 풀 합쳐서 sliding window 적용
-    //   server cat 3개만으론 풀이 부족 → 다른주제보기 눌러도 회전 안 보임
-    //   server (3) + 클라 (≈9) = 풀 ≈12 → 12 가지 starting point × 3개 = 매번 다른 조합
-    var combinedPool = [];
+    // 풀 구성 — server 데이터만 (모두 body_preview 있음 → 본문 일관 표시)
+    //   1) catPool (사용자 카테고리, 3) 우선
+    //   2) hotPool (글로벌 hot, 3) 보완
+    //   3) 다른 server 카테고리 펼쳐서 다양성 확보 (모두 body 있음)
+    //   클라 myPool 은 body 가 없어서 제외 — "어떤 카드는 본문 나오고 어떤 건 안 나오는" 문제 해결
+    var serverPool = [];
     var seenTopic = {};
     function addToPool(arr){
       for(var i = 0; i < arr.length; i++){
         var t = arr[i]; if(!t || !t.topic || seenTopic[t.topic]) continue;
-        seenTopic[t.topic] = 1; combinedPool.push(t);
+        seenTopic[t.topic] = 1; serverPool.push(t);
       }
     }
     if(savedKey){
-      // 같은 카테고리 안에서 server + 클라 합치기. hotPool 은 부족할 때만 fallback
       addToPool(catPool);
-      addToPool(myPool);
-      if(combinedPool.length < 6) addToPool(hotPool);
+      addToPool(hotPool);
     } else {
-      // 카테고리 안 골랐을 때 = 글로벌 hot 위주
       addToPool(hotPool);
       addToPool(catPool);
-      addToPool(myPool);
     }
-    var picks = shuffleTrendPool(combinedPool).slice(0, 3);
+    // 다른 카테고리도 섞어서 풀 키우기 (body 항상 있음)
+    Object.keys(topicsByCat).forEach(function(k){
+      if(k === catKey) return;
+      var arr = (Array.isArray(topicsByCat[k]) ? topicsByCat[k] : []).map(function(t){
+        return {
+          topic: t.topic || '',
+          chip: labelizeCategory(k),
+          meta: t.body_preview || t.why || t.preview_hook || '',
+        };
+      }).filter(function(x){ return x.topic && x.meta; });
+      addToPool(arr);
+    });
+    // body 없는 server item 은 제외 (일관성)
+    serverPool = serverPool.filter(function(x){ return x.meta; });
+
+    // 이전에 보여줬던 토픽 제외 — 다른주제보기 클릭 시 항상 새 카드
+    window._shownTrendTopics = window._shownTrendTopics || {};
+    var unshown = serverPool.filter(function(t){ return !window._shownTrendTopics[t.topic]; });
+    if(unshown.length < 3){
+      // 풀 다 소진 → 리셋 후 처음부터
+      window._shownTrendTopics = {};
+      unshown = serverPool;
+    }
+    var picks = shuffleTrendPool(unshown).slice(0, 3);
+    picks.forEach(function(p){ window._shownTrendTopics[p.topic] = 1; });
 
     if(savedKey && discoverData[savedKey]){
       createData._discTopic = savedKey;
