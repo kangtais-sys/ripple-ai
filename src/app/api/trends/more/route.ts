@@ -121,10 +121,13 @@ ${exclude.length > 0 ? exclude.map(t => `- ${t}`).join('\n') : '(없음)'}
 
 🚫 시점 매핑 룰: 검색 결과에 시점 정보가 명확하면 그대로 인용. 검색에 시점 없고 학습 지식만 있으면 "최근 1~2년" 같은 모호한 표현. 옛날 사실(2024년 이전)을 "지금" 으로 매핑 금지.
 
+- **hook_score (7~10)**: SNS 카드 후킹 강도. 10 = 클릭 안 할 수 없음, 7 = 평균. 6패턴 강도 + 시점 신선도 + 정보 구체성 종합.
+- **source**: 위 검색 결과 중 가장 핵심 인용한 출처 도메인 1개 (예: "보그 코리아", "glowpick"). 없으면 빈 문자열.
+
 JSON 배열로만 응답. 다른 텍스트 X.
 
 [
-  { "topic": "...", "preview_hook": "...", "body_preview": "...", "why": "..." },
+  { "topic": "...", "preview_hook": "...", "body_preview": "...", "why": "...", "hook_score": 9, "source": "..." },
   ...${count}개
 ]`
 
@@ -150,14 +153,16 @@ JSON 배열로만 응답. 다른 텍스트 X.
     const text = data.content?.[0]?.text || '[]'
     const match = text.match(/\[[\s\S]*\]/)
     if (!match) return NextResponse.json({ ok: false, reason: 'parse_error', topics: [] })
-    const topics = JSON.parse(match[0]) as Array<Record<string, string>>
+    const topics = JSON.parse(match[0]) as Array<Record<string, unknown>>
     const cleaned = topics
-      .filter(t => t && typeof t.topic === 'string' && t.topic.length > 3)
+      .filter(t => t && typeof t.topic === 'string' && (t.topic as string).length > 3)
       .map(t => ({
-        topic: t.topic,
-        preview_hook: t.preview_hook || '',
-        body_preview: t.body_preview || '',
-        why: t.why || '',
+        topic: t.topic as string,
+        preview_hook: (t.preview_hook as string) || '',
+        body_preview: (t.body_preview as string) || '',
+        why: (t.why as string) || '',
+        hook_score: typeof t.hook_score === 'number' ? (t.hook_score as number) : 8,
+        source: (t.source as string) || '',
         category,
       }))
     return NextResponse.json({

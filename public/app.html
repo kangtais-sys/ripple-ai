@@ -482,12 +482,38 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .trend-list{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
 .trend-list > .trend-card{width:100%;margin-bottom:0}
 /* v4 — mirra 스타일: 큰 후킹 멘트 + 본문 미리보기 (점수바·뱃지 제거) */
-.trend-card.v4{display:flex;flex-direction:column;gap:5px;padding:11px 13px;background:#fff;border:1px solid var(--b);border-radius:13px;margin-bottom:7px;cursor:pointer;transition:all .15s;font-family:'Pretendard',sans-serif;box-sizing:border-box}
+.trend-card.v4{position:relative;display:flex;flex-direction:column;gap:5px;padding:11px 13px 11px 17px;background:#fff;border:1px solid var(--b);border-radius:13px;margin-bottom:7px;cursor:pointer;transition:all .15s;font-family:'Pretendard',sans-serif;box-sizing:border-box;overflow:hidden}
 .trend-card.v4:active{transform:scale(.99);border-color:var(--mint)}
 .trend-card.v4:hover{border-color:var(--mint)}
-.tcv-chip{align-self:flex-start;padding:1.5px 6px;border-radius:3px;background:var(--mint-l);color:var(--mint-d);font-size:9px;font-weight:800;letter-spacing:.1px;line-height:1.35}
+/* 카테고리 색띠 (왼쪽 4px) */
+.trend-card.v4::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--cat-color, var(--mint))}
+.trend-card.v4[data-cat="beauty"]   { --cat-color:#FF80AB }
+.trend-card.v4[data-cat="fashion"]  { --cat-color:#7C3AED }
+.trend-card.v4[data-cat="food"]     { --cat-color:#FB923C }
+.trend-card.v4[data-cat="cafe"]     { --cat-color:#A16207 }
+.trend-card.v4[data-cat="travel"]   { --cat-color:#0EA5E9 }
+.trend-card.v4[data-cat="interior"] { --cat-color:#84CC16 }
+.trend-card.v4[data-cat="fitness"]  { --cat-color:#EF4444 }
+.trend-card.v4[data-cat="money"]    { --cat-color:#10B981 }
+.trend-card.v4[data-cat="book"]     { --cat-color:#6366F1 }
+.trend-card.v4[data-cat="baby"]     { --cat-color:#FBBF24 }
+.trend-card.v4[data-cat="pet"]      { --cat-color:#A855F7 }
+.trend-card.v4[data-cat="kpop"]     { --cat-color:#EC4899 }
+.trend-card.v4[data-cat="movie"]    { --cat-color:#1E293B }
+.trend-card.v4[data-cat="music"]    { --cat-color:#9333EA }
+.trend-card.v4[data-cat="psych"]    { --cat-color:#0891B2 }
+.trend-card.v4[data-cat="mystery"]  { --cat-color:#475569 }
+.trend-card.v4[data-cat="life"]     { --cat-color:#14B8A6 }
+.trend-card.v4[data-cat="trend"]    { --cat-color:var(--mint) }
+/* 카드 내부 */
+.tcv-row{display:flex;align-items:center;gap:6px;justify-content:space-between}
+.tcv-chip{padding:1.5px 6px;border-radius:3px;background:var(--mint-l);color:var(--mint-d);font-size:9px;font-weight:800;letter-spacing:.1px;line-height:1.35}
+.tcv-score{font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.05em;display:flex;align-items:center;gap:3px;flex-shrink:0}
+.tcv-score-dot{width:5px;height:5px;border-radius:50%;background:#FB923C}
 .tcv-hook{font-size:14.5px;font-weight:800;color:var(--t1);letter-spacing:-.3px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .tcv-preview{font-size:11.5px;font-weight:500;color:var(--t2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;letter-spacing:-.2px}
+.tcv-source{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:-.1px;margin-top:2px;display:flex;align-items:center;gap:4px}
+.tcv-source::before{content:'';width:8px;height:1px;background:var(--t3);opacity:.4}
 /* ── 추천 카드 v2 (PART 3 spec) ── */
 .trend-card.v2{display:block !important;padding:14px 16px;background:#fff;border:1px solid var(--b);border-radius:16px;margin-bottom:10px;cursor:pointer;transition:all .15s;font-family:'Pretendard',sans-serif}
 .trend-card.v2:active{transform:scale(.99);border-color:var(--mint)}
@@ -558,9 +584,21 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .trend-divider::before,.trend-divider::after{content:'';position:absolute;top:50%;width:30%;height:1px;background:var(--b)}
 .trend-divider::before{left:0}.trend-divider::after{right:0}
 
-.direct-box{background:var(--s);border-radius:20px;border:1.5px dashed var(--b);padding:18px}
-.direct-ta{width:100%;border:none;background:none;font-size:15.5px;font-family:'Pretendard',sans-serif;color:var(--t1);resize:none;outline:none;line-height:1.55;min-height:90px;letter-spacing:-.2px}
-.direct-ta::placeholder{color:var(--t3)}
+.direct-box{background:linear-gradient(135deg,#FFFEFB 0%,#F0FDF8 100%);border-radius:22px;border:1.5px solid var(--b);padding:20px;position:relative;overflow:hidden}
+.direct-box::before{content:'✨';position:absolute;top:14px;right:18px;font-size:18px;opacity:.3;animation:sparkle-pulse 2.4s ease infinite}
+@keyframes sparkle-pulse{0%,100%{opacity:.3;transform:rotate(0deg)}50%{opacity:.7;transform:rotate(15deg) scale(1.15)}}
+.direct-label{display:flex;align-items:center;gap:8px;margin-bottom:12px}
+.direct-label-icon{width:24px;height:24px;border-radius:7px;background:linear-gradient(135deg,var(--mint),var(--mint-d));display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:900}
+.direct-label-title{font-size:14.5px;font-weight:900;color:var(--t1);letter-spacing:-.3px}
+.direct-label-sub{font-size:11.5px;color:var(--t2);line-height:1.55;letter-spacing:-.2px;margin-bottom:14px}
+.direct-label-sub b{color:var(--mint-d);font-weight:800}
+.direct-ta{width:100%;border:none;background:#fff;border-radius:14px;padding:16px 18px;font-size:16.5px;font-family:'Pretendard',sans-serif;color:var(--t1);resize:none;outline:none;line-height:1.55;min-height:78px;letter-spacing:-.3px;font-weight:600;box-sizing:border-box;box-shadow:0 1px 3px rgba(0,0,0,.04),inset 0 0 0 1.5px transparent;transition:box-shadow .18s}
+.direct-ta:focus{box-shadow:0 1px 3px rgba(0,0,0,.04),inset 0 0 0 1.5px var(--mint)}
+.direct-ta::placeholder{color:#B7BFCB;font-weight:500;letter-spacing:-.2px}
+.direct-tip{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.direct-tip-chip{padding:5px 11px;border-radius:100px;background:#fff;border:1px solid var(--b);font-size:11px;font-weight:700;color:var(--t2);cursor:pointer;letter-spacing:-.2px;transition:all .12s;line-height:1.3;white-space:nowrap}
+.direct-tip-chip:hover{border-color:var(--mint);color:var(--mint-d);background:var(--mint-l)}
+.direct-tip-chip:active{transform:scale(.96)}
 /* ── 만들기 온보딩 (강조 컬러) ── */
 .discover-box{background:linear-gradient(135deg,#F0FDF9,#EEF2FF);border-radius:20px;border:1px solid #A7F3D0;margin-top:20px;overflow:hidden;transition:border-color .15s,box-shadow .2s}
 .discover-box:active{border-color:var(--mint);box-shadow:0 6px 20px rgba(0,200,150,.18)}
@@ -2243,12 +2281,18 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div class="trend-divider">또는</div>
 
     <div class="direct-box">
-      <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t1)" stroke-width="2"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <div style="font-size:13px;font-weight:800;color:var(--t1)">직접 입력하기</div>
+      <div class="direct-label">
+        <div class="direct-label-icon">✎</div>
+        <div class="direct-label-title">키워드 한 줄, AI 가 카드로</div>
       </div>
-      <div style="font-size:11.5px;color:var(--t2);line-height:1.55;margin-bottom:10px">주제 한 줄 적으면 <b style="color:var(--t1)">내 말투</b>로 카드뉴스·캡션을 자동 생성해요.</div>
-      <textarea class="direct-ta" id="direct-topic" placeholder="예: 우울할 때 보기 좋은 책 속 글귀 추천 (출처 포함) / 아이돌 메이크업 트렌드 Best 3 / 민감 피부 봄철 루틴 / 이번주 공구 정리" oninput="toggleDirectBtn()" onkeyup="toggleDirectBtn()" oncompositionupdate="toggleDirectBtn()" oncompositionend="toggleDirectBtn()" onchange="toggleDirectBtn()"></textarea>
+      <div class="direct-label-sub">키워드든 한 문장이든 — <b>내 말투</b>로 카드뉴스·캡션 자동 생성.</div>
+      <textarea class="direct-ta" id="direct-topic" placeholder="예: 봄 라떼 신메뉴 비교" oninput="toggleDirectBtn();rotateDirectPlaceholder()" onkeyup="toggleDirectBtn()" oncompositionupdate="toggleDirectBtn()" oncompositionend="toggleDirectBtn()" onchange="toggleDirectBtn()"></textarea>
+      <div class="direct-tip" id="direct-tip-chips">
+        <button type="button" class="direct-tip-chip" onclick="fillDirectTopic('봄 라떼 신메뉴 비교')">봄 라떼 신메뉴 비교</button>
+        <button type="button" class="direct-tip-chip" onclick="fillDirectTopic('30대 자취 인테리어 꿀팁')">30대 자취 인테리어</button>
+        <button type="button" class="direct-tip-chip" onclick="fillDirectTopic('민감 피부 봄철 루틴')">민감 피부 봄 루틴</button>
+        <button type="button" class="direct-tip-chip" onclick="fillDirectTopic('이번주 공구 베스트')">이번주 공구</button>
+      </div>
       <!-- 내 말투 표시 + 일회성 변경 토글 (이중 선택 제거, 온보딩에서 정한 톤 기본) -->
       <div id="direct-tone-summary" style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding:9px 12px;border-radius:10px;background:var(--mint-l);border:1px solid #A7F3D0">
         <div style="font-size:11.5px;color:var(--mint-d);line-height:1.5">
@@ -5024,6 +5068,7 @@ function syncToneChip(){
   if(nameEl) nameEl.textContent = TONE_LABELS[tone] || tone;
 }
 document.addEventListener('DOMContentLoaded', syncToneChip);
+document.addEventListener('DOMContentLoaded', startDirectPlaceholderRotation);
 // 톤 chip grid 표시/숨김 토글
 function toggleToneChips(){
   var grid = document.getElementById('tone-chip-grid');
@@ -5252,10 +5297,20 @@ function renderDailyTrendsStatic(picks, freshness){
     // 클라 풀의 메타 라벨 ("🔥 저장 12k" 류)은 본문 미리보기로 부적합 → 제거
     if(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}❤️📈💾💬✨🔥📊📍🛒📚]/u.test(preview)) preview = '';
     var showChip = !(myCatLabel && chip === myCatLabel);
-    return '<div class="trend-card v4" onclick="useTrend('+(i+1)+')">' +
-      (showChip ? '<span class="tcv-chip">'+escapeHtml(chip)+'</span>' : '') +
+    var score = (typeof t.hook_score === 'number' && t.hook_score >= 7) ? t.hook_score.toFixed(1) : '';
+    var source = (t.source || '').trim().slice(0, 30);
+    var catKey = t.catKey || (t.category || '');
+    var topRow = (showChip || score)
+      ? '<div class="tcv-row">' +
+          (showChip ? '<span class="tcv-chip">'+escapeHtml(chip)+'</span>' : '<span></span>') +
+          (score ? '<span class="tcv-score"><span class="tcv-score-dot"></span>' + escapeHtml(score) + '</span>' : '') +
+        '</div>'
+      : '';
+    return '<div class="trend-card v4" data-cat="'+escapeHtml(catKey)+'" onclick="useTrend('+(i+1)+')">' +
+      topRow +
       '<div class="tcv-hook">'+escapeHtml(t.topic || '')+'</div>' +
       (preview ? '<div class="tcv-preview">'+escapeHtml(preview)+'</div>' : '') +
+      (source ? '<div class="tcv-source">'+escapeHtml(source)+'</div>' : '') +
     '</div>';
   }).join('');
   void freshness;
@@ -5358,6 +5413,9 @@ function renderDailyTrends(){
         topic: t.topic || '',
         chip: (savedKey && discoverData[savedKey]) ? discoverData[savedKey].name : '오늘',
         meta: t.body_preview || t.why || t.preview_hook || '',
+        hook_score: typeof t.hook_score === 'number' ? t.hook_score : 8,
+        source: t.source || '',
+        catKey: catKey,
       };
     }).filter(function(x){ return x.topic; });
 
@@ -5367,6 +5425,9 @@ function renderDailyTrends(){
         topic: t.topic || '',
         chip: t.category || '오늘 핫',
         meta: t.body_preview || t.why || t.preview_hook || '',
+        hook_score: typeof t.hook_score === 'number' ? t.hook_score : 8,
+        source: t.source || '',
+        catKey: t.category || 'trend',
       };
     }).filter(function(x){ return x.topic; });
 
@@ -5383,10 +5444,7 @@ function renderDailyTrends(){
     }
     if(savedKey){
       addToPool(catPool);
-      // 클라 풀에 같은 카테고리 추가 토픽 있으면 보충 (cron 부족 시 임시)
-      addToPool(myPool.map(function(t){
-        return { topic: t.topic, chip: t.chip, meta: '' };
-      }));
+      // 클라 myPool 은 body 가 없어서 더 이상 풀에 안 넣음 — 풀 부족 시 /api/trends/more 가 채워줌
     } else {
       addToPool(hotPool);
       addToPool(catPool);
@@ -5397,6 +5455,9 @@ function renderDailyTrends(){
             topic: t.topic || '',
             chip: labelizeCategory(k),
             meta: t.body_preview || t.why || t.preview_hook || '',
+            hook_score: typeof t.hook_score === 'number' ? t.hook_score : 8,
+            source: t.source || '',
+            catKey: k,
           };
         }).filter(function(x){ return x.topic; });
         addToPool(arr);
@@ -5463,9 +5524,43 @@ function useTrend(n){
 function toggleDirectBtn(){
   var el = document.getElementById('direct-topic');
   var btn = document.getElementById('direct-gen-btn');
+  var tipChips = document.getElementById('direct-tip-chips');
   if(!el || !btn) return;
   var v = (el.value || '').trim();
   btn.disabled = v.length < 1;
+  // 입력 시작하면 예시 chip 들 살짝 흐리게 (시야 분산 방지)
+  if(tipChips) tipChips.style.opacity = v.length > 0 ? '0.4' : '1';
+}
+// 예시 chip 클릭 시 textarea 채우기
+function fillDirectTopic(text){
+  var el = document.getElementById('direct-topic');
+  if(!el) return;
+  el.value = text;
+  el.focus();
+  toggleDirectBtn();
+}
+// placeholder 자동 회전 — 입력 안 하고 있을 때 placeholder 가 매번 바뀌어서 영감 줌
+var _directPlaceholders = [
+  '예: 봄 라떼 신메뉴 비교',
+  '예: 30대가 결국 정착한 토너 4개',
+  '예: 다이소 1500원 자취템 후기',
+  '예: 무신사 봄 베스트 솔직 후기',
+  '예: 한 줄로 적어도 OK',
+];
+var _directPlaceholderIdx = 0;
+function rotateDirectPlaceholder(){
+  // 사용자가 타이핑 시작하면 회전 멈춤
+  var el = document.getElementById('direct-topic');
+  if(!el || el.value) return;
+}
+function startDirectPlaceholderRotation(){
+  if(window._directPlaceholderTimer) clearInterval(window._directPlaceholderTimer);
+  window._directPlaceholderTimer = setInterval(function(){
+    var el = document.getElementById('direct-topic');
+    if(!el || el.value) return;  // 입력 중이면 패스
+    _directPlaceholderIdx = (_directPlaceholderIdx + 1) % _directPlaceholders.length;
+    el.placeholder = _directPlaceholders[_directPlaceholderIdx];
+  }, 2800);
 }
 async function generatePrompt(){
   var topic = document.getElementById('direct-topic').value.trim();

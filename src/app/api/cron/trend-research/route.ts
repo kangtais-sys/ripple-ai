@@ -40,7 +40,7 @@ ${JSON.stringify(top20, null, 2)}
     { "topic": "후킹 문구 15자 이내", "category": "trend|beauty|fashion|food|cafe|travel|interior|fitness|money|book|baby|pet|kpop|movie|music|psych|mystery|life", "why": "왜 지금 뜨는지 한 줄", "preview_hook": "10자 이내 짧은 후킹", "body_preview": "카드뉴스 첫 슬라이드 본문 톤으로 2~3줄 (60~100자). 구체 사실/이름/수치 포함. 사용자가 카드 클릭 전에 어떤 내용인지 확 들어오게." }
   ],
   "topics_by_category": {
-    "beauty":   [{ "topic": "...", "why": "...", "preview_hook": "...", "body_preview": "2~3줄" }, ...5개],
+    "beauty":   [{ "topic": "...", "why": "...", "preview_hook": "...", "body_preview": "2~3줄", "hook_score": 8, "source": "출처 도메인 1개 (선택)" }, ...5개],
     "fashion":  [...5개],
     "food":     [...5개],
     "cafe":     [...5개],
@@ -63,7 +63,9 @@ ${JSON.stringify(top20, null, 2)}
 
 룰:
 - recommended_topics 3개: 카테고리 무관 오늘 가장 핫한 주제. hook_score 9~10 만.
-- topics_by_category: 18개 카테고리 각 정확히 5개. 같은 카테고리 안에서도 서브토픽 다양하게 (제품 / 시술 / 트렌드 / 비교 / 후기 / 가성비 / 실패담 / 순위 등 골고루). 입력 데이터에 해당 카테고리 정보가 약하면 모델 일반 지식으로 보강해 작성. (5개로 baseline 만 만들고, 사용자가 더 보고 싶어하면 클라가 /api/trends/more 로 추가 생성함)
+- topics_by_category: 18개 카테고리 각 정확히 5개. 같은 카테고리 안에서도 서브토픽 다양하게 (제품 / 시술 / 트렌드 / 비교 / 후기 / 가성비 / 실패담 / 순위 등 골고루). 입력 데이터에 해당 카테고리 정보가 약하면 모델 일반 지식으로 보강해 작성.
+- **hook_score (1~10)**: 토픽이 SNS 카드뉴스로 얼마나 후킹 강한지 (10 = 클릭 안 할 수 없음 / 7 = 평균 / 5 이하는 만들지 말 것). 후킹 6패턴 강도 + 시점 신선도 + 정보 구체성 종합 평가. 모든 토픽 7 이상.
+- **source**: 입력 데이터에 그 카테고리 관련 매체/도메인 있으면 그것 (예: "보그 코리아", "글로픽"). 없으면 빈 문자열.
 - topic 은 항상 한국어 자연어. 영문 제목은 한국 SNS 톤으로 의역.
 - **topic 은 후킹 6패턴 중 1개 적용**: 대비형 / 숫자+연도형 / 역추적형 / 비밀공개형 / 경험자 증언형 / 순위 리스트형
   · 단순 정보 나열 금지: "스킨케어 방법 소개" X / "30대가 결국 정착한 토너 4개" O
