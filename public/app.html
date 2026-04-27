@@ -482,12 +482,12 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .trend-list{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
 .trend-list > .trend-card{width:100%;margin-bottom:0}
 /* v4 — mirra 스타일: 큰 후킹 멘트 + 본문 미리보기 (점수바·뱃지 제거) */
-.trend-card.v4{display:flex;flex-direction:column;gap:7px;padding:14px 16px;background:#fff;border:1px solid var(--b);border-radius:16px;margin-bottom:8px;cursor:pointer;transition:all .15s;font-family:'Pretendard',sans-serif;box-sizing:border-box}
+.trend-card.v4{display:flex;flex-direction:column;gap:5px;padding:11px 13px;background:#fff;border:1px solid var(--b);border-radius:13px;margin-bottom:7px;cursor:pointer;transition:all .15s;font-family:'Pretendard',sans-serif;box-sizing:border-box}
 .trend-card.v4:active{transform:scale(.99);border-color:var(--mint)}
 .trend-card.v4:hover{border-color:var(--mint)}
-.tcv-chip{align-self:flex-start;padding:2px 7px;border-radius:4px;background:var(--mint-l);color:var(--mint-d);font-size:9.5px;font-weight:800;letter-spacing:.1px;line-height:1.4}
-.tcv-hook{font-size:15.5px;font-weight:800;color:var(--t1);letter-spacing:-.3px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.tcv-preview{font-size:12.5px;font-weight:500;color:var(--t2);line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;letter-spacing:-.2px}
+.tcv-chip{align-self:flex-start;padding:1.5px 6px;border-radius:3px;background:var(--mint-l);color:var(--mint-d);font-size:9px;font-weight:800;letter-spacing:.1px;line-height:1.35}
+.tcv-hook{font-size:14.5px;font-weight:800;color:var(--t1);letter-spacing:-.3px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.tcv-preview{font-size:11.5px;font-weight:500;color:var(--t2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;letter-spacing:-.2px}
 /* ── 추천 카드 v2 (PART 3 spec) ── */
 .trend-card.v2{display:block !important;padding:14px 16px;background:#fff;border:1px solid var(--b);border-radius:16px;margin-bottom:10px;cursor:pointer;transition:all .15s;font-family:'Pretendard',sans-serif}
 .trend-card.v2:active{transform:scale(.99);border-color:var(--mint)}
@@ -5338,33 +5338,29 @@ function renderDailyTrends(){
       };
     }).filter(function(x){ return x.topic; });
 
-    // 사용자가 카테고리 골랐으면 그 카테고리 데이터만 사용 (hotPool 은 카테고리 안 골랐을 때만)
-    // 모든 카드에 body_preview 일관 표시 + 카테고리 매칭 정확
-    var sCat = shuffleTrendPool(catPool);
-    var sHot = shuffleTrendPool(hotPool);
-    var sMy  = shuffleTrendPool(myPool);
-    var serverMix = [];
-    var seen = {};
-    function pushUnique(arr){
+    // 풀 결합 — 카테고리 선택됐으면 server cat + 클라 풀 합쳐서 sliding window 적용
+    //   server cat 3개만으론 풀이 부족 → 다른주제보기 눌러도 회전 안 보임
+    //   server (3) + 클라 (≈9) = 풀 ≈12 → 12 가지 starting point × 3개 = 매번 다른 조합
+    var combinedPool = [];
+    var seenTopic = {};
+    function addToPool(arr){
       for(var i = 0; i < arr.length; i++){
-        var t = arr[i]; if(!t || !t.topic || seen[t.topic]) continue;
-        seen[t.topic] = 1; serverMix.push(t);
-        if(serverMix.length >= 3) return;
+        var t = arr[i]; if(!t || !t.topic || seenTopic[t.topic]) continue;
+        seenTopic[t.topic] = 1; combinedPool.push(t);
       }
     }
     if(savedKey){
-      // 카테고리 선택됨 → 그 카테고리만. catPool 부족하면 클라 풀 fallback
-      pushUnique(sCat);
-      if(serverMix.length < 3) pushUnique(sMy);
-      // 그래도 부족하면 hotPool 마지막 fallback
-      if(serverMix.length < 3) pushUnique(sHot);
+      // 같은 카테고리 안에서 server + 클라 합치기. hotPool 은 부족할 때만 fallback
+      addToPool(catPool);
+      addToPool(myPool);
+      if(combinedPool.length < 6) addToPool(hotPool);
     } else {
       // 카테고리 안 골랐을 때 = 글로벌 hot 위주
-      pushUnique(sHot);
-      if(serverMix.length < 3) pushUnique(sCat);
-      if(serverMix.length < 3) pushUnique(sMy);
+      addToPool(hotPool);
+      addToPool(catPool);
+      addToPool(myPool);
     }
-    var picks = serverMix.slice(0, 3);
+    var picks = shuffleTrendPool(combinedPool).slice(0, 3);
 
     if(savedKey && discoverData[savedKey]){
       createData._discTopic = savedKey;
