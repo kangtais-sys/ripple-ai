@@ -5270,8 +5270,8 @@ function labelizeCategory(c){
 var _trendShuffleOffset = 0;
 function refreshTrends(){
   _trendShuffleOffset++;
-  // server 캐시 무효화 — 매 클릭마다 진짜 새 fetch
-  window._serverTrendsCache = null;
+  // 캐시 그대로 두고 offset 만 회전 — 같은 server 데이터에서 다른 3개 (sliding window)
+  // (cron 데이터는 같은 날 안 바뀌니 fetch 다시 할 필요 없음. 깜빡거림 방지)
   renderDailyTrends();
 }
 function shuffleTrendPool(pool){
