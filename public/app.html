@@ -10120,9 +10120,9 @@ TEMPLATE_SCHEMAS['mag:hook'] = {
       position:{ top:31, left:10, width:80 },
       style:{ fontSize:60, fontWeight:800, color:'#1A1A1A', lineHeight:1.15, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
       zIndex:5, lockColor:true },
-    // 노란 손그림 underline
+    // 노란 손그림 underline ("💥 80% 노려" 텍스트 바로 아래)
     { type:'doodle', kind:'underline_squiggle',
-      position:{ top:37, left:42, width:280, height:25 },
+      position:{ top:37, left:14, width:300, height:18 },
       style:{ color:'#E8FF4D', strokeWidth:5 },
       zIndex:5 },
     // 격자 노트 (아래쪽 큰 영역)
@@ -10192,15 +10192,15 @@ TEMPLATE_SCHEMAS['mag:cta'] = {
   background: '#F5EDE0',
   layout: 'mag-cta',
   elements: [
-    // 거대 영문 — line 2: FOLLOW ME (위, 살짝 우측으로 잘림)
-    { type:'big-typo', content:'FOLLOW ME',
-      position:{ top:14, left:25, width:140 },
-      style:{ fontSize:170, fontWeight:300, color:'#1A1A1A', letterSpacing:-5, lineHeight:0.95, fontFamily:'Pretendard,sans-serif', textAlign:'left', whiteSpace:'nowrap' },
+    // 거대 영문 — line 1: FOLLOW & (볼드, 잘림 방지)
+    { type:'big-typo', content:'FOLLOW &',
+      position:{ top:14, left:6, width:140 },
+      style:{ fontSize:160, fontWeight:900, color:'#1A1A1A', letterSpacing:-5, lineHeight:0.95, fontFamily:'Pretendard,sans-serif', textAlign:'left', whiteSpace:'nowrap' },
       zIndex:4 },
-    // 거대 영문 — line 1: SHARE & (아래)
-    { type:'big-typo', content:'SHARE &',
-      position:{ top:23, left:0, width:140 },
-      style:{ fontSize:170, fontWeight:300, color:'#1A1A1A', letterSpacing:-5, lineHeight:0.95, fontFamily:'Pretendard,sans-serif', textAlign:'left', whiteSpace:'nowrap' },
+    // 거대 영문 — line 2: SHARE (볼드)
+    { type:'big-typo', content:'SHARE',
+      position:{ top:23, left:6, width:140 },
+      style:{ fontSize:160, fontWeight:900, color:'#1A1A1A', letterSpacing:-5, lineHeight:0.95, fontFamily:'Pretendard,sans-serif', textAlign:'left', whiteSpace:'nowrap' },
       zIndex:4 },
     // 우상단 → 화살표
     { type:'arrow-right',
@@ -10234,15 +10234,15 @@ TEMPLATE_SCHEMAS['clean:cover'] = {
     { type:'image',
       position:{ top:4, left:34, width:60, height:42 },
       style:{ borderRadius:2 } },
-    // 큰 한글 제목 line 1 (얇은)
+    // 큰 한글 제목 line 1 (얇은) — 줄간격 좁게
     { type:'text', content:'title-line-1',
-      position:{ top:55, left:6, width:90 },
-      style:{ fontSize:104, fontWeight:300, color:'#1A1A1A', lineHeight:1.18, letterSpacing:-3, fontFamily:'Pretendard,sans-serif' },
+      position:{ top:60, left:6, width:90 },
+      style:{ fontSize:104, fontWeight:300, color:'#1A1A1A', lineHeight:1.05, letterSpacing:-3, fontFamily:'Pretendard,sans-serif' },
       zIndex:5, lockColor:true },
     // 큰 한글 제목 line 2 (굵은)
     { type:'text', content:'title-line-2',
-      position:{ top:68, left:6, width:90 },
-      style:{ fontSize:104, fontWeight:900, color:'#1A1A1A', lineHeight:1.18, letterSpacing:-3, fontFamily:'Pretendard,sans-serif' },
+      position:{ top:69, left:6, width:90 },
+      style:{ fontSize:104, fontWeight:900, color:'#1A1A1A', lineHeight:1.05, letterSpacing:-3, fontFamily:'Pretendard,sans-serif' },
       zIndex:5, lockColor:true },
     // 하단 가로 라인
     { type:'bottom-line',
@@ -10256,20 +10256,20 @@ TEMPLATE_SCHEMAS['clean:hook'] = {
   background: '#FFFFFF',
   layout: 'clean-hook',
   elements: [
-    // 좌상단 검정 배지 [Focus]
+    // 좌상단 검정 배지 [Focus] — 라운드된 사각
     { type:'badge', content:'Focus',
       position:{ top:5, left:6 },
-      style:{ fontSize:26, fontWeight:800, color:'#FFFFFF', background:'#1A1A1A', padding:'8px 22px', borderRadius:4, letterSpacing:1, fontFamily:'Pretendard,sans-serif' },
+      style:{ fontSize:26, fontWeight:800, color:'#FFFFFF', background:'#1A1A1A', padding:'8px 22px', borderRadius:14, letterSpacing:1, fontFamily:'Pretendard,sans-serif' },
       zIndex:5, lockColor:true },
-    // 큰 한글 제목 line 1 (얇은)
+    // 큰 한글 제목 line 1 (얇은) — 줄간격 좁게
     { type:'text', content:'title-line-1',
-      position:{ top:13, left:6, width:88 },
-      style:{ fontSize:64, fontWeight:300, color:'#1A1A1A', lineHeight:1.2, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
+      position:{ top:14, left:6, width:88 },
+      style:{ fontSize:64, fontWeight:300, color:'#1A1A1A', lineHeight:1.1, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
       zIndex:5, lockColor:true },
     // 한글 제목 line 2 (굵은)
     { type:'text', content:'title-line-2',
-      position:{ top:23, left:6, width:88 },
-      style:{ fontSize:64, fontWeight:900, color:'#1A1A1A', lineHeight:1.2, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
+      position:{ top:21, left:6, width:88 },
+      style:{ fontSize:64, fontWeight:900, color:'#1A1A1A', lineHeight:1.1, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
       zIndex:5, lockColor:true },
     // 큰 사진 하단
     { type:'image',
@@ -10282,10 +10282,10 @@ TEMPLATE_SCHEMAS['clean:body'] = {
   background: '#FFFFFF',
   layout: 'clean-body',
   elements: [
-    // 검정 배지 STEP{idx}
+    // 검정 배지 STEP{idx} — 라운드된 사각
     { type:'badge', content:'step-num',
       position:{ top:5, left:6 },
-      style:{ fontSize:26, fontWeight:800, color:'#FFFFFF', background:'#1A1A1A', padding:'8px 22px', borderRadius:4, letterSpacing:1, fontFamily:'Pretendard,sans-serif' },
+      style:{ fontSize:26, fontWeight:800, color:'#FFFFFF', background:'#1A1A1A', padding:'8px 22px', borderRadius:14, letterSpacing:1, fontFamily:'Pretendard,sans-serif' },
       zIndex:5, lockColor:true },
     // 한글 제목
     { type:'text', content:'body-title', fallback:'아침 일과 전, 10분의 명상',
@@ -10404,10 +10404,10 @@ TEMPLATE_SCHEMAS['noir:hook'] = {
       position:{ top:16, left:6, width:88 },
       style:{ fontSize:32, fontWeight:500, color:'#FFFFFF', lineHeight:1.45, letterSpacing:-0.4, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line', opacity:0.95, textShadow:'0 2px 10px rgba(0,0,0,.6)' },
       zIndex:5, lockColor:true },
-    // 흰 pill 배지 (쉬어도 돼)
+    // 흰 테두리 사각 배지 (쉬어도 돼) — 투명 배경 + 얇은 흰 테두리
     { type:'badge', content:'literal', text:'쉬어도 돼',
       position:{ top:38, left:6 },
-      style:{ fontSize:30, fontWeight:800, color:'#1A1A1A', background:'#FFFFFF', padding:'14px 28px', borderRadius:10, letterSpacing:-0.5, fontFamily:'Pretendard,sans-serif', boxShadow:'0 4px 16px rgba(0,0,0,.25)' },
+      style:{ fontSize:30, fontWeight:700, color:'#FFFFFF', background:'transparent', padding:'12px 24px', borderRadius:0, border:'1.5px solid #FFFFFF', letterSpacing:-0.5, fontFamily:'Pretendard,sans-serif' },
       zIndex:6, lockColor:true },
     // 가운데 logo
     { type:'logo',
@@ -10461,15 +10461,15 @@ TEMPLATE_SCHEMAS['noir:cta'] = {
   background: 'linear-gradient(180deg,#3F2D5C 0%,#6B5B7A 60%,#A48A8C 100%)',
   layout: 'noir-cta',
   elements: [
-    // 한글 제목 line 1
+    // 한글 제목 line 1 — 줄간격 좁게
     { type:'text', content:'title-line-1', fallback:'지친 당신을 안아줄',
       position:{ top:6, left:6, width:88 },
-      style:{ fontSize:56, fontWeight:900, color:'#FFFFFF', lineHeight:1.25, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
+      style:{ fontSize:56, fontWeight:900, color:'#FFFFFF', lineHeight:1.1, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
       zIndex:5, lockColor:true },
-    // line 2
+    // line 2 — 줄간격 좁게
     { type:'text', content:'title-line-2', fallback:'더 많은 이야기들\n저장하고 담아보세요.',
-      position:{ top:14, left:6, width:88 },
-      style:{ fontSize:56, fontWeight:900, color:'#FFFFFF', lineHeight:1.25, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line' },
+      position:{ top:13, left:6, width:88 },
+      style:{ fontSize:56, fontWeight:900, color:'#FFFFFF', lineHeight:1.1, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line' },
       zIndex:5, lockColor:true },
     // 본문
     { type:'text', content:'body', fallback:'지금 생각나는 사람에게\n들려주고픈 이야기를 댓글로 남겨주세요. :)',
@@ -10504,10 +10504,10 @@ TEMPLATE_SCHEMAS['bold:cover'] = {
       position:{ top:42, left:6, width:88 },
       style:{ fontSize:36, fontWeight:800, color:'#1A1A1A', letterSpacing:-0.6, fontFamily:'Pretendard,sans-serif' },
       zIndex:5, lockColor:true },
-    // 거대 한글 제목 (살짝 잘릴 정도로 큰)
+    // 거대 한글 제목 (살짝 잘릴 정도로 큰) — Pretendard 900 으로 (Black Han Sans 제거)
     { type:'text', content:'title',
       position:{ top:48, left:6, width:120 },
-      style:{ fontSize:130, fontWeight:900, color:'#1A1A1A', lineHeight:0.95, letterSpacing:-4, fontFamily:"'Black Han Sans',Pretendard,sans-serif", whiteSpace:'pre-line' },
+      style:{ fontSize:130, fontWeight:900, color:'#1A1A1A', lineHeight:0.95, letterSpacing:-4, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line' },
       zIndex:5, lockColor:true },
     // 이탤릭 영문 LIST
     { type:'text', content:'literal', text:'LIST',
