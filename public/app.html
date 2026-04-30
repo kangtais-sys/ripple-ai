@@ -532,12 +532,12 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .tc-stale{font-size:10px;font-weight:600;color:var(--t3);padding:3px 8px}
 .tc-action{font-size:12px;font-weight:800;color:var(--mint-d);letter-spacing:-.2px;display:flex;align-items:center;gap:4px;padding-top:8px;border-top:1px dashed var(--b)}
 /* 얇은 1줄 "처음이면" 바 */
-.first-bar{width:100%;display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:16px;border:1px solid var(--b);background:linear-gradient(90deg,#F0FDF9,#EEF2FF);color:var(--t1);cursor:pointer;margin-bottom:14px;font-family:'Pretendard',sans-serif;transition:transform .1s,border-color .15s}
+.first-bar{width:100%;display:flex;align-items:center;gap:10px;padding:11px 14px;border-radius:16px;border:1px solid var(--b);background:linear-gradient(90deg,#F0FDF9,#EEF2FF);color:var(--t1);cursor:pointer;margin-bottom:14px;font-family:'Pretendard',sans-serif;transition:transform .1s,border-color .15s}
 .first-bar:active{transform:scale(.99);border-color:var(--mint)}
-.first-bar-ico{font-size:15px;flex-shrink:0}
-.first-bar-txt{flex:1;text-align:left;font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px}
+.first-bar-ico{font-size:13px;flex-shrink:0}
+.first-bar-txt{flex:1;text-align:left;font-size:12px;font-weight:600;color:var(--t2);letter-spacing:-.2px}
 .first-bar-txt strong{color:var(--t1);font-weight:800}
-.first-bar-arr{color:var(--mint-d);font-size:15px;font-weight:800;flex-shrink:0}
+.first-bar-arr{color:var(--mint-d);font-size:13px;font-weight:800;flex-shrink:0}
 /* ── 온보딩 모달 ── */
 .ob-step{display:none;padding:22px 22px 28px}
 .ob-step.on{display:block}
@@ -2288,21 +2288,15 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         <div class="direct-label-icon">✎</div>
         <div class="direct-label-title">키워드 한 줄, AI 가 카드로</div>
       </div>
-      <div class="direct-label-sub">키워드든 한 문장이든 — <b>내 말투</b>로 카드뉴스·캡션 자동 생성.</div>
-      <textarea class="direct-ta" id="direct-topic" placeholder="예: 봄 라떼 신메뉴 비교" oninput="toggleDirectBtn();rotateDirectPlaceholder()" onkeyup="toggleDirectBtn()" oncompositionupdate="toggleDirectBtn()" oncompositionend="toggleDirectBtn()" onchange="toggleDirectBtn()"></textarea>
-      <div class="direct-tip" id="direct-tip-chips">
-        <button type="button" class="direct-tip-chip" onclick="fillDirectTopic('봄 라떼 신메뉴 비교')">봄 라떼 신메뉴 비교</button>
-        <button type="button" class="direct-tip-chip" onclick="fillDirectTopic('30대 자취 인테리어 꿀팁')">30대 자취 인테리어</button>
-        <button type="button" class="direct-tip-chip" onclick="fillDirectTopic('민감 피부 봄철 루틴')">민감 피부 봄 루틴</button>
-        <button type="button" class="direct-tip-chip" onclick="fillDirectTopic('이번주 공구 베스트')">이번주 공구</button>
-      </div>
-      <!-- 내 말투 표시 + 일회성 변경 토글 (이중 선택 제거, 온보딩에서 정한 톤 기본) -->
+      <div class="direct-label-sub">키워드든 한 문장이든 — <b>카드뉴스 문체</b>로 본문 자동 생성. 캡션은 <b>내 말투</b>(캐주얼)로.</div>
+      <textarea class="direct-ta" id="direct-topic" placeholder="여기에 주제를 입력해줘" oninput="toggleDirectBtn()" onkeyup="toggleDirectBtn()" oncompositionupdate="toggleDirectBtn()" oncompositionend="toggleDirectBtn()" onchange="toggleDirectBtn()"></textarea>
+      <!-- 내 주제 + 카드뉴스 문체 표시 + 일회성 변경 토글 -->
       <div id="direct-tone-summary" style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding:9px 12px;border-radius:10px;background:var(--mint-l);border:1px solid #A7F3D0">
-        <div style="font-size:11.5px;color:var(--mint-d);line-height:1.5">
-          <span style="font-weight:800">내 말투 ·</span>
-          <span id="direct-tone-name" style="font-weight:600">친근한</span>
+        <div style="font-size:11.5px;color:var(--mint-d);line-height:1.5;flex:1;min-width:0">
+          <div><span style="font-weight:800">내 주제 ·</span> <span id="direct-topic-name" style="font-weight:600">미설정</span></div>
+          <div style="margin-top:2px"><span style="font-weight:800">카드뉴스 문체 ·</span> <span id="direct-tone-name" style="font-weight:600">친근한</span></div>
         </div>
-        <button type="button" id="direct-tone-toggle" onclick="toggleToneChips()" style="padding:5px 10px;border-radius:100px;background:#fff;border:1px solid var(--b);font-size:10.5px;font-weight:700;color:var(--t2);cursor:pointer">변경</button>
+        <button type="button" id="direct-tone-toggle" onclick="toggleToneChips()" style="padding:5px 10px;border-radius:100px;background:#fff;border:1px solid var(--b);font-size:10.5px;font-weight:700;color:var(--t2);cursor:pointer;flex-shrink:0">변경</button>
       </div>
       <!-- 톤 chip 6개 (default hidden, 토글로 표시) -->
       <div id="tone-chip-grid" style="display:none;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px">
@@ -2328,8 +2322,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <!-- STEP 2: 생성된 프롬프트 확인 -->
   <div class="create-step" id="cs-2">
     <div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:6px;display:flex;align-items:center;gap:6px">
-      <span style="background:var(--mint);color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px">AI · 내 말투 학습</span>
-      <span>내 말투로 작성된 캐러셀 프롬프트</span>
+      <span style="background:var(--mint);color:#fff;font-size:9px;font-weight:800;padding:2px 7px;border-radius:5px">AI · 카드뉴스 문체</span>
+      <span>카드뉴스 문체로 작성된 캐러셀 프롬프트</span>
     </div>
     <div style="font-size:10px;font-weight:800;color:var(--t3);margin-bottom:8px;letter-spacing:.3px;text-transform:uppercase">슬라이드별 프롬프트 <span style="font-weight:600;margin-left:4px">탭해서 수정</span></div>
     <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px">
@@ -5056,12 +5050,20 @@ function syncToneChip(){
     c.style.color = on ? 'var(--mint-d)' : 'var(--t2)';
     c.style.fontWeight = on ? '800' : '700';
   });
-  // 만들기 탭 "내 말투 · ___" 라벨 동기화
+  // 만들기 탭 "카드뉴스 문체 · ___" 라벨 동기화
   var nameEl = document.getElementById('direct-tone-name');
   if(nameEl) nameEl.textContent = TONE_LABELS[tone] || tone;
+  // "내 주제 · ___" 라벨 — onboarding 에서 저장한 카테고리 (discoverData[savedKey].name)
+  var topicNameEl = document.getElementById('direct-topic-name');
+  if(topicNameEl){
+    var savedKey = '';
+    try { savedKey = localStorage.getItem('ssobi_disc_topic') || ''; } catch(_){}
+    var topicName = (savedKey && typeof discoverData !== 'undefined' && discoverData[savedKey])
+      ? discoverData[savedKey].name : '';
+    topicNameEl.textContent = topicName || '미설정';
+  }
 }
 document.addEventListener('DOMContentLoaded', syncToneChip);
-document.addEventListener('DOMContentLoaded', startDirectPlaceholderRotation);
 // 톤 chip grid 표시/숨김 토글
 function toggleToneChips(){
   var grid = document.getElementById('tone-chip-grid');
