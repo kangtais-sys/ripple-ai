@@ -8,6 +8,8 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,300;1,9..144,400;1,9..144,500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <!-- 카드뉴스 템플릿용 한국어 현대 폰트 -->
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700;900&family=Nanum+Myeongjo:wght@700;800&family=Gowun+Dodum&family=Gowun+Batang:wght@400;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&family=Black+Han+Sans&family=Song+Myung&display=swap" rel="stylesheet">
+<!-- 매거진 손글씨용 (love ART 등 cursive 영문) -->
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Permanent+Marker&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <style>
@@ -2398,35 +2400,30 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:6px">템플릿 선택</div>
     <div style="font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.55">클릭하면 바로 디자인이 적용돼요.</div>
     <div class="tpl-grid" id="tpl-grid">
-      <!-- 베이직 (clean) — 화이트 미니멀 + mint -->
+      <!-- 클린 (clean) — 화이트 미니멀 + 굵은 산세리프 — 팁/순위/정보 -->
       <div class="tpl-item on" onclick="selectTpl(this,'clean')">
         <div class="tpl-prev"></div>
-        <div class="tpl-name">베이직</div>
+        <div class="tpl-name">클린</div>
       </div>
-      <!-- 자정 (bold) — 다크 + 형광 라임 -->
-      <div class="tpl-item" onclick="selectTpl(this,'bold')">
-        <div class="tpl-prev"></div>
-        <div class="tpl-name">트렌디</div>
-      </div>
-      <!-- 여백 (noir) — 다크 + 골드 세리프 -->
+      <!-- 감성 (noir) — 다크 + 풀이미지 + 흰 세리프 — 카페/여행/뷰티 무드샷 -->
       <div class="tpl-item" onclick="selectTpl(this,'noir')">
         <div class="tpl-prev"></div>
         <div class="tpl-name">감성</div>
       </div>
-      <!-- 매거진 (mag) — 좌이미지 / 우 다크 패널 -->
+      <!-- 매거진 (mag) — 좌이미지 + 우 다크 패널 — 패션/뷰티 에디토리얼 -->
       <div class="tpl-item" onclick="selectTpl(this,'mag')">
         <div class="tpl-prev"></div>
         <div class="tpl-name">매거진</div>
       </div>
-      <!-- 흑과백 (mono) — 그레이 + 화이트 -->
-      <div class="tpl-item" onclick="selectTpl(this,'mono')">
+      <!-- 팝 (bold) — 원색 배경 + 임팩트 숫자 + 배지 — 공구/이벤트/세일 -->
+      <div class="tpl-item" onclick="selectTpl(this,'bold')">
         <div class="tpl-prev"></div>
-        <div class="tpl-name">모노</div>
+        <div class="tpl-name">팝</div>
       </div>
-      <!-- 소프트 (pastel) — 코랄 + 크림 + 둥근 폰트 -->
+      <!-- 다이어리 (pastel) — 핸드라이팅 + 따뜻한 톤 — 책/일상/심리/육아 -->
       <div class="tpl-item" onclick="selectTpl(this,'pastel')">
         <div class="tpl-prev"></div>
-        <div class="tpl-name">소프트</div>
+        <div class="tpl-name">다이어리</div>
       </div>
       <div class="tpl-my" onclick="openMyTpl()">
         <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
@@ -8428,14 +8425,14 @@ var edtSel = null;
 function tplBg(t){
   if(t==='custom') return window._customTplBg || '#FFFFFF';
   return ({
-    clean:     '#FFFFFF',     // CLEAN
-    bold:      '#0A0A0A',     // DARK
-    mag:       '#111111',     // SPLIT
-    editorial: '#1A1512',     // FILM
-    mono:      '#FAFAFA',     // MONO
-    pastel:    '#FDF6F0',     // PASTEL
-    noir:      '#1A1A1A',     // STATEMENT
-    luxury:    '#0D0D0D',     // RAW
+    clean:     '#FFFFFF',     // 클린 — 화이트 미니멀
+    bold:      '#D55A35',     // 팝 — 오렌지 풀 컬러 (cover) · 슬라이드별 색 다름
+    mag:       '#F5EDE0',     // 매거진 — 베이지 (형광펜·손그림 베이스)
+    editorial: '#1A1512',     // (legacy)
+    mono:      '#FAFAFA',     // (legacy)
+    pastel:    'linear-gradient(160deg,#FFF8EC 0%,#FCEFE0 60%,#F8E5D0 100%)',  // (legacy 다이어리)
+    noir:      '#1A1A1A',     // 감성 — 다크 (풀이미지 위에 깔림)
+    luxury:    '#0D0D0D',     // (legacy)
   })[t] || '#FFFFFF';
 }
 function tplText(t){
@@ -8444,27 +8441,27 @@ function tplText(t){
     return /#0|#1[0-9A-F]{2}/i.test(bg) ? '#F5F0E8' : '#1A1A1A';
   }
   return ({
-    clean:     '#111111',     // CLEAN
-    bold:      '#FFFFFF',     // DARK
-    mag:       '#FFFFFF',     // SPLIT
-    editorial: '#E8DFD0',     // FILM
-    mono:      '#111111',     // MONO
-    pastel:    '#3D2B1F',     // PASTEL
-    noir:      '#FFFFFF',     // STATEMENT
-    luxury:    '#FFFFFF',     // RAW
-  })[t] || '#111111';
+    clean:     '#1A1A1A',     // 클린 — 진한 검정 (소프트)
+    bold:      '#1A1A1A',     // 팝 — 검정 (오렌지 배경 위 임팩트)
+    mag:       '#1A1A1A',     // 매거진 — 검정 (베이지 배경 위)
+    editorial: '#E8DFD0',     // (legacy)
+    mono:      '#111111',     // (legacy)
+    pastel:    '#3D2B1F',     // (legacy)
+    noir:      '#FFFFFF',     // 감성 — 흰색 (다크 + 풀이미지 위)
+    luxury:    '#FFFFFF',     // (legacy)
+  })[t] || '#1A1A1A';
 }
 // 템플릿별 기본 폰트
 function tplFont(t){
   return ({
-    clean:     "'Pretendard','Noto Sans KR',sans-serif",
-    bold:      "'Pretendard','Noto Sans KR',sans-serif",                                    // DARK
-    mag:       "'Pretendard','Noto Sans KR',sans-serif",                                    // SPLIT
-    editorial: "'Nanum Myeongjo','Gowun Batang','Noto Serif KR',serif",                    // FILM
-    mono:      "'Pretendard','Noto Sans KR',sans-serif",                                    // MONO
-    pastel:    "'Gowun Dodum','Pretendard','Noto Sans KR',sans-serif",
-    noir:      "'Gowun Batang','Noto Serif KR',serif",                                      // STATEMENT
-    luxury:    "'Black Han Sans','Pretendard','Noto Sans KR',sans-serif",                  // RAW
+    clean:     "'Pretendard','Noto Sans KR',sans-serif",                                  // 클린 — 깔끔
+    bold:      "'Black Han Sans','Pretendard','Noto Sans KR',sans-serif",                // 팝 — 임팩트 굵은 산세리프
+    mag:       "'Pretendard','Noto Sans KR',sans-serif",                                  // 매거진
+    editorial: "'Nanum Myeongjo','Gowun Batang','Noto Serif KR',serif",                  // (legacy)
+    mono:      "'Pretendard','Noto Sans KR',sans-serif",                                  // (legacy)
+    pastel:    "'Gowun Dodum','Pretendard','Noto Sans KR',sans-serif",                   // 다이어리 — 핸드라이팅
+    noir:      "'Gowun Batang','Noto Serif KR',serif",                                    // 감성 — 세리프
+    luxury:    "'Black Han Sans','Pretendard','Noto Sans KR',sans-serif",                // (legacy)
   })[t] || "'Pretendard','Noto Sans KR',sans-serif";
 }
 function tplWeight(t){
@@ -8476,15 +8473,15 @@ function tplItalic(t){
 // 포인트 컬러
 function tplAccent(t){
   return ({
-    clean:     '#00C9A7',  // CLEAN — mint
-    bold:      '#CCFF00',  // DARK — 형광 라임 (카테고리별 동적 변경 가능)
-    mag:       '#FFFFFF',  // SPLIT — 흰 (다크 우측 패널 위)
-    editorial: '#C4A882',  // FILM — 따뜻한 베이지
-    mono:      '#0D0D0D',  // MONO — 단색 검정 칩
-    pastel:    '#F4A5B0',  // PASTEL — 코랄핑크
-    noir:      '#C9A84C',  // STATEMENT — 골드
-    luxury:    '#FFFFFF',  // RAW — 흰 (검정 위)
-  })[t] || '#00C9A7';
+    clean:     '#1A1A1A',  // 클린 — 검정 (배지·라인)
+    bold:      '#0E1B2C',  // 팝 — 다크 네이비 (오렌지 위 강한 대비)
+    mag:       '#E8FF4D',  // 매거진 — 형광 노랑 (highlight·낙서)
+    editorial: '#C4A882',  // (legacy)
+    mono:      '#0D0D0D',  // (legacy)
+    pastel:    '#D97757',  // (legacy)
+    noir:      '#FFFFFF',  // 감성 — 흰 (pill 배지·화살표)
+    luxury:    '#FFFFFF',  // (legacy)
+  })[t] || '#1A1A1A';
 }
 // 템플릿별 이미지 배치 전략 (kind: 'cover'|'intro'|'body')
 //   full        — 풀 배경 이미지, 어두운 그라데이션 위 텍스트
@@ -8493,18 +8490,26 @@ function tplAccent(t){
 //   small-top   — 상단 30%, 위쪽 악센트 라벨처럼
 //   none        — 이미지 없음 (템플릿 배경만)
 function tplImageLayout(tpl, kind){
-  if(kind === 'summary' || kind === 'cta') return 'none';
-  // 템플릿별 기본 — 풀이미지(full) 폐지: 모든 템플릿이 박스 이미지 사용
-  // 자정·여백·흑과백도 작은 박스 이미지로 변경 (사용자 피드백 2026-04-25)
+  if(kind === 'summary') return 'none';
+  // 템플릿별 + 슬라이드 역할별 layout (seed 디자인 기반)
+  //   clean:     화이트 + 사진 하단/상단 분리
+  //   noir(감성): 풀이미지 + 텍스트 오버레이
+  //   mag(매거진): 사진 사각형 + 형광펜·손그림 데코
+  //   bold(팝):   풀 컬러 + 거대 타이포 (대부분 이미지 X)
   var byTpl = {
-    clean:     { cover:'half-top',  intro:'half-top',  body:'half-top' },
-    bold:      { cover:'small-top', intro:'small-top', body:'small-top' },
-    mag:       { cover:'half-left', intro:'half-left', body:'half-left' },  // 매거진 첫장도 세로 분할
-    mono:      { cover:'half-top',  intro:'half-top',  body:'half-top' },
-    pastel:    { cover:'half-top',  intro:'half-top',  body:'half-top' },
-    noir:      { cover:'small-top', intro:'small-top', body:'small-top' },
+    clean:     { cover:'half-top',     hook:'half-bottom', body:'half-bottom', cta:'none' },
+    bold:      { cover:'none',         hook:'none',        body:'half-bottom', cta:'none' },
+    mag:       { cover:'half-top',     hook:'none',        body:'half-right',  cta:'none' },
+    mono:      { cover:'half-top',     hook:'half-top',    body:'half-top',    cta:'none' },  // (legacy)
+    pastel:    { cover:'half-top',     hook:'half-top',    body:'half-top',    cta:'none' },  // (legacy)
+    noir:      { cover:'full',         hook:'full',        body:'full',        cta:'none' },
   };
-  return (byTpl[tpl] && byTpl[tpl][kind]) || 'half-top';
+  var role = byTpl[tpl] && byTpl[tpl][kind];
+  if(role) return role;
+  // fallback
+  if(kind === 'cta') return 'none';
+  if(kind === 'hook') return 'none';
+  return 'half-top';
 }
 // 이미지 오버레이 (풀배경일 때 텍스트 가독성 확보용 어두운 그라데이션)
 function makeOverlayEl(mode){
@@ -8630,21 +8635,278 @@ function makeCategoryChip(label, opts){
   return el;
 }
 
-// ═══ 템플릿별 데코 요소 배치 (spec 2.2 — 카테고리 칩/브랜드 라벨 모두 제거) ═══
+// ═══ Phase A.5 신규 시그니처 데코 헬퍼 (4 템플릿 정체성 살리기) ═══
+
+// 작은 검정 배지 (clean — Focus / STEP1)
+function makeBlackBadge(label, opts){
+  var el = document.createElement('div');
+  el.className = 'edt-deco';
+  var bg = (opts && opts.bg) || '#1A1A1A';
+  var fg = (opts && opts.color) || '#FFFFFF';
+  el.style.cssText = 'position:absolute;left:' + (opts.x || 6) + '%;top:' + (opts.y || 6) + '%;padding:5px 12px;background:' + bg + ';color:' + fg + ';font-family:Pretendard,sans-serif;font-size:11px;font-weight:800;letter-spacing:.08em;border-radius:3px;pointer-events:none;z-index:6;display:inline-block';
+  el.textContent = label;
+  return el;
+}
+
+// 하단 가로 라인 (clean cta footer)
+function makeBottomLine(opts){
+  var el = document.createElement('div');
+  el.className = 'edt-deco';
+  el.style.cssText = 'position:absolute;left:' + (opts.x || 6) + '%;right:' + (opts.x || 6) + '%;bottom:' + (opts.y || 6) + '%;height:1px;background:' + (opts.color || '#1A1A1A') + ';opacity:' + (opts.opacity || 0.85) + ';pointer-events:none;z-index:5';
+  return el;
+}
+
+// 작은 흰 pill 배지 (emotional — "쉬어도 돼")
+function makeWhitePill(label, opts){
+  var el = document.createElement('div');
+  el.className = 'edt-deco';
+  el.style.cssText = 'position:absolute;left:' + (opts.x || 6) + '%;top:' + (opts.y || 60) + '%;padding:6px 13px;background:#FFFFFF;color:#1A1A1A;font-family:Pretendard,sans-serif;font-size:12px;font-weight:800;letter-spacing:-.2px;border-radius:6px;pointer-events:none;z-index:7;display:inline-block;box-shadow:0 1px 3px rgba(0,0,0,.15)';
+  el.textContent = label;
+  return el;
+}
+
+// 우하단 → 화살표 (emotional cta)
+function makeArrowRight(opts){
+  var el = document.createElement('div');
+  el.className = 'edt-deco';
+  var color = (opts && opts.color) || '#FFFFFF';
+  el.style.cssText = 'position:absolute;right:' + (opts.x || 8) + '%;bottom:' + (opts.y || 6) + '%;width:42px;height:14px;pointer-events:none;z-index:6';
+  el.innerHTML = '<svg viewBox="0 0 42 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%"><path d="M0 7H40M40 7L33 1M40 7L33 13" stroke="' + color + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  return el;
+}
+
+// 노란 형광펜 highlight (magazine — 텍스트 뒤에 비스듬하게 깔리는 노란 라인)
+function makeYellowHighlight(opts){
+  var el = document.createElement('div');
+  el.className = 'edt-deco edt-highlight';
+  var color = (opts && opts.color) || '#E8FF4D';
+  var rotate = (opts && opts.rotate != null) ? opts.rotate : -1.5;
+  el.style.cssText = 'position:absolute;left:' + (opts.x || 6) + '%;top:' + (opts.y || 30) + '%;width:' + (opts.w || 50) + '%;height:' + (opts.h || 14) + 'px;background:' + color + ';transform:rotate(' + rotate + 'deg);pointer-events:none;z-index:2;border-radius:1px';
+  return el;
+}
+
+// 손그림 낙서 SVG (magazine — LOVE ART, 화살표, 동그라미 등)
+function makeHandDoodle(kind, opts){
+  var el = document.createElement('div');
+  el.className = 'edt-deco edt-doodle';
+  el.style.cssText = 'position:absolute;left:' + (opts.x || 8) + '%;top:' + (opts.y || 50) + '%;width:' + (opts.w || 80) + 'px;height:' + (opts.h || 60) + 'px;pointer-events:none;z-index:6';
+  var color = (opts && opts.color) || '#1A1A1A';
+  var sw = (opts && opts.strokeWidth) || 1.8;
+  var path = '';
+  if(kind === 'arrow_squiggle'){
+    // 노란 화살표 손그림 (구불구불 → 모양)
+    path = '<svg viewBox="0 0 100 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%;overflow:visible">'
+      + '<path d="M5 30 C 20 15, 35 45, 50 25 S 80 35, 90 22" stroke="' + color + '" stroke-width="' + sw + '" stroke-linecap="round" fill="none"/>'
+      + '<path d="M85 18 L92 22 L86 28" stroke="' + color + '" stroke-width="' + sw + '" stroke-linecap="round" stroke-linejoin="round" fill="none"/>'
+      + '</svg>';
+  } else if(kind === 'love_art'){
+    // 핸드라이팅 LOVE ART (소문자 cursive 느낌)
+    el.style.fontFamily = "'Caveat','Gowun Dodum',cursive,sans-serif";
+    el.style.fontSize = ((opts && opts.fontSize) || 80) + 'px';
+    el.style.fontWeight = '700';
+    el.style.color = color;
+    el.style.lineHeight = '1';
+    el.textContent = (opts && opts.text) || 'love\nART';
+    el.style.whiteSpace = 'pre';
+    el.style.transform = 'rotate(-8deg)';
+    el.style.width = 'auto';
+    el.style.height = 'auto';
+    return el;
+  } else if(kind === 'circle_scribble'){
+    // 동그라미 손그림 (마구잡이 동그라미)
+    path = '<svg viewBox="0 0 80 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">'
+      + '<path d="M30 10 C 50 5, 70 15, 65 35 C 60 50, 35 55, 25 45 C 10 35, 15 15, 30 10 Z" stroke="' + color + '" stroke-width="' + sw + '" fill="none" stroke-linecap="round"/>'
+      + '<path d="M35 15 C 55 12, 65 25, 60 38" stroke="' + color + '" stroke-width="' + sw + '" fill="none" stroke-linecap="round"/>'
+      + '</svg>';
+  } else if(kind === 'hearts'){
+    // 하트 두 개 + 등호 + 동그라미 낙서 (magazine hook 같은)
+    path = '<svg viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">'
+      + '<path d="M20 30 C 15 22, 25 18, 30 24 C 35 18, 45 22, 40 30 L30 42 Z" stroke="' + color + '" stroke-width="' + sw + '" fill="none"/>'
+      + '<line x1="55" y1="30" x2="75" y2="30" stroke="' + color + '" stroke-width="' + sw + '" stroke-linecap="round"/>'
+      + '<path d="M90 30 C 85 22, 95 18, 100 24 C 105 18, 115 22, 110 30 L100 42 Z" stroke="' + color + '" stroke-width="' + sw + '" fill="none"/>'
+      + '<line x1="125" y1="26" x2="145" y2="26" stroke="' + color + '" stroke-width="' + sw + '" stroke-linecap="round"/>'
+      + '<line x1="125" y1="34" x2="145" y2="34" stroke="' + color + '" stroke-width="' + sw + '" stroke-linecap="round"/>'
+      + '<path d="M165 35 C 175 25, 185 35, 180 45 C 175 50, 165 50, 162 42 C 168 38, 178 38, 175 30" stroke="' + color + '" stroke-width="' + sw + '" fill="none" stroke-linecap="round"/>'
+      + '</svg>';
+  } else if(kind === 'underline_squiggle'){
+    // 텍스트 밑 노란 손그림 밑줄
+    path = '<svg viewBox="0 0 200 12" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%">'
+      + '<path d="M2 6 Q 50 2, 100 7 T 198 5" stroke="' + color + '" stroke-width="' + sw + '" fill="none" stroke-linecap="round"/>'
+      + '</svg>';
+  }
+  if(path) el.innerHTML = path;
+  return el;
+}
+
+// 격자 노트 배경 (magazine hook 의 노트 패턴)
+function makeNoteGrid(opts){
+  var el = document.createElement('div');
+  el.className = 'edt-deco edt-note-grid';
+  var color = (opts && opts.color) || 'rgba(26,26,26,.12)';
+  var size = (opts && opts.size) || 28;
+  el.style.cssText = 'position:absolute;left:' + (opts.x || 6) + '%;top:' + (opts.y || 50) + '%;width:' + (opts.w || 88) + '%;height:' + (opts.h || 35) + '%;background-image:linear-gradient(' + color + ' 1px, transparent 1px),linear-gradient(90deg,' + color + ' 1px, transparent 1px);background-size:' + size + 'px ' + size + 'px;pointer-events:none;z-index:1;border-radius:4px';
+  return el;
+}
+
+// 색 칩 (pop hook — 4개 알록달록 카테고리 칩)
+function makeColorChips(items, opts){
+  var wrap = document.createElement('div');
+  wrap.className = 'edt-deco edt-color-chips';
+  wrap.style.cssText = 'position:absolute;left:' + (opts.x || 50) + '%;top:' + (opts.y || 60) + '%;transform:translateX(-50%);display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-width:80%;pointer-events:none;z-index:6';
+  (items || []).forEach(function(it){
+    var c = document.createElement('span');
+    c.style.cssText = 'padding:6px 12px;background:' + (it.bg || '#FFFFFF') + ';color:' + (it.color || '#1A1A1A') + ';font-family:Pretendard,sans-serif;font-size:12px;font-weight:800;letter-spacing:-.2px;border-radius:5px;display:inline-block';
+    c.textContent = it.text || '';
+    wrap.appendChild(c);
+  });
+  return wrap;
+}
+
+// 검정 pill 버튼 (pop cover — "Learn more →")
+function makeBlackPillButton(label, opts){
+  var el = document.createElement('div');
+  el.className = 'edt-deco';
+  el.style.cssText = 'position:absolute;left:' + (opts.x || 6) + '%;top:' + (opts.y || 75) + '%;padding:11px 22px;background:#1A1A1A;color:#FFFFFF;font-family:Pretendard,sans-serif;font-size:13px;font-weight:700;border-radius:100px;display:inline-flex;align-items:center;gap:10px;pointer-events:none;z-index:6';
+  el.innerHTML = '<span>' + label + '</span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px"><path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  return el;
+}
+
+// 거대 컬러 번호 (pop content — "01" 큰 오렌지 숫자)
+function makeBigColorNumber(num, opts){
+  var el = document.createElement('div');
+  el.className = 'edt-deco';
+  var color = (opts && opts.color) || '#D55A35';
+  el.style.cssText = 'position:absolute;left:' + (opts.x || 6) + '%;top:' + (opts.y || 4) + '%;font-family:Pretendard,sans-serif;font-size:' + (opts.size || 56) + 'px;font-weight:900;color:' + color + ';letter-spacing:-2px;line-height:1;pointer-events:none;z-index:5';
+  el.textContent = num;
+  return el;
+}
+
+// 거대 영문 타이포 (magazine cta — "FOLLOW ME / SHARE &")
+function makeBigEnglishTypo(text, opts){
+  var el = document.createElement('div');
+  el.className = 'edt-deco';
+  var color = (opts && opts.color) || '#1A1A1A';
+  el.style.cssText = 'position:absolute;left:' + (opts.x || 0) + '%;top:' + (opts.y || 12) + '%;width:' + (opts.w || 100) + '%;font-family:Pretendard,sans-serif;font-size:' + (opts.size || 56) + 'px;font-weight:900;color:' + color + ';letter-spacing:-2px;line-height:.95;white-space:nowrap;overflow:hidden;pointer-events:none;z-index:5';
+  el.textContent = text;
+  return el;
+}
+
+// 작은 logo 텍스트 (모든 템플릿 — 위치만 다름)
+function makeLogoText(opts){
+  var el = document.createElement('div');
+  el.className = 'edt-deco';
+  var color = (opts && opts.color) || '#1A1A1A';
+  var family = (opts && opts.family) || 'Pretendard,sans-serif';
+  el.style.cssText = 'position:absolute;'
+    + (opts.left != null ? 'left:' + opts.left + '%;' : (opts.right != null ? 'right:' + opts.right + '%;' : 'left:50%;transform:translateX(-50%);'))
+    + (opts.top != null ? 'top:' + opts.top + '%;' : 'bottom:' + (opts.bottom || 6) + '%;')
+    + 'font-family:' + family + ';font-size:' + (opts.size || 11) + 'px;font-weight:' + (opts.weight || 600) + ';color:' + color + ';letter-spacing:.01em;pointer-events:none;z-index:5';
+  el.textContent = (opts && opts.text) || 'logo';
+  return el;
+}
+
+// ═══ 템플릿별 데코 요소 배치 (Phase A.5 — 4 템플릿 정체성) ═══
 function tplDecoForSlide(tpl, kind, idx, accent, textColor){
   var decos = [];
-  // 템플릿별 추가 데코 (카테고리 칩 / 브랜드 라벨 모두 제거)
-  if(tpl === 'bold'){
-    if(kind === 'body' || kind === 'cover'){
-      decos.push(makeBigOutlineNumber(String(idx).padStart(2,'0'), {x:55, y:-15, size:240, color:'#FFFFFF', opacity:0.06}));
+  // ═══ clean — 검정 배지 + 좌상단 logo + 하단 라인 ═══
+  if(tpl === 'clean'){
+    decos.push(makeLogoText({left:6, top:5, size:11, weight:500, color:'#1A1A1A', family:"'Times New Roman','Pretendard',serif", text:'logo'}));
+    if(kind === 'hook'){
+      decos.push(makeBlackBadge('Focus', {x:6, y:6, bg:'#1A1A1A', color:'#FFFFFF'}));
+    } else if(kind === 'body' || kind === 'content'){
+      decos.push(makeBlackBadge('STEP' + idx, {x:6, y:6, bg:'#1A1A1A', color:'#FFFFFF'}));
     }
-  } else if(tpl === 'editorial'){
+    decos.push(makeBottomLine({x:6, y:6, color:'#1A1A1A', opacity:0.85}));
+  }
+  // ═══ noir/emotional — 풀이미지 + 흰 pill + 하단 화살표 + 가운데 logo ═══
+  else if(tpl === 'noir'){
+    decos.push(makeLogoText({bottom:6, size:13, weight:600, color:'#FFFFFF', text:'logo'}));
+    decos.push(makeArrowRight({x:8, y:6, color:'#FFFFFF'}));
+    if(kind === 'hook'){
+      decos.push(makeWhitePill('쉬어도 돼', {x:8, y:46}));
+    }
+  }
+  // ═══ mag/magazine — 노란 형광펜 + 손그림 낙서 + 격자 노트 + 하단 logo ═══
+  else if(tpl === 'mag'){
+    decos.push(makeLogoText({bottom:5, size:12, weight:500, color:'#1A1A1A', text:'logo'}));
+    if(kind === 'cover'){
+      // 형광펜 highlight (제목 주변)
+      decos.push(makeYellowHighlight({x:6, y:24, w:62, h:18, color:'#E8FF4D', rotate:-1.5}));
+      // LOVE ART 손글씨 (사진 위)
+      decos.push(makeHandDoodle('love_art', {x:5, y:62, color:'#E8FF4D'}));
+      // 손그림 squiggle (사진 우측)
+      decos.push(makeHandDoodle('arrow_squiggle', {x:60, y:60, w:120, h:50, color:'#E8FF4D'}));
+    } else if(kind === 'hook'){
+      // 형광펜 + 격자노트 + 하트 손그림
+      decos.push(makeYellowHighlight({x:6, y:14, w:78, h:18, color:'#E8FF4D', rotate:-1}));
+      decos.push(makeNoteGrid({x:8, y:55, w:84, h:35, color:'rgba(26,26,26,.08)', size:30}));
+      decos.push(makeHandDoodle('hearts', {x:18, y:65, w:60, h:25, color:'#1A1A1A'}));
+      // 노란 밑줄 손그림
+      decos.push(makeHandDoodle('underline_squiggle', {x:32, y:42, w:100, h:10, color:'#E8FF4D'}));
+    } else if(kind === 'body' || kind === 'content'){
+      // 작은 노란 페이지 번호 형광펜
+      decos.push(makeYellowHighlight({x:6, y:5, w:8, h:14, color:'#E8FF4D', rotate:-3}));
+      var num = document.createElement('div');
+      num.className = 'edt-deco';
+      num.style.cssText = 'position:absolute;left:6%;top:5%;width:8%;text-align:center;font-family:Pretendard,sans-serif;font-size:13px;font-weight:800;color:#1A1A1A;line-height:14px;height:14px;pointer-events:none;z-index:6';
+      num.textContent = String(idx).padStart(2, '0');
+      decos.push(num);
+      // 사진 우측 노란 손그림 화살표
+      decos.push(makeHandDoodle('arrow_squiggle', {x:38, y:65, w:100, h:50, color:'#E8FF4D'}));
+    } else if(kind === 'cta'){
+      // 거대 영문 타이포 (FOLLOW ME / SHARE &)
+      decos.push(makeBigEnglishTypo('FOLLOW ME', {x:8, y:14, w:100, size:62, color:'#1A1A1A'}));
+      decos.push(makeBigEnglishTypo('SHARE &', {x:0, y:25, w:100, size:62, color:'#1A1A1A'}));
+      // 우측 → 화살표
+      decos.push(makeArrowRight({x:8, y:48, color:'#1A1A1A'}));
+    }
+  }
+  // ═══ bold/pop — 풀 컬러 + 거대 타이포 + 색 칩 + pill 버튼 ═══
+  else if(tpl === 'bold'){
+    if(kind === 'cover'){
+      // 좌상단 작은 날짜
+      var date = document.createElement('div');
+      date.className = 'edt-deco';
+      date.style.cssText = 'position:absolute;left:6%;top:7%;font-family:Pretendard,sans-serif;font-size:13px;font-weight:600;color:#1A1A1A;letter-spacing:-.1px;pointer-events:none;z-index:5';
+      var now = new Date();
+      var weekdays = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+      var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+      date.textContent = weekdays[now.getDay()] + ', ' + months[now.getMonth()] + ', ' + now.getFullYear();
+      decos.push(date);
+      // 작은 영문 부제 (Understanding Typography 류)
+      var sub = document.createElement('div');
+      sub.className = 'edt-deco';
+      sub.style.cssText = 'position:absolute;left:6%;top:30%;font-family:Pretendard,sans-serif;font-size:14px;font-weight:800;color:#1A1A1A;letter-spacing:-.1px;pointer-events:none;z-index:5';
+      sub.textContent = 'Now Trending';
+      decos.push(sub);
+      // Learn more 버튼
+      decos.push(makeBlackPillButton('Learn more', {x:6, y:78}));
+      // 좌하단 @logo
+      decos.push(makeLogoText({left:6, bottom:5, size:11, weight:500, color:'#1A1A1A', text:'@logo'}));
+    } else if(kind === 'hook'){
+      // 색 칩 4개 (다크 네이비 배경 위)
+      decos.push(makeColorChips([
+        { text:'01 인사이트', bg:'#D55A35', color:'#1A1A1A' },
+        { text:'02 트렌드',   bg:'#FFD23F', color:'#1A1A1A' },
+        { text:'03 시그널',   bg:'#C4B5FD', color:'#1A1A1A' },
+        { text:'04 디테일',   bg:'#A7F3D0', color:'#1A1A1A' },
+      ], {x:50, y:55}));
+    } else if(kind === 'body' || kind === 'content'){
+      // 큰 오렌지 번호 + 작은 영문 라벨
+      decos.push(makeBigColorNumber(String(idx).padStart(2,'0'), {x:6, y:4, color:'#D55A35', size:48}));
+    } else if(kind === 'cta'){
+      // 좌하단 @logo
+      decos.push(makeLogoText({left:6, bottom:5, size:11, weight:500, color:'#1A1A1A', text:'@logo'}));
+    }
+  }
+  // ═══ 기존 legacy 템플릿 호환 ═══
+  else if(tpl === 'editorial'){
     var lines = makeHorizontalFrame({color:textColor, topY:5, botY:5, opacity:0.18});
     decos.push(lines[0]); decos.push(lines[1]);
   } else if(tpl === 'pastel'){
     decos.push(makeCornerDots({x:6, y:6, colors:['#F4A5B0', '#C4B5FD', '#A7F3D0']}));
-  } else if(tpl === 'noir' || tpl === 'luxury'){
-    decos.push(makeGoldFrame({color:accent, inset: tpl==='noir' ? 4.5 : 5, opacity:0.35}));
+  } else if(tpl === 'luxury'){
+    decos.push(makeGoldFrame({color:accent, inset:5, opacity:0.35}));
   }
   return decos;
 }
@@ -9473,6 +9735,864 @@ function fitTextsInSlide(slideEl){
   }
   requestAnimationFrame(function(){ doFit(4); });
 }
+// ═══════════════════════════════════════════════════════════════════════════
+// Phase A.5+ — 스키마-기반 템플릿 렌더 시스템 (mirra 방식)
+//   각 (template, slide-kind) = JSON 스키마 (코드 X)
+//   하나의 generic renderer 가 스키마 읽어서 슬라이드 통째로 만듦
+//   새 템플릿 추가 = 스키마(JSON) 만 추가, 코드 변경 X
+//   AI 가 스키마 변주 자동 생성 가능 → 100+ 템플릿 확장 가능
+// ═══════════════════════════════════════════════════════════════════════════
+
+// ─── 헬퍼: 제목 자동 2줄 분리 ───
+function splitTitleLines(title){
+  if(!title) return ['', ''];
+  if(title.indexOf('\n') >= 0 || title.indexOf('<br>') >= 0){
+    var parts = title.split(/\n|<br>/);
+    return [parts[0] || '', parts.slice(1).join(' ') || ''];
+  }
+  // 단일 라인 → 단어 단위 자연 분리 (앞 절반 / 뒤 절반)
+  var words = title.split(/\s+/);
+  if(words.length === 1) return [title, ''];
+  var mid = Math.ceil(words.length / 2);
+  return [words.slice(0, mid).join(' '), words.slice(mid).join(' ')];
+}
+
+// ─── 헬퍼: 콘텐츠 토큰 해석 (title-line-1 / subtitle / body 등) ───
+//   알려진 토큰 → 동적 데이터 / 'literal' → null (spec.text 사용 유도) / 그 외 → 토큰 자체 반환
+function resolveContent(token, ctx){
+  if(typeof token !== 'string') return '';
+  if(token === 'literal') return null;  // spec.text 우선 사용 신호
+  if(token === 'title-line-1') return splitTitleLines(ctx.title)[0];
+  if(token === 'title-line-2') return splitTitleLines(ctx.title)[1];
+  if(token === 'title') return ctx.title;
+  if(token === 'subtitle') return ctx.subtitle;
+  if(token === 'body') return ctx.body;
+  if(token === 'body-title') return ctx.bodyTitle;
+  if(token === 'body-line-1') return (ctx.body || '').split('\n')[0] || '';
+  if(token === 'page-number') return String(ctx.idx + 1).padStart(2, '0') + ' / ' + String(ctx.N).padStart(2, '0');
+  if(token === 'page-number-only') return String(ctx.idx + 1).padStart(2, '0');
+  if(token === 'step-num'){
+    // STEP1 / STEP2 / STEP3... — content 슬라이드 순서 (cover·hook 제외)
+    var stepIdx = Math.max(1, ctx.idx - 1);
+    return 'STEP' + stepIdx;
+  }
+  if(token === 'date'){
+    var now = new Date();
+    var weekdays = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+    var months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+    return weekdays[now.getDay()] + ', ' + months[now.getMonth()] + ', ' + now.getFullYear();
+  }
+  return token;  // unknown token → 그대로 출력 (literal로 사용)
+}
+
+// ─── 헬퍼: 텍스트 콘텐츠 결정 (text / spec.text / fallback 우선순위) ───
+function pickContent(spec, ctx){
+  // 1) spec.text 명시되어 있으면 우선 (literal)
+  if(spec.text != null && spec.text !== '') return spec.text;
+  // 2) content 토큰 → 동적 데이터
+  var resolved = resolveContent(spec.content, ctx);
+  if(resolved != null && resolved !== '') return resolved;
+  // 3) fallback
+  if(spec.fallback) return spec.fallback;
+  return '';
+}
+
+// ─── 헬퍼: position 데이터 → CSS 변환 ───
+function applyPosition(el, pos){
+  if(!pos) return;
+  el.style.position = 'absolute';
+  if(pos.top != null) el.style.top = pos.top + '%';
+  if(pos.bottom != null) el.style.bottom = pos.bottom + '%';
+  if(pos.left != null) el.style.left = pos.left + '%';
+  if(pos.right != null) el.style.right = pos.right + '%';
+  if(pos.width != null) el.style.width = pos.width + (typeof pos.width === 'string' ? '' : '%');
+  if(pos.height != null) el.style.height = pos.height + (typeof pos.height === 'string' ? '' : '%');
+  if(pos.transform) el.style.transform = pos.transform;
+}
+
+// ─── 헬퍼: style 데이터 → CSS 변환 ───
+function applyStyle(el, style){
+  if(!style) return;
+  if(style.fontSize) el.style.fontSize = style.fontSize + 'px';
+  if(style.fontFamily) el.style.fontFamily = style.fontFamily;
+  if(style.fontWeight) el.style.fontWeight = String(style.fontWeight);
+  if(style.fontStyle) el.style.fontStyle = style.fontStyle;
+  if(style.color) el.style.color = style.color;
+  if(style.background) el.style.background = style.background;
+  if(style.lineHeight != null) el.style.lineHeight = String(style.lineHeight);
+  if(style.letterSpacing != null) el.style.letterSpacing = style.letterSpacing + 'px';
+  if(style.borderRadius != null) el.style.borderRadius = (typeof style.borderRadius === 'string' ? style.borderRadius : style.borderRadius + 'px');
+  if(style.padding) el.style.padding = style.padding;
+  if(style.display) el.style.display = style.display;
+  if(style.opacity != null) el.style.opacity = String(style.opacity);
+  if(style.textShadow) el.style.textShadow = style.textShadow;
+  if(style.textAlign) el.style.textAlign = style.textAlign;
+  if(style.whiteSpace) el.style.whiteSpace = style.whiteSpace;
+  if(style.boxShadow) el.style.boxShadow = style.boxShadow;
+  if(style.border) el.style.border = style.border;
+  if(style.rotate != null){
+    el.style.transform = (el.style.transform || '') + ' rotate(' + style.rotate + 'deg)';
+  }
+}
+
+// ─── 요소 빌더: type 별 DOM 생성 ───
+function buildSchemaElement(spec, ctx){
+  var el;
+  switch(spec.type){
+    case 'text': {
+      el = document.createElement('div');
+      el.className = 'edt-el text';
+      el.textContent = pickContent(spec, ctx);
+      el.style.pointerEvents = 'none';
+      if(spec.lockColor) el.dataset.userColor = '1';
+      break;
+    }
+    case 'image': {
+      var kw = ctx.keyword || '';
+      el = makeImageSlotEl(kw, {
+        x: (spec.position && spec.position.left) || 0,
+        y: (spec.position && spec.position.top) || 0,
+        w: (spec.position && spec.position.width) || 100,
+        h: (spec.position && spec.position.height) || 100,
+        slideIdx: ctx.slideIdx,
+        radius: parseInt((spec.style && spec.style.borderRadius) || 0, 10) || 0,
+      });
+      // makeImageSlotEl 가 position 자체 처리 — applyPosition 스킵
+      if(spec.zIndex != null) el.style.zIndex = String(spec.zIndex);
+      return el;
+    }
+    case 'image-overlay': {
+      // 풀이미지 위에 다크 그라디언트 오버레이
+      el = document.createElement('div');
+      el.className = 'edt-overlay';
+      el.style.cssText = 'position:absolute;inset:0;pointer-events:none;background:' + (spec.gradient || 'linear-gradient(180deg,rgba(0,0,0,.10) 0%,rgba(0,0,0,.65) 100%)');
+      if(spec.zIndex != null) el.style.zIndex = String(spec.zIndex);
+      return el;
+    }
+    case 'highlight': {
+      // 노란 형광펜 (회전 가능)
+      el = document.createElement('div');
+      el.className = 'edt-deco edt-highlight';
+      el.style.pointerEvents = 'none';
+      break;
+    }
+    case 'doodle': {
+      // 손그림 SVG (kind 별)
+      el = makeHandDoodle(spec.kind, {
+        x: (spec.position && spec.position.left) || 0,
+        y: (spec.position && spec.position.top) || 0,
+        w: (spec.position && spec.position.width) || 80,
+        h: (spec.position && spec.position.height) || 60,
+        color: (spec.style && spec.style.color) || '#1A1A1A',
+        strokeWidth: (spec.style && spec.style.strokeWidth),
+        fontSize: (spec.style && spec.style.fontSize),
+        text: (spec.style && spec.style.text) || (spec.kind === 'love_art' ? 'love\nART' : ''),
+      });
+      if(spec.zIndex != null) el.style.zIndex = String(spec.zIndex);
+      return el;
+    }
+    case 'logo': {
+      el = document.createElement('div');
+      el.className = 'edt-deco';
+      el.textContent = spec.text || (spec.style && spec.style.text) || ctx.logoText || 'logo';
+      el.style.pointerEvents = 'none';
+      break;
+    }
+    case 'badge': {
+      // 사각형 라벨 (검정 배지 — Focus / STEP1 등)
+      el = document.createElement('div');
+      el.className = 'edt-deco';
+      el.textContent = pickContent(spec, ctx);
+      el.style.pointerEvents = 'none';
+      el.style.display = 'inline-block';
+      break;
+    }
+    case 'bottom-line': {
+      el = document.createElement('div');
+      el.className = 'edt-deco';
+      el.style.pointerEvents = 'none';
+      break;
+    }
+    case 'arrow-right': {
+      el = document.createElement('div');
+      el.className = 'edt-deco';
+      el.style.pointerEvents = 'none';
+      var color = (spec.style && spec.style.color) || '#1A1A1A';
+      var size = (spec.style && spec.style.size) || 14;
+      el.innerHTML = '<svg viewBox="0 0 42 14" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%"><path d="M0 7H40M40 7L33 1M40 7L33 13" stroke="' + color + '" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      // 기본 사이즈 (별도 width 없을 때)
+      if(!spec.position || (spec.position.width == null && spec.position.right == null)){
+        el.style.width = '42px';
+        el.style.height = size + 'px';
+      }
+      break;
+    }
+    case 'pill-button': {
+      el = document.createElement('div');
+      el.className = 'edt-deco';
+      el.style.pointerEvents = 'none';
+      var label = pickContent(spec, ctx) || 'Learn more';
+      var iconColor = (spec.style && spec.style.color) || '#FFFFFF';
+      el.innerHTML = '<span>' + label + '</span><svg viewBox="0 0 24 24" fill="none" stroke="' + iconColor + '" stroke-width="2" style="width:14px;height:14px;flex-shrink:0"><path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      el.style.display = 'inline-flex';
+      el.style.alignItems = 'center';
+      el.style.gap = '10px';
+      break;
+    }
+    case 'color-chips': {
+      el = document.createElement('div');
+      el.className = 'edt-deco';
+      el.style.pointerEvents = 'none';
+      el.style.display = 'flex';
+      el.style.flexWrap = 'wrap';
+      el.style.gap = '8px';
+      el.style.justifyContent = 'center';
+      (spec.items || []).forEach(function(it){
+        var c = document.createElement('span');
+        c.style.cssText = 'padding:6px 12px;background:' + (it.bg || '#FFFFFF') + ';color:' + (it.color || '#1A1A1A') + ';font-family:Pretendard,sans-serif;font-size:12px;font-weight:800;letter-spacing:-.2px;border-radius:5px;display:inline-block';
+        c.textContent = it.text || '';
+        el.appendChild(c);
+      });
+      break;
+    }
+    case 'note-grid': {
+      el = document.createElement('div');
+      el.className = 'edt-deco';
+      el.style.pointerEvents = 'none';
+      var gridColor = (spec.style && spec.style.color) || 'rgba(26,26,26,.08)';
+      var gridSize = (spec.style && spec.style.size) || 28;
+      el.style.backgroundImage = 'linear-gradient(' + gridColor + ' 1px, transparent 1px),linear-gradient(90deg,' + gridColor + ' 1px, transparent 1px)';
+      el.style.backgroundSize = gridSize + 'px ' + gridSize + 'px';
+      break;
+    }
+    case 'big-typo': {
+      // 거대 영문 타이포 (mag cta FOLLOW ME, pop cover 거대 한글)
+      el = document.createElement('div');
+      el.className = 'edt-deco';
+      el.style.pointerEvents = 'none';
+      var text = pickContent(spec, ctx);
+      if(spec.allowHTML){ el.innerHTML = text; }
+      else { el.textContent = text; }
+      el.style.lineHeight = (spec.style && spec.style.lineHeight) || '.95';
+      break;
+    }
+    case 'big-number': {
+      el = document.createElement('div');
+      el.className = 'edt-deco';
+      el.style.pointerEvents = 'none';
+      el.textContent = pickContent(spec, ctx) || String(ctx.idx).padStart(2, '0');
+      break;
+    }
+    case 'circle': {
+      el = document.createElement('div');
+      el.className = 'edt-deco';
+      el.style.pointerEvents = 'none';
+      el.style.borderRadius = '50%';
+      break;
+    }
+    case 'chevrons': {
+      // mag cta 우측 ≪ chevrons
+      el = document.createElement('div');
+      el.className = 'edt-deco';
+      el.style.pointerEvents = 'none';
+      var ccolor = (spec.style && spec.style.color) || '#1A1A1A';
+      el.innerHTML = '<svg viewBox="0 0 50 30" fill="none" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:100%"><path d="M30 5L15 15L30 25M45 5L30 15L45 25" stroke="' + ccolor + '" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+      break;
+    }
+    default:
+      return null;
+  }
+  applyPosition(el, spec.position);
+  applyStyle(el, spec.style);
+  if(spec.zIndex != null) el.style.zIndex = String(spec.zIndex);
+  return el;
+}
+
+// ─── 메인 렌더러: 스키마 → DOM ───
+function renderFromSchema(sl, schema, ctx){
+  if(!schema) return;
+  // 슬라이드 배경
+  if(schema.background) sl.style.background = schema.background;
+  // 요소 순회
+  if(Array.isArray(schema.elements)){
+    schema.elements.forEach(function(spec){
+      var dom = buildSchemaElement(spec, ctx);
+      if(dom) sl.appendChild(dom);
+    });
+  }
+  // 데이터 layout 정보 (applyPerTextColor 등에서 활용)
+  if(schema.layout) sl.dataset.layout = schema.layout;
+}
+
+// ─── initEditor 가 호출 — 스키마 있으면 렌더 후 true 반환 ───
+function renderPerTemplate(sl, tpl, kind, i, N, p, kws, titleTxt, createData){
+  var schemaKey = tpl + ':' + kind;
+  var schema = TEMPLATE_SCHEMAS[schemaKey];
+  if(!schema) return false;
+  var ctx = {
+    title: titleTxt,
+    subtitle: (createData && createData.coverSubtitle) || '',
+    body: (p && p.text) || '',
+    bodyTitle: (p && p.title) || '',
+    idx: i,
+    N: N,
+    keyword: (kws && kws[i]) || titleTxt || '',
+    slideIdx: i,
+    p: p,
+    createData: createData,
+    logoText: 'logo',
+  };
+  renderFromSchema(sl, schema, ctx);
+  return true;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// 템플릿 스키마 — 4 템플릿 × 4 슬라이드 = 16 디자인 (시드 PNG 100% 충실)
+// ═══════════════════════════════════════════════════════════════════════════
+var TEMPLATE_SCHEMAS = {};
+
+// ─── magazine (mag) — 베이지 + 형광펜 + 손그림 ───
+//   슬라이드 = 1080×1350 좌표계 기준 (transform:scale 로 표시 사이즈 결정)
+TEMPLATE_SCHEMAS['mag:cover'] = {
+  background: '#F5EDE0',
+  layout: 'mag-cover',
+  elements: [
+    { type:'text', content:'title-line-1',
+      position:{ top:7, left:6, width:88 },
+      style:{ fontSize:90, fontWeight:800, color:'#1A1A1A', lineHeight:1.15, letterSpacing:-2.5, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    { type:'highlight',
+      position:{ top:15.5, left:4, width:62, height:9 },
+      style:{ background:'#E8FF4D', rotate:-1.5, borderRadius:2 },
+      zIndex:4 },
+    { type:'text', content:'title-line-2',
+      position:{ top:16, left:6, width:88 },
+      style:{ fontSize:96, fontWeight:900, color:'#1A1A1A', lineHeight:1.15, letterSpacing:-2.5, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    { type:'text', content:'subtitle', fallback:'비밀코드 모았어',
+      position:{ top:26, left:6 },
+      style:{ fontSize:54, fontWeight:900, color:'#1A1A1A', background:'#E8FF4D', padding:'14px 28px', borderRadius:4, display:'inline-block', letterSpacing:-1.2, lineHeight:1.15, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    { type:'image',
+      position:{ top:38, left:14, width:72, height:48 },
+      style:{ borderRadius:2 } },
+    { type:'doodle', kind:'love_art',
+      position:{ top:58, left:6 },
+      style:{ color:'#E8FF4D', text:'love\nART', fontSize:140 },
+      zIndex:6 },
+    { type:'doodle', kind:'arrow_squiggle',
+      position:{ top:62, left:60, width:380, height:160 },
+      style:{ color:'#E8FF4D', strokeWidth:6 },
+      zIndex:6 },
+    { type:'logo',
+      position:{ bottom:3, left:50, transform:'translateX(-50%)' },
+      style:{ fontSize:26, fontWeight:500, color:'#1A1A1A', fontFamily:'Pretendard,sans-serif' },
+      zIndex:5 },
+  ],
+};
+
+TEMPLATE_SCHEMAS['mag:hook'] = {
+  background: '#F5EDE0',
+  layout: 'mag-hook',
+  elements: [
+    // 흰 카드 (베이지 위)
+    { type:'circle',
+      position:{ top:6, left:5, width:90, height:84 },
+      style:{ background:'#FFFFFF', borderRadius:14 },
+      zIndex:2 },
+    // 노란 형광펜 (제목 line 2 뒤)
+    { type:'highlight',
+      position:{ top:18, left:8, width:60, height:8 },
+      style:{ background:'#E8FF4D', rotate:-1.5, borderRadius:2 },
+      zIndex:3 },
+    // 제목 line 1
+    { type:'text', content:'title-line-1',
+      position:{ top:11, left:10, width:80 },
+      style:{ fontSize:80, fontWeight:800, color:'#1A1A1A', lineHeight:1.15, letterSpacing:-2, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    // 제목 line 2
+    { type:'text', content:'title-line-2',
+      position:{ top:18, left:10, width:80 },
+      style:{ fontSize:80, fontWeight:900, color:'#1A1A1A', lineHeight:1.15, letterSpacing:-2, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    // 💥 + sub text
+    { type:'text', content:'subtitle', fallback:'💥 80% 노려.',
+      position:{ top:31, left:10, width:80 },
+      style:{ fontSize:60, fontWeight:800, color:'#1A1A1A', lineHeight:1.15, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    // 노란 손그림 underline
+    { type:'doodle', kind:'underline_squiggle',
+      position:{ top:37, left:42, width:280, height:25 },
+      style:{ color:'#E8FF4D', strokeWidth:5 },
+      zIndex:5 },
+    // 격자 노트 (아래쪽 큰 영역)
+    { type:'note-grid',
+      position:{ top:54, left:10, width:80, height:32 },
+      style:{ color:'rgba(26,26,26,.1)', size:60, borderRadius:4 },
+      zIndex:3 },
+    // 하트 손그림 (격자 위에 큰 SVG)
+    { type:'doodle', kind:'hearts',
+      position:{ top:60, left:14, width:780, height:200 },
+      style:{ color:'#1A1A1A', strokeWidth:4 },
+      zIndex:5 },
+    // 우하단 (→) pill
+    { type:'text', content:'( → )',
+      position:{ top:79, right:9 },
+      style:{ fontSize:38, fontWeight:700, color:'#1A1A1A', fontFamily:'Pretendard,sans-serif', padding:'10px 24px', border:'2px solid #1A1A1A', borderRadius:100, display:'inline-block' },
+      zIndex:6 },
+    // 하단 logo
+    { type:'logo',
+      position:{ bottom:2.5, left:50, transform:'translateX(-50%)' },
+      style:{ fontSize:26, fontWeight:500, color:'#1A1A1A', fontFamily:'Pretendard,sans-serif' },
+      zIndex:5 },
+  ],
+};
+
+TEMPLATE_SCHEMAS['mag:body'] = {
+  background: '#F5EDE0',
+  layout: 'mag-body',
+  elements: [
+    // 노란 페이지 번호 형광펜
+    { type:'highlight',
+      position:{ top:5, left:5, width:10, height:5 },
+      style:{ background:'#E8FF4D', rotate:-3, borderRadius:2 },
+      zIndex:3 },
+    { type:'text', content:'page-number-only',
+      position:{ top:5, left:5, width:10 },
+      style:{ fontSize:38, fontWeight:800, color:'#1A1A1A', textAlign:'center', lineHeight:1.3, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    // 영문 + 한글 제목 (좌측 큰)
+    { type:'text', content:'body-title', fallback:'QUEENING\n퀴닝 2026\nSEASON OFF',
+      position:{ top:14, left:6, width:50 },
+      style:{ fontSize:62, fontWeight:900, color:'#1A1A1A', lineHeight:1.1, letterSpacing:-1.5, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line' },
+      zIndex:5, lockColor:true },
+    // 본문 텍스트
+    { type:'text', content:'body',
+      position:{ top:42, left:6, width:50 },
+      style:{ fontSize:34, fontWeight:500, color:'#1A1A1A', lineHeight:1.5, letterSpacing:-0.6, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line' },
+      zIndex:5, lockColor:true },
+    // 사진 (우측 큰 사각, 너비 키움)
+    { type:'image',
+      position:{ top:6, left:58, width:38, height:78 },
+      style:{ borderRadius:2 } },
+    // 사진 위 손그림 화살표 (좌하단 → 우상단)
+    { type:'doodle', kind:'arrow_squiggle',
+      position:{ top:65, left:36, width:480, height:180 },
+      style:{ color:'#E8FF4D', strokeWidth:6 },
+      zIndex:6 },
+    // 하단 logo
+    { type:'logo',
+      position:{ bottom:2.5, left:50, transform:'translateX(-50%)' },
+      style:{ fontSize:26, fontWeight:500, color:'#1A1A1A', fontFamily:'Pretendard,sans-serif' },
+      zIndex:5 },
+  ],
+};
+
+TEMPLATE_SCHEMAS['mag:cta'] = {
+  background: '#F5EDE0',
+  layout: 'mag-cta',
+  elements: [
+    // 거대 영문 — line 2: FOLLOW ME (위, 살짝 우측으로 잘림)
+    { type:'big-typo', content:'FOLLOW ME',
+      position:{ top:14, left:25, width:140 },
+      style:{ fontSize:170, fontWeight:300, color:'#1A1A1A', letterSpacing:-5, lineHeight:0.95, fontFamily:'Pretendard,sans-serif', textAlign:'left', whiteSpace:'nowrap' },
+      zIndex:4 },
+    // 거대 영문 — line 1: SHARE & (아래)
+    { type:'big-typo', content:'SHARE &',
+      position:{ top:23, left:0, width:140 },
+      style:{ fontSize:170, fontWeight:300, color:'#1A1A1A', letterSpacing:-5, lineHeight:0.95, fontFamily:'Pretendard,sans-serif', textAlign:'left', whiteSpace:'nowrap' },
+      zIndex:4 },
+    // 우상단 → 화살표
+    { type:'arrow-right',
+      position:{ top:24, right:6, width:14, height:6 },
+      style:{ color:'#1A1A1A' },
+      zIndex:5 },
+    // 한글 sub
+    { type:'text', content:'subtitle', fallback:'재고 다 털리기 전에\n팔로우하고 팁 얻어가👉',
+      position:{ top:46, left:8, width:70 },
+      style:{ fontSize:46, fontWeight:700, color:'#1A1A1A', lineHeight:1.4, letterSpacing:-0.8, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line' },
+      zIndex:5, lockColor:true },
+    // 우하단 ≪ chevrons
+    { type:'chevrons',
+      position:{ top:62, right:8, width:18, height:8 },
+      style:{ color:'#1A1A1A' },
+      zIndex:5 },
+  ],
+};
+
+// ─── clean — 화이트 미니멀 + 검정 배지 + 하단 라인 ───
+TEMPLATE_SCHEMAS['clean:cover'] = {
+  background: '#FFFFFF',
+  layout: 'clean-cover',
+  elements: [
+    // 좌상단 logo (Times New Roman italic)
+    { type:'logo',
+      position:{ top:3, left:6 },
+      style:{ fontSize:38, fontWeight:400, color:'#1A1A1A', fontFamily:"'Times New Roman','Pretendard',serif", fontStyle:'italic' },
+      zIndex:5 },
+    // 우측 사진 (사각, 상단 ~40%)
+    { type:'image',
+      position:{ top:4, left:34, width:60, height:42 },
+      style:{ borderRadius:2 } },
+    // 큰 한글 제목 line 1 (얇은)
+    { type:'text', content:'title-line-1',
+      position:{ top:55, left:6, width:90 },
+      style:{ fontSize:104, fontWeight:300, color:'#1A1A1A', lineHeight:1.18, letterSpacing:-3, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    // 큰 한글 제목 line 2 (굵은)
+    { type:'text', content:'title-line-2',
+      position:{ top:68, left:6, width:90 },
+      style:{ fontSize:104, fontWeight:900, color:'#1A1A1A', lineHeight:1.18, letterSpacing:-3, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    // 하단 가로 라인
+    { type:'bottom-line',
+      position:{ bottom:5, left:6, right:6, height:'1px' },
+      style:{ background:'#1A1A1A' },
+      zIndex:4 },
+  ],
+};
+
+TEMPLATE_SCHEMAS['clean:hook'] = {
+  background: '#FFFFFF',
+  layout: 'clean-hook',
+  elements: [
+    // 좌상단 검정 배지 [Focus]
+    { type:'badge', content:'Focus',
+      position:{ top:5, left:6 },
+      style:{ fontSize:26, fontWeight:800, color:'#FFFFFF', background:'#1A1A1A', padding:'8px 22px', borderRadius:4, letterSpacing:1, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    // 큰 한글 제목 line 1 (얇은)
+    { type:'text', content:'title-line-1',
+      position:{ top:13, left:6, width:88 },
+      style:{ fontSize:64, fontWeight:300, color:'#1A1A1A', lineHeight:1.2, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    // 한글 제목 line 2 (굵은)
+    { type:'text', content:'title-line-2',
+      position:{ top:23, left:6, width:88 },
+      style:{ fontSize:64, fontWeight:900, color:'#1A1A1A', lineHeight:1.2, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    // 큰 사진 하단
+    { type:'image',
+      position:{ top:42, left:6, width:88, height:54 },
+      style:{ borderRadius:2 } },
+  ],
+};
+
+TEMPLATE_SCHEMAS['clean:body'] = {
+  background: '#FFFFFF',
+  layout: 'clean-body',
+  elements: [
+    // 검정 배지 STEP{idx}
+    { type:'badge', content:'step-num',
+      position:{ top:5, left:6 },
+      style:{ fontSize:26, fontWeight:800, color:'#FFFFFF', background:'#1A1A1A', padding:'8px 22px', borderRadius:4, letterSpacing:1, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    // 한글 제목
+    { type:'text', content:'body-title', fallback:'아침 일과 전, 10분의 명상',
+      position:{ top:13, left:6, width:88 },
+      style:{ fontSize:72, fontWeight:900, color:'#1A1A1A', lineHeight:1.18, letterSpacing:-1.4, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    // 본문 텍스트
+    { type:'text', content:'body',
+      position:{ top:28, left:6, width:88 },
+      style:{ fontSize:36, fontWeight:500, color:'#1A1A1A', lineHeight:1.5, letterSpacing:-0.4, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line' },
+      zIndex:5, lockColor:true },
+    // 큰 사진 (하단)
+    { type:'image',
+      position:{ top:55, left:6, width:88, height:38 },
+      style:{ borderRadius:2 } },
+    // 하단 가로 라인
+    { type:'bottom-line',
+      position:{ bottom:3, left:6, right:6, height:'1px' },
+      style:{ background:'#1A1A1A' },
+      zIndex:4 },
+  ],
+};
+
+TEMPLATE_SCHEMAS['clean:cta'] = {
+  background: '#FFFFFF',
+  layout: 'clean-cta',
+  elements: [
+    // 큰 한글 제목 line 1 (얇은)
+    { type:'text', content:'title-line-1', fallback:'내 운명을 바꾸는 시간',
+      position:{ top:10, left:6, width:88 },
+      style:{ fontSize:62, fontWeight:300, color:'#1A1A1A', lineHeight:1.2, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    // 한글 제목 line 2 (굵은)
+    { type:'text', content:'title-line-2', fallback:'하루 10분.',
+      position:{ top:18, left:6, width:88 },
+      style:{ fontSize:62, fontWeight:900, color:'#1A1A1A', lineHeight:1.2, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    // 본문
+    { type:'text', content:'body', fallback:'팔로우하고\n매일 받아가세요.',
+      position:{ top:33, left:6, width:88 },
+      style:{ fontSize:58, fontWeight:300, color:'#1A1A1A', lineHeight:1.25, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line' },
+      zIndex:5, lockColor:true },
+    // 가운데 logo
+    { type:'logo',
+      position:{ bottom:8, left:50, transform:'translateX(-50%)' },
+      style:{ fontSize:30, fontWeight:400, color:'#1A1A1A', fontFamily:"'Times New Roman','Pretendard',serif", fontStyle:'italic' },
+      zIndex:5 },
+    // 하단 가로 라인
+    { type:'bottom-line',
+      position:{ bottom:4, left:6, right:6, height:'1px' },
+      style:{ background:'#1A1A1A' },
+      zIndex:4 },
+  ],
+};
+
+// ─── noir(emotional) — 풀이미지 + 흰 텍스트 + 하단 logo + 화살표 ───
+TEMPLATE_SCHEMAS['noir:cover'] = {
+  background: '#1A1A1A',
+  layout: 'noir-cover',
+  elements: [
+    // 풀이미지 배경
+    { type:'image',
+      position:{ top:0, left:0, width:100, height:100 },
+      style:{ borderRadius:0 } },
+    // 다크 그라디언트 오버레이 (텍스트 가독성)
+    { type:'image-overlay',
+      gradient:'linear-gradient(180deg,rgba(0,0,0,.2) 0%,rgba(0,0,0,.55) 50%,rgba(0,0,0,.85) 100%)',
+      zIndex:2 },
+    // 큰 한글 제목 line 1
+    { type:'text', content:'title-line-1', fallback:'마음이 유난히',
+      position:{ top:48, left:6, width:88 },
+      style:{ fontSize:74, fontWeight:900, color:'#FFFFFF', lineHeight:1.2, letterSpacing:-1.6, fontFamily:'Pretendard,sans-serif', textShadow:'0 4px 20px rgba(0,0,0,.85)' },
+      zIndex:5, lockColor:true },
+    // line 2
+    { type:'text', content:'title-line-2', fallback:'소란스러운 밤',
+      position:{ top:55, left:6, width:88 },
+      style:{ fontSize:74, fontWeight:900, color:'#FFFFFF', lineHeight:1.2, letterSpacing:-1.6, fontFamily:'Pretendard,sans-serif', textShadow:'0 3px 16px rgba(0,0,0,.7)' },
+      zIndex:5, lockColor:true },
+    // 부제
+    { type:'text', content:'subtitle', fallback:'그 밤을 지날 당신에게 건네는 문장들',
+      position:{ top:73, left:6, width:88 },
+      style:{ fontSize:30, fontWeight:500, color:'#FFFFFF', lineHeight:1.45, letterSpacing:-0.5, fontFamily:'Pretendard,sans-serif', opacity:0.92, textShadow:'0 2px 10px rgba(0,0,0,.6)' },
+      zIndex:5, lockColor:true },
+    // 가운데 하단 logo
+    { type:'logo',
+      position:{ bottom:5, left:50, transform:'translateX(-50%)' },
+      style:{ fontSize:30, fontWeight:600, color:'#FFFFFF', fontFamily:'Pretendard,sans-serif' },
+      zIndex:6 },
+    // 우하단 → 화살표
+    { type:'arrow-right',
+      position:{ bottom:6, right:7, width:14, height:32 },
+      style:{ color:'#FFFFFF' },
+      zIndex:6 },
+  ],
+};
+
+TEMPLATE_SCHEMAS['noir:hook'] = {
+  background: '#5C5D7A',
+  layout: 'noir-hook',
+  elements: [
+    // 풀이미지 (그라디 sky 류)
+    { type:'image',
+      position:{ top:0, left:0, width:100, height:100 },
+      style:{ borderRadius:0 } },
+    // 다크 그라디 오버레이
+    { type:'image-overlay',
+      gradient:'linear-gradient(180deg,rgba(0,0,0,.45) 0%,rgba(0,0,0,.55) 100%)',
+      zIndex:2 },
+    // 한글 제목 (잘하고 있어 류)
+    { type:'text', content:'title-line-1', fallback:'잘하고 있어,',
+      position:{ top:8, left:6, width:88 },
+      style:{ fontSize:60, fontWeight:900, color:'#FFFFFF', lineHeight:1.2, letterSpacing:-1.4, fontFamily:'Pretendard,sans-serif', textShadow:'0 4px 20px rgba(0,0,0,.85)' },
+      zIndex:5, lockColor:true },
+    // 부제 (얇은)
+    { type:'text', content:'subtitle', fallback:'라는 말보다\n가끔은 \'쉬어도 돼\'라는 말이\n더 필요할 때가 있죠.',
+      position:{ top:16, left:6, width:88 },
+      style:{ fontSize:32, fontWeight:500, color:'#FFFFFF', lineHeight:1.45, letterSpacing:-0.4, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line', opacity:0.95, textShadow:'0 2px 10px rgba(0,0,0,.6)' },
+      zIndex:5, lockColor:true },
+    // 흰 pill 배지 (쉬어도 돼)
+    { type:'badge', content:'literal', text:'쉬어도 돼',
+      position:{ top:38, left:6 },
+      style:{ fontSize:30, fontWeight:800, color:'#1A1A1A', background:'#FFFFFF', padding:'14px 28px', borderRadius:10, letterSpacing:-0.5, fontFamily:'Pretendard,sans-serif', boxShadow:'0 4px 16px rgba(0,0,0,.25)' },
+      zIndex:6, lockColor:true },
+    // 가운데 logo
+    { type:'logo',
+      position:{ bottom:5, left:50, transform:'translateX(-50%)' },
+      style:{ fontSize:30, fontWeight:600, color:'#FFFFFF', fontFamily:'Pretendard,sans-serif' },
+      zIndex:6 },
+    // 우하단 → 화살표
+    { type:'arrow-right',
+      position:{ bottom:6, right:7, width:14, height:32 },
+      style:{ color:'#FFFFFF' },
+      zIndex:6 },
+  ],
+};
+
+TEMPLATE_SCHEMAS['noir:body'] = {
+  background: '#1A1A1A',
+  layout: 'noir-body',
+  elements: [
+    // 풀이미지
+    { type:'image',
+      position:{ top:0, left:0, width:100, height:100 },
+      style:{ borderRadius:0 } },
+    // 다크 오버레이 (하단 더 어둡게)
+    { type:'image-overlay',
+      gradient:'linear-gradient(180deg,rgba(0,0,0,0) 30%,rgba(0,0,0,.9) 100%)',
+      zIndex:2 },
+    // 한글 제목 (하단)
+    { type:'text', content:'body-title', fallback:'남들과 속도를 맞추느라',
+      position:{ top:54, left:6, width:88 },
+      style:{ fontSize:54, fontWeight:900, color:'#FFFFFF', lineHeight:1.25, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif', textShadow:'0 3px 14px rgba(0,0,0,.7)' },
+      zIndex:5, lockColor:true },
+    // 본문 (얇은)
+    { type:'text', content:'body',
+      position:{ top:64, left:6, width:88 },
+      style:{ fontSize:30, fontWeight:500, color:'#FFFFFF', lineHeight:1.5, letterSpacing:-0.5, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line', opacity:0.92, textShadow:'0 2px 10px rgba(0,0,0,.6)' },
+      zIndex:5, lockColor:true },
+    // 가운데 logo
+    { type:'logo',
+      position:{ bottom:5, left:50, transform:'translateX(-50%)' },
+      style:{ fontSize:30, fontWeight:600, color:'#FFFFFF', fontFamily:'Pretendard,sans-serif' },
+      zIndex:6 },
+    // 우하단 → 화살표
+    { type:'arrow-right',
+      position:{ bottom:6, right:7, width:14, height:32 },
+      style:{ color:'#FFFFFF' },
+      zIndex:6 },
+  ],
+};
+
+TEMPLATE_SCHEMAS['noir:cta'] = {
+  background: 'linear-gradient(180deg,#3F2D5C 0%,#6B5B7A 60%,#A48A8C 100%)',
+  layout: 'noir-cta',
+  elements: [
+    // 한글 제목 line 1
+    { type:'text', content:'title-line-1', fallback:'지친 당신을 안아줄',
+      position:{ top:6, left:6, width:88 },
+      style:{ fontSize:56, fontWeight:900, color:'#FFFFFF', lineHeight:1.25, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    // line 2
+    { type:'text', content:'title-line-2', fallback:'더 많은 이야기들\n저장하고 담아보세요.',
+      position:{ top:14, left:6, width:88 },
+      style:{ fontSize:56, fontWeight:900, color:'#FFFFFF', lineHeight:1.25, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line' },
+      zIndex:5, lockColor:true },
+    // 본문
+    { type:'text', content:'body', fallback:'지금 생각나는 사람에게\n들려주고픈 이야기를 댓글로 남겨주세요. :)',
+      position:{ top:36, left:6, width:88 },
+      style:{ fontSize:28, fontWeight:500, color:'#FFFFFF', lineHeight:1.6, letterSpacing:-0.4, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line', opacity:0.92 },
+      zIndex:5, lockColor:true },
+    // 가운데 logo
+    { type:'logo',
+      position:{ bottom:5, left:50, transform:'translateX(-50%)' },
+      style:{ fontSize:30, fontWeight:600, color:'#FFFFFF', fontFamily:'Pretendard,sans-serif' },
+      zIndex:6 },
+    // 우하단 → 화살표
+    { type:'arrow-right',
+      position:{ bottom:6, right:7, width:14, height:32 },
+      style:{ color:'#FFFFFF' },
+      zIndex:6 },
+  ],
+};
+
+// ─── bold(pop) — 풀 컬러 + 거대 타이포 + 색 칩 + pill 버튼 ───
+TEMPLATE_SCHEMAS['bold:cover'] = {
+  background: '#D55A35',
+  layout: 'bold-cover',
+  elements: [
+    // 좌상단 날짜
+    { type:'text', content:'date',
+      position:{ top:6, left:6 },
+      style:{ fontSize:30, fontWeight:500, color:'#1A1A1A', letterSpacing:-0.5, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    // 영문 부제
+    { type:'text', content:'literal', text:'Understanding Typography',
+      position:{ top:42, left:6, width:88 },
+      style:{ fontSize:36, fontWeight:800, color:'#1A1A1A', letterSpacing:-0.6, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    // 거대 한글 제목 (살짝 잘릴 정도로 큰)
+    { type:'text', content:'title',
+      position:{ top:48, left:6, width:120 },
+      style:{ fontSize:130, fontWeight:900, color:'#1A1A1A', lineHeight:0.95, letterSpacing:-4, fontFamily:"'Black Han Sans',Pretendard,sans-serif", whiteSpace:'pre-line' },
+      zIndex:5, lockColor:true },
+    // 이탤릭 영문 LIST
+    { type:'text', content:'literal', text:'LIST',
+      position:{ top:67, left:6 },
+      style:{ fontSize:108, fontWeight:900, color:'#1A1A1A', fontStyle:'italic', letterSpacing:-3, lineHeight:0.95, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    // 검정 pill 버튼
+    { type:'pill-button', content:'literal', text:'Learn more',
+      position:{ top:78, left:6 },
+      style:{ fontSize:30, fontWeight:700, color:'#FFFFFF', background:'#1A1A1A', padding:'22px 44px', borderRadius:100, fontFamily:'Pretendard,sans-serif' },
+      zIndex:6, lockColor:true },
+    // 좌하단 @logo
+    { type:'logo', text:'@logo',
+      position:{ bottom:5, left:6 },
+      style:{ fontSize:26, fontWeight:500, color:'#1A1A1A', fontFamily:'Pretendard,sans-serif' },
+      zIndex:5 },
+  ],
+};
+
+TEMPLATE_SCHEMAS['bold:hook'] = {
+  background: '#0E1B2C',
+  layout: 'bold-hook',
+  elements: [
+    // 가운데 한글 부제
+    { type:'text', content:'subtitle', fallback:'줄 서서 들어가는 그곳,\n단순한 쇼핑 그 이상이 경험을 제안합니다.',
+      position:{ top:40, left:6, width:88 },
+      style:{ fontSize:42, fontWeight:800, color:'#FFFFFF', lineHeight:1.4, letterSpacing:-0.8, fontFamily:'Pretendard,sans-serif', textAlign:'center', whiteSpace:'pre-line' },
+      zIndex:5, lockColor:true },
+    // 색 칩 4개
+    { type:'color-chips',
+      position:{ top:54, left:50, transform:'translateX(-50%)', width:90 },
+      items:[
+        { text:'01 인사이트', bg:'#D55A35', color:'#1A1A1A' },
+        { text:'02 트렌드',   bg:'#FFD23F', color:'#1A1A1A' },
+        { text:'03 시그널',   bg:'#C4B5FD', color:'#1A1A1A' },
+        { text:'04 디테일',   bg:'#A7F3D0', color:'#1A1A1A' },
+      ],
+      zIndex:6 },
+  ],
+};
+
+TEMPLATE_SCHEMAS['bold:body'] = {
+  background: '#0E1B2C',
+  layout: 'bold-body',
+  elements: [
+    // 큰 오렌지 번호 (좌상단)
+    { type:'big-number', content:'page-number-only',
+      position:{ top:4, left:6 },
+      style:{ fontSize:120, fontWeight:900, color:'#D55A35', letterSpacing:-4, lineHeight:1, fontFamily:'Pretendard,sans-serif' },
+      zIndex:5 },
+    // 영문 + 굵은 제목 (오렌지 italic)
+    { type:'text', content:'body-title', fallback:'HAUS BY.',
+      position:{ top:17, left:6, width:88 },
+      style:{ fontSize:62, fontWeight:900, color:'#D55A35', lineHeight:1, letterSpacing:-1.5, fontStyle:'italic', fontFamily:'Pretendard,sans-serif' },
+      zIndex:5, lockColor:true },
+    // 한글 본문
+    { type:'text', content:'body',
+      position:{ top:24, left:6, width:88 },
+      style:{ fontSize:32, fontWeight:500, color:'#FFFFFF', lineHeight:1.5, letterSpacing:-0.5, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line', opacity:0.95 },
+      zIndex:5, lockColor:true },
+    // 사진 (하단 큰 영역)
+    { type:'image',
+      position:{ top:42, left:0, width:100, height:58 },
+      style:{ borderRadius:0 } },
+  ],
+};
+
+TEMPLATE_SCHEMAS['bold:cta'] = {
+  background: '#D55A35',
+  layout: 'bold-cta',
+  elements: [
+    // 가운데 파란 원 (큰)
+    { type:'circle',
+      position:{ top:38, left:50, transform:'translateX(-50%)', width:30, height:24 },
+      style:{ background:'#2E1AE3', borderRadius:'50%' },
+      zIndex:5 },
+    // 작은 logo 텍스트 아래
+    { type:'logo', text:'aenz',
+      position:{ top:64, left:50, transform:'translateX(-50%)' },
+      style:{ fontSize:36, fontWeight:800, color:'#1A1A1A', fontFamily:'Pretendard,sans-serif' },
+      zIndex:6 },
+  ],
+};
+
+
 function initEditor(){
   var canvas = document.getElementById('edt-canvas'); if(!canvas) return;
   // 사이즈 클래스 갱신
@@ -9518,14 +10638,45 @@ function initEditor(){
     var sl = document.createElement('div');
     sl.className = 'edt-slide'+(i===0?' on':'');
     sl.style.background = tplBg(tpl);
+    // Phase A.5 — bold(팝) 슬라이드별 다른 배경색
+    var _isCoverEarly = i===0;
+    var _isEndingEarly = i===N-1;
+    var _isHookEarly = (i === 1 && N >= 5 && !_isEndingEarly);
+    if(tpl === 'bold'){
+      if(_isHookEarly) sl.style.background = '#0E1B2C';     // 다크 네이비 hook
+      else if(!_isCoverEarly && !_isEndingEarly) sl.style.background = '#0E1B2C';  // body 도 다크 네이비 (사진+텍스트 패널)
+      // cover, cta 는 오렌지 (tplBg 기본값)
+    }
     var isCover = i===0;
     var isEnding = i===N-1;
-    // 2.3: hook2/intro/summary 자동 변형 모드 제거 — 모든 본문은 일반 body 로 통일
-    var isIntro = false;
+    // Phase A — 슬라이드 1 (커버 다음) = hook 슬라이드 (텍스트 중심 예고/리스트)
+    //   N>=5 일 때만 (3장 이하면 hook 따로 안 둠)
+    var isHook = (i === 1 && N >= 5 && !isEnding);
+    var isIntro = isHook;  // legacy 분기 호환
     var isSummary = false;
-    var kind = isCover ? 'cover' : isEnding ? 'cta' : 'body';
+    var kind = isCover ? 'cover' : isEnding ? 'cta' : isHook ? 'hook' : 'body';
+    // ═══ Phase A.5+ — 템플릿별 전용 렌더 (seed 디자인 100% 충실 재현) ═══
+    //   각 (tpl, kind) 조합에 대해 전용 함수가 슬라이드 통째로 만듦
+    //   handled === true 면 generic 파이프라인 건너뛰고 다음 슬라이드로
+    if(typeof renderPerTemplate === 'function'){
+      var handled = renderPerTemplate(sl, tpl, kind, i, N, p, kws, titleTxt, createData);
+      if(handled){
+        canvas.appendChild(sl);
+        edtSlides.push(sl);
+        return;  // generic 파이프라인 스킵
+      }
+    }
+    // Phase A.5 — 신규 4 템플릿은 슬라이드 역할별 고정 layout (seed 디자인 충실 재현)
+    //   기존 mono/pastel(legacy) 만 body 순환
     var layout = tplImageLayout(tpl, kind);
-    sl.dataset.layout = layout;  // applyPerTextColor 가 풀이미지 여부 판별
+    var newTpls = { clean:1, bold:1, mag:1, noir:1 };
+    if(kind === 'body' && !newTpls[tpl] && tpl !== 'mag'){
+      // legacy 템플릿만 body cycling
+      var bodyIdx = (N >= 5 ? i - 2 : i - 1);
+      var cycle = ['half-top', 'half-left', 'small-top'];
+      layout = cycle[Math.max(0, bodyIdx) % cycle.length];
+    }
+    sl.dataset.layout = layout;
     var kw = kws[i] || p.title || titleTxt;
 
     // 이미지 슬롯 배치 (layout 에 따라 위치/크기 다름)
@@ -9535,8 +10686,14 @@ function initEditor(){
       sl.appendChild(makeOverlayEl('dark'));
     } else if(layout === 'half-top'){
       sl.appendChild(makeImageSlotEl(kw, {x:6, y:5, w:88, h:46, slideIdx:i, radius:8}));
+    } else if(layout === 'half-bottom'){
+      // 신규 — 텍스트 상단 / 이미지 하단 (clean·pop body 용)
+      sl.appendChild(makeImageSlotEl(kw, {x:6, y:50, w:88, h:46, slideIdx:i, radius:8}));
     } else if(layout === 'half-left'){
       sl.appendChild(makeImageSlotEl(kw, {x:5, y:5, w:42, h:90, slideIdx:i, radius:8}));
+    } else if(layout === 'half-right'){
+      // 신규 — 텍스트 좌 / 이미지 우 (mag body 용)
+      sl.appendChild(makeImageSlotEl(kw, {x:53, y:5, w:42, h:90, slideIdx:i, radius:8}));
     } else if(layout === 'small-top'){
       sl.appendChild(makeImageSlotEl(kw, {x:18, y:6, w:64, h:32, slideIdx:i, radius:8}));
     }
@@ -9560,24 +10717,51 @@ function initEditor(){
       if(layout === 'full'){
         t = { hookY:50, subY:78, pageY:92, hookSize:36, hookWeight:900 };
       } else if(layout === 'half-top'){
+        // mag cover — 사진 상단 / 텍스트 하단
         t = { hookY:56, subY:82, pageY:93, hookSize:32, hookWeight:900 };
+      } else if(layout === 'half-bottom'){
+        // 신규 — 사진 하단 / 텍스트 상단 (clean cover 등)
+        t = { hookY:6, subY:36, pageY:93, hookSize:30, hookWeight:900 };
       } else if(layout === 'half-left'){
         t = { hookY:18, subY:54, pageY:93, hookSize:26, hookWeight:900 };
+      } else if(layout === 'half-right'){
+        // 신규 — 텍스트 좌 / 사진 우
+        t = { hookY:18, subY:54, pageY:93, hookSize:26, hookWeight:900 };
+        coverX = 6; coverW = 44;
+      } else if(layout === 'none'){
+        // pop cover — 풀 컬러, 거대 타이포 (이미지 X)
+        t = { hookY:38, subY:80, pageY:93, hookSize:46, hookWeight:900 };
       } else { // small-top
         t = { hookY:42, subY:70, pageY:93, hookSize:28, hookWeight:900 };
       }
-      var hookEl = makeTextEl(titleTxt, {x:coverX,y:t.hookY,w:coverW,size:t.hookSize,color:c,weight:t.hookWeight,isTitle:true});
+      // full 레이아웃 = 풀이미지 + 다크 오버레이 → 텍스트 항상 흰색 + 강한 그림자 강제
+      //   (applyPerTextColor 가 이미지 brightness 만 보고 overlay 무시해서 가독성 깨지는 거 방지)
+      var coverTextColor = (layout === 'full') ? '#FFFFFF' : c;
+      var coverHasOverlay = (layout === 'full');
+      var hookEl = makeTextEl(titleTxt, {x:coverX,y:t.hookY,w:coverW,size:t.hookSize,color:coverTextColor,weight:t.hookWeight,isTitle:true});
       hookEl.style.zIndex = '5';
+      if(coverHasOverlay){
+        hookEl.style.textShadow = '0 2px 12px rgba(0,0,0,.65)';
+        hookEl.dataset.userColor = '1';  // applyPerTextColor 가 덮어쓰지 않게 잠금
+      }
       sl.appendChild(hookEl);
       // 부제목: Claude 응답의 cover_subtitle 우선, 없으면 첫 본문 첫 줄 fallback
       var sub = (createData.coverSubtitle || (p.text || '').split('\n')[0] || '').slice(0, 32);
       if(sub){
-        var subEl = makeTextEl(sub, {x:coverX,y:t.subY,w:coverW,size:15,color:c,weight:600});
+        var subEl = makeTextEl(sub, {x:coverX,y:t.subY,w:coverW,size:15,color:coverTextColor,weight:600});
         subEl.style.zIndex = '5';
+        if(coverHasOverlay){
+          subEl.style.textShadow = '0 1px 8px rgba(0,0,0,.55)';
+          subEl.dataset.userColor = '1';
+        }
         sl.appendChild(subEl);
       }
-      var pgEl = makeTextEl(String(1).padStart(2,'0')+' / '+String(N).padStart(2,'0'), {x:coverX,y:t.pageY,w:20,size:10,color:c,weight:700});
+      var pgEl = makeTextEl(String(1).padStart(2,'0')+' / '+String(N).padStart(2,'0'), {x:coverX,y:t.pageY,w:20,size:10,color:coverTextColor,weight:700});
       pgEl.style.zIndex = '5';
+      if(coverHasOverlay){
+        pgEl.style.textShadow = '0 1px 6px rgba(0,0,0,.5)';
+        pgEl.dataset.userColor = '1';
+      }
       sl.appendChild(pgEl);
     } else if(isIntro){
       // 2번 슬라이드 (hook2) — 이중 후킹 전용 eyebrow 라벨 + 더 큰 제목
@@ -9601,14 +10785,24 @@ function initEditor(){
       pEl.style.zIndex = '5';
       sl.appendChild(pEl);
     } else if(isEnding){
-      // 마지막 CTA — 큰 제목 + 문구 + 액션 pill 3개
+      // 마지막 CTA — 큰 제목 + 문구 + 액션 pill 3개 + 캡션 안내
       var ctaAccent = tplAccent(tpl);
+      // 본문에 "캡션에서" 류 문구 박혀있으면 중복 제거 (클라이언트가 별도 라인으로 표시함)
+      var ctaText = (p.text || '팔로우하면 볼 수 있음\n광고 아님, 내 경험담')
+        .replace(/[\s\n]*[👇⬇️↓📌]\s*(자세한\s*(내용|정보)|더\s*자세한)\s*(은|는)?\s*캡션(에서|에서\s*확인|\s*확인)?[^\n]*/g, '')
+        .replace(/[\s\n]*캡션(에서|을)\s*(확인|봐|체크|참고)[^\n]*/g, '')
+        .trim();
       sl.appendChild(makeTextEl(p.title || '다음편도 올라옴', {x:6,y:22,w:88,size:30,color:c,weight:900,isTitle:true}));
-      sl.appendChild(makeTextEl(p.text || '팔로우하면 볼 수 있음\n광고 아님, 내 경험담', {
+      sl.appendChild(makeTextEl(ctaText, {
         x:6, y:48, w:88, size:18, color:c, weight:600,
         fontFamily: "'Pretendard','Noto Sans KR',sans-serif"
       }));
-      sl.appendChild(makeCtaPillsEl({x:10,y:78,w:80,accent:ctaAccent,textColor:c}));
+      // 캡션 안내 — mirr 스타일 (본문 못 담은 디테일 캡션에)
+      sl.appendChild(makeTextEl('👇 자세한 내용은 캡션에서', {
+        x:6, y:72, w:88, size:13, color:c, weight:700,
+        fontFamily: "'Pretendard','Noto Sans KR',sans-serif"
+      }));
+      sl.appendChild(makeCtaPillsEl({x:10,y:82,w:80,accent:ctaAccent,textColor:c}));
     } else {
       // 본론 — role 에 따라 레이아웃 분기
       var bodyAccent = tplAccent(tpl);
@@ -9645,8 +10839,14 @@ function initEditor(){
         nY = 46; titleY2 = 52; textY2 = 74; textX2 = 6; textW2 = 88;
       } else if(layout === 'half-top'){
         nY = 54; titleY2 = 58; textY2 = 74; textX2 = 6; textW2 = 88;
+      } else if(layout === 'half-bottom'){
+        // 신규 — 텍스트 상단 / 이미지 하단
+        nY = 6; titleY2 = 11; textY2 = 28; textX2 = 6; textW2 = 88;
       } else if(layout === 'half-left'){
         nY = 10; titleY2 = 14; textY2 = 40; textX2 = 52; textW2 = 44;
+      } else if(layout === 'half-right'){
+        // 신규 — 텍스트 좌 / 이미지 우
+        nY = 10; titleY2 = 14; textY2 = 40; textX2 = 6; textW2 = 44;
       } else if(layout === 'small-top'){
         nY = 42; titleY2 = 46; textY2 = 66; textX2 = 6; textW2 = 88;
       } else {
@@ -10682,39 +11882,51 @@ var __genSteps = [];
 // 카테고리 칩도 노출하지 않음. 8개 템플릿 각자 고유 분위기.
 function renderTplThumbs(){
   function html(tpl){
-    if(tpl === 'clean'){ // CLEAN — 화이트 미니멀, mint 포인트
+    if(tpl === 'clean'){ // 클린 — 화이트 + 검정 배지 + 굵은/얇은 한글 mix + 하단 라인 (정보/팁)
       return ''
-        + '<div style="position:absolute;inset:0;background:radial-gradient(120% 80% at 100% 0%,#F0FAF6 0%,#FFFFFF 55%)"></div>'
-        + '<div style="position:absolute;left:8%;top:8%;width:32%;height:34%;background:linear-gradient(135deg,#E8F1EC,#F5F5F2)"></div>'
-        + '<div style="position:absolute;left:46%;top:10%;width:22%;height:2px;background:#00C9A7;opacity:.7"></div>'
-        + '<div style="position:absolute;left:8%;bottom:30%;display:flex;align-items:flex-end;gap:7px"><div style="width:3px;height:38px;background:#00C9A7;flex-shrink:0"></div><div style="font-size:18px;font-weight:800;color:#111;line-height:1.05;letter-spacing:-.4px;font-family:Pretendard,sans-serif">조용히,<br>천천히.</div></div>'
-        + '<div style="position:absolute;left:14%;bottom:18%;font-size:11px;color:#888;line-height:1.3;letter-spacing:.04em">매일의 작은 기록</div>'
-        + '<div style="position:absolute;left:8%;bottom:7%;font-size:9px;color:#00C9A7;font-weight:800;letter-spacing:.25em">— CLEAN</div>';
+        + '<div style="position:absolute;inset:0;background:#FFFFFF"></div>'
+        // 좌상단 logo
+        + '<div style="position:absolute;left:6%;top:5%;font-family:\'Times New Roman\',serif;font-size:11px;color:#1A1A1A;font-weight:500">logo</div>'
+        // 우측 사진 (작은 사각)
+        + '<div style="position:absolute;right:6%;top:8%;width:48%;height:36%;background:linear-gradient(135deg,#FF8C42 0%,#3A2E1F 100%);border-radius:2px"></div>'
+        // 큰 한글 제목 (얇은 + 굵은 mix)
+        + '<div style="position:absolute;left:6%;bottom:18%;font-size:18px;font-weight:300;color:#1A1A1A;line-height:1.15;letter-spacing:-.3px;font-family:Pretendard,sans-serif">생산성 2배 높이는</div>'
+        + '<div style="position:absolute;left:6%;bottom:9%;font-size:18px;font-weight:900;color:#1A1A1A;line-height:1.15;letter-spacing:-.3px;font-family:Pretendard,sans-serif">아침 루틴 3가지</div>'
+        // 하단 가로 라인
+        + '<div style="position:absolute;left:6%;right:6%;bottom:5%;height:1px;background:#1A1A1A"></div>';
     }
-    if(tpl === 'bold'){ // 트렌디 — 형광 포인트, 임팩트 (HOT 칩과 제목이 겹치지 않게 분리)
+    if(tpl === 'bold'){ // 팝 — 풀 컬러 + 거대 타이포 + 검정 pill 버튼 (트렌디/핫플)
       return ''
-        + '<div style="position:absolute;inset:0;background:linear-gradient(160deg,#0A0A0A 0%,#1A1A1A 55%,#2E2E2E 100%)"></div>'
-        + '<div style="position:absolute;right:-8%;top:-8%;width:60%;height:60%;background:radial-gradient(circle,rgba(204,255,0,.18) 0%,transparent 60%);pointer-events:none"></div>'
-        + '<div style="position:absolute;left:8%;top:9%;font-size:9px;color:#CCFF00;font-weight:900;letter-spacing:.3em">TRENDING NOW</div>'
-        + '<div style="position:absolute;left:8%;top:20%;padding:3px 8px;background:#CCFF00;color:#0A0A0A;font-size:10px;font-weight:900;letter-spacing:.15em">HOT</div>'
-        + '<div style="position:absolute;left:8%;bottom:9%;color:#fff;font-size:22px;font-weight:900;line-height:.95;letter-spacing:-.7px;font-family:Pretendard,sans-serif">지금<br>떠오르는<br><span style="color:#CCFF00">것.</span></div>';
+        + '<div style="position:absolute;inset:0;background:#D55A35"></div>'
+        + '<div style="position:absolute;left:6%;top:8%;font-size:8px;color:#1A1A1A;font-weight:600;font-family:Pretendard,sans-serif">Friday, April, 2026</div>'
+        + '<div style="position:absolute;left:6%;top:38%;font-size:9px;color:#1A1A1A;font-weight:800;font-family:Pretendard,sans-serif">Now Trending</div>'
+        + '<div style="position:absolute;left:6%;top:46%;color:#1A1A1A;font-family:\'Black Han Sans\',Pretendard,sans-serif;font-size:24px;font-weight:900;line-height:.95;letter-spacing:-.7px">지금 가장<br>힙한 핫플<br><i style="font-style:italic">LIST</i></div>'
+        + '<div style="position:absolute;left:6%;bottom:18%;padding:5px 11px;background:#1A1A1A;color:#FFFFFF;font-size:9px;font-weight:700;border-radius:100px;display:inline-flex;align-items:center;gap:4px">Learn more →</div>'
+        + '<div style="position:absolute;left:6%;bottom:5%;font-size:9px;color:#1A1A1A;font-weight:500;font-family:Pretendard,sans-serif">@logo</div>';
     }
     if(tpl === 'noir'){ // STATEMENT — 인용구 중심
       return ''
-        + '<div style="position:absolute;inset:0;background:radial-gradient(120% 100% at 30% 30%,#262220 0%,#1A1A1A 60%,#0E0E0E 100%)"></div>'
-        + '<div style="position:absolute;left:6%;top:-6%;font-family:Gowun Batang,Noto Serif KR,serif;font-size:78px;color:#C9A84C;opacity:.22;line-height:.8">"</div>'
-        + '<div style="position:absolute;right:6%;bottom:14%;font-family:Gowun Batang,Noto Serif KR,serif;font-size:78px;color:#C9A84C;opacity:.22;line-height:.8;transform:rotate(180deg)">"</div>'
-        + '<div style="position:absolute;left:10%;top:32%;color:#F5EFE6;font-family:Gowun Batang,Noto Serif KR,serif;font-size:17px;line-height:1.4;letter-spacing:-.2px">덜어낼수록<br>더 선명해진다.</div>'
-        + '<div style="position:absolute;left:10%;bottom:8%;font-size:9px;color:#C9A84C;letter-spacing:.3em;font-weight:800">— STATEMENT</div>';
+        // 풀이미지 시뮬레이션 (보라/네이비 톤 — 새벽 무드)
+        + '<div style="position:absolute;inset:0;background:linear-gradient(180deg,#2A2D4A 0%,#3A3B58 40%,#5C5D7A 100%)"></div>'
+        + '<div style="position:absolute;inset:0;background:radial-gradient(80% 60% at 50% 30%,rgba(255,200,150,.12) 0%,transparent 60%)"></div>'
+        + '<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.0) 30%,rgba(0,0,0,.55) 100%);pointer-events:none"></div>'
+        + '<div style="position:absolute;left:6%;top:32%;color:#FFFFFF;font-family:Pretendard,sans-serif;font-size:18px;font-weight:900;line-height:1.15;letter-spacing:-.4px">마음이 유난히<br>소란스러운 밤</div>'
+        + '<div style="position:absolute;left:6%;top:54%;color:#FFFFFF;font-family:Pretendard,sans-serif;font-size:9px;font-weight:500;line-height:1.4;opacity:.9">그 밤을 지날<br>당신에게 건네는 문장들</div>'
+        + '<div style="position:absolute;left:50%;bottom:5%;transform:translateX(-50%);color:#FFFFFF;font-size:11px;font-weight:600;font-family:Pretendard,sans-serif">logo</div>'
+        + '<svg viewBox="0 0 42 14" style="position:absolute;right:8%;bottom:6%;width:14%;height:14px;pointer-events:none"><path d="M0 7H40M40 7L33 1M40 7L33 13" stroke="#FFFFFF" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>';
     }
-    if(tpl === 'mag'){ // SPLIT — 좌 이미지 / 우 다크 매거진
+    if(tpl === 'mag'){ // 매거진 — 베이지 + 형광펜 + 손그림 (패션/세일/공구)
       return ''
-        + '<div style="position:absolute;left:0;top:0;width:48%;height:100%;background:linear-gradient(135deg,#9A938A 0%,#C4BBAE 45%,#DDD2C0 100%)"></div>'
-        + '<div style="position:absolute;left:0;top:0;width:48%;height:100%;background:radial-gradient(60% 40% at 50% 50%,rgba(255,255,255,.18) 0%,transparent 70%)"></div>'
-        + '<div style="position:absolute;right:0;top:0;width:52%;height:100%;background:linear-gradient(180deg,#0F0F0F 0%,#1A1A1A 100%)"></div>'
-        + '<div style="position:absolute;right:8%;top:11%;font-size:9px;color:#00C9A7;font-weight:900;letter-spacing:.3em">EDITORIAL</div>'
-        + '<div style="position:absolute;right:8%;top:23%;width:42%;color:#fff;font-size:18px;font-weight:800;line-height:1.1;letter-spacing:-.4px;font-family:Pretendard,sans-serif">취향이<br>기록되는<br>방식.</div>'
-        + '<div style="position:absolute;right:8%;bottom:8%;width:42%;font-size:10px;color:rgba(255,255,255,.6);letter-spacing:.04em">NO. 04 · WINTER</div>';
+        + '<div style="position:absolute;inset:0;background:#F5EDE0"></div>'
+        // 노란 형광펜 highlight
+        + '<div style="position:absolute;left:8%;top:32%;width:54%;height:11px;background:#E8FF4D;transform:rotate(-1.5deg);border-radius:1px"></div>'
+        + '<div style="position:absolute;left:8%;top:9%;font-size:18px;font-weight:900;color:#1A1A1A;line-height:1.15;letter-spacing:-.5px;font-family:Pretendard,sans-serif">놓치면 손해보는<br>패밀리세일</div>'
+        // 사진 박스 (회색 placeholder — 실제론 사진 들어감)
+        + '<div style="position:absolute;left:24%;top:40%;width:52%;height:42%;background:linear-gradient(135deg,#3a3a3a 0%,#5a5a5a 60%,#7a7a7a 100%);border-radius:2px"></div>'
+        // 손그림 LOVE ART (좌하단)
+        + '<div style="position:absolute;left:9%;top:52%;font-family:Caveat,cursive;font-size:18px;font-weight:700;color:#E8FF4D;line-height:1;transform:rotate(-8deg);letter-spacing:.05em">love<br>ART</div>'
+        // 손그림 화살표 squiggle (우하단)
+        + '<svg viewBox="0 0 100 60" style="position:absolute;right:6%;bottom:14%;width:32%;height:30px;overflow:visible;pointer-events:none"><path d="M5 30 C 20 15, 35 45, 50 25 S 80 35, 90 22" stroke="#E8FF4D" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M85 18 L92 22 L86 28" stroke="#E8FF4D" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>';
     }
     if(tpl === 'mono'){ // MONO — 흑백 강한 대비
       return ''
@@ -10724,14 +11936,19 @@ function renderTplThumbs(){
         + '<div style="position:absolute;left:8%;bottom:24%;color:#0D0D0D;font-size:20px;font-weight:800;line-height:1.05;letter-spacing:-.5px;font-family:Pretendard,sans-serif">군더더기<br>없이.</div>'
         + '<div style="position:absolute;right:8%;bottom:8%;font-size:10px;color:#0D0D0D;letter-spacing:.25em;font-weight:700">— BLACK / WHITE</div>';
     }
-    if(tpl === 'pastel'){ // PASTEL — 따뜻한 크림 + 코랄
+    if(tpl === 'pastel'){ // 다이어리 — 핸드라이팅 + 따뜻한 크림 (책/일상/심리/육아)
       return ''
-        + '<div style="position:absolute;inset:0;background:linear-gradient(160deg,#FFD7C2 0%,#FBE4D2 50%,#FDF6F0 100%)"></div>'
-        + '<div style="position:absolute;right:-15%;top:-15%;width:55%;height:55%;border-radius:50%;background:radial-gradient(circle,rgba(244,165,176,.5) 0%,transparent 65%)"></div>'
-        + '<div style="position:absolute;left:8%;top:9%;font-size:9px;color:#A6645A;font-weight:800;letter-spacing:.3em">DAILY · SOFT</div>'
-        + '<div style="position:absolute;left:8%;bottom:24%;color:#3D2B1F;font-family:Gowun Dodum,Pretendard,sans-serif;font-size:20px;font-weight:700;line-height:1.1;letter-spacing:-.4px">달콤한<br>일상의 결.</div>'
-        + '<div style="position:absolute;left:8%;bottom:10%;font-size:11px;color:rgba(61,43,31,.6);font-family:Gowun Dodum,Pretendard,sans-serif">따뜻하게, 천천히</div>'
-        + '<div style="position:absolute;right:8%;bottom:30%;display:flex;gap:5px"><div style="width:8px;height:8px;border-radius:50%;background:#F4A5B0"></div><div style="width:8px;height:8px;border-radius:50%;background:#C4B5FD"></div><div style="width:8px;height:8px;border-radius:50%;background:#A7F3D0"></div></div>';
+        + '<div style="position:absolute;inset:0;background:linear-gradient(160deg,#FFF8EC 0%,#FCEFE0 60%,#F8E5D0 100%)"></div>'
+        // 노트 가로 라인 (다이어리 페이지 느낌)
+        + '<div style="position:absolute;left:10%;right:10%;top:36%;height:1px;background:#D9A37E;opacity:.25"></div>'
+        + '<div style="position:absolute;left:10%;right:10%;top:46%;height:1px;background:#D9A37E;opacity:.2"></div>'
+        + '<div style="position:absolute;left:10%;right:10%;top:56%;height:1px;background:#D9A37E;opacity:.15"></div>'
+        // 손그림 별 모양 액센트
+        + '<div style="position:absolute;right:10%;top:12%;font-size:14px;color:#D97757;opacity:.55;transform:rotate(8deg)">✦</div>'
+        + '<div style="position:absolute;left:8%;top:9%;font-size:9px;color:#D97757;font-family:Gowun Dodum,Pretendard,sans-serif;font-weight:700;letter-spacing:.18em">DIARY · NOTE</div>'
+        + '<div style="position:absolute;left:8%;top:16%;font-size:10px;color:#8C6B52;font-family:Gowun Dodum,Pretendard,sans-serif">2026.04.27 토요일 ☁️</div>'
+        + '<div style="position:absolute;left:8%;bottom:30%;color:#3D2B1F;font-family:Gowun Dodum,Pretendard,sans-serif;font-size:21px;font-weight:700;line-height:1.2;letter-spacing:-.3px">오늘의 기록 ·<br>하루 한 줄 일기</div>'
+        + '<div style="position:absolute;left:8%;bottom:10%;font-size:11px;color:rgba(61,43,31,.55);font-family:Gowun Dodum,Pretendard,sans-serif;line-height:1.5">따뜻하게 적어둔 마음들</div>';
     }
     return '';
   }
@@ -12806,6 +14023,157 @@ function devResetState(){
   } catch(e){}
   if(window.sb && window.sb.auth) window.sb.auth.signOut().finally(function(){ window.location.href='/'; });
   else window.location.href='/';
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Phase A.5+ — 템플릿 스키마 테스트 모드 (?test=schemas)
+//   16개 슬라이드 (4 템플릿 × 4 슬라이드) 격자로 렌더 → 시드와 비교용
+//   Playwright 자동 검증·수정 사이클 빠르게
+// ═══════════════════════════════════════════════════════════════════════════
+function mockCtxForSlide(tpl, kind, idx, N){
+  var mocks = {
+    'mag:cover':   { title:'놓치면 손해보는\n패밀리세일', subtitle:'80% 비밀코드 모았어', keyword:'fashion editorial closet' },
+    'mag:hook':    { title:'1년 중 단 한번\n직원 아니어도 돼.', subtitle:'💥 80% 노려.', keyword:'fashion sale notebook' },
+    'mag:body':    { bodyTitle:'QUEENING\n퀴닝 2026\nSEASON OFF', body:'컨템포러리 무드 여성복\n브랜드 퀴닝의\n2026 SS 시즌 오프.\n\n시그니처 셔츠\n80%면 말 다했지?', keyword:'fashion model gray' },
+    'mag:cta':     { subtitle:'재고 다 털리기 전에\n팔로우하고 팁 얻어가👉' },
+    'clean:cover': { title:'생산성 2배 높이는\n아침 루틴 3가지', keyword:'morning sunrise window laptop' },
+    'clean:hook':  { title:'성공한 CEO들이 공통적으로 지키는\n기적의 10분을 아시나요?', keyword:'businessman suit close up' },
+    'clean:body':  { bodyTitle:'아침 일과 전, 10분의 명상', body:'매일 우리는 수많은 선택을 합니다.\n선택의 기준은 \'우선순위\'.\n\n매일 일과 전 단 10분의 명상은\n우선순위를 정리하게 하고\n더 바른 선택을 하도록 돕습니다.', keyword:'meditation beach yoga' },
+    'clean:cta':   { title:'내 운명을 바꾸는 시간\n하루 10분.', body:'팔로우하고\n매일 받아가세요.' },
+    'noir:cover':  { title:'마음이 유난히\n소란스러운 밤', subtitle:'그 밤을 지날 당신에게 건네는 문장들', keyword:'cozy bed dark mood night' },
+    'noir:hook':   { title:'잘하고 있어,', subtitle:'라는 말보다\n가끔은 \'쉬어도 돼\'라는 말이\n더 필요할 때가 있죠.', keyword:'sky sunset gradient mountains' },
+    'noir:body':   { bodyTitle:'남들과 속도를 맞추느라', body:'정작 내 마음이 숨차는 줄도 몰랐던 시간들.\n오늘은 조금 느려도 괜찮아요.\n\n당신의 계절은\n당신만의 속도로 오고 있으니까요.', keyword:'sunset highway dawn city' },
+    'noir:cta':    { title:'지친 당신을 안아줄\n더 많은 이야기들\n저장하고 담아보세요.', body:'지금 생각나는 사람에게\n들려주고픈 이야기를 댓글로 남겨주세요. :)' },
+    'bold:cover':  { title:'지금 가장 힙한\n성수동 편집숍', keyword:'trendy boutique seoul interior' },
+    'bold:hook':   { subtitle:'줄 서서 들어가는 그곳,\n단순한 쇼핑 그 이상이 경험을 제안합니다.' },
+    'bold:body':   { bodyTitle:'HAUS BY.', body:'실험적인 공간 구성과\n감각적인 큐레이션의 정수', keyword:'yoga woman athletic wood floor' },
+    'bold:cta':    {},
+  };
+  var m = mocks[tpl + ':' + kind] || {};
+  return {
+    title: m.title || '제목 첫째 줄\n제목 둘째 줄',
+    subtitle: m.subtitle || '',
+    body: m.body || '본문 내용 첫째 줄\n둘째 줄에 추가 정보\n\n새 단락의 본문',
+    bodyTitle: m.bodyTitle || '본문 제목',
+    idx: idx,
+    N: N,
+    keyword: m.keyword || 'minimal lifestyle',
+    slideIdx: idx,
+    p: { title: m.bodyTitle || '', text: m.body || '' },
+    createData: { coverSubtitle: m.subtitle || '' },
+    logoText: 'logo',
+  };
+}
+
+function showSchemaTest(){
+  // 기존 UI 제거
+  document.body.innerHTML = '';
+  // body max-width:430px (모바일 앱) 풀기 + 테스트 페이지 스타일
+  document.body.style.cssText = 'background:#1F1F23;color:#fff;font-family:Pretendard,sans-serif;padding:0;margin:0;min-height:100vh;max-width:none !important;width:100%';
+  document.documentElement.style.maxWidth = 'none';
+
+  // 테스트 모드 — 이미지 fetch 우회 (Unsplash rate limit 회피, 시드 PNG 톤 매칭 placeholder)
+  //   템플릿별 시드 사진 톤을 그라디언트로 흉내 (mag = 어두운 옷가게 / clean = 일출 / noir = 어두운 무드 / bold = 요가)
+  var TEST_IMG_TONES = {
+    mag:   'linear-gradient(135deg,#3a3a3a 0%,#5a5a5a 50%,#7a7a7a 100%)',           // 어두운 옷가게/패션
+    clean: 'linear-gradient(135deg,#FF8C42 0%,#3A2E1F 100%)',                        // 일출 창문
+    noir:  'linear-gradient(180deg,#1A1F2E 0%,#3A3D4F 50%,#6B5B7A 100%)',           // 새벽 무드 (어둡게)
+    bold:  'linear-gradient(135deg,#3a3a3a 0%,#5a5a5a 50%,#2a2a2a 100%)',           // 요가/어두운 인테리어
+  };
+  // 원본 makeImageSlotEl 백업 후 테스트용으로 override
+  var originalMakeImageSlotEl = window.makeImageSlotEl;
+  window.makeImageSlotEl = function(keyword, opts){
+    var wrap = document.createElement('div');
+    wrap.className = 'edt-el img';
+    wrap.style.cssText = 'position:absolute;left:' + opts.x + '%;top:' + opts.y + '%;width:' + opts.w + '%;height:' + opts.h + '%;border-radius:' + (opts.radius || 0) + 'px;overflow:hidden;background:' + (window._currentTestTone || TEST_IMG_TONES.mag);
+    wrap.dataset.keyword = keyword || '';
+    wrap.dataset.slideIdx = String(opts.slideIdx || 0);
+    return wrap;
+  };
+  // 렌더 끝나면 복원
+  setTimeout(function(){ window.makeImageSlotEl = originalMakeImageSlotEl; }, 500);
+  // 슬라이드 렌더 시 현재 템플릿 톤 설정
+  window._setTestImgTone = function(tpl){ window._currentTestTone = TEST_IMG_TONES[tpl] || TEST_IMG_TONES.mag; };
+
+  var hdr = document.createElement('div');
+  hdr.style.cssText = 'padding:24px 24px 8px;font-size:14px;font-weight:700;color:#A0A0A0;letter-spacing:.4px';
+  hdr.textContent = '🎨 TEMPLATE SCHEMA TEST  ·  4 TEMPLATES × 4 SLIDES = 16 DESIGNS';
+  document.body.appendChild(hdr);
+
+  // 시드 = 1080×1350 (4:5). 화면에선 축소해서 표시 → 폰트 px 비율 정확
+  var SLIDE_W = 1080, SLIDE_H = 1350;
+  var SCALE = 0.5;
+  var DISP_W = SLIDE_W * SCALE;  // 432
+  var DISP_H = SLIDE_H * SCALE;  // 540
+
+  // 4개 템플릿 × 4개 슬라이드 (행: 템플릿 / 열: 슬라이드 역할)
+  var templates = ['mag', 'clean', 'noir', 'bold'];
+  var kinds = ['cover', 'hook', 'body', 'cta'];
+
+  templates.forEach(function(tpl){
+    // 행 헤더
+    var rowLabel = document.createElement('div');
+    rowLabel.style.cssText = 'padding:18px 24px 6px;font-size:12px;font-weight:800;color:#FFD23F;letter-spacing:.3em;text-transform:uppercase';
+    rowLabel.textContent = tpl + ' template';
+    document.body.appendChild(rowLabel);
+
+    var row = document.createElement('div');
+    row.style.cssText = 'display:flex;gap:18px;padding:0 24px 12px;flex-wrap:wrap';
+    document.body.appendChild(row);
+
+    // 이 템플릿의 이미지 톤 적용
+    if(window._setTestImgTone) window._setTestImgTone(tpl);
+
+    kinds.forEach(function(kind, kindIdx){
+      var key = tpl + ':' + kind;
+      var schema = TEMPLATE_SCHEMAS[key];
+
+      var col = document.createElement('div');
+      col.style.cssText = 'display:flex;flex-direction:column;gap:6px';
+      var label = document.createElement('div');
+      label.style.cssText = 'font-size:10px;font-weight:700;color:#A0A0A0;letter-spacing:.15em;text-transform:uppercase';
+      label.textContent = kind;
+      col.appendChild(label);
+
+      // 화면용 wrapper (축소된 사이즈)
+      var wrap = document.createElement('div');
+      wrap.style.cssText = 'width:' + DISP_W + 'px;height:' + DISP_H + 'px;overflow:hidden;border-radius:4px;box-shadow:0 4px 14px rgba(0,0,0,.4);position:relative;background:#FFF';
+
+      // 실제 슬라이드 (1080×1350 시드 크기로 그린 뒤 scale)
+      var slide = document.createElement('div');
+      slide.className = 'edt-slide on';
+      slide.style.cssText = 'position:absolute;left:0;top:0;width:' + SLIDE_W + 'px;height:' + SLIDE_H + 'px;display:block;transform:scale(' + SCALE + ');transform-origin:top left;background:#FFF';
+      wrap.appendChild(slide);
+
+      if(schema){
+        var idx = (kind === 'cover') ? 0 : (kind === 'hook') ? 1 : (kind === 'body') ? 2 : 4;
+        var ctx = mockCtxForSlide(tpl, kind, idx, 5);
+        try {
+          renderFromSchema(slide, schema, ctx);
+        } catch(e){
+          var err = document.createElement('div');
+          err.style.cssText = 'position:absolute;inset:0;background:#FFE4E4;color:#C00;padding:16px;font-size:11px;font-family:monospace;overflow:auto';
+          err.textContent = 'Render error: ' + e.message;
+          wrap.innerHTML = '';
+          wrap.appendChild(err);
+        }
+      } else {
+        var miss = document.createElement('div');
+        miss.style.cssText = 'position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#999;font-size:13px';
+        miss.textContent = '(no schema)';
+        wrap.appendChild(miss);
+      }
+
+      col.appendChild(wrap);
+      row.appendChild(col);
+    });
+  });
+}
+
+if(typeof location !== 'undefined' && location.search.indexOf('test=schemas') >= 0){
+  document.addEventListener('DOMContentLoaded', function(){
+    setTimeout(showSchemaTest, 100);  // helpers/schemas 다 로드된 후
+  });
 }
 
 window.addEventListener('load', function(){
