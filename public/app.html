@@ -9940,11 +9940,13 @@ function buildSchemaElement(spec, ctx){
       el.style.pointerEvents = 'none';
       el.style.display = 'flex';
       el.style.flexWrap = 'wrap';
-      el.style.gap = '8px';
+      el.style.gap = ((spec.style && spec.style.gap) || 8) + 'px';
       el.style.justifyContent = 'center';
+      var chipFont = (spec.style && spec.style.fontSize) || 12;
+      var chipPadding = (spec.style && spec.style.padding) || '6px 12px';
       (spec.items || []).forEach(function(it){
         var c = document.createElement('span');
-        c.style.cssText = 'padding:6px 12px;background:' + (it.bg || '#FFFFFF') + ';color:' + (it.color || '#1A1A1A') + ';font-family:Pretendard,sans-serif;font-size:12px;font-weight:800;letter-spacing:-.2px;border-radius:5px;display:inline-block';
+        c.style.cssText = 'padding:' + chipPadding + ';background:' + (it.bg || '#FFFFFF') + ';color:' + (it.color || '#1A1A1A') + ';font-family:Pretendard,sans-serif;font-size:' + chipFont + 'px;font-weight:800;letter-spacing:-.2px;border-radius:5px;display:inline-block';
         c.textContent = it.text || '';
         el.appendChild(c);
       });
@@ -10197,11 +10199,6 @@ TEMPLATE_SCHEMAS['mag:cta'] = {
       position:{ top:23, left:6, width:140 },
       style:{ fontSize:160, fontWeight:900, color:'#1A1A1A', letterSpacing:-5, lineHeight:0.95, fontFamily:'Pretendard,sans-serif', textAlign:'left', whiteSpace:'nowrap' },
       zIndex:4 },
-    // 우상단 → 화살표
-    { type:'arrow-right',
-      position:{ top:24, right:6, width:14, height:6 },
-      style:{ color:'#1A1A1A' },
-      zIndex:5 },
     // 한글 sub
     { type:'text', content:'subtitle', fallback:'재고 다 털리기 전에\n팔로우하고 팁 얻어가👉',
       position:{ top:46, left:8, width:70 },
@@ -10369,11 +10366,6 @@ TEMPLATE_SCHEMAS['noir:cover'] = {
       position:{ bottom:5, left:50, transform:'translateX(-50%)' },
       style:{ fontSize:30, fontWeight:600, color:'#FFFFFF', fontFamily:'Pretendard,sans-serif' },
       zIndex:6 },
-    // 우하단 → 화살표
-    { type:'arrow-right',
-      position:{ bottom:6, right:7, width:14, height:32 },
-      style:{ color:'#FFFFFF' },
-      zIndex:6 },
   ],
 };
 
@@ -10409,11 +10401,6 @@ TEMPLATE_SCHEMAS['noir:hook'] = {
       position:{ bottom:5, left:50, transform:'translateX(-50%)' },
       style:{ fontSize:30, fontWeight:600, color:'#FFFFFF', fontFamily:'Pretendard,sans-serif' },
       zIndex:6 },
-    // 우하단 → 화살표
-    { type:'arrow-right',
-      position:{ bottom:6, right:7, width:14, height:32 },
-      style:{ color:'#FFFFFF' },
-      zIndex:6 },
   ],
 };
 
@@ -10444,11 +10431,6 @@ TEMPLATE_SCHEMAS['noir:body'] = {
       position:{ bottom:5, left:50, transform:'translateX(-50%)' },
       style:{ fontSize:30, fontWeight:600, color:'#FFFFFF', fontFamily:'Pretendard,sans-serif' },
       zIndex:6 },
-    // 우하단 → 화살표
-    { type:'arrow-right',
-      position:{ bottom:6, right:7, width:14, height:32 },
-      style:{ color:'#FFFFFF' },
-      zIndex:6 },
   ],
 };
 
@@ -10456,15 +10438,15 @@ TEMPLATE_SCHEMAS['noir:cta'] = {
   background: 'linear-gradient(180deg,#3F2D5C 0%,#6B5B7A 60%,#A48A8C 100%)',
   layout: 'noir-cta',
   elements: [
-    // 한글 제목 line 1 — 줄간격 좁게
+    // 한글 제목 line 1 — 위치 아래로, 줄간격 좁게
     { type:'text', content:'title-line-1', fallback:'지친 당신을 안아줄',
-      position:{ top:6, left:6, width:88 },
-      style:{ fontSize:56, fontWeight:900, color:'#FFFFFF', lineHeight:1.1, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
+      position:{ top:14, left:6, width:88 },
+      style:{ fontSize:56, fontWeight:900, color:'#FFFFFF', lineHeight:1.0, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
       zIndex:5, lockColor:true },
     // line 2 — 줄간격 좁게
     { type:'text', content:'title-line-2', fallback:'더 많은 이야기들\n저장하고 담아보세요.',
-      position:{ top:13, left:6, width:88 },
-      style:{ fontSize:56, fontWeight:900, color:'#FFFFFF', lineHeight:1.1, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line' },
+      position:{ top:20, left:6, width:88 },
+      style:{ fontSize:56, fontWeight:900, color:'#FFFFFF', lineHeight:1.0, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line' },
       zIndex:5, lockColor:true },
     // 본문
     { type:'text', content:'body', fallback:'지금 생각나는 사람에게\n들려주고픈 이야기를 댓글로 남겨주세요. :)',
@@ -10475,11 +10457,6 @@ TEMPLATE_SCHEMAS['noir:cta'] = {
     { type:'logo',
       position:{ bottom:5, left:50, transform:'translateX(-50%)' },
       style:{ fontSize:30, fontWeight:600, color:'#FFFFFF', fontFamily:'Pretendard,sans-serif' },
-      zIndex:6 },
-    // 우하단 → 화살표
-    { type:'arrow-right',
-      position:{ bottom:6, right:7, width:14, height:32 },
-      style:{ color:'#FFFFFF' },
       zIndex:6 },
   ],
 };
@@ -10531,9 +10508,10 @@ TEMPLATE_SCHEMAS['bold:hook'] = {
       position:{ top:40, left:6, width:88 },
       style:{ fontSize:42, fontWeight:800, color:'#FFFFFF', lineHeight:1.4, letterSpacing:-0.8, fontFamily:'Pretendard,sans-serif', textAlign:'center', whiteSpace:'pre-line' },
       zIndex:5, lockColor:true },
-    // 색 칩 4개
+    // 색 칩 4개 — 텍스트 사이즈 2배, 패딩도 비례
     { type:'color-chips',
       position:{ top:54, left:50, transform:'translateX(-50%)', width:90 },
+      style:{ fontSize:24, padding:'12px 22px', gap:14 },
       items:[
         { text:'01 인사이트', bg:'#D55A35', color:'#1A1A1A' },
         { text:'02 트렌드',   bg:'#FFD23F', color:'#1A1A1A' },
