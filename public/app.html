@@ -2400,30 +2400,25 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:6px">템플릿 선택</div>
     <div style="font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.55">클릭하면 바로 디자인이 적용돼요.</div>
     <div class="tpl-grid" id="tpl-grid">
-      <!-- 클린 (clean) — 화이트 미니멀 + 굵은 산세리프 — 팁/순위/정보 -->
-      <div class="tpl-item on" onclick="selectTpl(this,'clean')">
+      <!-- 클린 (clean) — 화이트 미니멀 — 팁/순위/정보 -->
+      <div class="tpl-item on" onclick="openTplPreview('clean')">
         <div class="tpl-prev"></div>
         <div class="tpl-name">클린</div>
       </div>
-      <!-- 감성 (noir) — 다크 + 풀이미지 + 흰 세리프 — 카페/여행/뷰티 무드샷 -->
-      <div class="tpl-item" onclick="selectTpl(this,'noir')">
+      <!-- 감성 (noir) — 풀이미지 + 무드 -->
+      <div class="tpl-item" onclick="openTplPreview('noir')">
         <div class="tpl-prev"></div>
         <div class="tpl-name">감성</div>
       </div>
-      <!-- 매거진 (mag) — 좌이미지 + 우 다크 패널 — 패션/뷰티 에디토리얼 -->
-      <div class="tpl-item" onclick="selectTpl(this,'mag')">
+      <!-- 매거진 (mag) — 베이지 + 형광펜 + 손그림 -->
+      <div class="tpl-item" onclick="openTplPreview('mag')">
         <div class="tpl-prev"></div>
         <div class="tpl-name">매거진</div>
       </div>
-      <!-- 팝 (bold) — 원색 배경 + 임팩트 숫자 + 배지 — 공구/이벤트/세일 -->
-      <div class="tpl-item" onclick="selectTpl(this,'bold')">
+      <!-- 팝 (bold) — 원색 + 거대 타이포 -->
+      <div class="tpl-item" onclick="openTplPreview('bold')">
         <div class="tpl-prev"></div>
         <div class="tpl-name">팝</div>
-      </div>
-      <!-- 다이어리 (pastel) — 핸드라이팅 + 따뜻한 톤 — 책/일상/심리/육아 -->
-      <div class="tpl-item" onclick="selectTpl(this,'pastel')">
-        <div class="tpl-prev"></div>
-        <div class="tpl-name">다이어리</div>
       </div>
       <div class="tpl-my" onclick="openMyTpl()">
         <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
@@ -10256,20 +10251,20 @@ TEMPLATE_SCHEMAS['clean:hook'] = {
   background: '#FFFFFF',
   layout: 'clean-hook',
   elements: [
-    // 좌상단 검정 배지 [Focus] — 라운드된 사각
+    // 좌상단 검정 배지 [Focus] — 풀 라운드 (pill)
     { type:'badge', content:'Focus',
       position:{ top:5, left:6 },
-      style:{ fontSize:26, fontWeight:800, color:'#FFFFFF', background:'#1A1A1A', padding:'8px 22px', borderRadius:14, letterSpacing:1, fontFamily:'Pretendard,sans-serif' },
+      style:{ fontSize:26, fontWeight:800, color:'#FFFFFF', background:'#1A1A1A', padding:'8px 22px', borderRadius:100, letterSpacing:1, fontFamily:'Pretendard,sans-serif' },
       zIndex:5, lockColor:true },
-    // 큰 한글 제목 line 1 (얇은) — 줄간격 좁게
+    // 큰 한글 제목 line 1 (얇은) — 줄간격 더 좁게
     { type:'text', content:'title-line-1',
       position:{ top:14, left:6, width:88 },
-      style:{ fontSize:64, fontWeight:300, color:'#1A1A1A', lineHeight:1.1, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
+      style:{ fontSize:64, fontWeight:300, color:'#1A1A1A', lineHeight:1.0, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
       zIndex:5, lockColor:true },
     // 한글 제목 line 2 (굵은)
     { type:'text', content:'title-line-2',
-      position:{ top:21, left:6, width:88 },
-      style:{ fontSize:64, fontWeight:900, color:'#1A1A1A', lineHeight:1.1, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
+      position:{ top:20, left:6, width:88 },
+      style:{ fontSize:64, fontWeight:900, color:'#1A1A1A', lineHeight:1.0, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
       zIndex:5, lockColor:true },
     // 큰 사진 하단
     { type:'image',
@@ -10282,10 +10277,10 @@ TEMPLATE_SCHEMAS['clean:body'] = {
   background: '#FFFFFF',
   layout: 'clean-body',
   elements: [
-    // 검정 배지 STEP{idx} — 라운드된 사각
+    // 검정 배지 STEP{idx} — 풀 라운드 (pill)
     { type:'badge', content:'step-num',
       position:{ top:5, left:6 },
-      style:{ fontSize:26, fontWeight:800, color:'#FFFFFF', background:'#1A1A1A', padding:'8px 22px', borderRadius:14, letterSpacing:1, fontFamily:'Pretendard,sans-serif' },
+      style:{ fontSize:26, fontWeight:800, color:'#FFFFFF', background:'#1A1A1A', padding:'8px 22px', borderRadius:100, letterSpacing:1, fontFamily:'Pretendard,sans-serif' },
       zIndex:5, lockColor:true },
     // 한글 제목
     { type:'text', content:'body-title', fallback:'아침 일과 전, 10분의 명상',
@@ -10313,15 +10308,15 @@ TEMPLATE_SCHEMAS['clean:cta'] = {
   background: '#FFFFFF',
   layout: 'clean-cta',
   elements: [
-    // 큰 한글 제목 line 1 (얇은)
+    // 큰 한글 제목 line 1 (얇은) — 줄간격 좁게
     { type:'text', content:'title-line-1', fallback:'내 운명을 바꾸는 시간',
       position:{ top:10, left:6, width:88 },
-      style:{ fontSize:62, fontWeight:300, color:'#1A1A1A', lineHeight:1.2, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
+      style:{ fontSize:62, fontWeight:300, color:'#1A1A1A', lineHeight:1.0, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
       zIndex:5, lockColor:true },
     // 한글 제목 line 2 (굵은)
     { type:'text', content:'title-line-2', fallback:'하루 10분.',
-      position:{ top:18, left:6, width:88 },
-      style:{ fontSize:62, fontWeight:900, color:'#1A1A1A', lineHeight:1.2, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
+      position:{ top:16, left:6, width:88 },
+      style:{ fontSize:62, fontWeight:900, color:'#1A1A1A', lineHeight:1.0, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif' },
       zIndex:5, lockColor:true },
     // 본문
     { type:'text', content:'body', fallback:'팔로우하고\n매일 받아가세요.',
@@ -10394,10 +10389,10 @@ TEMPLATE_SCHEMAS['noir:hook'] = {
     { type:'image-overlay',
       gradient:'linear-gradient(180deg,rgba(0,0,0,.45) 0%,rgba(0,0,0,.55) 100%)',
       zIndex:2 },
-    // 한글 제목 (잘하고 있어 류)
-    { type:'text', content:'title-line-1', fallback:'잘하고 있어,',
+    // 한글 제목 (잘하고 있어 류) — 한 줄로 전체 텍스트 (split 안 함)
+    { type:'text', content:'title', fallback:'잘하고 있어,',
       position:{ top:8, left:6, width:88 },
-      style:{ fontSize:60, fontWeight:900, color:'#FFFFFF', lineHeight:1.2, letterSpacing:-1.4, fontFamily:'Pretendard,sans-serif', textShadow:'0 4px 20px rgba(0,0,0,.85)' },
+      style:{ fontSize:60, fontWeight:900, color:'#FFFFFF', lineHeight:1.0, letterSpacing:-1.4, fontFamily:'Pretendard,sans-serif', textShadow:'0 4px 20px rgba(0,0,0,.85)' },
       zIndex:5, lockColor:true },
     // 부제 (얇은)
     { type:'text', content:'subtitle', fallback:'라는 말보다\n가끔은 \'쉬어도 돼\'라는 말이\n더 필요할 때가 있죠.',
@@ -11878,9 +11873,110 @@ function hidePublishProgress(){
 
 // ────────── AI 생성 오버레이 ──────────
 var __genSteps = [];
-// 템플릿 썸네일 — 무드만 전달하는 고정 샘플 (유저 후킹 멘트는 글자수 잘림 → 사용 안 함)
-// 카테고리 칩도 노출하지 않음. 8개 템플릿 각자 고유 분위기.
+// 템플릿 ID → 시드 PNG 파일 prefix 매핑 (/figma-seeds/ 디렉토리)
+var TPL_SEED_PREFIX = {
+  clean: 'clean',
+  noir:  'emotional',
+  mag:   'magazine',
+  bold:  'pop',
+};
+var TPL_DISPLAY_NAME = {
+  clean: '클린',
+  noir:  '감성',
+  mag:   '매거진',
+  bold:  '팝',
+};
+
+// ─── 템플릿 미리보기 모달 헬퍼 ───
+var _tplPreviewState = { tpl: null, idx: 0, slides: [] };
+function openTplPreview(tpl){
+  var prefix = TPL_SEED_PREFIX[tpl];
+  if(!prefix){
+    // legacy/seed 없는 템플릿 → 즉시 select
+    var fakeEl = document.querySelector('#tpl-grid .tpl-item');
+    selectTpl(fakeEl, tpl);
+    return;
+  }
+  _tplPreviewState.tpl = tpl;
+  _tplPreviewState.idx = 0;
+  _tplPreviewState.slides = [
+    '/figma-seeds/' + prefix + '_01_cover.png',
+    '/figma-seeds/' + prefix + '_02_hook.png',
+    '/figma-seeds/' + prefix + '_03_content.png',
+    '/figma-seeds/' + prefix + '_04_cta.png',
+  ];
+  var nameEl = document.getElementById('tplp-name');
+  if(nameEl) nameEl.textContent = TPL_DISPLAY_NAME[tpl] || tpl;
+  tplPreviewRender();
+  // 모달 열기
+  var ov = document.getElementById('m-tpl-preview');
+  if(ov) ov.classList.add('on');
+}
+function tplPreviewRender(){
+  var img = document.getElementById('tplp-img');
+  var counter = document.getElementById('tplp-counter');
+  var dots = document.getElementById('tplp-dots');
+  var meta = document.getElementById('tplp-meta');
+  if(!img) return;
+  var idx = _tplPreviewState.idx || 0;
+  img.src = _tplPreviewState.slides[idx] || '';
+  if(counter) counter.textContent = (idx + 1) + ' / ' + _tplPreviewState.slides.length;
+  if(meta) meta.textContent = '4:5 · 4장 · ' + ['표지','후킹','본문','CTA'][idx];
+  if(dots){
+    dots.innerHTML = '';
+    _tplPreviewState.slides.forEach(function(_, i){
+      var d = document.createElement('span');
+      d.style.cssText = 'width:8px;height:8px;border-radius:50%;background:' + (i === idx ? '#1A1A1A' : '#D1D5DB') + ';cursor:pointer;transition:background .15s';
+      d.onclick = function(){ _tplPreviewState.idx = i; tplPreviewRender(); };
+      dots.appendChild(d);
+    });
+  }
+}
+function tplPreviewNav(dir){
+  var n = _tplPreviewState.slides.length;
+  if(n === 0) return;
+  _tplPreviewState.idx = (_tplPreviewState.idx + dir + n) % n;
+  tplPreviewRender();
+}
+function tplPreviewConfirm(){
+  var tpl = _tplPreviewState.tpl;
+  if(!tpl) return;
+  // grid 에서 해당 tpl 카드 찾아서 selectTpl 호출 (on 표시 + 저장)
+  var card = null;
+  document.querySelectorAll('#tpl-grid .tpl-item').forEach(function(it){
+    var oc = it.getAttribute('onclick') || '';
+    var m = oc.match(/(?:openTplPreview|selectTpl)\([^,]*,?\s*'([^']+)'\)/);
+    if(m && m[1] === tpl) card = it;
+  });
+  if(card) selectTpl(card, tpl);
+  cm('m-tpl-preview');
+}
+
+// 템플릿 썸네일 — Figma 시드 PNG 그대로 사용 (cover 슬라이드)
 function renderTplThumbs(){
+  document.querySelectorAll('#tpl-grid .tpl-item').forEach(function(item){
+    var oc = item.getAttribute('onclick') || '';
+    // openTplPreview('X') 또는 selectTpl(this,'X') 둘 다 지원
+    var m = oc.match(/openTplPreview\('([^']+)'\)/) || oc.match(/selectTpl\(this,'([^']+)'\)/);
+    if(!m) return;
+    var tpl = m[1];
+    if(tpl === 'custom') return;
+    var prev = item.querySelector('.tpl-prev');
+    if(!prev) return;
+    var prefix = TPL_SEED_PREFIX[tpl];
+    if(!prefix){
+      // legacy 템플릿 — 기존 CSS 썸네일 fallback
+      prev.innerHTML = '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#999;font-size:11px;background:#F5F5F5">' + tpl + '</div>';
+      return;
+    }
+    item.style.background = 'transparent';
+    prev.removeAttribute('style');
+    prev.innerHTML = '<img src="/figma-seeds/' + prefix + '_01_cover.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block" alt="' + tpl + '"/>';
+  });
+}
+
+// (legacy) CSS 기반 썸네일 — 더 이상 안 씀. 완전 제거 후엔 삭제 예정
+function renderTplThumbsLegacy(){
   function html(tpl){
     if(tpl === 'clean'){ // 클린 — 화이트 + 검정 배지 + 굵은/얇은 한글 mix + 하단 라인 (정보/팁)
       return ''
@@ -14258,6 +14354,41 @@ window.addEventListener('load', function(){
   <button class="btn-p" onclick="doResetPassword()">재설정 링크 보내기</button>
   <button class="btn-s" onclick="cm('m-find-account')">닫기</button>
 </div></div>
+
+<!-- ════ 템플릿 미리보기 모달 (cover + hook + body + cta 4슬라이드 carousel) ════ -->
+<div class="ov" id="m-tpl-preview" onclick="co(event,'m-tpl-preview')">
+  <div class="sheet" style="padding:0;max-height:92vh;overflow:hidden;display:flex;flex-direction:column">
+    <!-- 헤더 -->
+    <div style="position:sticky;top:0;z-index:2;background:#fff;border-bottom:1px solid #E7E5E4;padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
+      <div id="tplp-name" style="font-size:14px;color:var(--t1);font-weight:800">템플릿</div>
+      <button onclick="cm('m-tpl-preview')" style="border:none;background:#F3F4F6;width:30px;height:30px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <!-- 슬라이드 carousel -->
+    <div style="flex:1;overflow:hidden;background:#F5F5F4;padding:18px;position:relative;display:flex;align-items:center;justify-content:center">
+      <button onclick="tplPreviewNav(-1)" style="position:absolute;left:8px;z-index:3;width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.95);box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" style="width:18px;height:18px"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button onclick="tplPreviewNav(1)" style="position:absolute;right:8px;z-index:3;width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.95);box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" style="width:18px;height:18px"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <img id="tplp-img" src="" style="max-width:100%;max-height:60vh;border-radius:8px;box-shadow:0 6px 20px rgba(0,0,0,.18);display:block" alt="template slide"/>
+    </div>
+    <!-- dot 인디케이터 + 메타 -->
+    <div style="padding:10px 16px 14px;background:#fff;border-top:1px solid #F3F4F6">
+      <div id="tplp-dots" style="display:flex;justify-content:center;gap:6px;margin-bottom:8px"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--t3)">
+        <span id="tplp-meta">4:5 · 4장</span>
+        <span id="tplp-counter">1 / 4</span>
+      </div>
+    </div>
+    <!-- 액션 버튼 -->
+    <div style="padding:0 16px 16px;background:#fff">
+      <button class="btn-p" onclick="tplPreviewConfirm()" style="width:100%">이 템플릿으로 시작</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
