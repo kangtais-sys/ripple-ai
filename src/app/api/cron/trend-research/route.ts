@@ -83,32 +83,108 @@ ${JSON.stringify(top20, null, 2)}
   · 옛 사실을 "지금" 처럼 포장하면 즉시 재작성
 `
 
-  let claudeResp: unknown = null
-  let parsed: {
+  // ─── Claude API 호출 — 견고한 버전 ───────────────────────────────
+  //   1) system 프롬프트로 JSON-only 강제
+  //   2) assistant 프리필 `{` 로 JSON 시작 보장
+  //   3) HTTP status 검증
+  //   4) JSON 파싱 실패 시 1회 재시도 (max_tokens 높여서)
+  //   5) 파싱 결과 누락 시 상세 로그 + 파싱 시도 수정
+  //   6) topics_by_category 비어있으면 명시적 에러로 처리 (silent fail 방지)
+  type ClaudeResp = { content?: Array<{ text?: string }>; usage?: Record<string, unknown>; stop_reason?: string; error?: { message?: string } }
+  type ParsedResp = {
     top5?: Array<Record<string, unknown>>
     recommended_topics?: Array<Record<string, unknown>>
     topics_by_category?: Record<string, Array<Record<string, unknown>>>
-  } = {}
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': process.env.ANTHROPIC_API_KEY!,
-        'anthropic-version': '2023-06-01',
-      },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-5-20250929',
-        max_tokens: 20000,  // 18 카테고리 × 5개 × body_preview ≈ 15k 출력 토큰 (300s timeout 안에 맞춤)
-        messages: [{ role: 'user', content: userPrompt }],
-      }),
-    })
-    claudeResp = await res.json()
-    const text = (claudeResp as { content?: Array<{ text?: string }> })?.content?.[0]?.text || '{}'
+  }
+  let claudeResp: ClaudeResp = {}
+  let parsed: ParsedResp = {}
+  let claudeRawText = ''
+  let lastError = ''
+
+  async function callClaude(maxTokens: number): Promise<{ ok: boolean; resp?: ClaudeResp; text?: string; err?: string; status?: number }> {
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': process.env.ANTHROPIC_API_KEY!,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-5-20250929',
+          max_tokens: maxTokens,
+          system: '너는 JSON-only API 다. 응답은 반드시 valid JSON 객체 하나로만. 마크다운 코드블록 (```), 설명, 인사말, 그 어떤 prefix/suffix 도 절대 금지. 첫 글자 { 로 시작해서 마지막 글자 } 로 끝나는 단일 JSON.',
+          messages: [
+            { role: 'user', content: userPrompt },
+            { role: 'assistant', content: '{' },  // 프리필: JSON 시작 강제
+          ],
+        }),
+      })
+      if (!res.ok) {
+        const errText = await res.text().catch(() => '')
+        return { ok: false, err: 'http_' + res.status + ': ' + errText.slice(0, 300), status: res.status }
+      }
+      const j = (await res.json()) as ClaudeResp
+      // 프리필 `{` 추가 → 응답에서 첫 `{` 가 빠져있을 것 → 다시 붙임
+      const text = '{' + ((j.content?.[0]?.text) || '')
+      return { ok: true, resp: j, text }
+    } catch (e) {
+      return { ok: false, err: 'exception: ' + String(e) }
+    }
+  }
+
+  function tryParseJSON(text: string): { ok: boolean; data?: ParsedResp; err?: string } {
+    if (!text) return { ok: false, err: 'empty' }
+    // 1차: 전체 텍스트 그대로 파싱
+    try { return { ok: true, data: JSON.parse(text) as ParsedResp } } catch {}
+    // 2차: { ... } 가장 큰 블록 추출
     const match = text.match(/\{[\s\S]*\}/)
-    if (match) parsed = JSON.parse(match[0])
-  } catch (e) {
-    return NextResponse.json({ ok: false, reason: 'claude_error', detail: String(e), stats })
+    if (match) {
+      try { return { ok: true, data: JSON.parse(match[0]) as ParsedResp } } catch (e) { return { ok: false, err: 'parse_outer: ' + String(e) } }
+    }
+    return { ok: false, err: 'no_json_found' }
+  }
+
+  // ─── 1차 시도 ───
+  let attempt = await callClaude(20000)
+  if (attempt.ok && attempt.text) {
+    claudeResp = attempt.resp || {}
+    claudeRawText = attempt.text
+    const p = tryParseJSON(attempt.text)
+    if (p.ok && p.data) parsed = p.data
+    else lastError = p.err || 'parse_unknown'
+  } else {
+    lastError = attempt.err || 'unknown'
+  }
+
+  // ─── 1차 실패 또는 topics_by_category 비었으면 재시도 (max_tokens 늘려서) ───
+  const hasValidTopics = parsed.topics_by_category && Object.keys(parsed.topics_by_category).length > 0
+  if (!hasValidTopics) {
+    console.warn('[cron] 1차 시도 실패 또는 topics_by_category 비어있음. 재시도. lastError:', lastError, 'rawText 길이:', claudeRawText.length, 'sample:', claudeRawText.slice(0, 500))
+    const retry = await callClaude(28000)  // max_tokens 늘림
+    if (retry.ok && retry.text) {
+      claudeResp = retry.resp || claudeResp
+      claudeRawText = retry.text
+      const p = tryParseJSON(retry.text)
+      if (p.ok && p.data) parsed = p.data
+      else lastError = (p.err || 'parse_unknown') + ' (retry)'
+    } else {
+      lastError = (retry.err || 'unknown') + ' (retry)'
+    }
+  }
+
+  // ─── 최종 검증: topics_by_category 비어있으면 silent fail 차단 ───
+  const finalHasTopics = parsed.topics_by_category && Object.keys(parsed.topics_by_category).length > 0
+  if (!finalHasTopics) {
+    return NextResponse.json({
+      ok: false,
+      reason: 'parse_failed_or_empty',
+      detail: lastError,
+      stats,
+      claudeStopReason: claudeResp.stop_reason || null,
+      claudeUsage: claudeResp.usage || null,
+      rawSample: claudeRawText.slice(0, 800),
+    }, { status: 200 })
   }
 
   // 3) KST 날짜 계산
