@@ -98,7 +98,7 @@ ${JSON.stringify(top20, null, 2)}
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-5-20250929',
         max_tokens: 20000,  // 18 카테고리 × 5개 × body_preview ≈ 15k 출력 토큰 (300s timeout 안에 맞춤)
         messages: [{ role: 'user', content: userPrompt }],
       }),
@@ -135,7 +135,7 @@ ${JSON.stringify(top20, null, 2)}
       meta: {
         stats,
         usage: (claudeResp as { usage?: Record<string, unknown> })?.usage || null,
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-5-20250929',
       },
     }, { onConflict: 'date_kst' })
 

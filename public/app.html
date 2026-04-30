@@ -5439,11 +5439,10 @@ function renderDailyTrends(){
     }
     if(savedKey){
       addToPool(catPool);
-      // 클라 myPool 은 body 가 없어서 더 이상 풀에 안 넣음 — 풀 부족 시 /api/trends/more 가 채워줌
     } else {
       addToPool(hotPool);
       addToPool(catPool);
-      // 글로벌 fallback 은 모든 카테고리 합치기
+      // 글로벌 fallback — 모든 카테고리 합치기
       Object.keys(topicsByCat).forEach(function(k){
         var arr = (Array.isArray(topicsByCat[k]) ? topicsByCat[k] : []).map(function(t){
           return {
@@ -5458,6 +5457,8 @@ function renderDailyTrends(){
         addToPool(arr);
       });
     }
+    // 최후 fallback — server 데이터 비었으면 클라 myPool 로 (cron 실패해도 화면 안 비도록)
+    if(serverPool.length === 0) addToPool(myPool);
 
     // 이전에 보여줬던 토픽 제외 — 다른주제보기 클릭 시 항상 새 카드
     window._shownTrendTopics = window._shownTrendTopics || {};
@@ -5469,7 +5470,7 @@ function renderDailyTrends(){
     if(unshown.length < 3){
       // 풀 진짜 소진 → 리셋 후 기존 풀 재사용 (이미 prefetch 도는 중일 거임)
       window._shownTrendTopics = {};
-      unshown = serverPool;
+      unshown = serverPool.length > 0 ? serverPool : myPool;
     }
     var picks = shuffleTrendPool(unshown).slice(0, 3);
     picks.forEach(function(p){ window._shownTrendTopics[p.topic] = 1; });

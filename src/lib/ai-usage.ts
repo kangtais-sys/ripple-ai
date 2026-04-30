@@ -6,7 +6,7 @@ import { createClient as createAdmin } from '@supabase/supabase-js'
 
 // USD 센트 (소수점 4자리)로 계산
 const PRICING: Record<string, { input: number; output: number; cache_read: number; cache_creation: number }> = {
-  'claude-sonnet-4-20250514': { input: 0.0003, output: 0.0015, cache_read: 0.00003, cache_creation: 0.000375 },
+  'claude-sonnet-4-5-20250929': { input: 0.0003, output: 0.0015, cache_read: 0.00003, cache_creation: 0.000375 },
   'claude-opus-4-5': { input: 0.0015, output: 0.0075, cache_read: 0.00015, cache_creation: 0.001875 },
   'claude-haiku-4-5-20251001': { input: 0.00008, output: 0.0004, cache_read: 0.000008, cache_creation: 0.0001 },
 }
@@ -19,7 +19,7 @@ type UsageInput = {
 }
 
 export function calculateCostCents(model: string, usage: UsageInput): number {
-  const p = PRICING[model] || PRICING['claude-sonnet-4-20250514']
+  const p = PRICING[model] || PRICING['claude-sonnet-4-5-20250929']
   const inTok = usage.input_tokens || 0
   const outTok = usage.output_tokens || 0
   const ccTok = usage.cache_creation_input_tokens || 0

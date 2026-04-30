@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
       'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-5-20250929',
       max_tokens: 2048,
       messages: [{
         role: 'user',
@@ -98,7 +98,7 @@ ${samples.map((s: string, i: number) => `${i + 1}. "${s}"`).join('\n')}
   await logAIUsage({
     userId: user.id,
     feature: 'tone_learn',
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-sonnet-4-5-20250929',
     usage: data.usage || {},
     refType: 'tone_profiles',
     refId: user.id,

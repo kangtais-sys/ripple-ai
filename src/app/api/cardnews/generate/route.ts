@@ -259,7 +259,7 @@ export async function POST(req: NextRequest) {
         'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-5-20250929',
         max_tokens: 8000,
         messages: [{ role: 'user', content: prompt }],
       }),
@@ -323,7 +323,7 @@ export async function POST(req: NextRequest) {
           'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-sonnet-4-5-20250929',
           max_tokens: 8000,
           messages: [{ role: 'user', content: retryPrompt }],
         }),
@@ -428,7 +428,7 @@ export async function POST(req: NextRequest) {
               'anthropic-version': '2023-06-01',
             },
             body: JSON.stringify({
-              model: 'claude-sonnet-4-20250514',
+              model: 'claude-sonnet-4-5-20250929',
               max_tokens: 8000,
               messages: [{ role: 'user', content: fixPrompt }],
             }),
@@ -516,7 +516,7 @@ export async function POST(req: NextRequest) {
         slide_count: slideCount,
         status: 'draft',
         meta: {
-          model: 'claude-sonnet-4-20250514',
+          model: 'claude-sonnet-4-5-20250929',
           tokens: data.usage || null,
           category: cat,
           scope,
@@ -539,7 +539,7 @@ export async function POST(req: NextRequest) {
     await logAIUsage({
       userId: user.id,
       feature: 'cardnews',
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-5-20250929',
       usage: data.usage || {},
       refType: 'card_news_jobs',
       refId: job?.id,

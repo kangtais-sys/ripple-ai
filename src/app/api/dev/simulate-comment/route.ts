@@ -84,7 +84,7 @@ export async function POST(req: Request) {
       'anthropic-version': '2023-06-01',
     },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-5-20250929',
       max_tokens: 200,
       system: type === 'dm'
         ? `당신은 K-뷰티 인플루언서의 Instagram DM 응대를 대신합니다.
@@ -113,7 +113,7 @@ export async function POST(req: Request) {
   await logAIUsage({
     userId: user.id,
     feature: type === 'dm' ? 'dm_gen' : 'reply_gen',
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-sonnet-4-5-20250929',
     usage: claudeData.usage || {},
     refType: 'reply_logs',
   })
