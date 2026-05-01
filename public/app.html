@@ -10010,19 +10010,54 @@ function buildSchemaElement(spec, ctx){
 }
 
 // ─── 메인 렌더러: 스키마 → DOM ───
+//   스키마는 1080×1350 좌표계 기준 (시드 PNG 와 동일).
+//   실제 편집기 캔버스는 viewport 사이즈 (~350px) 라서 px 단위가 안 맞음.
+//   해결: 1080×1350 native 사이즈 inner 컨테이너 만들고 transform:scale 로 캔버스에 fit.
+//   이 방식은 테스트 페이지(?test=schemas)와 동일 — 폰트·위치 비율 정확 유지.
 function renderFromSchema(sl, schema, ctx){
   if(!schema) return;
-  // 슬라이드 배경
+  // 슬라이드 배경 (캔버스 전체)
   if(schema.background) sl.style.background = schema.background;
-  // 요소 순회
+  // 슬라이드 데이터 layout
+  if(schema.layout) sl.dataset.layout = schema.layout;
+  // 캔버스 overflow:hidden 보장 (scale 된 inner 가 넘치면 잘림)
+  sl.style.overflow = 'hidden';
+
+  // 시드 native 좌표계 (1080×1350) inner 컨테이너
+  var inner = document.createElement('div');
+  inner.className = 'edt-schema-inner';
+  inner.style.cssText = 'position:absolute;left:0;top:0;width:1080px;height:1350px;transform-origin:top left;transform:scale(1)';
+  sl.appendChild(inner);
+
+  // 요소들 inner 에 append (schema 의 % / px 좌표가 1080×1350 기준으로 정확히 동작)
   if(Array.isArray(schema.elements)){
     schema.elements.forEach(function(spec){
       var dom = buildSchemaElement(spec, ctx);
-      if(dom) sl.appendChild(dom);
+      if(dom) inner.appendChild(dom);
     });
   }
-  // 데이터 layout 정보 (applyPerTextColor 등에서 활용)
-  if(schema.layout) sl.dataset.layout = schema.layout;
+
+  // scale 계산·적용 — 슬라이드 사이즈에 맞춰 inner 축소
+  function applySchemaScale(){
+    var slW = sl.offsetWidth || sl.parentElement?.offsetWidth || 0;
+    var slH = sl.offsetHeight || sl.parentElement?.offsetHeight || 0;
+    if(slW > 0 && slH > 0){
+      // 가로/세로 중 더 작은 비율로 fit (보통 가로 기준이지만 안전망)
+      var sx = slW / 1080;
+      var sy = slH / 1350;
+      var scale = Math.min(sx, sy);
+      inner.style.transform = 'scale(' + scale + ')';
+    } else {
+      // 캔버스 아직 사이즈 미정 → 다음 frame 재시도
+      requestAnimationFrame(applySchemaScale);
+    }
+  }
+  requestAnimationFrame(applySchemaScale);
+  // 캔버스 사이즈 변경 (디바이스 회전 / 풀스크린 모드 등) 추적
+  if(typeof ResizeObserver !== 'undefined'){
+    var ro = new ResizeObserver(applySchemaScale);
+    ro.observe(sl);
+  }
 }
 
 // ─── initEditor 가 호출 — 스키마 있으면 렌더 후 true 반환 ───
