@@ -558,18 +558,12 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .trend-meta{font-size:10px;color:var(--t3);font-weight:600}
 .trend-arrow{flex-shrink:0;color:var(--t3)}
 .trend-arrow svg{width:14px;height:14px;stroke:currentColor;stroke-width:2}
-.trend-divider{text-align:center;font-size:11px;font-weight:600;color:#94A3B8;margin:24px 0 14px;position:relative}
-.trend-divider::before,.trend-divider::after{content:'';position:absolute;top:50%;width:35%;height:1px;background:#F0F2F5}
-.trend-divider::before{left:0}.trend-divider::after{right:0}
+.trend-divider{text-align:center;font-size:10.5px;font-weight:600;color:#CBD5E1;margin:20px 0 12px;letter-spacing:.04em}
 
-/* 토스 스타일 — 흰 배경 + 가벼운 보더, 그라디·sparkle 제거 */
-.direct-box{background:#FFFFFF;border-radius:18px;border:1px solid #F0F2F5;padding:20px}
-.direct-label{display:flex;align-items:center;gap:8px;margin-bottom:8px}
-.direct-label-title{font-size:15px;font-weight:800;color:#1A1F27;letter-spacing:-.3px}
-.direct-label-sub{font-size:12px;color:#94A3B8;line-height:1.55;letter-spacing:-.2px;margin-bottom:14px;font-weight:500}
-.direct-ta{width:100%;border:1px solid #F0F2F5;background:#F9FAFB;border-radius:12px;padding:16px;font-size:15.5px;font-family:'Pretendard',sans-serif;color:#1A1F27;resize:none;outline:none;line-height:1.55;min-height:72px;letter-spacing:-.3px;font-weight:500;box-sizing:border-box;transition:border-color .15s,background .15s}
+/* 토스 스타일 — 단독 textarea (라벨·박스 제거, placeholder 만) */
+.direct-ta{width:100%;border:1px solid #F0F2F5;background:#F9FAFB;border-radius:14px;padding:18px 20px;font-size:15.5px;font-family:'Pretendard',sans-serif;color:#1A1F27;resize:none;outline:none;line-height:1.55;min-height:64px;letter-spacing:-.3px;font-weight:500;box-sizing:border-box;transition:border-color .15s,background .15s}
 .direct-ta:focus{border-color:var(--mint);background:#FFFFFF}
-.direct-ta::placeholder{color:#CBD5E1;font-weight:500;letter-spacing:-.2px}
+.direct-ta::placeholder{color:#94A3B8;font-weight:500;letter-spacing:-.2px}
 /* ── 만들기 온보딩 (강조 컬러) ── */
 .discover-box{background:linear-gradient(135deg,#F0FDF9,#EEF2FF);border-radius:20px;border:1px solid #A7F3D0;margin-top:20px;overflow:hidden;transition:border-color .15s,box-shadow .2s}
 .discover-box:active{border-color:var(--mint);box-shadow:0 6px 20px rgba(0,200,150,.18)}
@@ -952,6 +946,20 @@ input:checked+.tsl::before{transform:translateX(18px)}
 @keyframes deukpulse{0%,100%{box-shadow:0 6px 18px rgba(0,200,150,.3),0 0 0 0 rgba(0,200,150,.4)}50%{box-shadow:0 6px 18px rgba(0,200,150,.35),0 0 0 10px rgba(0,200,150,0)}}
 
 /* template picker */
+/* 템플릿 가로 스와이프 (cs-1 상단, 토스/Apple Wallet 스타일) */
+.tpl-carousel{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:0 0 10px;margin:0 -16px 18px;padding-left:16px;padding-right:16px;scrollbar-width:none}
+.tpl-carousel::-webkit-scrollbar{display:none}
+.tpl-card{flex-shrink:0;width:140px;scroll-snap-align:start;cursor:pointer;position:relative;transition:transform .12s}
+.tpl-card:active{transform:scale(.97)}
+.tpl-card-thumb{width:100%;aspect-ratio:4/5;border-radius:14px;overflow:hidden;background:#F0F2F5;position:relative;border:1.5px solid transparent;transition:border-color .15s}
+.tpl-card.is-default .tpl-card-thumb{border-color:var(--mint)}
+.tpl-card-thumb img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.tpl-card-pin{position:absolute;top:7px;right:7px;width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(6px);transition:background .15s}
+.tpl-card-pin svg{width:13px;height:13px;color:#94A3B8}
+.tpl-card.is-default .tpl-card-pin{background:var(--mint)}
+.tpl-card.is-default .tpl-card-pin svg{color:#fff}
+.tpl-card-name{font-size:12px;font-weight:700;color:#1A1F27;letter-spacing:-.2px;margin-top:7px;text-align:center}
+
 /* 템플릿 갤러리 모달 그리드 (전체 템플릿 둘러보기) */
 .tpl-gallery-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .tpl-gallery-item{cursor:pointer;border-radius:14px;overflow:hidden;background:#fff;border:1px solid #F0F2F5;transition:transform .12s,border-color .15s,box-shadow .15s}
@@ -2211,18 +2219,12 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <span class="first-bar-arr">→</span>
     </button>
 
-    <!-- 내 기본 템플릿 (큰 썸네일 + 변경 링크) -->
-    <div id="my-default-tpl" style="display:flex;align-items:center;gap:12px;padding:14px 16px;background:#fff;border:1px solid #F0F2F5;border-radius:14px;margin-bottom:14px;cursor:pointer" onclick="openTplGallery()">
-      <div id="my-default-tpl-thumb" style="width:60px;height:75px;border-radius:8px;background:#F0F2F5;flex-shrink:0;overflow:hidden;position:relative"></div>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:11px;color:#94A3B8;font-weight:600;letter-spacing:-.1px;margin-bottom:2px">내 기본 템플릿</div>
-        <div id="my-default-tpl-name" style="font-size:14.5px;color:#1A1F27;font-weight:800;letter-spacing:-.3px">매거진</div>
-      </div>
-      <span style="font-size:11px;color:var(--mint-d);font-weight:700">변경 →</span>
+    <!-- 템플릿 가로 스와이프 — 4개 (기본 핀 표시) -->
+    <div class="tpl-carousel" id="tpl-carousel">
+      <!-- renderTplCarousel() 가 동적 채움 -->
     </div>
 
-    <div class="sec-eye" style="margin-top:4px">FOR YOU</div>
-    <div class="sec-t xl" id="for-you-title">유민혜님께 딱 맞는 오늘 주제</div>
+    <div class="sec-t xl" id="for-you-title" style="margin-top:6px;font-size:18px;letter-spacing:-.4px">오늘 주제</div>
     <div class="trend-list" id="trend-carousel">
     <!-- 카드 3개는 renderDailyTrends()가 동적으로 주입 -->
     <div class="trend-card" onclick="useTrend(1)" style="display:none">
@@ -2276,13 +2278,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
     <div class="trend-divider">또는</div>
 
-    <div class="direct-box">
-      <div class="direct-label">
-        <div class="direct-label-title">직접 입력</div>
-      </div>
-      <div class="direct-label-sub">키워드 한 줄로 카드뉴스를 만들어요</div>
-      <textarea class="direct-ta" id="direct-topic" placeholder="여기에 주제를 입력해줘" oninput="toggleDirectBtn()" onkeyup="toggleDirectBtn()" oncompositionupdate="toggleDirectBtn()" oncompositionend="toggleDirectBtn()" onchange="toggleDirectBtn()"></textarea>
-    </div>
+    <textarea class="direct-ta" id="direct-topic" placeholder="키워드로 직접 만들어요" oninput="toggleDirectBtn()" onkeyup="toggleDirectBtn()" oncompositionupdate="toggleDirectBtn()" oncompositionend="toggleDirectBtn()" onchange="toggleDirectBtn()"></textarea>
 
     <!-- 카드뉴스 만들기 (단일 액션) -->
     <button class="direct-gen" id="direct-gen-btn" disabled onclick="generatePrompt()" style="margin-top:14px">카드뉴스 만들기</button>
@@ -5035,21 +5031,36 @@ function setDefaultTemplate(tpl){
   loadDefaultTplThumbnail();
 }
 function loadDefaultTplThumbnail(){
-  var tpl = getDefaultTemplate();
-  if(!createData.template) createData.template = tpl;
-  var thumb = document.getElementById('my-default-tpl-thumb');
-  var name = document.getElementById('my-default-tpl-name');
-  if(thumb){
-    var prefix = TPL_SEED_PREFIX[tpl];
-    thumb.innerHTML = prefix
-      ? '<img src="/figma-seeds/' + prefix + '_01_cover.png" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block" alt="' + tpl + '"/>'
-      : '';
-  }
-  if(name) name.textContent = (typeof TPL_DISPLAY_NAME !== 'undefined' && TPL_DISPLAY_NAME[tpl]) || tpl;
+  // legacy alias — 가로 스와이프 carousel 갱신
+  renderTplCarousel();
 }
-// cs-1 진입 시 기본 템플릿 썸네일 로드 (DOM ready 후)
+// 가로 스와이프 템플릿 carousel — cs-1 상단
+//   각 카드: 큰 썸네일 + 핀 아이콘 (탭 시 기본 설정 토글) + 이름
+//   카드 자체 클릭: 미리보기 모달 (4슬라이드 carousel)
+function renderTplCarousel(){
+  var c = document.getElementById('tpl-carousel');
+  if(!c) return;
+  var current = getDefaultTemplate();
+  if(!createData.template) createData.template = current;
+  var tpls = ['mag', 'clean', 'noir', 'bold'];
+  // SVG pin icon (filled when default, outline otherwise)
+  var pinSVG = '<svg viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="0"><path d="M12 2L9 7H5L8 11L7 17L12 14L17 17L16 11L19 7H15L12 2Z" stroke-linejoin="round"/></svg>';
+  c.innerHTML = tpls.map(function(tpl){
+    var prefix = TPL_SEED_PREFIX[tpl];
+    var name = TPL_DISPLAY_NAME[tpl] || tpl;
+    var isDefault = tpl === current;
+    return '<div class="tpl-card' + (isDefault ? ' is-default' : '') + '" data-tpl="' + tpl + '" onclick="openTplPreview(\'' + tpl + '\')">' +
+      '<div class="tpl-card-thumb">' +
+        '<img src="/figma-seeds/' + prefix + '_01_cover.png" alt="' + name + '"/>' +
+        '<div class="tpl-card-pin" onclick="event.stopPropagation();setDefaultTemplate(\'' + tpl + '\')" title="' + (isDefault ? '기본' : '기본으로 설정') + '">' + pinSVG + '</div>' +
+      '</div>' +
+      '<div class="tpl-card-name">' + name + (isDefault ? ' · 기본' : '') + '</div>' +
+    '</div>';
+  }).join('');
+}
+// cs-1 진입 시 carousel 로드 (DOM ready 후)
 document.addEventListener('DOMContentLoaded', function(){
-  setTimeout(loadDefaultTplThumbnail, 200);
+  setTimeout(renderTplCarousel, 200);
 });
 
 // ─── 템플릿 갤러리 모달 ───
