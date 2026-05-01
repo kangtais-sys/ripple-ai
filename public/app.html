@@ -482,41 +482,16 @@ input:checked+.tsl::before{transform:translateX(18px)}
 
 /* ── CREATE (만들기) ── */
 .create-step{display:none}.create-step.on{display:block}
-.trend-list{display:flex;flex-direction:column;gap:8px;margin-bottom:4px}
+.trend-list{display:flex;flex-direction:column;gap:10px;margin-bottom:4px}
 .trend-list > .trend-card{width:100%;margin-bottom:0}
-/* v4 — mirra 스타일: 큰 후킹 멘트 + 본문 미리보기 (점수바·뱃지 제거) */
-.trend-card.v4{position:relative;display:flex;flex-direction:column;gap:5px;padding:11px 13px 11px 17px;background:#fff;border:1px solid var(--b);border-radius:13px;margin-bottom:7px;cursor:pointer;transition:all .15s;font-family:'Pretendard',sans-serif;box-sizing:border-box;overflow:hidden}
-.trend-card.v4:active{transform:scale(.99);border-color:var(--mint)}
-.trend-card.v4:hover{border-color:var(--mint)}
-/* 카테고리 색띠 (왼쪽 4px) */
-.trend-card.v4::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--cat-color, var(--mint))}
-.trend-card.v4[data-cat="beauty"]   { --cat-color:#FF80AB }
-.trend-card.v4[data-cat="fashion"]  { --cat-color:#7C3AED }
-.trend-card.v4[data-cat="food"]     { --cat-color:#FB923C }
-.trend-card.v4[data-cat="cafe"]     { --cat-color:#A16207 }
-.trend-card.v4[data-cat="travel"]   { --cat-color:#0EA5E9 }
-.trend-card.v4[data-cat="interior"] { --cat-color:#84CC16 }
-.trend-card.v4[data-cat="fitness"]  { --cat-color:#EF4444 }
-.trend-card.v4[data-cat="money"]    { --cat-color:#10B981 }
-.trend-card.v4[data-cat="book"]     { --cat-color:#6366F1 }
-.trend-card.v4[data-cat="baby"]     { --cat-color:#FBBF24 }
-.trend-card.v4[data-cat="pet"]      { --cat-color:#A855F7 }
-.trend-card.v4[data-cat="kpop"]     { --cat-color:#EC4899 }
-.trend-card.v4[data-cat="movie"]    { --cat-color:#1E293B }
-.trend-card.v4[data-cat="music"]    { --cat-color:#9333EA }
-.trend-card.v4[data-cat="psych"]    { --cat-color:#0891B2 }
-.trend-card.v4[data-cat="mystery"]  { --cat-color:#475569 }
-.trend-card.v4[data-cat="life"]     { --cat-color:#14B8A6 }
-.trend-card.v4[data-cat="trend"]    { --cat-color:var(--mint) }
-/* 카드 내부 */
-.tcv-row{display:flex;align-items:center;gap:6px;justify-content:space-between}
-.tcv-chip{padding:1.5px 6px;border-radius:3px;background:var(--mint-l);color:var(--mint-d);font-size:9px;font-weight:800;letter-spacing:.1px;line-height:1.35}
-.tcv-score{font-size:10px;font-weight:800;color:var(--t3);letter-spacing:.05em;display:flex;align-items:center;gap:3px;flex-shrink:0}
-.tcv-score-dot{width:5px;height:5px;border-radius:50%;background:#FB923C}
-.tcv-hook{font-size:14.5px;font-weight:800;color:var(--t1);letter-spacing:-.3px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.tcv-preview{font-size:11.5px;font-weight:500;color:var(--t2);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;letter-spacing:-.2px}
-.tcv-source{font-size:10px;font-weight:600;color:var(--t3);letter-spacing:-.1px;margin-top:2px;display:flex;align-items:center;gap:4px}
-.tcv-source::before{content:'';width:8px;height:1px;background:var(--t3);opacity:.4}
+/* v5 — 토스 스타일 미니멀: 제목 + 작은 메타 한 줄 (chip·score·source·body·색띠 모두 제거) */
+.trend-card.v4{display:flex;flex-direction:column;gap:8px;padding:18px 20px;background:#fff;border:1px solid #F0F2F5;border-radius:18px;cursor:pointer;transition:transform .12s,border-color .15s,box-shadow .15s;font-family:'Pretendard',sans-serif;box-sizing:border-box}
+.trend-card.v4:hover{border-color:#E2E8F0;box-shadow:0 2px 12px rgba(15,19,25,.04)}
+.trend-card.v4:active{transform:scale(.98);border-color:var(--mint)}
+/* 토스 스타일 — 큰 hook + 작은 메타 한 줄 */
+.tcv-hook{font-size:16px;font-weight:800;color:#1A1F27;letter-spacing:-.4px;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;word-break:keep-all}
+.tcv-meta{font-size:11.5px;font-weight:600;color:#94A3B8;letter-spacing:-.2px;display:flex;align-items:center;gap:6px}
+.tcv-meta-dot{width:3px;height:3px;border-radius:50%;background:#CBD5E1;flex-shrink:0}
 /* ── 추천 카드 v2 (PART 3 spec) ── */
 .trend-card.v2{display:block !important;padding:14px 16px;background:#fff;border:1px solid var(--b);border-radius:16px;margin-bottom:10px;cursor:pointer;transition:all .15s;font-family:'Pretendard',sans-serif}
 .trend-card.v2:active{transform:scale(.99);border-color:var(--mint)}
@@ -583,25 +558,18 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .trend-meta{font-size:10px;color:var(--t3);font-weight:600}
 .trend-arrow{flex-shrink:0;color:var(--t3)}
 .trend-arrow svg{width:14px;height:14px;stroke:currentColor;stroke-width:2}
-.trend-divider{text-align:center;font-size:11px;font-weight:600;color:var(--t3);margin:18px 0 10px;position:relative}
-.trend-divider::before,.trend-divider::after{content:'';position:absolute;top:50%;width:30%;height:1px;background:var(--b)}
+.trend-divider{text-align:center;font-size:11px;font-weight:600;color:#94A3B8;margin:24px 0 14px;position:relative}
+.trend-divider::before,.trend-divider::after{content:'';position:absolute;top:50%;width:35%;height:1px;background:#F0F2F5}
 .trend-divider::before{left:0}.trend-divider::after{right:0}
 
-.direct-box{background:linear-gradient(135deg,#FFFEFB 0%,#F0FDF8 100%);border-radius:22px;border:1.5px solid var(--b);padding:20px;position:relative;overflow:hidden}
-.direct-box::before{content:'✨';position:absolute;top:14px;right:18px;font-size:18px;opacity:.3;animation:sparkle-pulse 2.4s ease infinite}
-@keyframes sparkle-pulse{0%,100%{opacity:.3;transform:rotate(0deg)}50%{opacity:.7;transform:rotate(15deg) scale(1.15)}}
-.direct-label{display:flex;align-items:center;gap:8px;margin-bottom:12px}
-.direct-label-icon{width:24px;height:24px;border-radius:7px;background:linear-gradient(135deg,var(--mint),var(--mint-d));display:flex;align-items:center;justify-content:center;color:#fff;font-size:13px;font-weight:900}
-.direct-label-title{font-size:14.5px;font-weight:900;color:var(--t1);letter-spacing:-.3px}
-.direct-label-sub{font-size:11.5px;color:var(--t2);line-height:1.55;letter-spacing:-.2px;margin-bottom:14px}
-.direct-label-sub b{color:var(--mint-d);font-weight:800}
-.direct-ta{width:100%;border:none;background:#fff;border-radius:14px;padding:16px 18px;font-size:16.5px;font-family:'Pretendard',sans-serif;color:var(--t1);resize:none;outline:none;line-height:1.55;min-height:78px;letter-spacing:-.3px;font-weight:600;box-sizing:border-box;box-shadow:0 1px 3px rgba(0,0,0,.04),inset 0 0 0 1.5px transparent;transition:box-shadow .18s}
-.direct-ta:focus{box-shadow:0 1px 3px rgba(0,0,0,.04),inset 0 0 0 1.5px var(--mint)}
-.direct-ta::placeholder{color:#B7BFCB;font-weight:500;letter-spacing:-.2px}
-.direct-tip{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.direct-tip-chip{padding:5px 11px;border-radius:100px;background:#fff;border:1px solid var(--b);font-size:11px;font-weight:700;color:var(--t2);cursor:pointer;letter-spacing:-.2px;transition:all .12s;line-height:1.3;white-space:nowrap}
-.direct-tip-chip:hover{border-color:var(--mint);color:var(--mint-d);background:var(--mint-l)}
-.direct-tip-chip:active{transform:scale(.96)}
+/* 토스 스타일 — 흰 배경 + 가벼운 보더, 그라디·sparkle 제거 */
+.direct-box{background:#FFFFFF;border-radius:18px;border:1px solid #F0F2F5;padding:20px}
+.direct-label{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.direct-label-title{font-size:15px;font-weight:800;color:#1A1F27;letter-spacing:-.3px}
+.direct-label-sub{font-size:12px;color:#94A3B8;line-height:1.55;letter-spacing:-.2px;margin-bottom:14px;font-weight:500}
+.direct-ta{width:100%;border:1px solid #F0F2F5;background:#F9FAFB;border-radius:12px;padding:16px;font-size:15.5px;font-family:'Pretendard',sans-serif;color:#1A1F27;resize:none;outline:none;line-height:1.55;min-height:72px;letter-spacing:-.3px;font-weight:500;box-sizing:border-box;transition:border-color .15s,background .15s}
+.direct-ta:focus{border-color:var(--mint);background:#FFFFFF}
+.direct-ta::placeholder{color:#CBD5E1;font-weight:500;letter-spacing:-.2px}
 /* ── 만들기 온보딩 (강조 컬러) ── */
 .discover-box{background:linear-gradient(135deg,#F0FDF9,#EEF2FF);border-radius:20px;border:1px solid #A7F3D0;margin-top:20px;overflow:hidden;transition:border-color .15s,box-shadow .2s}
 .discover-box:active{border-color:var(--mint);box-shadow:0 6px 20px rgba(0,200,150,.18)}
@@ -2285,10 +2253,9 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
     <div class="direct-box">
       <div class="direct-label">
-        <div class="direct-label-icon">✎</div>
-        <div class="direct-label-title">키워드 한 줄, AI 가 카드로</div>
+        <div class="direct-label-title">직접 입력</div>
       </div>
-      <div class="direct-label-sub">키워드든 한 문장이든 — <b>카드뉴스 문체</b>로 본문 자동 생성. 캡션은 <b>내 말투</b>(캐주얼)로.</div>
+      <div class="direct-label-sub">키워드 한 줄로 카드뉴스를 만들어요</div>
       <textarea class="direct-ta" id="direct-topic" placeholder="여기에 주제를 입력해줘" oninput="toggleDirectBtn()" onkeyup="toggleDirectBtn()" oncompositionupdate="toggleDirectBtn()" oncompositionend="toggleDirectBtn()" onchange="toggleDirectBtn()"></textarea>
       <!-- 내 주제 + 카드뉴스 문체 표시 + 일회성 변경 토글 -->
       <div id="direct-tone-summary" style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:10px;padding:9px 12px;border-radius:10px;background:var(--mint-l);border:1px solid #A7F3D0">
@@ -5282,30 +5249,34 @@ function renderDailyTrendsStatic(picks, freshness){
   var container = document.getElementById('trend-carousel');
   if(!container) return;
   window.__DAILY_TRENDS = picks;
-  // 사용자가 이미 카테고리 골랐으면 chip 은 같은 카테고리일 때만 숨김 (다른 카테고리 fallback 카드는 chip 으로 구분)
-  var savedKey = '';
-  try { savedKey = localStorage.getItem('ssobi_disc_topic') || ''; } catch(_){}
-  var myCatLabel = (savedKey && discoverData[savedKey]) ? discoverData[savedKey].name : '';
+  // 토스 스타일 미니멀: 제목 + 작은 메타 한 줄 (인기 지표 또는 신선도)
+  //   chip·점수·출처·본문 미리보기·색띠 모두 제거 → 의사결정 정보만 남김
   container.innerHTML = picks.map(function(t, i){
-    var chip = t.chip || (t.category ? labelizeCategory(t.category) : 'AI 추천');
-    var preview = (t.preview_hook || t.why || t.meta || '').trim();
-    // 클라 풀의 메타 라벨 ("🔥 저장 12k" 류)은 본문 미리보기로 부적합 → 제거
-    if(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}❤️📈💾💬✨🔥📊📍🛒📚]/u.test(preview)) preview = '';
-    var showChip = !(myCatLabel && chip === myCatLabel);
-    var score = (typeof t.hook_score === 'number' && t.hook_score >= 7) ? t.hook_score.toFixed(1) : '';
-    var source = (t.source || '').trim().slice(0, 30);
-    var catKey = t.catKey || (t.category || '');
-    var topRow = (showChip || score)
-      ? '<div class="tcv-row">' +
-          (showChip ? '<span class="tcv-chip">'+escapeHtml(chip)+'</span>' : '<span></span>') +
-          (score ? '<span class="tcv-score"><span class="tcv-score-dot"></span>' + escapeHtml(score) + '</span>' : '') +
-        '</div>'
-      : '';
-    return '<div class="trend-card v4" data-cat="'+escapeHtml(catKey)+'" onclick="useTrend('+(i+1)+')">' +
-      topRow +
+    // meta 라인 — 인기 지표 (engagement / freshness)
+    //   순위: meta(클라 emoji 라벨) > 점수 > 카테고리 라벨 fallback
+    var metaText = '';
+    var rawMeta = (t.meta || '').trim();
+    // 클라 풀의 emoji prefix 메타 ("🔥 저장 12k") → 그대로 인기 지표로 활용 (이모지만 제거하고 텍스트는 살림)
+    if(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}❤️📈💾💬✨🔥📊📍🛒📚]/u.test(rawMeta)){
+      metaText = rawMeta.replace(/^[^\w가-힣]+\s*/, '').trim();
+    } else if(typeof t.hook_score === 'number' && t.hook_score >= 8){
+      metaText = '오늘 핫';
+    }
+    // 카테고리 라벨 fallback (다른 카테고리 카드일 때만)
+    var savedKey = '';
+    try { savedKey = localStorage.getItem('ssobi_disc_topic') || ''; } catch(_){}
+    var myCatLabel = (savedKey && discoverData[savedKey]) ? discoverData[savedKey].name : '';
+    var catLabel = t.chip || (t.category ? labelizeCategory(t.category) : '');
+    var showCat = catLabel && myCatLabel && catLabel !== myCatLabel;
+    return '<div class="trend-card v4" onclick="useTrend('+(i+1)+')">' +
       '<div class="tcv-hook">'+escapeHtml(t.topic || '')+'</div>' +
-      (preview ? '<div class="tcv-preview">'+escapeHtml(preview)+'</div>' : '') +
-      (source ? '<div class="tcv-source">'+escapeHtml(source)+'</div>' : '') +
+      ((metaText || showCat)
+        ? '<div class="tcv-meta">' +
+            (showCat ? '<span>'+escapeHtml(catLabel)+'</span>' : '') +
+            (showCat && metaText ? '<span class="tcv-meta-dot"></span>' : '') +
+            (metaText ? '<span>'+escapeHtml(metaText)+'</span>' : '') +
+          '</div>'
+        : '') +
     '</div>';
   }).join('');
   void freshness;
