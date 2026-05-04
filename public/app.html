@@ -2249,6 +2249,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <span class="first-bar-arr">→</span>
     </button>
 
+    <div style="margin-top:6px;font-size:13px;font-weight:700;color:#64748B;letter-spacing:-.2px;margin-bottom:10px">템플릿</div>
+
     <!-- 템플릿 가로 스와이프 — 4개 (기본 핀 표시 + PC 좌우 화살표) -->
     <div class="tpl-carousel-wrap">
       <button class="tpl-carousel-arr prev" onclick="scrollTplCarousel(-1)" aria-label="이전">
@@ -2373,13 +2375,13 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
     <div class="sec-t">이미지 비율</div>
     <div class="size-grid" id="size-grid">
-      <div class="size-item on" onclick="selectSize(this,'sq')">
+      <div class="size-item" onclick="selectSize(this,'sq')">
         <div class="size-shape" style="width:40px;height:40px"></div>
         <div class="size-label">정사각</div>
         <div class="size-dim">1080×1080</div>
         <div class="size-chs"><span class="size-ch ig">IG 피드</span></div>
       </div>
-      <div class="size-item" onclick="selectSize(this,'pt')">
+      <div class="size-item on" onclick="selectSize(this,'pt')">
         <div class="size-shape" style="width:32px;height:40px"></div>
         <div class="size-label">세로형</div>
         <div class="size-dim">1080×1350</div>
@@ -2401,15 +2403,15 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:6px">템플릿 선택</div>
     <div style="font-size:12px;color:var(--t2);margin-bottom:14px;line-height:1.55">클릭하면 바로 디자인이 적용돼요.</div>
     <div class="tpl-grid" id="tpl-grid">
-      <!-- 클린 (clean) — 화이트 미니멀 — 팁/순위/정보 -->
-      <div class="tpl-item on" onclick="openTplPreview('clean')">
-        <div class="tpl-prev"></div>
-        <div class="tpl-name">클린</div>
-      </div>
       <!-- 감성 (noir) — 풀이미지 + 무드 -->
       <div class="tpl-item" onclick="openTplPreview('noir')">
         <div class="tpl-prev"></div>
         <div class="tpl-name">감성</div>
+      </div>
+      <!-- 클린 (clean) — 화이트 미니멀 — 팁/순위/정보 -->
+      <div class="tpl-item on" onclick="openTplPreview('clean')">
+        <div class="tpl-prev"></div>
+        <div class="tpl-name">클린</div>
       </div>
       <!-- 매거진 (mag) — 베이지 + 형광펜 + 손그림 -->
       <div class="tpl-item" onclick="openTplPreview('mag')">
@@ -2434,8 +2436,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div class="create-step" id="cs-4">
     <div class="edt-mode-tabs" style="display:flex;align-items:center;gap:6px">
       <button class="edt-mode-tab on" id="edt-mode-edit" onclick="edtSetMode('edit')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke-linecap="round" stroke-linejoin="round"/></svg>편집</button>
+      <button class="edt-mode-tab" id="edt-mode-tpl" onclick="openTplChange()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" stroke-linecap="round" stroke-linejoin="round"/></svg>템플릿 변경</button>
       <button class="edt-mode-tab" id="edt-mode-preview" onclick="edtSetMode('preview')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3"/></svg>미리보기</button>
-      <button class="edt-mode-tab" id="edt-fullscreen-btn" onclick="toggleFullscreenEditor()" title="전체화면" style="margin-left:auto;padding:8px 10px"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M8 3H5a2 2 0 00-2 2v3m18 0V5a2 2 0 00-2-2h-3m0 18h3a2 2 0 002-2v-3M3 16v3a2 2 0 002 2h3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
     <div style="font-size:11px;color:var(--t3);margin:2px 0 12px" id="edt-mode-hint">드래그로 위치 이동 · 모서리로 크기 조절 · 탭하면 편집</div>
 
@@ -2642,15 +2644,6 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
   <!-- 긴급 -->
   <div class="tc on" id="tc-urgent">
-    <!-- 최근 발행 (만들기 → 발행 후 자동 표시) -->
-    <div id="recent-pub-wrap" style="display:none;margin-bottom:14px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <div style="font-size:12px;font-weight:800;color:var(--t1);letter-spacing:-.2px">내 최근 발행</div>
-        <div style="font-size:10.5px;color:var(--t3);font-weight:600">탭하면 댓글·DM 응대 자동 시작</div>
-      </div>
-      <div id="recent-pub-list" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none"></div>
-    </div>
-
     <!-- DEV 전용: 긴급 시뮬레이션 -->
     <div class="dev-only" style="display:none;margin-bottom:10px;gap:6px">
       <button onclick="devSimulate('comment','urgent')" style="padding:8px 12px;border-radius:8px;background:#FEE2E2;border:1px dashed var(--red);color:#991B1B;font-size:11px;font-weight:800;cursor:pointer">🧪 긴급 댓글 (승인 대기)</button>
@@ -5013,7 +5006,7 @@ function showDay(k){
 
 // ═══════════════ CREATE FLOW ═══════════════
 var createStep = 1;
-var createData = { hook:'', body:'', slides:7, size:'sq', template:'clean', channels:['ig'], contentTone:'friendly' };
+var createData = { hook:'', body:'', slides:7, size:'pt', template:'clean', channels:['ig'], contentTone:'friendly' };
 // 메타 라벨 제거 — 괄호로 묶인 시스템성 표기만 잡음.
 //   비괄호 패턴(* 참고: ...) 까지 잡으면 실제 본문 라인을 잘라먹어서 본문이 통째 사라지는 버그 발생.
 //   그래서 괄호 안 키워드만 처리. AI 가 비괄호로 박으면 후처리 대신 시스템 프롬프트 룰로 차단.
@@ -5083,7 +5076,7 @@ function renderTplCarousel(){
   if(!c) return;
   var current = getDefaultTemplate();
   if(!createData.template) createData.template = current;
-  var tpls = ['mag', 'clean', 'noir', 'bold'];
+  var tpls = ['noir', 'clean', 'mag', 'bold'];
   // 핀 아이콘 (기본 카드에만 표시)
   var pinSVG = '<svg viewBox="0 0 24 24" fill="#FFFFFF" stroke="#FFFFFF" stroke-width="0"><path d="M12 2L9 7H5L8 11L7 17L12 14L17 17L16 11L19 7H15L12 2Z" stroke-linejoin="round"/></svg>';
   c.innerHTML = tpls.map(function(tpl){
@@ -5122,7 +5115,7 @@ function openTplGallery(){
   var grid = document.getElementById('tpl-gallery-grid');
   if(grid){
     var current = getDefaultTemplate();
-    var tpls = ['mag', 'clean', 'noir', 'bold'];
+    var tpls = ['noir', 'clean', 'mag', 'bold'];
     grid.innerHTML = tpls.map(function(tpl){
       var prefix = TPL_SEED_PREFIX[tpl];
       var name = TPL_DISPLAY_NAME[tpl] || tpl;
@@ -5138,6 +5131,43 @@ function openTplGallery(){
   }
   ov.classList.add('on');
 }
+
+// 편집 화면(cs-4)에서 [템플릿 변경] 누르면 — 갤러리 열고, 클릭 시 즉시 현재 편집본에 적용
+function openTplChange(){
+  var ov = document.getElementById('m-tpl-gallery');
+  if(!ov) return;
+  var grid = document.getElementById('tpl-gallery-grid');
+  if(grid){
+    var current = createData.template || getDefaultTemplate();
+    var tpls = ['noir', 'clean', 'mag', 'bold'];
+    grid.innerHTML = tpls.map(function(tpl){
+      var prefix = TPL_SEED_PREFIX[tpl];
+      var name = TPL_DISPLAY_NAME[tpl] || tpl;
+      var isCurrent = tpl === current;
+      return '<div class="tpl-gallery-item' + (isCurrent ? ' is-default' : '') + '" onclick="applyTplFromGallery(\'' + tpl + '\')">' +
+        '<div class="tpl-gallery-thumb"><img src="/figma-seeds/' + prefix + '_01_cover.png" alt="' + name + '"/></div>' +
+        '<div class="tpl-gallery-meta">' +
+          '<span class="tpl-gallery-name">' + name + '</span>' +
+          (isCurrent ? '<span class="tpl-gallery-badge">현재</span>' : '') +
+        '</div>' +
+      '</div>';
+    }).join('');
+  }
+  ov.classList.add('on');
+}
+
+// 갤러리에서 클릭한 템플릿 즉시 적용 — 편집 캔버스 재빌드
+function applyTplFromGallery(tpl){
+  if(!tpl) return;
+  if(createData.template !== tpl){
+    createData.template = tpl;
+    createData._editorSource = null;
+    try { initEditor(); } catch(e) { console.warn('initEditor failed', e); }
+    if(typeof lkeShowToast === 'function') lkeShowToast('✓ 템플릿 변경됨 · ' + (TPL_DISPLAY_NAME[tpl] || tpl));
+  }
+  cm('m-tpl-gallery');
+}
+
 function selectContentTone(btn){
   document.querySelectorAll('.tone-chip').forEach(function(c){
     c.classList.remove('on');
@@ -5367,6 +5397,8 @@ function goStep(n){
   window.scrollTo(0,0);
 }
 function createBack(){
+  // cs-4 → cs-2 (cs-3 템플릿 선택은 인라인 step 이 아니라 [템플릿 변경] 모달로 분리됨)
+  if(createStep === 4) return goStep(2);
   if(createStep>1) return goStep(createStep-1);
   // hook-pick 화면에서 뒤로가면 cs-1 로
   var hp = document.getElementById('cs-hook-pick');
@@ -14645,17 +14677,17 @@ window.addEventListener('load', function(){
     <!-- 헤더 -->
     <div style="position:sticky;top:0;z-index:2;background:#fff;border-bottom:1px solid #E7E5E4;padding:12px 16px;display:flex;align-items:center;justify-content:space-between">
       <div id="tplp-name" style="font-size:14px;color:var(--t1);font-weight:800">템플릿</div>
-      <button onclick="cm('m-tpl-preview')" style="border:none;background:#F3F4F6;width:30px;height:30px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <button onclick="cm('m-tpl-preview')" style="border:none;background:none;cursor:pointer;padding:6px;color:var(--t2);display:flex;align-items:center;justify-content:center" aria-label="닫기">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:18px;height:18px"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
     </div>
     <!-- 슬라이드 carousel -->
     <div style="flex:1;overflow:hidden;background:#F5F5F4;padding:18px;position:relative;display:flex;align-items:center;justify-content:center">
-      <button onclick="tplPreviewNav(-1)" style="position:absolute;left:8px;z-index:3;width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.95);box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" style="width:18px;height:18px"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <button onclick="tplPreviewNav(-1)" style="position:absolute;left:6px;z-index:3;width:32px;height:32px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;color:var(--t2)" aria-label="이전">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:22px;height:22px"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <button onclick="tplPreviewNav(1)" style="position:absolute;right:8px;z-index:3;width:36px;height:36px;border-radius:50%;border:none;background:rgba(255,255,255,.95);box-shadow:0 2px 8px rgba(0,0,0,.15);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" style="width:18px;height:18px"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <button onclick="tplPreviewNav(1)" style="position:absolute;right:6px;z-index:3;width:32px;height:32px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;color:var(--t2)" aria-label="다음">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" style="width:22px;height:22px"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
       <img id="tplp-img" src="" style="max-width:100%;max-height:60vh;box-shadow:0 6px 20px rgba(0,0,0,.18);display:block" alt="template slide"/>
     </div>
