@@ -146,7 +146,7 @@ ${JSON.stringify(top20, null, 2)}
   }
 
   // ─── 1차 시도 ───
-  let attempt = await callClaude(20000)
+  const attempt = await callClaude(20000)
   if (attempt.ok && attempt.text) {
     claudeResp = attempt.resp || {}
     claudeRawText = attempt.text

@@ -2109,14 +2109,35 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div class="acc" id="acc-auto">
     <div class="acc-hdr" onclick="toggleAcc('acc-auto')">
       <div class="acc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="acc-copy"><div class="acc-name">AI가 나 대신 댓글·DM 응대</div><div class="acc-sub">24시간 내 말투로 자동 처리 중</div></div>
-      <div class="acc-aside"><label class="tog" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="tsl"></span></label><div class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+      <div class="acc-copy"><div class="acc-name">AI가 나 대신 댓글·DM 응대</div><div class="acc-sub" id="ar-master-sub">24시간 내 말투로 자동 처리 중</div></div>
+      <div class="acc-aside"><span id="ar-master-state" style="font-size:10px;font-weight:800;color:var(--mint-d);margin-right:6px;letter-spacing:.5px">ON</span><label class="tog" onclick="event.stopPropagation()"><input type="checkbox" id="ar-master-toggle" onchange="onAutoReplyMasterToggle(this)" checked><span class="tsl"></span></label><div class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
     </div>
     <div class="acc-body">
       <div class="ai-stats">
         <div class="ai-stat"><div class="ai-stat-v" id="q-used">0</div><div class="ai-stat-l">오늘 응대</div></div>
         <div class="ai-stat"><div class="ai-stat-v" id="q-left">—</div><div class="ai-stat-l">남은 응대</div></div>
         <div class="ai-stat"><div class="ai-stat-v" id="q-tone">—</div><div class="ai-stat-l">말투 일치도</div></div>
+      </div>
+
+      <!-- 채널별 자동 응대 토글 (Meta App Review: 사용자 통제권 명시) -->
+      <div style="background:var(--bg);border-radius:12px;padding:14px;margin-bottom:10px">
+        <div style="font-size:12px;font-weight:700;color:var(--t3);margin-bottom:10px">채널별 자동 응대 (Per-channel auto-reply)</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b)">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700;color:var(--t1)">댓글 자동 응대 <span style="font-size:11px;color:var(--t3);font-weight:500">· Comments</span></div>
+            <div style="font-size:11px;color:var(--t3);margin-top:2px;line-height:1.45">Instagram 댓글에 AI가 내 말투로 답변</div>
+          </div>
+          <span id="ar-ch-comment-state" style="font-size:10px;font-weight:800;color:var(--mint-d);margin-right:6px;letter-spacing:.5px">ON</span>
+          <label class="tog" style="flex-shrink:0"><input type="checkbox" id="ar-ch-comment" onchange="onAutoReplyChannelToggle('ig_comment', this)" checked><span class="tsl"></span></label>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0">
+          <div style="flex:1;min-width:0">
+            <div style="font-size:13px;font-weight:700;color:var(--t1)">DM 자동 응대 <span style="font-size:11px;color:var(--t3);font-weight:500">· Direct Messages</span></div>
+            <div style="font-size:11px;color:var(--t3);margin-top:2px;line-height:1.45">개별 대화는 직접 답변 모드로 전환 가능</div>
+          </div>
+          <span id="ar-ch-dm-state" style="font-size:10px;font-weight:800;color:var(--mint-d);margin-right:6px;letter-spacing:.5px">ON</span>
+          <label class="tog" style="flex-shrink:0"><input type="checkbox" id="ar-ch-dm" onchange="onAutoReplyChannelToggle('ig_dm', this)" checked><span class="tsl"></span></label>
+        </div>
       </div>
 
       <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg);border-radius:12px;margin-bottom:10px">
@@ -2783,6 +2804,14 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div class="mitem" onclick="openModal('m-account')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><div class="mbd"><div class="mname2">계정 연동</div><div class="msub2">Instagram · TikTok · YouTube</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
     <div class="mitem" onclick="go('targets')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mbd"><div class="mname2">참고 계정 분석</div><div class="msub2">경쟁 계정 해시태그 · 게시 패턴 분석</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
     <div class="mitem" onclick="openModal('m-ai-style')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div><div class="mbd"><div class="mname2">AI 말투 학습</div><div class="msub2">일치도 98% · 게시물 250개 분석</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    <div class="mitem" style="cursor:default">
+      <div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
+      <div class="mbd"><div class="mname2">언어 · Language</div><div class="msub2">앱 표시 언어 설정</div></div>
+      <select id="app-language-select" onchange="onAppLanguageChange(this)" style="margin-left:auto;flex-shrink:0;padding:8px 10px;border:1px solid var(--b);border-radius:8px;font-size:13px;font-weight:700;color:var(--t1);background:#fff">
+        <option value="ko">한국어</option>
+        <option value="en">English</option>
+      </select>
+    </div>
     <div class="mitem mitem-kakao" onclick="openModal('m-kakao')"><div class="mico" style="background:#FEE500;border-color:#FEE500"><svg viewBox="0 0 24 24" fill="none" stroke="#3A1D1D" stroke-width="1.8"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mbd"><div class="mname2" style="color:#3A1D1D">카카오톡으로 알림 받기</div><div class="msub2">요주의·수익제안·일일 리포트 즉시 <span class="badge" style="background:#FEE500;color:#3A1D1D;margin-left:4px;font-weight:800">무료</span></div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
     <div class="mitem" onclick="openModal('m-plan')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="mbd"><div class="mname2">이용권</div><div class="msub2">프리미엄 · 무료체험 D-4</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
   </div>
@@ -5156,6 +5185,107 @@ function syncToneChip(){
   }
 }
 document.addEventListener('DOMContentLoaded', syncToneChip);
+
+// ─── 자동 응대 토글 (Meta App Review: 사용자 통제권 명시) ───
+//   1) 페이지 로드 시 GET /api/auto-reply/toggle → UI 동기화
+//   2) 마스터/채널 토글 onchange → POST 로 즉시 반영
+//   3) ON/OFF 라벨로 시각적 명시 (Meta 리뷰어용)
+async function loadAutoReplySettings(){
+  try{
+    var res = await fetch('/api/auto-reply/toggle');
+    if(!res.ok) return;
+    var d = await res.json();
+    if(!d.ok) return;
+    var master = document.getElementById('ar-master-toggle');
+    var masterState = document.getElementById('ar-master-state');
+    var masterSub = document.getElementById('ar-master-sub');
+    if(master){
+      master.checked = !!d.enabled;
+      if(masterState) masterState.textContent = d.enabled ? 'ON' : 'OFF';
+      if(masterState) masterState.style.color = d.enabled ? 'var(--mint-d)' : 'var(--red)';
+      if(masterSub) masterSub.textContent = d.enabled ? '24시간 내 말투로 자동 처리 중' : '자동 응대 OFF · 직접 답변 모드';
+    }
+    var ch = d.channels || {};
+    var commentToggle = document.getElementById('ar-ch-comment');
+    var commentState = document.getElementById('ar-ch-comment-state');
+    if(commentToggle){
+      var c = ch.ig_comment !== false;
+      commentToggle.checked = c;
+      if(commentState){ commentState.textContent = c ? 'ON' : 'OFF'; commentState.style.color = c ? 'var(--mint-d)' : 'var(--red)'; }
+    }
+    var dmToggle = document.getElementById('ar-ch-dm');
+    var dmState = document.getElementById('ar-ch-dm-state');
+    if(dmToggle){
+      var dm = ch.ig_dm !== false;
+      dmToggle.checked = dm;
+      if(dmState){ dmState.textContent = dm ? 'ON' : 'OFF'; dmState.style.color = dm ? 'var(--mint-d)' : 'var(--red)'; }
+    }
+    // 언어 설정 동기화
+    var langSel = document.getElementById('app-language-select');
+    if(langSel && d.language){ langSel.value = d.language; }
+  }catch(e){ console.warn('[auto-reply] load failed', e); }
+}
+
+async function onAutoReplyMasterToggle(el){
+  var enabled = !!el.checked;
+  var state = document.getElementById('ar-master-state');
+  var sub = document.getElementById('ar-master-sub');
+  if(state){ state.textContent = enabled ? 'ON' : 'OFF'; state.style.color = enabled ? 'var(--mint-d)' : 'var(--red)'; }
+  if(sub) sub.textContent = enabled ? '24시간 내 말투로 자동 처리 중' : '자동 응대 OFF · 직접 답변 모드';
+  try{
+    var res = await fetch('/api/auto-reply/toggle', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ enabled: enabled })
+    });
+    var d = await res.json();
+    if(!d.ok) throw new Error(d.error||'failed');
+    if(typeof lkeShowToast === 'function') lkeShowToast(enabled ? '자동 응대 ON' : '자동 응대 OFF · 직접 답변 모드');
+  }catch(e){
+    el.checked = !enabled;
+    if(state){ state.textContent = !enabled ? 'ON' : 'OFF'; state.style.color = !enabled ? 'var(--mint-d)' : 'var(--red)'; }
+    alert('설정 저장 실패: ' + (e.message||e));
+  }
+}
+
+async function onAutoReplyChannelToggle(channel, el){
+  var enabled = !!el.checked;
+  var stateId = channel === 'ig_comment' ? 'ar-ch-comment-state' : 'ar-ch-dm-state';
+  var state = document.getElementById(stateId);
+  if(state){ state.textContent = enabled ? 'ON' : 'OFF'; state.style.color = enabled ? 'var(--mint-d)' : 'var(--red)'; }
+  try{
+    var body = { channels: {} };
+    body.channels[channel] = enabled;
+    var res = await fetch('/api/auto-reply/toggle', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify(body)
+    });
+    var d = await res.json();
+    if(!d.ok) throw new Error(d.error||'failed');
+    var label = channel === 'ig_comment' ? '댓글' : 'DM';
+    if(typeof lkeShowToast === 'function') lkeShowToast(label + ' 자동 응대 ' + (enabled?'ON':'OFF'));
+  }catch(e){
+    el.checked = !enabled;
+    if(state){ state.textContent = !enabled ? 'ON' : 'OFF'; state.style.color = !enabled ? 'var(--mint-d)' : 'var(--red)'; }
+    alert('설정 저장 실패: ' + (e.message||e));
+  }
+}
+
+async function onAppLanguageChange(el){
+  var lang = el.value;
+  try{
+    var res = await fetch('/api/profile/language', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ language: lang })
+    });
+    var d = await res.json();
+    if(!d.ok) throw new Error(d.error||'failed');
+    if(typeof lkeShowToast === 'function') lkeShowToast('언어 설정 저장됨 · ' + lang.toUpperCase());
+  }catch(e){
+    alert('언어 설정 저장 실패: ' + (e.message||e));
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadAutoReplySettings);
 // 톤 chip grid 표시/숨김 토글
 function toggleToneChips(){
   var grid = document.getElementById('tone-chip-grid');

@@ -131,6 +131,39 @@ async function handleComment(supabase: AdminClient, value: any) {
       continue
     }
 
+    // 자동 응대 토글 체크 (글로벌 + 채널별)
+    const { data: autoSettings } = await supabase
+      .from('profiles')
+      .select('auto_reply_enabled, auto_reply_channels')
+      .eq('id', account.user_id)
+      .maybeSingle()
+
+    const autoEnabled = autoSettings?.auto_reply_enabled !== false  // null/undefined 면 기본 true
+    const channels = (autoSettings?.auto_reply_channels || {}) as Record<string, boolean>
+    const channelEnabled = channels.ig_comment !== false  // 채널별 토글
+
+    if (!autoEnabled || !channelEnabled) {
+      console.log(`[Webhook/Comment] auto-reply OFF (global=${autoEnabled}, channel=${channelEnabled}), skipping`)
+      // 사용자가 토글 OFF 한 것도 로그에 기록 (Meta 검수 영상에서 보여주기 위해)
+      await supabase.from('reply_logs').insert({
+        user_id: account.user_id,
+        ig_account_id: account.id,
+        type: 'comment',
+        original_text: text,
+        reply_text: '[자동 응대 OFF — 사용자 통제]',
+        platform_id: commentId,
+        send_status: 'skipped',
+        is_approved: false,
+        context: {
+          comment_id: commentId,
+          commenter_handle: value.from?.username || '',
+          commenter_platform_id: String(value.from?.id || ''),
+          skip_reason: !autoEnabled ? 'global_toggle_off' : 'channel_toggle_off',
+        },
+      })
+      continue
+    }
+
     try {
       const draft = await generateReply(account.user_id, text, supabase)
       console.log('[Webhook/Comment] generated draft:', draft?.slice(0, 80))
@@ -271,6 +304,79 @@ async function handleMessage(supabase: AdminClient, value: any) {
       console.log(`[Webhook] User ${account.user_id} over plan limit (DM), skipping`)
       continue
     }
+
+    // 자동 응대 토글 체크 (글로벌 + 채널별)
+    const { data: autoSettings } = await supabase
+      .from('profiles')
+      .select('auto_reply_enabled, auto_reply_channels')
+      .eq('id', account.user_id)
+      .maybeSingle()
+    const autoEnabled = autoSettings?.auto_reply_enabled !== false
+    const channels = (autoSettings?.auto_reply_channels || {}) as Record<string, boolean>
+    const dmEnabled = channels.ig_dm !== false
+
+    if (!autoEnabled || !dmEnabled) {
+      console.log(`[Webhook/DM] auto-reply OFF (global=${autoEnabled}, dm=${dmEnabled}), skipping`)
+      await supabase.from('reply_logs').insert({
+        user_id: account.user_id,
+        ig_account_id: account.id,
+        type: 'dm',
+        original_text: text,
+        reply_text: '[자동 응대 OFF — 사용자 통제]',
+        platform_id: messageId,
+        send_status: 'skipped',
+        is_approved: false,
+        context: {
+          sender_id: String(senderId),
+          sender_handle: value.sender?.username || '',
+          skip_reason: !autoEnabled ? 'global_toggle_off' : 'channel_toggle_off',
+        },
+      })
+      continue
+    }
+
+    // DM thread takeover 체크 (특정 고객 thread 만 사장이 직접 응대 모드)
+    const { data: thread } = await supabase
+      .from('dm_threads')
+      .select('takeover_active')
+      .eq('user_id', account.user_id)
+      .eq('ig_account_id', account.id)
+      .eq('remote_ig_user_id', String(senderId))
+      .maybeSingle()
+
+    if (thread?.takeover_active) {
+      console.log(`[Webhook/DM] thread takeover active, sender=${senderId}, skipping`)
+      await supabase.from('reply_logs').insert({
+        user_id: account.user_id,
+        ig_account_id: account.id,
+        type: 'dm',
+        original_text: text,
+        reply_text: '[직접 답변 모드 — 사장이 직접 응대 중]',
+        platform_id: messageId,
+        send_status: 'skipped',
+        is_approved: false,
+        context: {
+          sender_id: String(senderId),
+          sender_handle: value.sender?.username || '',
+          skip_reason: 'thread_takeover',
+        },
+      })
+      // last_message_at 업데이트 (thread 활동 추적)
+      await supabase.from('dm_threads').update({ last_message_at: new Date().toISOString() })
+        .eq('user_id', account.user_id)
+        .eq('ig_account_id', account.id)
+        .eq('remote_ig_user_id', String(senderId))
+      continue
+    }
+
+    // thread record 생성 / 업데이트 (자동 응대 통계용)
+    await supabase.from('dm_threads').upsert({
+      user_id: account.user_id,
+      ig_account_id: account.id,
+      remote_ig_user_id: String(senderId),
+      remote_username: value.sender?.username || null,
+      last_message_at: new Date().toISOString(),
+    }, { onConflict: 'user_id,ig_account_id,remote_ig_user_id', ignoreDuplicates: false })
 
     try {
       const draft = await generateReply(account.user_id, text, supabase, 'dm')
