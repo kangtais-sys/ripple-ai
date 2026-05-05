@@ -2607,7 +2607,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
             <span class="sched-ch" style="background:#F0F0F0;color:#111">TK</span>
           </div>
         </div>
-        <button onclick="cancelSched(this)" style="background:none;border:none;color:var(--red);font-size:11px;font-weight:800;cursor:pointer" data-i18n="create.cs5.cancel">취소</button>
+        <button onclick="cancelSched(this)" style="background:none;border:none;color:var(--red);font-size:11px;font-weight:800;cursor:pointer"><span data-i18n="btn.cancel">취소</span></button>
       </div>
       <div class="sched-card">
         <div class="sched-thumb" style="background:url('https://images.unsplash.com/photo-1571875257727-256c39da42af?auto=format&fit=crop&w=160&q=80') center/cover"></div>
@@ -2618,7 +2618,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
             <span class="sched-ch" style="background:#FFF0F5;color:#E1306C">IG</span>
           </div>
         </div>
-        <button onclick="cancelSched(this)" style="background:none;border:none;color:var(--red);font-size:11px;font-weight:800;cursor:pointer" data-i18n="create.cs5.cancel">취소</button>
+        <button onclick="cancelSched(this)" style="background:none;border:none;color:var(--red);font-size:11px;font-weight:800;cursor:pointer"><span data-i18n="btn.cancel">취소</span></button>
       </div>
     </div>
   </div>
@@ -3239,7 +3239,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <button class="lk-block-pick" onclick="addLinkBlock('spacer');cm('m-link-add')"><div class="lkp-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="8" width="14" height="8" rx="1"/></svg></div><div class="lkp-t">여백</div><div class="lkp-s">위아래 공간</div></button>
       <button class="lk-block-pick" onclick="addLinkBlock('alert');cm('m-link-add')"><div class="lkp-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.158c0 .538-.214 1.055-.595 1.437L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="lkp-t">알림 설정</div><div class="lkp-s">신규 링크/공구 알림 구독</div></button>
     </div>
-    <button class="btn-s" onclick="cm('m-link-add')">닫기</button>
+    <button class="btn-s" onclick="cm('m-link-add')"><span data-i18n="btn.close">닫기</span></button>
   </div>
 </div>
 
@@ -3352,7 +3352,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <button class="lk-share-btn" onclick="shareTo('yt')"><div class="ch-av ch-yt"></div><div>YouTube</div></button>
       <button class="lk-share-btn" onclick="shareTo('more')"><div style="width:28px;height:28px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;margin:0 auto 4px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></div><div>기타</div></button>
     </div>
-    <button class="btn-s" onclick="cm('m-link-share')">닫기</button>
+    <button class="btn-s" onclick="cm('m-link-share')"><span data-i18n="btn.close">닫기</span></button>
   </div>
 </div>
 
@@ -3376,7 +3376,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div class="lk-label">내용</div>
     <textarea class="lk-inp" id="pp-msg" rows="4" placeholder="제품·금액·일정 등 자세한 내용" style="resize:vertical"></textarea>
     <button class="btn-p" style="margin-top:8px" onclick="submitProposal()">보내기</button>
-    <button class="btn-s" onclick="cm('m-link-propose')">취소</button>
+    <button class="btn-s" onclick="cm('m-link-propose')"><span data-i18n="btn.cancel">취소</span></button>
   </div>
 </div>
 
@@ -3386,9 +3386,9 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div class="s-bar"></div>
     <div class="s-title">블록 편집</div>
     <div id="lk-block-edit-body"></div>
-    <button class="btn-p" style="margin-top:8px" onclick="saveBlockEdit()">저장</button>
+    <button class="btn-p" style="margin-top:8px" onclick="saveBlockEdit()"><span data-i18n="btn.save">저장</span></button>
     <button class="btn-d" onclick="deleteCurrentBlock()">삭제</button>
-    <button class="btn-s" onclick="cm('m-link-block-edit')">취소</button>
+    <button class="btn-s" onclick="cm('m-link-block-edit')"><span data-i18n="btn.cancel">취소</span></button>
   </div>
 </div>
 
@@ -3694,12 +3694,12 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 </div>
 
 <!-- MODALS -->
-<div class="ov" id="m-u1" onclick="co(event,'m-u1')"><div class="sheet"><div class="s-bar"></div><div class="s-title">결제 문제</div><div class="s-sub">@beauty_lover99 · Instagram · 2분 전</div><div class="bubble"><div class="b-who">@beauty_lover99</div>"공동구매 결제가 계속 오류가 나는데 환불은 어떻게 해요?"</div><div class="bubble ai"><div class="b-who ai">Ssobi AI 초안</div>안녕하세요! 불편을 드려서 정말 죄송해요. 결제 오류 및 중복 결제 문제는 구매하신 플랫폼 고객센터에서 바로 처리해 드릴 수 있어요. 올리브영 1800-0033 / 스마트스토어는 마이페이지 문의하기로 접수해 주세요!</div><button class="btn-p" onclick="cm('m-u1')">승인 · 바로 발송</button><button class="btn-s" onclick="cm('m-u1')">수정하기</button><button class="btn-d" onclick="cm('m-u1')">직접 응대</button></div></div>
-<div class="ov" id="m-u2" onclick="co(event,'m-u2')"><div class="sheet"><div class="s-bar"></div><div class="s-title">부정 이슈</div><div class="s-sub">@skin_trouble_k · Instagram · 18분 전</div><div class="bubble"><div class="b-who">@skin_trouble_k</div>"이거 쓰고 트러블 났어요 신고 어떻게 해요..."</div><div class="bubble ai"><div class="b-who ai">Ssobi AI 초안</div>안녕하세요, 불편을 드려 정말 죄송해요. DM으로 연락 주시면 교환·환불 빠르게 도와드릴게요!</div><button class="btn-p" onclick="cm('m-u2')">승인 · 바로 발송</button><button class="btn-s" onclick="cm('m-u2')">수정하기</button><button class="btn-d" onclick="cm('m-u2')">직접 응대</button></div></div>
-<div class="ov" id="m-biz" onclick="co(event,'m-biz')"><div class="sheet"><div class="s-bar"></div><div class="s-title">협업 문의</div><div class="s-sub">@collab_brand_k · DM · 1시간 전</div><div class="bubble"><div class="b-who">@collab_brand_k</div>"OEM 협업 및 견적 문의드립니다"</div><div class="bubble ai"><div class="b-who ai">Ssobi AI 초안</div>안녕하세요! 관심 감사해요. 자세한 협의는 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6f060109002f02060303060206030306410c00">[email&#160;protected]</a> 또는 카카오 @millimilli 로 연락 주시면 빠르게 안내드릴게요</div><button class="btn-p" onclick="cm('m-biz')">승인 · 바로 발송</button><button class="btn-s" onclick="cm('m-biz')">수정하기</button></div></div>
-<div class="ov" id="m-c1" onclick="co(event,'m-c1')"><div class="sheet"><div class="s-bar"></div><div class="s-title">응대 내역</div><div class="bubble"><div class="b-who">@yuna__daily</div>"제품 어디서 구매해요?"</div><div class="bubble ai"><div class="b-who ai">Ssobi AI · 말투 98%</div>올리브영·스마트스토어·카페24에서 구매 가능해요! 프로필 링크에 바로 있어요</div><div class="bubble"><div class="b-who">@yuna__daily</div>"감사해요!! 바로 주문했어요"</div><button class="btn-s" onclick="cm('m-c1')">닫기</button></div></div>
-<div class="ov" id="m-crm1" onclick="co(event,'m-crm1')"><div class="sheet"><div class="s-bar"></div><div class="s-title">@yuna__daily</div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px"><span class="badge bg">VVIP</span><span class="badge bn">Instagram</span><span class="badge bn">댓글 38회</span></div><div style="font-size:11px;font-weight:800;color:var(--t3);letter-spacing:.3px;margin-bottom:6px">최근 댓글 3건</div><div class="bubble"><div class="b-who">3일 전</div>"이 제품 너무 좋아요! 주변에 다 추천했어요 ✨"</div><div class="bubble"><div class="b-who">1주 전</div>"공구 열리자마자 바로 샀어요 ㅎㅎ 다음 공구도 기다릴게요!"</div><div class="bubble"><div class="b-who">2주 전</div>"성분 설명 너무 꼼꼼해서 믿고 구매해요 😊"</div><div style="font-size:11px;color:var(--t2);margin:10px 2px 14px">구매 3회 · 공유 5회 · 좋아요 28회</div><button class="btn-p" onclick="cm('m-crm1')">스토리 조회 예약</button><button class="btn-s" onclick="cm('m-crm1')">닫기</button></div></div>
-<div class="ov" id="m-crm2" onclick="co(event,'m-crm2')"><div class="sheet"><div class="s-bar"></div><div class="s-title">요주의 — @skin_trouble_k</div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px"><span class="badge br">요주의</span><span class="badge bn">Instagram</span><span class="badge br">부정 4회</span></div><div style="font-size:11px;font-weight:800;color:var(--t3);letter-spacing:.3px;margin-bottom:6px">최근 댓글 3건</div><div class="bubble"><div class="b-who" style="color:var(--red)">어제</div>"이 제품 써서 트러블 났어요!! 환불 어떻게 해요"</div><div class="bubble"><div class="b-who" style="color:var(--red)">3일 전</div>"성분 믿고 샀는데 알러지 반응. 환불 부탁드려요"</div><div class="bubble"><div class="b-who" style="color:var(--red)">1주 전</div>"배송도 늦고 포장도 별로네요 ㅠㅠ"</div><div class="bubble ai"><div class="b-who ai">Ssobi AI 초안</div>안녕하세요, 불편을 드려 정말 죄송해요. DM으로 연락 주시면 빠르게 도와드릴게요!</div><button class="btn-p" onclick="cm('m-crm2')">승인 · 바로 발송</button><button class="btn-d" onclick="cm('m-crm2')">직접 응대</button></div></div>
+<div class="ov" id="m-u1" onclick="co(event,'m-u1')"><div class="sheet"><div class="s-bar"></div><div class="s-title" data-i18n="mod.urgent.payment">결제 문제</div><div class="s-sub">@beauty_lover99 · Instagram · 2분 전</div><div class="bubble"><div class="b-who">@beauty_lover99</div>"공동구매 결제가 계속 오류가 나는데 환불은 어떻게 해요?"</div><div class="bubble ai"><div class="b-who ai" data-i18n="mod.urgent.ai_draft">Ssobi AI 초안</div>안녕하세요! 불편을 드려서 정말 죄송해요. 결제 오류 및 중복 결제 문제는 구매하신 플랫폼 고객센터에서 바로 처리해 드릴 수 있어요. 올리브영 1800-0033 / 스마트스토어는 마이페이지 문의하기로 접수해 주세요!</div><button class="btn-p" onclick="cm('m-u1')"><span data-i18n="btn.approve_send">승인 · 바로 발송</span></button><button class="btn-s" onclick="cm('m-u1')"><span data-i18n="btn.edit_more">수정하기</span></button><button class="btn-d" onclick="cm('m-u1')"><span data-i18n="btn.manual_reply">직접 응대</span></button></div></div>
+<div class="ov" id="m-u2" onclick="co(event,'m-u2')"><div class="sheet"><div class="s-bar"></div><div class="s-title" data-i18n="mod.urgent.negative">부정 이슈</div><div class="s-sub">@skin_trouble_k · Instagram · 18분 전</div><div class="bubble"><div class="b-who">@skin_trouble_k</div>"이거 쓰고 트러블 났어요 신고 어떻게 해요..."</div><div class="bubble ai"><div class="b-who ai" data-i18n="mod.urgent.ai_draft">Ssobi AI 초안</div>안녕하세요, 불편을 드려 정말 죄송해요. DM으로 연락 주시면 교환·환불 빠르게 도와드릴게요!</div><button class="btn-p" onclick="cm('m-u2')"><span data-i18n="btn.approve_send">승인 · 바로 발송</span></button><button class="btn-s" onclick="cm('m-u2')"><span data-i18n="btn.edit_more">수정하기</span></button><button class="btn-d" onclick="cm('m-u2')"><span data-i18n="btn.manual_reply">직접 응대</span></button></div></div>
+<div class="ov" id="m-biz" onclick="co(event,'m-biz')"><div class="sheet"><div class="s-bar"></div><div class="s-title" data-i18n="mod.urgent.collab">협업 문의</div><div class="s-sub">@collab_brand_k · DM · 1시간 전</div><div class="bubble"><div class="b-who">@collab_brand_k</div>"OEM 협업 및 견적 문의드립니다"</div><div class="bubble ai"><div class="b-who ai" data-i18n="mod.urgent.ai_draft">Ssobi AI 초안</div>안녕하세요! 관심 감사해요. 자세한 협의는 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="6f060109002f02060303060206030306410c00">[email&#160;protected]</a> 또는 카카오 @millimilli 로 연락 주시면 빠르게 안내드릴게요</div><button class="btn-p" onclick="cm('m-biz')"><span data-i18n="btn.approve_send">승인 · 바로 발송</span></button><button class="btn-s" onclick="cm('m-biz')"><span data-i18n="btn.edit_more">수정하기</span></button></div></div>
+<div class="ov" id="m-c1" onclick="co(event,'m-c1')"><div class="sheet"><div class="s-bar"></div><div class="s-title" data-i18n="mod.urgent.history">응대 내역</div><div class="bubble"><div class="b-who">@yuna__daily</div>"제품 어디서 구매해요?"</div><div class="bubble ai"><div class="b-who ai" data-i18n="mod.urgent.tone98">Ssobi AI · 말투 98%</div>올리브영·스마트스토어·카페24에서 구매 가능해요! 프로필 링크에 바로 있어요</div><div class="bubble"><div class="b-who">@yuna__daily</div>"감사해요!! 바로 주문했어요"</div><button class="btn-s" onclick="cm('m-c1')"><span data-i18n="btn.close">닫기</span></button></div></div>
+<div class="ov" id="m-crm1" onclick="co(event,'m-crm1')"><div class="sheet"><div class="s-bar"></div><div class="s-title">@yuna__daily</div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px"><span class="badge bg">VVIP</span><span class="badge bn">Instagram</span><span class="badge bn">댓글 38회</span></div><div style="font-size:11px;font-weight:800;color:var(--t3);letter-spacing:.3px;margin-bottom:6px">최근 댓글 3건</div><div class="bubble"><div class="b-who">3일 전</div>"이 제품 너무 좋아요! 주변에 다 추천했어요 ✨"</div><div class="bubble"><div class="b-who">1주 전</div>"공구 열리자마자 바로 샀어요 ㅎㅎ 다음 공구도 기다릴게요!"</div><div class="bubble"><div class="b-who">2주 전</div>"성분 설명 너무 꼼꼼해서 믿고 구매해요 😊"</div><div style="font-size:11px;color:var(--t2);margin:10px 2px 14px">구매 3회 · 공유 5회 · 좋아요 28회</div><button class="btn-p" onclick="cm('m-crm1')">스토리 조회 예약</button><button class="btn-s" onclick="cm('m-crm1')"><span data-i18n="btn.close">닫기</span></button></div></div>
+<div class="ov" id="m-crm2" onclick="co(event,'m-crm2')"><div class="sheet"><div class="s-bar"></div><div class="s-title">요주의 — @skin_trouble_k</div><div style="display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px"><span class="badge br">요주의</span><span class="badge bn">Instagram</span><span class="badge br">부정 4회</span></div><div style="font-size:11px;font-weight:800;color:var(--t3);letter-spacing:.3px;margin-bottom:6px">최근 댓글 3건</div><div class="bubble"><div class="b-who" style="color:var(--red)">어제</div>"이 제품 써서 트러블 났어요!! 환불 어떻게 해요"</div><div class="bubble"><div class="b-who" style="color:var(--red)">3일 전</div>"성분 믿고 샀는데 알러지 반응. 환불 부탁드려요"</div><div class="bubble"><div class="b-who" style="color:var(--red)">1주 전</div>"배송도 늦고 포장도 별로네요 ㅠㅠ"</div><div class="bubble ai"><div class="b-who ai" data-i18n="mod.urgent.ai_draft">Ssobi AI 초안</div>안녕하세요, 불편을 드려 정말 죄송해요. DM으로 연락 주시면 빠르게 도와드릴게요!</div><button class="btn-p" onclick="cm('m-crm2')"><span data-i18n="btn.approve_send">승인 · 바로 발송</span></button><button class="btn-d" onclick="cm('m-crm2')"><span data-i18n="btn.manual_reply">직접 응대</span></button></div></div>
 
 <!-- 긍정 팔로워 공유 모달 -->
 <div class="ov" id="m-pos-more" onclick="co(event,'m-pos-more')"><div class="sheet" style="max-height:88vh;overflow-y:auto"><div class="s-bar"></div>
@@ -3714,7 +3714,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div class="crow"><div class="ch-av ch-ig" style="border-radius:50%">IG</div><div class="cbody"><div class="cname">@skincare_lover</div><div class="csub">댓글 12회 · 저장 8회</div><div class="ctags"><span class="badge bn">일반팬</span></div></div><div class="cscore">55점</div></div>
     <div class="crow" style="border:none"><div class="ch-av ch-tk" style="border-radius:50%">TK</div><div class="cbody"><div class="cname">@daily_beauty_log</div><div class="csub">구매 2회 · 리뷰 1개</div><div class="ctags"><span class="badge bn">구매의향</span></div></div><div class="cscore">52점</div></div>
   </div>
-  <button class="btn-s" onclick="cm('m-pos-more')">닫기</button>
+  <button class="btn-s" onclick="cm('m-pos-more')"><span data-i18n="btn.close">닫기</span></button>
 </div></div>
 
 <!-- 부정 팔로워 공유 모달 -->
@@ -3730,19 +3730,19 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div class="crow"><div class="ch-av ch-ig" style="border-radius:50%;background:var(--red-l);color:var(--red)">IG</div><div class="cbody"><div class="cname">@bad_review_k</div><div class="csub">부정 댓글 2회 · 성분 의혹</div><div class="ctags"><span class="badge br">주의</span></div></div><div class="cscore" style="color:var(--red)">!</div></div>
     <div class="crow" style="border:none"><div class="ch-av ch-ig" style="border-radius:50%;background:var(--red-l);color:var(--red)">IG</div><div class="cbody"><div class="cname">@refund_xxx</div><div class="csub">환불 요청 · 반복</div><div class="ctags"><span class="badge br">요주의</span></div></div><div class="cscore" style="color:var(--red)">!</div></div>
   </div>
-  <button class="btn-s" onclick="cm('m-neg-more')">닫기</button>
+  <button class="btn-s" onclick="cm('m-neg-more')"><span data-i18n="btn.close">닫기</span></button>
 </div></div>
 
 <!-- 수익 한번에 응답 -->
-<div class="ov" id="m-rev-bulk" onclick="co(event,'m-rev-bulk')"><div class="sheet"><div class="s-bar"></div><div class="s-title">한번에 응답하기</div><div class="s-sub">4건 전체에 동일한 응대 메시지를 발송해요</div><div style="font-size:12px;font-weight:600;color:var(--t3);margin-bottom:6px">발송 메시지</div><textarea class="sheet-ta" rows="4">"안녕하세요! 관심 감사드려요. 자세한 협의를 위해 info@millimilli.co 또는 카카오 @millimilli 로 연락 주시면 빠르게 안내드릴게요 :)"</textarea><button class="btn-p" onclick="cm('m-rev-bulk')">4건 전체 발송</button><button class="btn-s" onclick="cm('m-rev-bulk')">닫기</button></div></div>
+<div class="ov" id="m-rev-bulk" onclick="co(event,'m-rev-bulk')"><div class="sheet"><div class="s-bar"></div><div class="s-title" data-i18n="mod.rev.bulk_title">한번에 응답하기</div><div class="s-sub">4건 전체에 동일한 응대 메시지를 발송해요</div><div style="font-size:12px;font-weight:600;color:var(--t3);margin-bottom:6px">발송 메시지</div><textarea class="sheet-ta" rows="4">"안녕하세요! 관심 감사드려요. 자세한 협의를 위해 info@millimilli.co 또는 카카오 @millimilli 로 연락 주시면 빠르게 안내드릴게요 :)"</textarea><button class="btn-p" onclick="cm('m-rev-bulk')">4건 전체 발송</button><button class="btn-s" onclick="cm('m-rev-bulk')"><span data-i18n="btn.close">닫기</span></button></div></div>
 
 <!-- 수익 상세 -->
-<div class="ov" id="m-rev1" onclick="co(event,'m-rev1')"><div class="sheet"><div class="s-bar"></div><div class="s-title">협찬·광고 제안</div><div class="s-sub">케이뷰티코 · Instagram DM · 1월 15일 · 200만원</div><div class="bubble"><div class="b-who">@kbeauty_brand1</div>"신제품 쿠션 광고 협업 제안드리고 싶어요. 광고비 200만원 생각 중입니다."</div><div class="bubble ai"><div class="b-who ai">Ssobi AI 초안</div>안녕하세요! 제안 감사드려요. 자세한 협의는 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ec85828a83ac81858080858185808085c28f83">[email&#160;protected]</a> 또는 카카오 @millimilli 로 연락 주시면 빠르게 안내드릴게요 :)</div><button class="btn-p" onclick="cm('m-rev1')">승인 · 바로 발송</button><button class="btn-s" onclick="cm('m-rev1')">수정하기</button></div></div>
-<div class="ov" id="m-rev2" onclick="co(event,'m-rev2')"><div class="sheet"><div class="s-bar"></div><div class="s-title">수출 문의</div><div class="s-sub">재팬뷰티 · DM · 1월 14일 · ~4,500만원</div><div class="bubble"><div class="b-who">@japan_import_co</div>"K-뷰티 BEST 제품 수출 가능한지요? 초도 물량 500만엔 규모입니다."</div><div class="bubble ai"><div class="b-who ai">Ssobi AI 초안</div>안녕하세요! 관심 감사해요. 수출 관련 협의는 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d7beb9b1b897babebbbbbebabebbbbbef9b4b8">[email&#160;protected]</a> 로 연락 주시면 담당자가 빠르게 안내드릴게요.</div><button class="btn-p" onclick="cm('m-rev2')">승인 · 바로 발송</button><button class="btn-s" onclick="cm('m-rev2')">수정하기</button></div></div>
-<div class="ov" id="m-rev3" onclick="co(event,'m-rev3')"><div class="sheet"><div class="s-bar"></div><div class="s-title">Amazon 판매 제안</div><div class="s-sub">US K-Beauty · DM · 1월 13일 · ~4,200만원</div><div class="bubble"><div class="b-who">@us_kbeauty_shop</div>"Interested in reselling MILLIMILLI on Amazon US. 2,000 units, ~$30,000."</div><div class="bubble ai"><div class="b-who ai">Ssobi AI 초안</div>Hello! Thank you for your interest. Please contact us at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="254c4b434a65484c49494c484c49494c0b464a">[email&#160;protected]</a> for detailed distribution terms.</div><button class="btn-p" onclick="cm('m-rev3')">승인 · 바로 발송</button><button class="btn-s" onclick="cm('m-rev3')">수정하기</button></div></div>
+<div class="ov" id="m-rev1" onclick="co(event,'m-rev1')"><div class="sheet"><div class="s-bar"></div><div class="s-title" data-i18n="mod.rev.title.sponsor">협찬·광고 제안</div><div class="s-sub">케이뷰티코 · Instagram DM · 1월 15일 · 200만원</div><div class="bubble"><div class="b-who">@kbeauty_brand1</div>"신제품 쿠션 광고 협업 제안드리고 싶어요. 광고비 200만원 생각 중입니다."</div><div class="bubble ai"><div class="b-who ai" data-i18n="mod.urgent.ai_draft">Ssobi AI 초안</div>안녕하세요! 제안 감사드려요. 자세한 협의는 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ec85828a83ac81858080858185808085c28f83">[email&#160;protected]</a> 또는 카카오 @millimilli 로 연락 주시면 빠르게 안내드릴게요 :)</div><button class="btn-p" onclick="cm('m-rev1')"><span data-i18n="btn.approve_send">승인 · 바로 발송</span></button><button class="btn-s" onclick="cm('m-rev1')"><span data-i18n="btn.edit_more">수정하기</span></button></div></div>
+<div class="ov" id="m-rev2" onclick="co(event,'m-rev2')"><div class="sheet"><div class="s-bar"></div><div class="s-title" data-i18n="mod.rev.title.export">수출 문의</div><div class="s-sub">재팬뷰티 · DM · 1월 14일 · ~4,500만원</div><div class="bubble"><div class="b-who">@japan_import_co</div>"K-뷰티 BEST 제품 수출 가능한지요? 초도 물량 500만엔 규모입니다."</div><div class="bubble ai"><div class="b-who ai" data-i18n="mod.urgent.ai_draft">Ssobi AI 초안</div>안녕하세요! 관심 감사해요. 수출 관련 협의는 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d7beb9b1b897babebbbbbebabebbbbbef9b4b8">[email&#160;protected]</a> 로 연락 주시면 담당자가 빠르게 안내드릴게요.</div><button class="btn-p" onclick="cm('m-rev2')"><span data-i18n="btn.approve_send">승인 · 바로 발송</span></button><button class="btn-s" onclick="cm('m-rev2')"><span data-i18n="btn.edit_more">수정하기</span></button></div></div>
+<div class="ov" id="m-rev3" onclick="co(event,'m-rev3')"><div class="sheet"><div class="s-bar"></div><div class="s-title" data-i18n="mod.rev.title.amazon">Amazon 판매 제안</div><div class="s-sub">US K-Beauty · DM · 1월 13일 · ~4,200만원</div><div class="bubble"><div class="b-who">@us_kbeauty_shop</div>"Interested in reselling MILLIMILLI on Amazon US. 2,000 units, ~$30,000."</div><div class="bubble ai"><div class="b-who ai" data-i18n="mod.urgent.ai_draft">Ssobi AI 초안</div>Hello! Thank you for your interest. Please contact us at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="254c4b434a65484c49494c484c49494c0b464a">[email&#160;protected]</a> for detailed distribution terms.</div><button class="btn-p" onclick="cm('m-rev3')"><span data-i18n="btn.approve_send">승인 · 바로 발송</span></button><button class="btn-s" onclick="cm('m-rev3')"><span data-i18n="btn.edit_more">수정하기</span></button></div></div>
 
 <!-- 긴급 메시지 설정 -->
-<div class="ov" id="m-bulk-setting" onclick="co(event,'m-bulk-setting')"><div class="sheet"><div class="s-bar"></div><div class="s-title">안내 메시지 설정</div><div class="s-sub">긴급 댓글·DM에 일괄 발송할 메시지를 설정하세요</div><div style="font-size:12px;font-weight:600;color:var(--t3);margin-bottom:6px">연락처</div><input class="sheet-in" type="text" value="카카오 @millimilli" placeholder="카카오 @계정 또는 이메일"><div style="font-size:12px;font-weight:600;color:var(--t3);margin-top:14px;margin-bottom:6px">안내 메시지</div><textarea class="sheet-ta" rows="4">"안녕하세요! 소중한 말씀 감사해요. 자세한 확인을 위해 카카오 @millimilli 로 연락 주시면 빠르게 도와드릴게요 :)"</textarea><button class="btn-p" onclick="saveBulk()">저장</button><button class="btn-s" onclick="cm('m-bulk-setting')">닫기</button></div></div>
+<div class="ov" id="m-bulk-setting" onclick="co(event,'m-bulk-setting')"><div class="sheet"><div class="s-bar"></div><div class="s-title" data-i18n="mod.bulk.title">안내 메시지 설정</div><div class="s-sub">긴급 댓글·DM에 일괄 발송할 메시지를 설정하세요</div><div style="font-size:12px;font-weight:600;color:var(--t3);margin-bottom:6px">연락처</div><input class="sheet-in" type="text" value="카카오 @millimilli" placeholder="카카오 @계정 또는 이메일"><div style="font-size:12px;font-weight:600;color:var(--t3);margin-top:14px;margin-bottom:6px">안내 메시지</div><textarea class="sheet-ta" rows="4">"안녕하세요! 소중한 말씀 감사해요. 자세한 확인을 위해 카카오 @millimilli 로 연락 주시면 빠르게 도와드릴게요 :)"</textarea><button class="btn-p" onclick="saveBulk()"><span data-i18n="btn.save">저장</span></button><button class="btn-s" onclick="cm('m-bulk-setting')"><span data-i18n="btn.close">닫기</span></button></div></div>
 
 <!-- AI 말투 학습 -->
 <div class="ov" id="m-ai-style" onclick="co(event,'m-ai-style')"><div class="sheet"><div class="s-bar"></div>
@@ -3774,7 +3774,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   </div>
 
   <button class="btn-p" onclick="saveToneContext()" id="tone-context-save" style="margin-top:16px" data-i18n="mod.tone.save_btn">브랜드 정보·금지어 저장</button>
-  <button class="btn-s" onclick="cm('m-ai-style')" style="margin-top:12px" data-i18n="btn.close">닫기</button>
+  <button class="btn-s" onclick="cm('m-ai-style')" style="margin-top:12px" data-i18n="btn.close"><span data-i18n="btn.close">닫기</span></button>
 </div></div>
 
 <!-- 인스타 프로필 미리보기 -->
@@ -3866,7 +3866,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     </div>
 
     <button class="btn-p" style="margin-top:16px" onclick="mytplSave()">내 템플릿으로 저장</button>
-    <button class="btn-s" onclick="cm('m-my-tpl')">닫기</button>
+    <button class="btn-s" onclick="cm('m-my-tpl')"><span data-i18n="btn.close">닫기</span></button>
   </div>
 </div>
 
@@ -3908,7 +3908,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     </div>
 
     <button class="btn-s" style="margin-top:0" onclick="cm('m-pt-use');openModal('m-pt-history')">적립·사용 내역 자세히 보기</button>
-    <button class="btn-s" onclick="cm('m-pt-use')">닫기</button>
+    <button class="btn-s" onclick="cm('m-pt-use')"><span data-i18n="btn.close">닫기</span></button>
   </div>
 </div>
 
@@ -3990,7 +3990,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       </div>
     </div>
 
-    <button class="btn-s" style="margin-top:12px" onclick="cm('m-pt-history')">닫기</button>
+    <button class="btn-s" style="margin-top:12px" onclick="cm('m-pt-history')"><span data-i18n="btn.close">닫기</span></button>
   </div>
 </div>
 
@@ -4021,7 +4021,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div style="background:var(--bg);border-radius:14px;padding:20px;text-align:center;font-size:12px;color:var(--t3);margin-bottom:14px">아직 인출 내역이 없어요</div>
 
     <button class="btn-p" onclick="cm('m-earn-detail');openModal('m-wallet-withdraw')">인출하기 · 실지급 ₩46,000</button>
-    <button class="btn-s" onclick="cm('m-earn-detail')">닫기</button>
+    <button class="btn-s" onclick="cm('m-earn-detail')"><span data-i18n="btn.close">닫기</span></button>
   </div>
 </div>
 
@@ -4071,7 +4071,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     </div>
 
     <button class="btn-p" onclick="submitWithdraw()">인출 신청</button>
-    <button class="btn-s" onclick="cm('m-wallet-withdraw')">취소</button>
+    <button class="btn-s" onclick="cm('m-wallet-withdraw')"><span data-i18n="btn.cancel">취소</span></button>
   </div>
 </div>
 
@@ -4159,7 +4159,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       </div>
 
       <button class="flash-cta" style="margin:0 0 8px;width:100%;animation:none" onclick="cm('m-mission-info');startMissionApply()">지금 신청하기 → 7/20명 남음</button>
-      <button class="btn-s" style="margin-top:0" onclick="cm('m-mission-info')">닫기</button>
+      <button class="btn-s" style="margin-top:0" onclick="cm('m-mission-info')"><span data-i18n="btn.close">닫기</span></button>
     </div>
   </div>
 </div>
@@ -4199,7 +4199,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     </label>
 
     <button class="btn-p" onclick="proceedMissionSMS()">동의하고 문자 인증</button>
-    <button class="btn-s" onclick="cm('m-mission-agree')">취소</button>
+    <button class="btn-s" onclick="cm('m-mission-agree')"><span data-i18n="btn.cancel">취소</span></button>
   </div>
 </div>
 
@@ -4223,7 +4223,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     </div>
 
     <button class="btn-p" onclick="confirmMissionSMS()">인증하고 신청 완료</button>
-    <button class="btn-s" onclick="cm('m-mission-sms')">닫기</button>
+    <button class="btn-s" onclick="cm('m-mission-sms')"><span data-i18n="btn.close">닫기</span></button>
   </div>
 </div>
 
@@ -4237,7 +4237,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div style="font-size:22px;font-weight:900;color:var(--t1);letter-spacing:-.5px;margin-bottom:8px">신청 완료!</div>
     <div style="font-size:13px;color:var(--t2);line-height:1.65;margin-bottom:20px">구매 링크와 미션 안내가<br>카카오톡으로 발송됐어요.<br>7일 이내 구매·후기 업로드 후<br><b style="color:var(--t1)">영수증과 스크린샷을 제출</b>해주세요.</div>
     <button class="btn-p" onclick="cm('m-mission-done');openModal('m-mission-detail')">진행 중인 미션 열기</button>
-    <button class="btn-s" onclick="cm('m-mission-done')">닫기</button>
+    <button class="btn-s" onclick="cm('m-mission-done')"><span data-i18n="btn.close">닫기</span></button>
   </div>
 </div>
 
@@ -4316,7 +4316,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       </div>
     </div>
 
-    <button class="btn-s" style="margin-top:14px" onclick="cm('m-mission-detail')">닫기</button>
+    <button class="btn-s" style="margin-top:14px" onclick="cm('m-mission-detail')"><span data-i18n="btn.close">닫기</span></button>
   </div>
 </div>
 
@@ -4398,7 +4398,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     </div>
 
     <button class="btn-p" onclick="saveDmRule()">저장하고 활성화</button>
-    <button class="btn-s" onclick="cm('m-dm-rule')">취소</button>
+    <button class="btn-s" onclick="cm('m-dm-rule')"><span data-i18n="btn.cancel">취소</span></button>
   </div>
 </div>
 
@@ -4409,7 +4409,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div class="s-title">내 최근 게시물</div>
     <div class="s-sub">댓글 감지 → DM 자동 발송 대상으로 추가할 게시물을 골라주세요</div>
     <div id="post-picker-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:14px 0 6px"></div>
-    <button class="btn-s" onclick="cm('m-post-picker')">닫기</button>
+    <button class="btn-s" onclick="cm('m-post-picker')"><span data-i18n="btn.close">닫기</span></button>
   </div>
 </div>
 
@@ -4423,7 +4423,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div style="display:flex;flex-direction:column;gap:8px">
       <button class="btn-p" style="margin-top:0;background:var(--mint)" onclick="cm('m-pt-empty');openModal('m-plan')">프리미엄 시작하기</button>
       <button class="btn-s" onclick="cm('m-pt-empty');openModal('m-invite-share')">친구에게 공유하고 포인트 받기</button>
-      <button class="btn-s" style="margin-top:0;background:none;color:var(--t3)" onclick="cm('m-pt-empty')">닫기</button>
+      <button class="btn-s" style="margin-top:0;background:none;color:var(--t3)" onclick="cm('m-pt-empty')"><span data-i18n="btn.close">닫기</span></button>
     </div>
   </div>
 </div>
@@ -4467,7 +4467,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <div id="invite-url" style="font-family:'SF Mono',monospace;color:var(--mint-d);font-weight:700;word-break:break-all">repli.app/r/yuminhye</div>
     </div>
 
-    <button class="btn-s" onclick="cm('m-invite-share')">닫기</button>
+    <button class="btn-s" onclick="cm('m-invite-share')"><span data-i18n="btn.close">닫기</span></button>
   </div>
 </div>
 
@@ -4490,7 +4490,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     </div>
     <div style="font-size:13px;font-weight:800;color:var(--t1);margin-bottom:10px">예약된 게시물</div>
     <div id="sdet-posts"></div>
-    <button class="btn-s" onclick="cm('m-sched-day')">닫기</button>
+    <button class="btn-s" onclick="cm('m-sched-day')"><span data-i18n="btn.close">닫기</span></button>
   </div>
 </div>
 
@@ -4505,15 +4505,15 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div id="prev-dots" style="display:flex;gap:5px;justify-content:center;margin-top:10px"></div>
     <div style="font-size:11px;font-weight:800;color:var(--t3);margin-top:18px;margin-bottom:6px;letter-spacing:.3px">게시 캡션</div>
     <div id="prev-cap" style="background:var(--bg);border-radius:12px;padding:12px 14px;font-size:12.5px;color:var(--t1);line-height:1.65;white-space:pre-line">—</div>
-    <button class="btn-s" style="margin-top:16px" onclick="cm('m-sched-preview')">닫기</button>
+    <button class="btn-s" style="margin-top:16px" onclick="cm('m-sched-preview')"><span data-i18n="btn.close">닫기</span></button>
   </div>
 </div>
 
 <!-- 카카오 알림 -->
-<div class="ov" id="m-kakao" onclick="co(event,'m-kakao')"><div class="sheet"><div class="s-bar"></div><div class="s-title">카카오 알림 설정</div><div class="s-sub">중요 이벤트 발생 시 카카오톡으로 즉시 알려드려요</div><div class="setting-row"><div class="s-body"><div class="s-name">요주의 댓글 즉시 알림</div><div class="s-desc">부정 이슈, 결제 문제 감지 시 즉시 발송</div></div><label class="tog"><input type="checkbox" checked><span class="tsl"></span></label></div><div class="setting-row"><div class="s-body"><div class="s-name">일일 리포트</div><div class="s-desc">매일 오전 9시 전일 응대 요약 발송</div></div><label class="tog"><input type="checkbox" checked><span class="tsl"></span></label></div><div class="setting-row"><div class="s-body"><div class="s-name">수익 제안 알림</div><div class="s-desc">광고·협업·수출 문의 도착 시 즉시 발송</div></div><label class="tog"><input type="checkbox" checked><span class="tsl"></span></label></div><div style="font-size:13px;font-weight:700;color:var(--t1);margin-top:16px;margin-bottom:8px">카카오톡 연동</div><input class="sheet-in" type="text" placeholder="카카오톡 ID 입력" style="margin-bottom:10px"><button class="btn-p" style="background:#FEE500;color:#3A1D1D;margin-top:0" onclick="cm('m-kakao')">카카오 알림톡 연동하기</button><button class="btn-s" style="margin-top:6px" onclick="cm('m-kakao')">닫기</button></div></div>
+<div class="ov" id="m-kakao" onclick="co(event,'m-kakao')"><div class="sheet"><div class="s-bar"></div><div class="s-title">카카오 알림 설정</div><div class="s-sub">중요 이벤트 발생 시 카카오톡으로 즉시 알려드려요</div><div class="setting-row"><div class="s-body"><div class="s-name">요주의 댓글 즉시 알림</div><div class="s-desc">부정 이슈, 결제 문제 감지 시 즉시 발송</div></div><label class="tog"><input type="checkbox" checked><span class="tsl"></span></label></div><div class="setting-row"><div class="s-body"><div class="s-name">일일 리포트</div><div class="s-desc">매일 오전 9시 전일 응대 요약 발송</div></div><label class="tog"><input type="checkbox" checked><span class="tsl"></span></label></div><div class="setting-row"><div class="s-body"><div class="s-name">수익 제안 알림</div><div class="s-desc">광고·협업·수출 문의 도착 시 즉시 발송</div></div><label class="tog"><input type="checkbox" checked><span class="tsl"></span></label></div><div style="font-size:13px;font-weight:700;color:var(--t1);margin-top:16px;margin-bottom:8px">카카오톡 연동</div><input class="sheet-in" type="text" placeholder="카카오톡 ID 입력" style="margin-bottom:10px"><button class="btn-p" style="background:#FEE500;color:#3A1D1D;margin-top:0" onclick="cm('m-kakao')">카카오 알림톡 연동하기</button><button class="btn-s" style="margin-top:6px" onclick="cm('m-kakao')"><span data-i18n="btn.close">닫기</span></button></div></div>
 
 <!-- 이용권 -->
-<div class="ov" id="m-plan" onclick="co(event,'m-plan')"><div class="sheet"><div class="s-bar"></div><div class="s-title">이용권</div><div style="background:var(--mint-l);border-radius:16px;padding:20px;margin-bottom:16px;border:1px solid #A7F3D0"><div style="font-size:11px;font-weight:700;color:var(--mint-d);margin-bottom:4px">현재 플랜</div><div style="font-size:22px;font-weight:900;color:var(--t1)">프리미엄</div><div style="font-size:13px;color:var(--t2);margin-top:4px">무료체험 D-4 남음</div><div style="margin-top:12px;font-size:12px;color:var(--mint-d);font-weight:600">월 6,600건 응대 · 3개 채널 · AI 말투 학습 포함</div></div><div class="setting-row"><div class="s-body"><div class="s-name">월 응대 한도</div><div class="s-desc">6,600건 / 이번 달 1,842건 사용 (28%)</div></div></div><div class="setting-row"><div class="s-body"><div class="s-name">연결 채널</div><div class="s-desc">Instagram · TikTok · YouTube</div></div></div><div class="setting-row"><div class="s-body"><div class="s-name">갱신일</div><div class="s-desc">2025년 2월 15일</div></div></div><button class="btn-p" onclick="cm('m-plan')">구독 관리</button><button class="btn-s" onclick="cm('m-plan')">닫기</button></div></div>
+<div class="ov" id="m-plan" onclick="co(event,'m-plan')"><div class="sheet"><div class="s-bar"></div><div class="s-title">이용권</div><div style="background:var(--mint-l);border-radius:16px;padding:20px;margin-bottom:16px;border:1px solid #A7F3D0"><div style="font-size:11px;font-weight:700;color:var(--mint-d);margin-bottom:4px">현재 플랜</div><div style="font-size:22px;font-weight:900;color:var(--t1)">프리미엄</div><div style="font-size:13px;color:var(--t2);margin-top:4px">무료체험 D-4 남음</div><div style="margin-top:12px;font-size:12px;color:var(--mint-d);font-weight:600">월 6,600건 응대 · 3개 채널 · AI 말투 학습 포함</div></div><div class="setting-row"><div class="s-body"><div class="s-name">월 응대 한도</div><div class="s-desc">6,600건 / 이번 달 1,842건 사용 (28%)</div></div></div><div class="setting-row"><div class="s-body"><div class="s-name">연결 채널</div><div class="s-desc">Instagram · TikTok · YouTube</div></div></div><div class="setting-row"><div class="s-body"><div class="s-name">갱신일</div><div class="s-desc">2025년 2월 15일</div></div></div><button class="btn-p" onclick="cm('m-plan')">구독 관리</button><button class="btn-s" onclick="cm('m-plan')"><span data-i18n="btn.close">닫기</span></button></div></div>
 
 <!-- 계정 연동 -->
 <div class="ov" id="m-account" onclick="co(event,'m-account')">
@@ -5522,6 +5522,101 @@ var I18N = {
     'mod.tone.banned_sub':'AI가 절대 쓰지 않을 단어·문구. 콤마로 구분',
     'mod.tone.banned_ph':'예) 고객님, 부탁드립니다, 구매하세요',
     'mod.tone.save_btn':'브랜드 정보·금지어 저장',
+    // 공통 버튼 (반복 사용)
+    'btn.approve_send':'승인 · 바로 발송',
+    'btn.edit_more':'수정하기',
+    'btn.manual_reply':'직접 응대',
+    'btn.send':'발송',
+    // 긴급 응대 데모 모달
+    'mod.urgent.payment':'결제 문제',
+    'mod.urgent.negative':'부정 이슈',
+    'mod.urgent.collab':'협업 문의',
+    'mod.urgent.ai_draft':'Ssobi AI 초안',
+    'mod.urgent.history':'응대 내역',
+    'mod.urgent.tone98':'Ssobi AI · 말투 98%',
+    // CRM 데모 모달
+    'mod.crm.attention_prefix':'요주의 — ',
+    'mod.crm.attention':'요주의',
+    'mod.crm.recent_comments_3':'최근 댓글 3건',
+    'mod.crm.story_action':'스토리 조회 예약',
+    'mod.crm.user_stats':'구매 3회 · 공유 5회 · 좋아요 28회',
+    'mod.crm.day_y':'어제',
+    'mod.crm.day_3':'3일 전',
+    'mod.crm.week_1':'1주 전',
+    'mod.crm.week_2':'2주 전',
+    // 수익 제안 모달
+    'mod.rev.bulk_title':'한번에 응답하기',
+    'mod.rev.bulk_sub':'4건 전체에 동일한 응대 메시지를 발송해요',
+    'mod.rev.send_msg':'발송 메시지',
+    'mod.rev.send_all4':'4건 전체 발송',
+    'mod.rev.title.sponsor':'협찬·광고 제안',
+    'mod.rev.title.export':'수출 문의',
+    'mod.rev.title.amazon':'Amazon 판매 제안',
+    // 긴급 메시지 설정 모달
+    'mod.bulk.title':'안내 메시지 설정',
+    'mod.bulk.sub':'긴급 댓글·DM에 일괄 발송할 메시지를 설정하세요',
+    'mod.bulk.contact':'연락처',
+    'mod.bulk.message':'안내 메시지',
+    'mod.bulk.contact_ph':'카카오 @계정 또는 이메일',
+    // 팔로워 더보기
+    'mod.followers.pos_full':'긍정 팔로워 전체',
+    'mod.followers.neg_full':'부정 팔로워 전체',
+    // 가입 / 비밀번호 재설정
+    'auth.signup':'7일 무료로 시작',
+    'auth.signup.title':'7일 무료로 Ssobi 시작',
+    'auth.signup.sub':'카드 없이 시작 · 언제든 해지',
+    'auth.have_account':'이미 계정이 있나요?',
+    'auth.signin':'로그인',
+    'auth.reset.title':'비밀번호 재설정',
+    'auth.reset.sub':'가입 이메일로 재설정 링크를 보내드려요',
+    'auth.reset.send':'재설정 링크 보내기',
+    'auth.find.title':'아이디·비밀번호 찾기',
+    // 플랜 모달
+    'mod.plan.title':'이용권',
+    'mod.plan.sub':'성장 단계에 맞는 플랜을 선택하세요',
+    'mod.plan.basic':'베이직',
+    'mod.plan.premium':'프리미엄',
+    'mod.plan.pro':'프로페셔널',
+    'mod.plan.month':'/월',
+    'mod.plan.free_forever':'평생 무료',
+    'mod.plan.trial7':'7일 무료체험',
+    'mod.plan.popular':'가장 인기',
+    'mod.plan.upgrade':'업그레이드',
+    'mod.plan.current':'현재 플랜',
+    // 포인트 사용·내역
+    'mod.point.use_title':'포인트 사용',
+    'mod.point.history_title':'포인트 내역',
+    'mod.point.earn_title':'내가 번 돈',
+    'mod.point.balance':'보유 포인트',
+    // 첫날 모드 (newbie-pane)
+    'newbie.hero.tag':'Ssobi 학습 중',
+    'newbie.hero.title':'안녕하세요.\n오늘이 Ssobi 첫날이에요',
+    'newbie.hero.sub':'3단계만 완료하면\nAI가 24시간 자동으로 움직여요.',
+    'newbie.progress.label':'준비 진행률',
+    'newbie.checklist.eyebrow':'CHECKLIST',
+    'newbie.checklist.title':'오늘 할 일',
+    'newbie.check.ig':'SNS 계정 연동',
+    'newbie.check.ig.sub':'Instagram · TikTok · YouTube 공식 API',
+    'newbie.check.tone':'AI 말투 학습',
+    'newbie.check.tone.sub':'내 게시물 250개로 자동 학습 · 1분이면 끝',
+    'newbie.check.target':'참고 계정·해시태그 설정',
+    'newbie.check.target.sub':'경쟁 계정 분석으로 틈새 해시태그 발굴',
+    'newbie.check.kakao':'카카오톡 알림 연동',
+    'newbie.check.kakao.sub':'긴급 메시지·수익 제안 즉시 알림',
+    'newbie.optional':'선택',
+    'newbie.forecast.eyebrow':'FORECAST',
+    'newbie.forecast.title':'이렇게 자라요',
+    'newbie.forecast.followers':'7일 뒤 신규 팔로워',
+    'newbie.forecast.ai_predict':'AI 예측',
+    'newbie.forecast.hero_label':'자동 응대·스토리 조회·AI 선댓글 누적 효과',
+    'newbie.forecast.today':'오늘',
+    'newbie.forecast.note':'같은 플랜 사용자 평균 기준 · 체크리스트 완료 후 24시간부터 실제 데이터',
+    'newbie.forecast.replies':'자동 응대',
+    'newbie.forecast.reach':'평균 도달',
+    'newbie.forecast.save':'저장·공유',
+    'newbie.live.badge':'곧 시작돼요',
+    'newbie.live.title':'위 5개 완료하면 바로 움직여요',
+    'newbie.live.sub':'이건 다른 유저들의 실시간 활동이에요\n체크리스트 끝나면 내 피드도 채워집니다',
   },
   en: {
     // tab bar
@@ -5830,6 +5925,101 @@ var I18N = {
     'mod.tone.banned_sub':'Words/phrases the AI must never use. Separate by commas.',
     'mod.tone.banned_ph':'e.g. dear customer, please, buy now',
     'mod.tone.save_btn':'Save brand info & banned words',
+    // common buttons
+    'btn.approve_send':'Approve · Send',
+    'btn.edit_more':'Edit',
+    'btn.manual_reply':'Reply manually',
+    'btn.send':'Send',
+    // urgent demo modals
+    'mod.urgent.payment':'Payment issue',
+    'mod.urgent.negative':'Critical issue',
+    'mod.urgent.collab':'Collab inquiry',
+    'mod.urgent.ai_draft':'Ssobi AI draft',
+    'mod.urgent.history':'Reply history',
+    'mod.urgent.tone98':'Ssobi AI · 98% tone match',
+    // CRM demo
+    'mod.crm.attention_prefix':'At-risk — ',
+    'mod.crm.attention':'At-risk',
+    'mod.crm.recent_comments_3':'Last 3 comments',
+    'mod.crm.story_action':'Schedule story view',
+    'mod.crm.user_stats':'Purchases 3 · Shares 5 · Likes 28',
+    'mod.crm.day_y':'Yesterday',
+    'mod.crm.day_3':'3 days ago',
+    'mod.crm.week_1':'1 week ago',
+    'mod.crm.week_2':'2 weeks ago',
+    // revenue offers
+    'mod.rev.bulk_title':'Bulk reply',
+    'mod.rev.bulk_sub':'Send the same message to all 4',
+    'mod.rev.send_msg':'Message',
+    'mod.rev.send_all4':'Send to all 4',
+    'mod.rev.title.sponsor':'Sponsorship / Ad offer',
+    'mod.rev.title.export':'Export inquiry',
+    'mod.rev.title.amazon':'Amazon reselling offer',
+    // bulk message setup
+    'mod.bulk.title':'Auto-reply message setup',
+    'mod.bulk.sub':'Configure the message sent to urgent comments / DMs',
+    'mod.bulk.contact':'Contact',
+    'mod.bulk.message':'Auto-reply message',
+    'mod.bulk.contact_ph':'KakaoTalk @handle or email',
+    // followers see-all
+    'mod.followers.pos_full':'All positive followers',
+    'mod.followers.neg_full':'All critical followers',
+    // signup / reset / find
+    'auth.signup':'Start free for 7 days',
+    'auth.signup.title':'Start Ssobi free for 7 days',
+    'auth.signup.sub':'No card required · Cancel anytime',
+    'auth.have_account':'Already have an account?',
+    'auth.signin':'Sign in',
+    'auth.reset.title':'Reset password',
+    'auth.reset.sub':'We\'ll email you a reset link.',
+    'auth.reset.send':'Send reset link',
+    'auth.find.title':'Find ID / reset password',
+    // plan modal
+    'mod.plan.title':'Subscription',
+    'mod.plan.sub':'Pick the plan that matches your stage',
+    'mod.plan.basic':'Basic',
+    'mod.plan.premium':'Premium',
+    'mod.plan.pro':'Professional',
+    'mod.plan.month':'/mo',
+    'mod.plan.free_forever':'Free forever',
+    'mod.plan.trial7':'7-day free trial',
+    'mod.plan.popular':'Most popular',
+    'mod.plan.upgrade':'Upgrade',
+    'mod.plan.current':'Current plan',
+    // points
+    'mod.point.use_title':'Use points',
+    'mod.point.history_title':'Points history',
+    'mod.point.earn_title':'My earnings',
+    'mod.point.balance':'Points balance',
+    // first-day mode (newbie-pane)
+    'newbie.hero.tag':'Ssobi is learning',
+    'newbie.hero.title':'Hi there.\nToday is your first day with Ssobi.',
+    'newbie.hero.sub':'Complete 3 quick steps and AI works for you 24/7.',
+    'newbie.progress.label':'Setup progress',
+    'newbie.checklist.eyebrow':'CHECKLIST',
+    'newbie.checklist.title':'Today\'s tasks',
+    'newbie.check.ig':'Connect SNS accounts',
+    'newbie.check.ig.sub':'Instagram · TikTok · YouTube official API',
+    'newbie.check.tone':'AI tone learning',
+    'newbie.check.tone.sub':'Auto-learn from 250 of your posts in under a minute',
+    'newbie.check.target':'Reference accounts & hashtags',
+    'newbie.check.target.sub':'Find niche hashtags from competitor accounts',
+    'newbie.check.kakao':'KakaoTalk alerts',
+    'newbie.check.kakao.sub':'Instant alerts for urgent messages and offers',
+    'newbie.optional':'Optional',
+    'newbie.forecast.eyebrow':'FORECAST',
+    'newbie.forecast.title':'Your growth forecast',
+    'newbie.forecast.followers':'New followers in 7 days',
+    'newbie.forecast.ai_predict':'AI prediction',
+    'newbie.forecast.hero_label':'Compounding from auto-replies, story views, and AI first-comments',
+    'newbie.forecast.today':'Today',
+    'newbie.forecast.note':'Average for users on the same plan · Real data starts 24h after checklist completion.',
+    'newbie.forecast.replies':'Auto-replies',
+    'newbie.forecast.reach':'Average reach',
+    'newbie.forecast.save':'Saves & shares',
+    'newbie.live.badge':'Coming soon',
+    'newbie.live.title':'Complete the 5 steps and Ssobi starts immediately.',
+    'newbie.live.sub':'These are other users\' live activity.\nYour feed fills up after the checklist.',
   }
 };
 
@@ -8460,8 +8650,8 @@ function lkeRenderEditForm(b, idx){
   // 공통: 저장/삭제/이동
   html+='<div style="display:flex;gap:8px;margin-top:16px">'+
     '<button class="lke-top-btn danger" onclick="lkeDeleteBlock('+idx+')">삭제</button>'+
-    '<button class="lke-top-btn" style="flex:1" onclick="lkeCloseSheet()">취소</button>'+
-    '<button class="lke-top-btn primary" style="flex:2" onclick="lkeSaveBlock('+idx+')">저장</button>'+
+    '<button class="lke-top-btn" style="flex:1" onclick="lkeCloseSheet()"><span data-i18n="btn.cancel">취소</span></button>'+
+    '<button class="lke-top-btn primary" style="flex:2" onclick="lkeSaveBlock('+idx+')"><span data-i18n="btn.save">저장</span></button>'+
   '</div>';
   body.innerHTML=html;
 }
@@ -9364,8 +9554,8 @@ function lkeEditGridCard(blockIdx, cardIdx){
     '</div>'+
     '<div style="display:flex;gap:8px;margin-top:14px">'+
       '<button class="lke-top-btn danger" onclick="lkeGridDelCard('+blockIdx+','+cardIdx+')">삭제</button>'+
-      '<button class="lke-top-btn" style="flex:1" onclick="lkeCloseSheet()">취소</button>'+
-      '<button class="lke-top-btn primary" style="flex:2" onclick="lkeSaveGridCard('+blockIdx+','+cardIdx+')">저장</button>'+
+      '<button class="lke-top-btn" style="flex:1" onclick="lkeCloseSheet()"><span data-i18n="btn.cancel">취소</span></button>'+
+      '<button class="lke-top-btn primary" style="flex:2" onclick="lkeSaveGridCard('+blockIdx+','+cardIdx+')"><span data-i18n="btn.save">저장</span></button>'+
     '</div>';
   body.innerHTML=html;
   lkeOpenSheet('edit');
@@ -10213,7 +10403,7 @@ function ensureVtModal(){
       '<input type="range" id="vt-start" min="0" max="1000" value="0" style="display:none">' +
       '<input type="range" id="vt-end" min="0" max="1000" value="1000" style="display:none">' +
       '<div style="display:flex;gap:8px">' +
-        '<button onclick="cm(\'m-video-trim\')" style="flex:1;padding:13px;border-radius:12px;border:1.5px solid var(--b);background:#fff;font-size:13px;font-weight:800;color:var(--t1);cursor:pointer">취소</button>' +
+        '<button onclick="cm(\'m-video-trim\')" style="flex:1;padding:13px;border-radius:12px;border:1.5px solid var(--b);background:#fff;font-size:13px;font-weight:800;color:var(--t1);cursor:pointer"><span data-i18n="btn.cancel">취소</span></button>' +
         '<button onclick="vtApply()" style="flex:2;padding:13px;border-radius:12px;border:none;background:var(--mint);color:#fff;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 4px 12px rgba(0,200,150,.25)">이 영상 사용</button>' +
       '</div>' +
     '</div>';
@@ -15408,7 +15598,7 @@ window.addEventListener('load', function(){
   <div style="font-size:13px;font-weight:700;color:var(--t1);margin-top:4px;margin-bottom:8px">카카오톡 연동</div>
   <input class="sheet-in" type="text" placeholder="카카오톡 ID 입력" style="margin-bottom:10px">
   <button class="btn-p" style="background:#FEE500;color:#3A1D1D;margin-top:0" onclick="cm('m-kakao-popup')">카카오 알림톡 연동하기</button>
-  <button class="btn-s" onclick="cm('m-kakao-popup')">닫기</button>
+  <button class="btn-s" onclick="cm('m-kakao-popup')"><span data-i18n="btn.close">닫기</span></button>
 </div></div>
 
 
@@ -15435,7 +15625,7 @@ window.addEventListener('load', function(){
     </div>
   </div>
   <button class="btn-p" onclick="cm('m-plan-checkout');go('v-complete')">무료체험 후 결제 예약하기</button>
-  <button class="btn-s" onclick="cm('m-plan-checkout')">닫기</button>
+  <button class="btn-s" onclick="cm('m-plan-checkout')"><span data-i18n="btn.close">닫기</span></button>
 </div></div>
 
 
@@ -15448,7 +15638,7 @@ window.addEventListener('load', function(){
     <input class="inp" type="email" placeholder="hello@example.com">
   </div>
   <button class="btn-p" onclick="doResetPassword()">재설정 링크 보내기</button>
-  <button class="btn-s" onclick="cm('m-find-account')">닫기</button>
+  <button class="btn-s" onclick="cm('m-find-account')"><span data-i18n="btn.close">닫기</span></button>
 </div></div>
 
 <!-- ════ 템플릿 갤러리 모달 (전체 템플릿 그리드 — 4개 → 추후 100+) ════ -->
