@@ -15,9 +15,31 @@ const BIZ_KEYWORDS = [
   '견적', '단가', '수량', '납기',
 ]
 
-const URGENT_KEYWORDS = ['환불', '반품', '불량', '피해', '문제', '오류', '결제', '고장', '트러블', '피부병', '배송 안 옴']
-const NEGATIVE_KEYWORDS = ['싫어', '별로', '최악', '실망', '환불', '후회', '사기', '클레임']
-const POSITIVE_KEYWORDS = ['좋아요', '대박', '최고', '감사', '예뻐요', '완전', '짱', '사랑', '행복', '멋져', '추천']
+const URGENT_KEYWORDS = [
+  // ko
+  '환불', '반품', '불량', '피해', '문제', '오류', '결제', '고장', '트러블', '피부병', '배송 안 옴',
+  // en (lowercased — matched against text.toLowerCase())
+  'refund', 'return', 'broken', 'damaged', 'defective', 'wrong order', 'never arrived',
+  'didn\'t arrive', 'not arrived', 'not delivered', 'didn\'t receive', 'missing', 'lost',
+  'rash', 'broke out', 'breakout', 'allergic', 'reaction', 'irritation', 'burning',
+  'side effect', 'payment', 'charged', 'chargeback', 'fraud', 'scam', 'urgent',
+  'emergency', 'asap', 'help me', 'please help',
+]
+const NEGATIVE_KEYWORDS = [
+  // ko
+  '싫어', '별로', '최악', '실망', '환불', '후회', '사기', '클레임',
+  // en
+  'hate', 'worst', 'terrible', 'awful', 'disappointed', 'regret', 'scam',
+  'fraud', 'horrible', 'never again', 'don\'t buy', 'do not buy', 'waste',
+  'angry', 'furious', 'unacceptable',
+]
+const POSITIVE_KEYWORDS = [
+  // ko
+  '좋아요', '대박', '최고', '감사', '예뻐요', '완전', '짱', '사랑', '행복', '멋져', '추천',
+  // en
+  'love', 'amazing', 'great', 'awesome', 'perfect', 'best', 'thank',
+  'beautiful', 'gorgeous', 'recommend', 'obsessed', 'favorite',
+]
 
 export function classifyText(text: string): {
   urgency: 'low' | 'medium' | 'high' | 'urgent'
@@ -28,9 +50,12 @@ export function classifyText(text: string): {
   const isBiz = BIZ_KEYWORDS.some(k => lower.includes(k.toLowerCase())) &&
                 (text.length > 30 || /\d/.test(text)) // 최소 길이·숫자 포함하면 진짜 비즈일 확률 ↑
 
-  const isUrgent = URGENT_KEYWORDS.some(k => text.includes(k))
-  const negCount = NEGATIVE_KEYWORDS.filter(k => text.includes(k)).length
-  const posCount = POSITIVE_KEYWORDS.filter(k => text.includes(k)).length
+  // ko 키워드는 원문(한글), en 키워드는 lowercase 매칭
+  const isUrgent = URGENT_KEYWORDS.some(k => {
+    return /[가-힣]/.test(k) ? text.includes(k) : lower.includes(k)
+  })
+  const negCount = NEGATIVE_KEYWORDS.filter(k => /[가-힣]/.test(k) ? text.includes(k) : lower.includes(k)).length
+  const posCount = POSITIVE_KEYWORDS.filter(k => /[가-힣]/.test(k) ? text.includes(k) : lower.includes(k)).length
 
   let sentiment: 'positive' | 'neutral' | 'negative' = 'neutral'
   if (negCount > posCount) sentiment = 'negative'
