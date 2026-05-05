@@ -6536,6 +6536,19 @@ function applyI18n(lang){
       _badge.textContent = _info.label;
     }
   } catch(_){}
+  // ROI 카드 period (예: "May 2026" / "2026 · 5월") 갱신
+  try {
+    var _periodEl = document.getElementById('roi-period');
+    if(_periodEl){
+      var _now = new Date();
+      if(lang === 'en'){
+        var _months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        _periodEl.textContent = _months[_now.getMonth()] + ' ' + _now.getFullYear();
+      } else {
+        _periodEl.textContent = _now.getFullYear() + ' · ' + (_now.getMonth()+1) + '월';
+      }
+    }
+  } catch(_){}
   // quota suffix 도 즉시 반영
   try {
     var unit = I18N[lang]['grow.quota.unit'] || '';
@@ -15548,7 +15561,15 @@ async function doUpdatePassword() {
 function applyDashboard(d) {
   var now = new Date();
   var periodEl = document.getElementById('roi-period');
-  if (periodEl) periodEl.textContent = now.getFullYear() + ' · ' + (now.getMonth()+1) + '월';
+  if (periodEl) {
+    var _lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+    if(_lang === 'en'){
+      var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      periodEl.textContent = months[now.getMonth()] + ' ' + now.getFullYear();
+    } else {
+      periodEl.textContent = now.getFullYear() + ' · ' + (now.getMonth()+1) + '월';
+    }
+  }
   var roiEl = document.getElementById('roi-v');
   if (roiEl) {
     var target = d.savedWon;
