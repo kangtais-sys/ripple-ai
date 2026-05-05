@@ -2651,8 +2651,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div class="tc on" id="tc-urgent">
     <!-- DEV 전용: 긴급 시뮬레이션 -->
     <div class="dev-only" style="display:none;margin-bottom:10px;gap:6px">
-      <button onclick="devSimulate('comment','urgent')" style="padding:8px 12px;border-radius:8px;background:#FEE2E2;border:1px dashed var(--red);color:#991B1B;font-size:11px;font-weight:800;cursor:pointer">🧪 긴급 댓글 (승인 대기)</button>
-      <button onclick="devSimulate('dm','urgent')" style="padding:8px 12px;border-radius:8px;background:#FEE2E2;border:1px dashed var(--red);color:#991B1B;font-size:11px;font-weight:800;cursor:pointer;margin-left:6px">🧪 긴급 DM (승인 대기)</button>
+      <button onclick="devSimulate('comment','urgent')" style="padding:8px 12px;border-radius:8px;background:#FEE2E2;border:1px dashed var(--red);color:#991B1B;font-size:11px;font-weight:800;cursor:pointer"><span data-i18n="dev.sim.urgent_comment">🧪 긴급 댓글 (승인 대기)</span></button>
+      <button onclick="devSimulate('dm','urgent')" style="padding:8px 12px;border-radius:8px;background:#FEE2E2;border:1px dashed var(--red);color:#991B1B;font-size:11px;font-weight:800;cursor:pointer;margin-left:6px"><span data-i18n="dev.sim.urgent_dm">🧪 긴급 DM (승인 대기)</span></button>
     </div>
 
     <!-- AI 초안 승인 대기 (실데이터 — 긴급 케이스만) -->
@@ -2668,8 +2668,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div class="tc" id="tc-comments">
     <!-- DEV 전용: 시뮬레이션 드래프트 생성 -->
     <div class="dev-only" style="display:none;margin-bottom:10px;gap:6px">
-      <button onclick="devSimulate('comment')" style="padding:8px 12px;border-radius:8px;background:#FEF3C7;border:1px dashed #F59E0B;color:#78350F;font-size:11px;font-weight:800;cursor:pointer">🧪 일반 댓글 (자동발송)</button>
-      <button onclick="devSimulate('dm')" style="padding:8px 12px;border-radius:8px;background:#FEF3C7;border:1px dashed #F59E0B;color:#78350F;font-size:11px;font-weight:800;cursor:pointer;margin-left:6px">🧪 일반 DM (자동발송)</button>
+      <button onclick="devSimulate('comment')" style="padding:8px 12px;border-radius:8px;background:#FEF3C7;border:1px dashed #F59E0B;color:#78350F;font-size:11px;font-weight:800;cursor:pointer"><span data-i18n="dev.sim.normal_comment">🧪 일반 댓글 (자동발송)</span></button>
+      <button onclick="devSimulate('dm')" style="padding:8px 12px;border-radius:8px;background:#FEF3C7;border:1px dashed #F59E0B;color:#78350F;font-size:11px;font-weight:800;cursor:pointer;margin-left:6px"><span data-i18n="dev.sim.normal_dm">🧪 일반 DM (자동발송)</span></button>
     </div>
 
     <div class="msg-card" id="replies-sent-card"></div>
@@ -5203,9 +5203,13 @@ function syncToneChip(){
   if(topicNameEl){
     var savedKey = '';
     try { savedKey = localStorage.getItem('ssobi_disc_topic') || ''; } catch(_){}
-    var topicName = (savedKey && typeof discoverData !== 'undefined' && discoverData[savedKey])
-      ? discoverData[savedKey].name : '';
-    topicNameEl.textContent = topicName || '미설정';
+    var _stnLang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+    var topicName = '';
+    if(savedKey && typeof discoverData !== 'undefined' && discoverData[savedKey]){
+      var _d = discoverData[savedKey];
+      topicName = (_stnLang === 'en' && _d.nameEn) ? _d.nameEn : _d.name;
+    }
+    topicNameEl.textContent = topicName || (_stnLang === 'en' ? 'Not set' : '미설정');
   }
 }
 document.addEventListener('DOMContentLoaded', syncToneChip);
@@ -5265,6 +5269,38 @@ var I18N = {
     'manage.tab.insight':'분석',
     'manage.urgent.empty':'긴급 응대 대기 없음',
     'manage.urgent.empty_sub':'결제 오류·부정 이슈 같은 중요한 메시지가 도착하면 AI 초안이 여기로 올라옵니다.',
+    'manage.urgent.header':'긴급 AI 응대 대기',
+    'dev.sim.urgent_comment':'🧪 긴급 댓글 (승인 대기)',
+    'dev.sim.urgent_dm':'🧪 긴급 DM (승인 대기)',
+    'dev.sim.normal_comment':'🧪 일반 댓글 (자동발송)',
+    'dev.sim.normal_dm':'🧪 일반 DM (자동발송)',
+    'draft.urgent_badge':'긴급',
+    'draft.high_badge':'중요',
+    'draft.new_dm':'새 DM',
+    'draft.new_comment':'새 댓글',
+    'draft.just_now':'방금 도착',
+    'draft.ai_tone':'AI · 내 말투',
+    'draft.tap_edit':'탭해서 수정 가능',
+    'draft.skip':'스킵',
+    'draft.approve':'✓ 승인 · 발송',
+    'draft.sending':'발송 중...',
+    'draft.sent':'✓ 발송 완료',
+    'draft.dm_drafted':' · DM 초안 생성됨',
+    'draft.send_failed':'발송 실패: ',
+    'draft.unknown_error':'알 수 없는 오류',
+    'draft.network_error':'네트워크 오류',
+    'draft.skip_confirm':'이 응대를 스킵할까요? 발송하지 않고 폐기돼요.',
+    'draft.also_dm':'이 사람에게 DM으로 상세 안내도 보내기',
+    'draft.ch_dm':'DM',
+    'draft.ch_comment':'댓글',
+    'devsim.urgent_prefix':'[긴급] ',
+    'devsim.normal_prefix':'[일반] ',
+    'devsim.prompt_dm':'DM 내용',
+    'devsim.prompt_comment':'댓글 내용',
+    'devsim.auto_sent':'✓ 자동 응대 발송됨 (',
+    'devsim.auto_sent_suffix':' · 댓글·DM 탭 확인)',
+    'devsim.urgent_pending':'✓ 긴급 초안 대기 — 위 긴급 탭에서 승인하세요',
+    'devsim.failed':'시뮬레이션 실패: ',
     'manage.comments.empty':'자동 응대 내역 없음',
     'manage.comments.empty_sub':'일반 댓글·DM이 도착하면 AI가 답장하고 여기에 쌓입니다.',
     'manage.crm.positive':'긍정 팔로워',
@@ -5965,6 +6001,38 @@ var I18N = {
     'manage.tab.insight':'Analytics',
     'manage.urgent.empty':'No urgent items waiting',
     'manage.urgent.empty_sub':'Drafts for important messages (refunds, complaints) appear here.',
+    'manage.urgent.header':'Urgent AI replies pending',
+    'dev.sim.urgent_comment':'🧪 Urgent comment (pending)',
+    'dev.sim.urgent_dm':'🧪 Urgent DM (pending)',
+    'dev.sim.normal_comment':'🧪 Comment (auto-send)',
+    'dev.sim.normal_dm':'🧪 DM (auto-send)',
+    'draft.urgent_badge':'Urgent',
+    'draft.high_badge':'Important',
+    'draft.new_dm':'New DM',
+    'draft.new_comment':'New comment',
+    'draft.just_now':'Just arrived',
+    'draft.ai_tone':'AI · Your tone',
+    'draft.tap_edit':'Tap to edit',
+    'draft.skip':'Skip',
+    'draft.approve':'✓ Approve · Send',
+    'draft.sending':'Sending...',
+    'draft.sent':'✓ Sent',
+    'draft.dm_drafted':' · DM draft created',
+    'draft.send_failed':'Send failed: ',
+    'draft.unknown_error':'Unknown error',
+    'draft.network_error':'Network error',
+    'draft.skip_confirm':'Skip this reply? It will be discarded without sending.',
+    'draft.also_dm':'Also send a DM with details',
+    'draft.ch_dm':'DM',
+    'draft.ch_comment':'Comment',
+    'devsim.urgent_prefix':'[Urgent] ',
+    'devsim.normal_prefix':'[Normal] ',
+    'devsim.prompt_dm':'DM text',
+    'devsim.prompt_comment':'Comment text',
+    'devsim.auto_sent':'✓ Auto-reply sent (',
+    'devsim.auto_sent_suffix':' · check Comments & DMs tab)',
+    'devsim.urgent_pending':'✓ Urgent draft pending — approve in the Urgent tab',
+    'devsim.failed':'Simulation failed: ',
     'manage.comments.empty':'No auto-replies yet',
     'manage.comments.empty_sub':'When a normal comment or DM arrives, the AI reply will appear here.',
     'manage.crm.positive':'Positive followers',
@@ -6650,6 +6718,16 @@ function applyI18n(lang){
   try { if(typeof renderCalendar === 'function') renderCalendar(); } catch(_){}
   try { if(typeof renderTplCarousel === 'function') renderTplCarousel(); } catch(_){}
   try { if(typeof renderDailyTrends === 'function') renderDailyTrends(); } catch(_){}
+  // cs-2 슬라이드 카드 (Slide 2 · Body 등) 라벨 즉시 갱신
+  try {
+    if(typeof renderBodyAsCards === 'function' && typeof createData !== 'undefined' && Array.isArray(createData.bodySlides) && createData.bodySlides.length){
+      renderBodyAsCards(createData.bodySlides);
+    }
+  } catch(_){}
+  // 긴급 응대 대기 카드 즉시 갱신
+  try { if(typeof loadPendingDrafts === 'function') loadPendingDrafts(); } catch(_){}
+  // 만들기 탭 "내 주제 · ___" 라벨 갱신 (lang 따라 카테고리명 swap)
+  try { if(typeof syncToneChip === 'function') syncToneChip(); } catch(_){}
   // edt-size-badge 갱신 (사용자가 cs-4 에 있을 때 lang 변경되면)
   try {
     var _badge = document.getElementById('edt-size-badge');
@@ -7042,6 +7120,36 @@ var DAILY_TOPIC_POOL = [
   { topic:'이직 성공한 사람들의 공통 이력서 스킬', chip:'커리어', meta:'취업 팁' },
   { topic:'취미로 월 30만원 버는 방법 3가지', chip:'부수입', meta:'N잡' },
 ];
+// English fallback pool — used when ssobiCurrentLang === 'en'
+var DAILY_TOPIC_POOL_EN = [
+  // Beauty
+  { topic:'7 skincare mistakes most people still make', chip:'Beauty', meta:'🔥 Trending now' },
+  { topic:'3 ingredients dermatologists never buy', chip:'Ingredients', meta:'Read your label' },
+  { topic:'Glass-skin routine that actually works this year', chip:'Trend', meta:'Glow up' },
+  { topic:'Drugstore beauty under $10 — best 3', chip:'Budget', meta:'Save smart' },
+  { topic:'Best K-beauty products to buy on sale', chip:'Shopping', meta:'Mindful beauty' },
+  // Food / cafe
+  { topic:'3 hidden brunch cafes worth the trip', chip:'Eats', meta:'Weekend plans' },
+  { topic:'Make your favorite cafe drink at home', chip:'Home cafe', meta:'Cozy vibes' },
+  { topic:'4 convenience store desserts that surprised everyone', chip:'Snacks', meta:'Going viral' },
+  // Travel
+  { topic:'Best 2-night domestic trip itineraries', chip:'Travel', meta:'Weekend escape' },
+  { topic:'5 Tokyo spots only locals know', chip:'Abroad', meta:'Local picks' },
+  // Fashion / home
+  { topic:'5 spring outfits real Gen-Z wear daily', chip:'Fashion', meta:'OOTD' },
+  { topic:'Studio apartment with Scandinavian vibes', chip:'Interior', meta:'Room makeover' },
+  // Fitness
+  { topic:'10-minute home workout that actually burns fat', chip:'Home gym', meta:'Diet' },
+  { topic:'Pilates beginner mistakes to skip', chip:'Pilates', meta:'Starter guide' },
+  // Money / saving
+  { topic:'How I save $1k a month on a $2k income', chip:'Finance', meta:'Real savings' },
+  { topic:'Cut your phone + insurance bill by $100/mo', chip:'Saving', meta:'Fixed costs' },
+  // Lifestyle / tips
+  { topic:'5 useful iPhone features almost no one uses', chip:'Tech', meta:'Hidden tools' },
+  { topic:'5-minute clean routine that actually works', chip:'Home', meta:'Daily life' },
+  { topic:'Resume skills that actually got people hired', chip:'Career', meta:'Job tips' },
+  { topic:'3 hobbies that make $300/month on the side', chip:'Side hustle', meta:'Extra income' },
+];
 // 오늘 시드 계산 (한국 시간 9시 기준)
 //   9시 전이면 '어제' 날짜 사용 (밤새 같은 추천)
 function dailySeed(){
@@ -7057,7 +7165,10 @@ function dailySeed(){
 function pickDailyTrends(){
   // dailySeed + 더보기 클릭 횟수(_trendShuffleOffset) 합쳐 매번 다른 시작점
   var seed = (dailySeed() + _trendShuffleOffset * 12347) & 0x7fffffff;
-  var pool = DAILY_TOPIC_POOL.slice();
+  var _lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+  var pool = (_lang === 'en' && typeof DAILY_TOPIC_POOL_EN !== 'undefined')
+    ? DAILY_TOPIC_POOL_EN.slice()
+    : DAILY_TOPIC_POOL.slice();
   // Fisher–Yates with seeded random
   var rnd = function(){
     seed = (seed * 1103515245 + 12345) & 0x7fffffff;
@@ -7094,7 +7205,12 @@ function renderDailyTrendsStatic(picks, freshness){
     // 카테고리 라벨 fallback (다른 카테고리 카드일 때만)
     var savedKey = '';
     try { savedKey = localStorage.getItem('ssobi_disc_topic') || ''; } catch(_){}
-    var myCatLabel = (savedKey && discoverData[savedKey]) ? discoverData[savedKey].name : '';
+    var _stLang2 = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+    var myCatLabel = '';
+    if(savedKey && discoverData[savedKey]){
+      var _d2 = discoverData[savedKey];
+      myCatLabel = (_stLang2 === 'en' && _d2.nameEn) ? _d2.nameEn : _d2.name;
+    }
     var catLabel = t.chip || (t.category ? labelizeCategory(t.category) : '');
     var showCat = catLabel && myCatLabel && catLabel !== myCatLabel;
     return '<div class="trend-card v4" onclick="useTrend('+(i+1)+')">' +
@@ -7111,15 +7227,25 @@ function renderDailyTrendsStatic(picks, freshness){
   void freshness;
 }
 
-// category key → 한글 표기
+// category key → lang-aware label
 function labelizeCategory(c){
-  return ({
+  var _lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+  var ko = {
     beauty:'뷰티', beauty_treatment:'뷰티 시술', beauty_product:'뷰티 제품',
     food:'음식', cafe:'카페', travel:'여행', travel_domestic:'국내여행', travel_abroad:'해외여행',
     fashion:'패션', interior:'인테리어', book:'독서', baby:'육아', fit:'운동',
     fitness:'운동', money:'재테크', money_tip:'재테크', life:'라이프', life_tip:'라이프',
     trend:'트렌드', etc:'AI 추천',
-  })[c] || c;
+  };
+  var en = {
+    beauty:'Beauty', beauty_treatment:'Beauty treatment', beauty_product:'Beauty product',
+    food:'Food', cafe:'Cafe', travel:'Travel', travel_domestic:'Local travel', travel_abroad:'Abroad',
+    fashion:'Fashion', interior:'Interior', book:'Books', baby:'Parenting', fit:'Fitness',
+    fitness:'Fitness', money:'Finance', money_tip:'Finance', life:'Lifestyle', life_tip:'Lifestyle',
+    trend:'Trending', etc:'AI picks',
+  };
+  var map = _lang === 'en' ? en : ko;
+  return map[c] || c;
 }
 // 더보기 토글 — 추천 카드 6개 ↔ 12개 사이 전환
 function toggleMoreTrends(){
@@ -7206,9 +7332,21 @@ function renderDailyTrends(){
     var serverTopics = Array.isArray(serverData.topics) ? serverData.topics : [];
     var topicsByCat = (serverData.topics_by_category && typeof serverData.topics_by_category === 'object') ? serverData.topics_by_category : {};
 
+    var _curLang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+    var _todayChip = _curLang === 'en' ? 'Today' : '오늘';
+    var _hotChip = _curLang === 'en' ? 'Hot today' : '오늘 핫';
+    var _catName = function(k){
+      var d = discoverData[k]; if(!d) return '';
+      return (_curLang === 'en' && d.nameEn) ? d.nameEn : d.name;
+    };
+    var _catTrends = function(k){
+      var d = discoverData[k]; if(!d) return [];
+      return (_curLang === 'en' && Array.isArray(d.trendsEn) && d.trendsEn.length) ? d.trendsEn : (d.trends || []);
+    };
+
     var myPool = (savedKey && discoverData[savedKey])
-      ? discoverData[savedKey].trends.map(function(t){
-          return { topic: t.hook, chip: discoverData[savedKey].name, meta: t.meta, src: t.src };
+      ? _catTrends(savedKey).map(function(t){
+          return { topic: t.hook, chip: _catName(savedKey), meta: t.meta, src: t.src };
         })
       : pickDailyTrends();
 
@@ -7218,7 +7356,7 @@ function renderDailyTrends(){
     var catPool = catList.map(function(t){
       return {
         topic: t.topic || '',
-        chip: (savedKey && discoverData[savedKey]) ? discoverData[savedKey].name : '오늘',
+        chip: (savedKey && discoverData[savedKey]) ? _catName(savedKey) : _todayChip,
         meta: t.body_preview || t.why || t.preview_hook || '',
         hook_score: typeof t.hook_score === 'number' ? t.hook_score : 8,
         source: t.source || '',
@@ -7230,7 +7368,7 @@ function renderDailyTrends(){
     var hotPool = serverTopics.map(function(t){
       return {
         topic: t.topic || '',
-        chip: t.category || '오늘 핫',
+        chip: t.category || _hotChip,
         meta: t.body_preview || t.why || t.preview_hook || '',
         hook_score: typeof t.hook_score === 'number' ? t.hook_score : 8,
         source: t.source || '',
@@ -7249,7 +7387,10 @@ function renderDailyTrends(){
         seenTopic[t.topic] = 1; serverPool.push(t);
       }
     }
-    if(savedKey){
+    // EN 모드: 서버 데이터(한국어)는 건너뛰고 클라 EN 풀만 사용
+    if(_curLang === 'en'){
+      addToPool(myPool);
+    } else if(savedKey){
       addToPool(catPool);
     } else {
       addToPool(hotPool);
@@ -7276,7 +7417,8 @@ function renderDailyTrends(){
     window._shownTrendTopics = window._shownTrendTopics || {};
     var unshown = serverPool.filter(function(t){ return !window._shownTrendTopics[t.topic]; });
     // 풀 6개 이하 + savedKey 있으면 미리 prefetch (다음 클릭 때 새 풀 준비)
-    if(savedKey && unshown.length <= 6 && !window._fetchingMoreTrends){
+    // EN 모드는 서버 prefetch 건너뜀 (서버 응답이 한국어)
+    if(_curLang !== 'en' && savedKey && unshown.length <= 6 && !window._fetchingMoreTrends){
       fetchMoreTrends(catKey);
     }
     if(unshown.length < 3){
@@ -7291,7 +7433,7 @@ function renderDailyTrends(){
 
     if(savedKey && discoverData[savedKey]){
       createData._discTopic = savedKey;
-      window._pickedTopic = discoverData[savedKey].name;
+      window._pickedTopic = _catName(savedKey);
     }
     var freshness = (catPool.length || hotPool.length) ? 'fresh' : 'fallback';
     renderDailyTrendsStatic(picks, freshness);
@@ -7757,7 +7899,18 @@ var bioTemplates = {
 };
 var discoverData = {
   beauty: {
-    name:'뷰티',
+    name:'뷰티', nameEn:'Beauty',
+    trendsEn:[
+      {hook:'4 toners 30-somethings actually stick with', src:['Reddit','IG'], meta:'🔥 Saved 12k'},
+      {hook:'3 ingredients dermatologists never buy', src:['X','Threads'], meta:'📈 Cited 12k'},
+      {hook:'Sensitive skin: brand A vs brand B honest review', src:['IG','TikTok'], meta:'✨ Reviews booming'},
+      {hook:'Best K-beauty buys when sales hit', src:['IG'], meta:'🛒 #1 sale traffic'},
+      {hook:'Drugstore beauty finds you have to grab', src:['TikTok','Threads'], meta:'💬 9k upvotes'},
+      {hook:'My month-long acne recovery that actually worked', src:['Reddit'], meta:'📈 Saved 7k'},
+      {hook:'Build a full K-beauty kit under $50', src:['IG'], meta:'🔥 Carousel hit'},
+      {hook:'Glass-skin routine — Korean version', src:['TikTok','IG'], meta:'✨ #SlowBeauty 8.4k'},
+      {hook:'7 skincare mistakes most people still make', src:['Reddit'], meta:'🔥 r/AsianBeauty 2.8k'}
+    ],
     refs:[
       {h:'@millie_skin', f:'12.4만', s:'성분 기반 스킨케어 · 주 3회 루틴 공유',
         bio:'💄 민감 피부 탈출기\n📍 매주 화·목·토 루틴 업로드\n🌿 성분 체크 · 공구 얼리액세스\n↓ 최근 제품 리스트',
@@ -7791,7 +7944,18 @@ var discoverData = {
     ]
   },
   fashion: {
-    name:'패션',
+    name:'패션', nameEn:'Fashion',
+    trendsEn:[
+      {hook:'The flattering proportions only short people know', src:['Threads','IG'], meta:'💬 18k upvotes'},
+      {hook:'Best of the week — picks worth buying', src:['IG','X'], meta:'🛒 Click frenzy'},
+      {hook:'Zara vs COS: same design, honest comparison', src:['Reddit'], meta:'📈 8k reviews'},
+      {hook:'4 bags 30-somethings always end up buying', src:['IG','Threads'], meta:'🔥 Saved 11k'},
+      {hook:'4 spring trenches under $80 that never miss', src:['TikTok','IG'], meta:'✨ #OOTD 7k'},
+      {hook:'7 office looks that are clean but never boring', src:['IG'], meta:'📈 Saves rising'},
+      {hook:'Full spring outfit under $40', src:['TikTok'], meta:'💬 Shared 9k'},
+      {hook:'How to make even a basic hoodie look polished', src:['Threads','IG'], meta:'✨ Cited 6k'},
+      {hook:'5 spring buys to skip this year', src:['X','IG'], meta:'🔥 Trending up'}
+    ],
     refs:[
       {h:'@jisu_style', f:'18.4만', s:'데일리룩 + 브랜드 분석'},
       {h:'@seoulnista', f:'31만', s:'서울 거리 스냅 · 코디 팁'},
@@ -7810,7 +7974,18 @@ var discoverData = {
     ]
   },
   food: {
-    name:'푸드',
+    name:'푸드', nameEn:'Food',
+    trendsEn:[
+      {hook:'5 new convenience-store snacks that actually slap', src:['IG','Threads'], meta:'🔥 Reviews exploding'},
+      {hook:'Made $1 mala soup at home — here\'s how', src:['TikTok'], meta:'📈 Views 23k'},
+      {hook:'5-minute recipes I cook every day as a one-bedroom dweller', src:['Reddit','IG'], meta:'💾 Saved 10k'},
+      {hook:'Air fryer must-tries everyone\'s skipping', src:['TikTok'], meta:'💬 Comments 3.4k'},
+      {hook:'Cheaper than takeout — and tastier', src:['IG','Reddit'], meta:'🔥 Shared 8k'},
+      {hook:'Tested viral chef recipes — what actually held up', src:['IG'], meta:'✨ 9k reviews'},
+      {hook:'5 hidden eats under $10 in the trendy district', src:['IG','TikTok'], meta:'📍 Pin saves'},
+      {hook:'Office lunch boxes you can prep in 30 minutes', src:['Threads'], meta:'💬 Upvotes 7k'},
+      {hook:'What young people actually order at cafes now', src:['X','IG'], meta:'✨ #cafestagram'}
+    ],
     refs:[
       {h:'@food.mood.kr', f:'14만', s:'에세이식 식탁 · 홈 요리'},
       {h:'@bread.kitchen', f:'7.8만', s:'홈베이킹 · 재료 수급 꿀팁'},
@@ -7829,7 +8004,18 @@ var discoverData = {
     ]
   },
   life: {
-    name:'라이프',
+    name:'라이프', nameEn:'Lifestyle',
+    trendsEn:[
+      {hook:'5 appliances solo dwellers are glad they bought', src:['Reddit','IG'], meta:'🔥 Saved 14k'},
+      {hook:'Dollar-store buys you won\'t regret', src:['TikTok','IG'], meta:'📈 Clicks 9k'},
+      {hook:'3 things that actually help when you can\'t sleep', src:['Reddit'], meta:'💬 Upvotes 11k'},
+      {hook:'What a no-spend month looked like for me', src:['Threads','X'], meta:'✨ 8k reviews'},
+      {hook:'Tiny weekday-lunch tweaks that change everything', src:['IG'], meta:'💾 Saved 6k'},
+      {hook:'5 things to actually throw out when you move', src:['Threads'], meta:'💬 Shared 7k'},
+      {hook:'$10 home haul you should grab', src:['IG','TikTok'], meta:'🛒 Traffic spike'},
+      {hook:'Content that hits when you live alone', src:['X','IG'], meta:'❤️ Upvotes 9k'},
+      {hook:'30 weekday-evening minutes used really well', src:['Threads','IG'], meta:'📈 Saved 8k'}
+    ],
     refs:[
       {h:'@morning.k', f:'11.2만', s:'미라클모닝 + 오늘 할 일 공유'},
       {h:'@quiet_daily', f:'5.4만', s:'조용한 서울살이 · 에세이'},
@@ -7848,7 +8034,18 @@ var discoverData = {
     ]
   },
   fit: {
-    name:'피트니스',
+    name:'피트니스', nameEn:'Fitness',
+    trendsEn:[
+      {hook:'3 things gym beginners should never do', src:['Reddit','IG'], meta:'📈 Saved 10k'},
+      {hook:'How I actually broke my diet plateau', src:['X','Threads'], meta:'💬 Upvotes 12k'},
+      {hook:'30 min a day, 4 weeks later — here\'s the change', src:['TikTok','IG'], meta:'✨ before/after'},
+      {hook:'Protein shake vs Greek yogurt — which wins?', src:['Reddit'], meta:'🔥 7k reviews'},
+      {hook:'Home workouts that actually melt fat — no gym', src:['IG'], meta:'💾 Saved 9k'},
+      {hook:'3 months of pilates — body change log', src:['IG','TikTok'], meta:'✨ before/after'},
+      {hook:'A 5-minute core for people who hate working out', src:['Threads'], meta:'❤️ Upvotes 8k'},
+      {hook:'Best yoga mats under $40', src:['IG'], meta:'🛒 Clicks 6k'},
+      {hook:'Diet meal-prep — full week\'s plan', src:['Reddit','IG'], meta:'📈 Saved 11k'}
+    ],
     refs:[
       {h:'@fit.mina', f:'16만', s:'홈트 8주 변화 · 식단 병행'},
       {h:'@pilates_daily', f:'9.1만', s:'필라테스 동작 분해'},
@@ -7867,7 +8064,18 @@ var discoverData = {
     ]
   },
   baby: {
-    name:'육아',
+    name:'육아', nameEn:'Parenting',
+    trendsEn:[
+      {hook:'5 newborn items you absolutely don\'t need to buy', src:['IG','Threads'], meta:'💬 Upvotes 18k'},
+      {hook:'5-minute baby food recipes for 6-month-olds', src:['IG','TikTok'], meta:'✨ Downloads 14k'},
+      {hook:'3 ways to actually fix toddler bedtime tantrums', src:['Reddit'], meta:'📈 Saved 9k'},
+      {hook:'5 dollar-store baby finds that actually work', src:['IG'], meta:'🛒 Clicks 12k'},
+      {hook:'What I bought vs skipped before baby turned 100 days', src:['Threads'], meta:'❤️ Upvotes 11k'},
+      {hook:'Daycare day one — what moms should pack', src:['IG','Reddit'], meta:'💾 Saved 7k'},
+      {hook:'Diaper brand comparison after 6 months', src:['IG'], meta:'📊 Compare 8k'},
+      {hook:'12-month meal plan — what my baby actually ate', src:['IG','TikTok'], meta:'✨ Downloads 9k'},
+      {hook:'Pediatric checkups — what you cannot skip', src:['Reddit'], meta:'🔥 Shared 6k'}
+    ],
     refs:[
       {h:'@hana.mom', f:'8.4만', s:'둘째맘 육아 일상 · 공구'},
       {h:'@baby.sleep.coach', f:'14만', s:'수면 교육 팁 · 실전 Q&A'},
@@ -7886,7 +8094,18 @@ var discoverData = {
     ]
   },
   pet: {
-    name:'반려',
+    name:'반려', nameEn:'Pets',
+    trendsEn:[
+      {hook:'If your cat does this, take it to the vet immediately', src:['Reddit','IG'], meta:'🔥 Saved 11k'},
+      {hook:'I changed my senior dog\'s diet — here\'s what happened', src:['IG'], meta:'❤️ Upvotes 8k'},
+      {hook:'Costco pet food honest review', src:['Reddit','IG'], meta:'📈 Compare 7k'},
+      {hook:'Dog food: budget vs premium — real difference?', src:['Threads'], meta:'💬 Comments 12k'},
+      {hook:'Cat litter hygiene — what really matters', src:['Reddit'], meta:'💾 Saved 5k'},
+      {hook:'Pet insurance — what to know before signing up', src:['IG','Threads'], meta:'📊 Compare 9k'},
+      {hook:'Pet hotel vs sitter — honest comparison', src:['IG','Reddit'], meta:'✨ 6k reviews'},
+      {hook:'Top 3 toys cats actually love', src:['IG','TikTok'], meta:'🛒 Clicks 8k'},
+      {hook:'Walk routine tweaks that change your dog\'s mood', src:['X','TikTok'], meta:'📈 Upvotes 7k'}
+    ],
     refs:[
       {h:'@molly.the.poodle', f:'21만', s:'푸들 · 일상 일기'},
       {h:'@cat.doctor', f:'11만', s:'고양이 질병 · 행동 분석'},
@@ -7905,7 +8124,18 @@ var discoverData = {
     ]
   },
   money: {
-    name:'재테크',
+    name:'재테크', nameEn:'Finance',
+    trendsEn:[
+      {hook:'How a 30-something saves half a $2k paycheck', src:['Reddit','Threads'], meta:'🔥 Saved 16k'},
+      {hook:'Apple Pay vs Toss — honest comparison', src:['Threads','X'], meta:'📊 Compare 9k'},
+      {hook:'The insurance plans 30-somethings actually keep', src:['IG'], meta:'💾 Saved 11k'},
+      {hook:'Which ETF should you buy this half?', src:['X'], meta:'📈 Reposts 6k'},
+      {hook:'Savings vs ETF — same amount, 1-year result', src:['Reddit'], meta:'📊 Compare 8k'},
+      {hook:'Earning $500 extra a month — 1-year side gig log', src:['IG','TikTok'], meta:'💬 Comments 14k'},
+      {hook:'I tried 5 budget apps — here\'s the verdict', src:['IG'], meta:'✨ Compare 7k'},
+      {hook:'My frugal year — what\'s left in the account', src:['Threads','IG'], meta:'❤️ Upvotes 10k'},
+      {hook:'How to keep just one credit card', src:['Reddit','X'], meta:'📈 Shared 8k'}
+    ],
     refs:[
       {h:'@money.rule', f:'24만', s:'30대 자산관리 · 절약 루틴'},
       {h:'@invest.diary', f:'12만', s:'ETF 실전 투자 · 월간 수익'},
@@ -7924,7 +8154,18 @@ var discoverData = {
     ]
   },
   travel: {
-    name:'여행',
+    name:'여행', nameEn:'Travel',
+    trendsEn:[
+      {hook:'2-night domestic trip on a $80 budget', src:['IG','TikTok'], meta:'🛒 Bookings up'},
+      {hook:'3 real ways to score cheap flights', src:['Threads','Reddit'], meta:'💾 Saved 12k'},
+      {hook:'Tokyo for 4 days under $400 — possible?', src:['X','IG'], meta:'📈 Shared 9k'},
+      {hook:'Off-peak vs peak season — honest comparison', src:['IG'], meta:'📊 Compare 8k'},
+      {hook:'24 hours in the second city — vetted itinerary', src:['IG','TikTok'], meta:'📍 Saved 11k'},
+      {hook:'Hotel star rating vs guesthouse — review', src:['Reddit'], meta:'✨ 6k reviews'},
+      {hook:'A first-time solo traveler\'s guide', src:['X','Threads'], meta:'❤️ Upvotes 8k'},
+      {hook:'Carry-on vs backpack for a 5-night trip', src:['Reddit','IG'], meta:'📊 Compare 5k'},
+      {hook:'5 travel apps that are actually useful', src:['IG'], meta:'🔥 Saved 7k'}
+    ],
     refs:[
       {h:'@min.travels', f:'19만', s:'해외 단독 여행 · 일정표 공유'},
       {h:'@jeju.mood', f:'8.2만', s:'제주 한 달 살기'},
@@ -7943,7 +8184,18 @@ var discoverData = {
     ]
   },
   home: {
-    name:'홈·인테리어',
+    name:'홈·인테리어', nameEn:'Home & Interior',
+    trendsEn:[
+      {hook:'Turn a 200-sqft studio into a cafe vibe', src:['IG','Reddit'], meta:'🔥 Saved 14k'},
+      {hook:'4 things you should never buy at IKEA', src:['Threads','X'], meta:'💬 Upvotes 10k'},
+      {hook:'Muji vs dollar store — household comparison', src:['IG','TikTok'], meta:'📊 Compare 8k'},
+      {hook:'A bathroom makeover with only dollar-store finds', src:['IG'], meta:'🛒 Clicks 9k'},
+      {hook:'Decorate your studio in 4 steps for $100', src:['IG','TikTok'], meta:'💾 Saved 11k'},
+      {hook:'Closet organization — the order that finally worked', src:['Threads'], meta:'❤️ Upvotes 7k'},
+      {hook:'Best mood lights under $40 for the bedroom', src:['IG'], meta:'🛒 Clicks 6k'},
+      {hook:'Tiny kitchen organization — one item is enough', src:['IG','Reddit'], meta:'📈 Shared 8k'},
+      {hook:'First-month must-buys for living alone', src:['IG','TikTok'], meta:'💾 Saved 12k'}
+    ],
     refs:[
       {h:'@home.archive', f:'15만', s:'예산별 자취 인테리어 · 공간 활용'},
       {h:'@slow.house', f:'9.6만', s:'정리 루틴 + 작은 방 꾸미기'},
@@ -7962,7 +8214,18 @@ var discoverData = {
     ]
   },
   sports: {
-    name:'스포츠',
+    name:'스포츠', nameEn:'Sports',
+    trendsEn:[
+      {hook:'Beginner runner — how I hit 5k in 3 weeks', src:['Reddit','IG'], meta:'💾 Saved 9k'},
+      {hook:'Running shoes: $50 vs $150 — real difference', src:['Threads'], meta:'📊 Compare 7k'},
+      {hook:'1 month into tennis — gear that actually matters', src:['IG'], meta:'💬 Upvotes 5k'},
+      {hook:'Top 5 hobby sports trending right now', src:['X','TikTok'], meta:'📈 Trending up'},
+      {hook:'5 great cycling routes along the river', src:['IG','Reddit'], meta:'📍 Saved 6k'},
+      {hook:'A year of climbing — honest review', src:['IG'], meta:'❤️ Upvotes 8k'},
+      {hook:'1-year cost of getting into golf', src:['Threads'], meta:'📊 Compare 7k'},
+      {hook:'Pilates vs yoga — honest comparison', src:['IG','TikTok'], meta:'📈 Shared 5k'},
+      {hook:'3 things I learned joining a run crew', src:['Reddit'], meta:'❤️ Upvotes 4k'}
+    ],
     refs:[
       {h:'@run.crew.seoul', f:'7.8만', s:'주간 러닝 페이스 기록'},
       {h:'@tennis.diary', f:'5.4만', s:'테니스 레슨 일지 + 장비'},
@@ -7981,7 +8244,18 @@ var discoverData = {
     ]
   },
   tech: {
-    name:'테크',
+    name:'테크', nameEn:'Tech',
+    trendsEn:[
+      {hook:'5 AI apps you should be using right now', src:['X','Reddit'], meta:'🔥 Reposts 15k'},
+      {hook:'iPhone settings that double your battery life', src:['TikTok','IG'], meta:'💾 Saves exploding'},
+      {hook:'Notion vs Obsidian — 6-month comparison', src:['Reddit','IG'], meta:'📊 Compare 8k'},
+      {hook:'3 apps to use when you can\'t focus', src:['Threads'], meta:'❤️ Upvotes 9k'},
+      {hook:'The workflow that actually boosted my output', src:['IG','X'], meta:'📈 Shared 7k'},
+      {hook:'Galaxy vs iPhone — 4 real differences', src:['Threads'], meta:'💬 Comments 11k'},
+      {hook:'5 free AI tools that are actually worth it', src:['Reddit'], meta:'💾 Saved 10k'},
+      {hook:'AirPods vs Galaxy Buds — honest comparison', src:['IG'], meta:'📊 Compare 6k'},
+      {hook:'M4 MacBook — who should buy it (and skip it)', src:['Threads','X'], meta:'🔥 Shared 9k'}
+    ],
     refs:[
       {h:'@productivity.k', f:'22만', s:'생산성 앱 + 워크플로우 공유'},
       {h:'@gear.lab', f:'13만', s:'가성비 IT 기기 리뷰'},
@@ -8000,7 +8274,18 @@ var discoverData = {
     ]
   },
   book: {
-    name:'책·독서',
+    name:'책·독서', nameEn:'Books',
+    trendsEn:[
+      {hook:'You\'ll regret skipping this book', src:['IG','Threads'], meta:'💾 Saved 8k'},
+      {hook:'4 books 30-somethings always end up buying', src:['IG'], meta:'🔥 Saved 11k'},
+      {hook:'Beginner picks by genre, all in one place', src:['Reddit'], meta:'📊 Curation 7k'},
+      {hook:'Why this season\'s bestseller actually deserves it', src:['X'], meta:'❤️ Upvotes 7k'},
+      {hook:'People whose lives changed from one book', src:['Reddit'], meta:'💬 Comments exploding'},
+      {hook:'6 starter picks for reading in English', src:['IG'], meta:'💾 Saved 6k'},
+      {hook:'A reading-notes template worth using', src:['Threads'], meta:'📈 Shared 5k'},
+      {hook:'Bestseller vs steady seller — the real difference', src:['Reddit'], meta:'📊 Compare 4k'},
+      {hook:'30-minute commute audiobooks worth your time', src:['IG','TikTok'], meta:'❤️ Upvotes 6k'}
+    ],
     refs:[
       {h:'@book.daily', f:'11만', s:'한 달 5권 밑줄 아카이브'},
       {h:'@quiet.reader', f:'6.7만', s:'소설 추천 + 비슷한 책'},
@@ -8019,7 +8304,18 @@ var discoverData = {
     ]
   },
   music: {
-    name:'음악',
+    name:'음악', nameEn:'Music',
+    trendsEn:[
+      {hook:'10 songs you\'ll keep playing on the morning commute', src:['IG','TikTok'], meta:'📈 Sharing surge'},
+      {hook:'The indie artists everyone\'s watching now', src:['X','Threads'], meta:'🔥 Lots of reposts'},
+      {hook:'The optimal BPM for workouts', src:['Reddit'], meta:'💾 Saves rising'},
+      {hook:'Songs that actually help when you can\'t sleep', src:['IG'], meta:'❤️ Upvotes 9k'},
+      {hook:'Best 8 driving playlists', src:['IG','TikTok'], meta:'📈 Shared 7k'},
+      {hook:'10 songs that hit just right at a cafe', src:['IG'], meta:'💾 Saved 6k'},
+      {hook:'5 luxury headphones — honest comparison', src:['Reddit'], meta:'📊 Compare 8k'},
+      {hook:'Recommended LPs you can grab for $10', src:['IG'], meta:'🛒 Clicks 5k'},
+      {hook:'This week\'s #1 — why it actually got there', src:['X','Threads'], meta:'💬 Upvotes 6k'}
+    ],
     refs:[
       {h:'@mood.playlist', f:'17만', s:'무드별 플레이리스트 큐레이션'},
       {h:'@vinyl.kr', f:'6.3만', s:'LP 리뷰 + 소장 컬렉션'},
@@ -8038,7 +8334,18 @@ var discoverData = {
     ]
   },
   kpop: {
-    name:'아이돌·K팝',
+    name:'아이돌·K팝', nameEn:'Idols & K-pop',
+    trendsEn:[
+      {hook:'Why LE SSERAFIM\'s new track really hit #1', src:['X','TikTok'], meta:'🔥 Chart breakdown'},
+      {hook:'BLACKPINK Jennie merch — sold-out roundup', src:['IG','Threads'], meta:'🛒 Info exploding'},
+      {hook:'Idol airport looks worth actually copying', src:['IG'], meta:'✨ Saved 14k'},
+      {hook:'Real strategies for keeping streams at #1', src:['Threads'], meta:'💬 Fandom share'},
+      {hook:'5 rookie groups debuting this year that will blow up', src:['X','Reddit'], meta:'📈 Predictions 8k'},
+      {hook:'What the 100-million-view fancams have in common', src:['IG','TikTok'], meta:'❤️ Analysis 7k'},
+      {hook:'Hidden meaning inside group logos', src:['Threads'], meta:'💾 Saved 9k'},
+      {hook:'D-7 to comeback — every teaser explained', src:['X'], meta:'🔥 Hot topic'},
+      {hook:'Idols\' side jobs ranked — who\'s doing the most?', src:['IG'], meta:'📊 Compare 6k'}
+    ],
     refs:[
       {h:'@kpop.daily', f:'42만', s:'K-pop 데일리 컴백·빌보드 정리'},
       {h:'@idol.outfit', f:'18만', s:'아이돌 공항패션·무대의상 분석'},
@@ -8057,7 +8364,18 @@ var discoverData = {
     ]
   },
   movie: {
-    name:'영화·드라마',
+    name:'영화·드라마', nameEn:'Movies & Shows',
+    trendsEn:[
+      {hook:'This week\'s OTT releases worth your night', src:['IG','TikTok'], meta:'🎬 Picks 9k'},
+      {hook:'Top 5 box-office hits this year — analyzed', src:['X','Threads'], meta:'📊 Compare 7k'},
+      {hook:'The drama ending hides clues you missed', src:['Reddit','IG'], meta:'💬 Debate 11k'},
+      {hook:'Netflix vs rivals — April release comparison', src:['IG'], meta:'📈 Shared 8k'},
+      {hook:'Why this re-release is worth a theater visit', src:['Threads'], meta:'❤️ Upvotes 6k'},
+      {hook:'5 films whose OST blew up bigger than the movie', src:['IG','TikTok'], meta:'🎵 Popular 7k'},
+      {hook:'A show summarized in 30 minutes', src:['Reddit'], meta:'💾 Saved 12k'},
+      {hook:'Hidden masterpieces with 9+ scores worth discovering', src:['IG'], meta:'✨ Curated 10k'},
+      {hook:'New facts revealed in actor interviews', src:['X','Threads'], meta:'💬 Upvotes 5k'}
+    ],
     refs:[
       {h:'@cinema.kr', f:'24만', s:'개봉 영화 솔직 후기·해석'},
       {h:'@drama.diary', f:'13만', s:'드라마 명대사 + 스틸컷'},
@@ -8076,7 +8394,18 @@ var discoverData = {
     ]
   },
   psych: {
-    name:'심리·연애',
+    name:'심리·연애', nameEn:'Mind & Love',
+    trendsEn:[
+      {hook:'4 stages of actually healing after a breakup', src:['IG','Threads'], meta:'❤️ Upvotes 18k'},
+      {hook:'Do MBTI dating patterns really hold up?', src:['X','TikTok'], meta:'🔥 Debate 14k'},
+      {hook:'Exactly when to walk away from a maybe-thing', src:['IG'], meta:'💬 Comments 11k'},
+      {hook:'3 things that worked when my self-esteem was low', src:['Reddit','IG'], meta:'💾 Saved 9k'},
+      {hook:'5 ground rules couples that don\'t fight follow', src:['Threads'], meta:'📈 Shared 8k'},
+      {hook:'Why cutting toxic friends felt like relief', src:['IG'], meta:'❤️ Upvotes 7k'},
+      {hook:'A 1-week burnout recovery routine I tried', src:['Reddit'], meta:'✨ 6k reviews'},
+      {hook:'5 books that helped pull me out of a slump', src:['IG'], meta:'📚 Picks 5k'},
+      {hook:'My honest take after starting therapy', src:['Threads','IG'], meta:'💬 Shared 8k'}
+    ],
     refs:[
       {h:'@mind.note', f:'19만', s:'데일리 심리 인사이트 카드뉴스'},
       {h:'@love.lab', f:'11만', s:'연애 케이스 스터디'},
@@ -8095,7 +8424,18 @@ var discoverData = {
     ]
   },
   mystery: {
-    name:'미스터리·공포',
+    name:'미스터리·공포', nameEn:'Mystery & Horror',
+    trendsEn:[
+      {hook:'5 unsolved cases that actually happened', src:['IG','Reddit'], meta:'🔥 Views 22k'},
+      {hook:'Real reviews from places said to be haunted', src:['Threads','IG'], meta:'💬 Upvotes 13k'},
+      {hook:'CCTV moments no one can explain', src:['X','TikTok'], meta:'😱 Buzz 11k'},
+      {hook:'Songs you should never listen to at night', src:['IG'], meta:'❤️ Saved 9k'},
+      {hook:'Top 5 horror story channels worth watching', src:['Reddit'], meta:'📈 Picks 8k'},
+      {hook:'A collection of true hotel horror stories', src:['IG','Threads'], meta:'💾 Saved 10k'},
+      {hook:'Strange things people swear happened in broad daylight', src:['Threads'], meta:'💬 Comments 7k'},
+      {hook:'Foreign urban legends that genuinely creep', src:['Reddit'], meta:'🔥 Shared 6k'},
+      {hook:'How well each MBTI handles horror — ranked', src:['IG'], meta:'😆 Upvotes 5k'}
+    ],
     refs:[
       {h:'@horror.tales', f:'21만', s:'실화 괴담·미스터리 큐레이션'},
       {h:'@true.crime.kr', f:'14만', s:'국내외 미제·범죄 분석'},
@@ -8397,7 +8737,8 @@ function obFinish(){
   if(discKey && window.discoverData && discoverData[discKey]){
     try { localStorage.setItem('ssobi_disc_topic', discKey); } catch(_){}
     if(window.createData) createData._discTopic = discKey;
-    window._pickedTopic = discoverData[discKey].name;
+    var _pkLang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+    window._pickedTopic = (_pkLang === 'en' && discoverData[discKey].nameEn) ? discoverData[discKey].nameEn : discoverData[discKey].name;
   }
   // 4) Supabase user_profile 저장 (서버, 비차단)
   authHeaders().then(function(h){
@@ -14634,30 +14975,36 @@ function renderPendingDrafts(box, drafts){
     return;
   }
   if(urgentEmpty) urgentEmpty.style.display = 'none';
+  var _lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+  var _d = (typeof I18N !== 'undefined' && I18N[_lang]) || {};
+  var headerLabel = _d['manage.urgent.header'] || '긴급 AI 응대 대기';
   var header = document.createElement('div');
   header.style.cssText = 'display:flex;align-items:center;gap:8px;margin:6px 2px 10px;font-size:12px;font-weight:800;color:var(--red);letter-spacing:.3px';
-  header.innerHTML = '<span style="width:7px;height:7px;border-radius:50%;background:var(--red);animation:bl 2s infinite"></span>긴급 AI 응대 대기 <span style="background:var(--red);color:#fff;padding:2px 8px;border-radius:100px;font-size:10px">' + drafts.length + '</span>';
+  header.innerHTML = '<span style="width:7px;height:7px;border-radius:50%;background:var(--red);animation:bl 2s infinite"></span>' + headerLabel + ' <span style="background:var(--red);color:#fff;padding:2px 8px;border-radius:100px;font-size:10px">' + drafts.length + '</span>';
   box.appendChild(header);
   drafts.forEach(function(d){ box.appendChild(renderDraftCard(d)); });
 }
 
 function renderDraftCard(d){
+  var _lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+  var _d = (typeof I18N !== 'undefined' && I18N[_lang]) || {};
   var card = document.createElement('div');
   card.className = 'draft-card';
   card.dataset.id = d.id;
   card.style.cssText = 'background:#fff;border:1px solid var(--b);border-radius:14px;padding:14px 16px;margin-bottom:10px;box-shadow:0 2px 8px rgba(15,19,25,.04)';
-  var chTxt = d.type==='dm' ? 'DM' : '댓글';
+  var chTxt = d.type==='dm' ? (_d['draft.ch_dm'] || 'DM') : (_d['draft.ch_comment'] || '댓글');
+  var headChTxt = d.type==='dm' ? (_d['draft.new_dm'] || '새 DM') : (_d['draft.new_comment'] || '새 댓글');
   var chCol = d.type==='dm' ? 'linear-gradient(135deg,#4F5BD5,#8B5CF6)' : 'linear-gradient(135deg,#FEDA75,#D62976)';
   var urgencyBadge = '';
-  if(d.urgency==='urgent') urgencyBadge = '<span style="background:var(--red);color:#fff;padding:2px 7px;border-radius:5px;font-size:9.5px;font-weight:800;margin-left:4px">긴급</span>';
-  else if(d.urgency==='high') urgencyBadge = '<span style="background:#FCD34D;color:#78350F;padding:2px 7px;border-radius:5px;font-size:9.5px;font-weight:800;margin-left:4px">중요</span>';
+  if(d.urgency==='urgent') urgencyBadge = '<span style="background:var(--red);color:#fff;padding:2px 7px;border-radius:5px;font-size:9.5px;font-weight:800;margin-left:4px">' + (_d['draft.urgent_badge'] || '긴급') + '</span>';
+  else if(d.urgency==='high') urgencyBadge = '<span style="background:#FCD34D;color:#78350F;padding:2px 7px;border-radius:5px;font-size:9.5px;font-weight:800;margin-left:4px">' + (_d['draft.high_badge'] || '중요') + '</span>';
   var sentimentEmoji = d.sentiment==='negative' ? '😟' : (d.sentiment==='positive' ? '😊' : '');
 
   var head = document.createElement('div');
   head.style.cssText = 'display:flex;align-items:center;gap:8px;margin-bottom:10px';
   head.innerHTML = '<div style="width:28px;height:28px;border-radius:50%;background:'+chCol+';color:#fff;display:flex;align-items:center;justify-content:center;font-size:9.5px;font-weight:800">'+chTxt+'</div>' +
-    '<div style="flex:1"><div style="font-size:12.5px;font-weight:700;color:var(--t1)">'+sentimentEmoji+' 새 '+chTxt+urgencyBadge+'</div>' +
-    '<div style="font-size:10.5px;color:var(--t3);margin-top:1px">방금 도착</div></div>';
+    '<div style="flex:1"><div style="font-size:12.5px;font-weight:700;color:var(--t1)">'+sentimentEmoji+' '+headChTxt+urgencyBadge+'</div>' +
+    '<div style="font-size:10.5px;color:var(--t3);margin-top:1px">' + (_d['draft.just_now'] || '방금 도착') + '</div></div>';
   card.appendChild(head);
 
   // 원본
@@ -14669,7 +15016,7 @@ function renderDraftCard(d){
   // AI 초안 라벨
   var lbl = document.createElement('div');
   lbl.style.cssText = 'display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:10px;font-weight:800;color:var(--mint-d);letter-spacing:.4px';
-  lbl.innerHTML = '<span style="background:var(--mint);color:#fff;padding:2px 7px;border-radius:4px;font-size:8.5px">AI · 내 말투</span>탭해서 수정 가능';
+  lbl.innerHTML = '<span style="background:var(--mint);color:#fff;padding:2px 7px;border-radius:4px;font-size:8.5px">' + (_d['draft.ai_tone'] || 'AI · 내 말투') + '</span>' + (_d['draft.tap_edit'] || '탭해서 수정 가능');
   card.appendChild(lbl);
 
   // 편집 가능 초안
@@ -14685,7 +15032,7 @@ function renderDraftCard(d){
   if(d.type === 'comment'){
     dmCheckLabel = document.createElement('label');
     dmCheckLabel.style.cssText = 'display:flex;align-items:center;gap:6px;margin-top:10px;padding:8px 10px;background:var(--mint-l);border-radius:8px;font-size:11.5px;font-weight:700;color:var(--mint-d);cursor:pointer';
-    dmCheckLabel.innerHTML = '<input type="checkbox" class="draft-dm-check" style="cursor:pointer;accent-color:var(--mint)"><span>이 사람에게 DM으로 상세 안내도 보내기</span>';
+    dmCheckLabel.innerHTML = '<input type="checkbox" class="draft-dm-check" style="cursor:pointer;accent-color:var(--mint)"><span>' + (_d['draft.also_dm'] || '이 사람에게 DM으로 상세 안내도 보내기') + '</span>';
     card.appendChild(dmCheckLabel);
   }
 
@@ -14693,8 +15040,8 @@ function renderDraftCard(d){
   var acts = document.createElement('div');
   acts.style.cssText = 'display:flex;gap:8px;margin-top:10px';
   acts.innerHTML =
-    '<button class="draft-skip" style="padding:10px 14px;border:1px solid var(--b);background:#fff;color:var(--t2);font-size:12px;font-weight:700;border-radius:8px;cursor:pointer">스킵</button>' +
-    '<button class="draft-approve" style="flex:1;padding:10px;border:none;background:var(--mint);color:#fff;font-size:13px;font-weight:800;border-radius:8px;cursor:pointer;box-shadow:0 3px 10px rgba(0,200,150,.22)">✓ 승인 · 발송</button>';
+    '<button class="draft-skip" style="padding:10px 14px;border:1px solid var(--b);background:#fff;color:var(--t2);font-size:12px;font-weight:700;border-radius:8px;cursor:pointer">' + (_d['draft.skip'] || '스킵') + '</button>' +
+    '<button class="draft-approve" style="flex:1;padding:10px;border:none;background:var(--mint);color:#fff;font-size:13px;font-weight:800;border-radius:8px;cursor:pointer;box-shadow:0 3px 10px rgba(0,200,150,.22)">' + (_d['draft.approve'] || '✓ 승인 · 발송') + '</button>';
   card.appendChild(acts);
 
   acts.querySelector('.draft-approve').addEventListener('click', function(){
@@ -14709,8 +15056,10 @@ function renderDraftCard(d){
 }
 
 async function approveDraft(id, finalReply, card, btn, alsoSendDm){
+  var _lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+  var _d = (typeof I18N !== 'undefined' && I18N[_lang]) || {};
   btn.disabled = true;
-  btn.textContent = '발송 중...';
+  btn.textContent = _d['draft.sending'] || '발송 중...';
   var payload = { final_reply: finalReply };
   if(alsoSendDm) payload.also_send_dm = true;
   var h = await authHeaders();
@@ -14726,24 +15075,26 @@ async function approveDraft(id, finalReply, card, btn, alsoSendDm){
         card.style.opacity = '0';
         card.style.transform = 'translateX(20px)';
         setTimeout(function(){ card.remove(); loadPendingDrafts(); }, 320);
-        var msg = '✓ 발송 완료';
-        if(res.data && res.data.followup_dm_id) msg += ' · DM 초안 생성됨';
+        var msg = _d['draft.sent'] || '✓ 발송 완료';
+        if(res.data && res.data.followup_dm_id) msg += (_d['draft.dm_drafted'] || ' · DM 초안 생성됨');
         if(typeof lkeShowToast==='function') lkeShowToast(msg);
       } else {
         btn.disabled = false;
-        btn.textContent = '✓ 승인 · 발송';
-        alert('발송 실패: ' + (res.data?.error || '알 수 없는 오류'));
+        btn.textContent = _d['draft.approve'] || '✓ 승인 · 발송';
+        alert((_d['draft.send_failed'] || '발송 실패: ') + (res.data?.error || (_d['draft.unknown_error'] || '알 수 없는 오류')));
       }
     }).catch(function(e){
       btn.disabled = false;
-      btn.textContent = '✓ 승인 · 발송';
-      alert('네트워크 오류');
+      btn.textContent = _d['draft.approve'] || '✓ 승인 · 발송';
+      alert(_d['draft.network_error'] || '네트워크 오류');
       console.error(e);
     });
 }
 
 async function skipDraft(id, card){
-  if(!confirm('이 응대를 스킵할까요? 발송하지 않고 폐기돼요.')) return;
+  var _lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+  var _d = (typeof I18N !== 'undefined' && I18N[_lang]) || {};
+  if(!confirm(_d['draft.skip_confirm'] || '이 응대를 스킵할까요? 발송하지 않고 폐기돼요.')) return;
   var h = await authHeaders();
   fetch('/api/replies/'+id+'/skip', {method:'POST', credentials:'include', headers: h})
     .then(function(r){ if(r.ok){ card.style.opacity='.3'; setTimeout(function(){ card.remove(); }, 200); } });
@@ -14753,16 +15104,29 @@ async function skipDraft(id, card){
 // level: 'urgent' = 긴급 샘플 텍스트(환불/트러블 등) → pending
 //        undefined = 일반 샘플 → 자동 발송 (auto_sent=true)
 function devSimulate(kind, level){
-  var samples = {
-    normal_comment: '이 제품 어디서 살 수 있어요?',
-    normal_dm: '제품 공구 언제 열려요? 저번에 놓쳐서 이번엔 꼭!',
-    urgent_comment: '이 제품 써서 피부 트러블 났어요!! 환불 어떻게 해요',
-    urgent_dm: '결제는 됐는데 상품이 오지 않아요. 환불해주세요',
+  var _lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+  var _d = (typeof I18N !== 'undefined' && I18N[_lang]) || {};
+  var samplesByLang = {
+    ko: {
+      normal_comment: '이 제품 어디서 살 수 있어요?',
+      normal_dm: '제품 공구 언제 열려요? 저번에 놓쳐서 이번엔 꼭!',
+      urgent_comment: '이 제품 써서 피부 트러블 났어요!! 환불 어떻게 해요',
+      urgent_dm: '결제는 됐는데 상품이 오지 않아요. 환불해주세요',
+    },
+    en: {
+      normal_comment: 'Where can I buy this product?',
+      normal_dm: 'When does the next group buy open? I missed the last one!',
+      urgent_comment: 'I broke out badly after using this!! How do I get a refund?',
+      urgent_dm: 'I was charged but the product never arrived. Please refund me.',
+    },
   };
+  var samples = samplesByLang[_lang] || samplesByLang.ko;
   var defaultText = level === 'urgent'
     ? samples['urgent_' + kind]
     : samples['normal_' + kind];
-  var text = prompt((level==='urgent'?'[긴급] ':'[일반] ') + (kind==='dm'?'DM':'댓글')+' 내용', defaultText);
+  var prefix = level==='urgent' ? (_d['devsim.urgent_prefix'] || '[긴급] ') : (_d['devsim.normal_prefix'] || '[일반] ');
+  var promptLabel = kind==='dm' ? (_d['devsim.prompt_dm'] || 'DM 내용') : (_d['devsim.prompt_comment'] || '댓글 내용');
+  var text = prompt(prefix + promptLabel, defaultText);
   if(!text) return;
   authHeaders().then(function(h){
     return fetch('/api/dev/simulate-comment', {
@@ -14776,12 +15140,13 @@ function devSimulate(kind, level){
       if(j.ok){
         loadPendingDrafts();
         var auto = j.classification && !(j.classification.urgency==='urgent' || j.classification.urgency==='high' || j.classification.isBizProposal);
+        var chTxt = kind==='dm' ? (_d['draft.ch_dm'] || 'DM') : (_d['draft.ch_comment'] || '댓글');
         var msg = auto
-          ? '✓ 자동 응대 발송됨 ('+(kind==='dm'?'DM':'댓글')+' · 댓글·DM 탭 확인)'
-          : '✓ 긴급 초안 대기 — 위 긴급 탭에서 승인하세요';
+          ? (_d['devsim.auto_sent'] || '✓ 자동 응대 발송됨 (') + chTxt + (_d['devsim.auto_sent_suffix'] || ' · 댓글·DM 탭 확인)')
+          : (_d['devsim.urgent_pending'] || '✓ 긴급 초안 대기 — 위 긴급 탭에서 승인하세요');
         if(typeof lkeShowToast==='function') lkeShowToast(msg);
       }
-      else alert('시뮬레이션 실패: '+(j.error||'알 수 없는 오류'));
+      else alert((_d['devsim.failed'] || '시뮬레이션 실패: ') + (j.error||(_d['draft.unknown_error'] || '알 수 없는 오류')));
     });
 }
 
