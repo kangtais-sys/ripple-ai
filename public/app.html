@@ -2056,7 +2056,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     </div>
   </div>
   <div class="eff-strip" id="eff-repeat-strip" style="display:none">
-    <div>응대한 <b id="eff-total-users">0</b>명 중 <b id="eff-repeat-users" style="color:var(--mint-d)">0</b>명 재방문 · 관계 전환 <span id="eff-repeat-rate">0</span>%</div>
+    <div><span data-i18n="home.eff.replied">응대한</span> <b id="eff-total-users">0</b> <span data-i18n="home.eff.midfix">명 중</span> <b id="eff-repeat-users" style="color:var(--mint-d)">0</b> <span data-i18n="home.eff.returned">명 재방문 · 관계 전환</span> <span id="eff-repeat-rate">0</span>%</div>
   </div>
   <div id="home-alert-urgent" class="alert" onclick="go('manage');setTab('urgent')">
     <div><div class="alert-t"><span data-i18n="home.urgent_pending">긴급 응대 대기</span> <span id="home-alert-count">0</span></div><div class="alert-s" id="home-alert-sub" data-i18n="home.urgent_sub">긴급 · 비즈니스 제안</div></div>
@@ -2177,7 +2177,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div class="acc" id="acc-dm-manage">
     <div class="acc-hdr" onclick="toggleAcc('acc-dm-manage')">
       <div class="acc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="acc-copy"><div class="acc-name">댓글 감지 → DM 자동 발송</div><div class="acc-sub" id="dm-rule-count-sub">설정된 룰 없음</div></div>
+      <div class="acc-copy"><div class="acc-name" data-i18n="grow.dmrule.title">댓글 감지 → DM 자동 발송</div><div class="acc-sub" id="dm-rule-count-sub" data-i18n="grow.dmrule.empty">설정된 룰 없음</div></div>
       <div class="acc-aside">
         <label class="tog" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="tsl"></span></label>
         <div class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -2185,28 +2185,28 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     </div>
     <div class="acc-body">
       <div style="margin-bottom:16px">
-        <div style="font-size:12px;font-weight:700;color:var(--t3);margin-bottom:8px">대상 게시물 선택</div>
+        <div style="font-size:12px;font-weight:700;color:var(--t3);margin-bottom:8px" data-i18n="grow.dmrule.target">대상 게시물 선택</div>
         <div id="dm-post-row" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;-webkit-overflow-scrolling:touch">
           <div onclick="openPostPicker()" style="flex-shrink:0;width:68px;height:68px;border-radius:12px;background:var(--bg);border:1.5px dashed var(--b);cursor:pointer;display:flex;align-items:center;justify-content:center">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
           </div>
           <div onclick="selectPost(this)" class="post-thumb" style="flex-shrink:0;width:68px;height:68px;border-radius:12px;background:linear-gradient(135deg,#f8c8d4,#fde8b0);border:2px solid var(--mint);cursor:pointer;position:relative">
-            <div style="position:absolute;bottom:3px;left:3px;font-size:9px;font-weight:700;color:#fff;background:rgba(0,0,0,.45);padding:1px 5px;border-radius:3px">최근</div>
+            <div style="position:absolute;bottom:3px;left:3px;font-size:9px;font-weight:700;color:#fff;background:rgba(0,0,0,.45);padding:1px 5px;border-radius:3px" data-i18n="grow.dmrule.recent">최근</div>
           </div>
           <div onclick="selectPost(this)" class="post-thumb" style="flex-shrink:0;width:68px;height:68px;border-radius:12px;background:linear-gradient(135deg,#c8e6f8,#d4f8e8);border:2px solid transparent;cursor:pointer"></div>
           <div onclick="selectPost(this)" class="post-thumb" style="flex-shrink:0;width:68px;height:68px;border-radius:12px;background:linear-gradient(135deg,#f8d4c8,#f8e8fd);border:2px solid transparent;cursor:pointer"></div>
         </div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <div style="font-size:12px;font-weight:700;color:var(--t3)">진행 중인 DM 발송</div>
-        <button onclick="openModal('m-dm-all')" style="background:none;border:none;font-size:11px;font-weight:700;color:var(--mint-d);cursor:pointer;display:flex;align-items:center;gap:3px">목록 더보기 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div style="font-size:12px;font-weight:700;color:var(--t3)" data-i18n="grow.dmrule.active">진행 중인 DM 발송</div>
+        <button onclick="openModal('m-dm-all')" style="background:none;border:none;font-size:11px;font-weight:700;color:var(--mint-d);cursor:pointer;display:flex;align-items:center;gap:3px"><span data-i18n="grow.dmrule.see_all">목록 더보기</span> <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       </div>
       <div id="dm-active-list" class="empty-soft" style="margin-bottom:14px">
-        <div class="empty-soft-t">설정된 룰 없음</div>
-        <div>"+ 컨텐츠 추가"로 댓글 감지 룰을 만들 수 있습니다.</div>
+        <div class="empty-soft-t" data-i18n="grow.dmrule.empty_title">설정된 룰 없음</div>
+        <div data-i18n="grow.dmrule.empty_sub">"+ 컨텐츠 추가"로 댓글 감지 룰을 만들 수 있습니다.</div>
       </div>
-      <button onclick="addDmRule()" style="width:100%;padding:11px;border-radius:12px;border:1.5px dashed var(--b);background:none;font-size:13px;font-weight:700;color:var(--t3);cursor:pointer">+ 컨텐츠 추가</button>
-      <div class="tip" style="margin-top:10px">댓글이 달리면 조건을 확인하고 내 말투로 DM을 보내요.</div>
+      <button onclick="addDmRule()" style="width:100%;padding:11px;border-radius:12px;border:1.5px dashed var(--b);background:none;font-size:13px;font-weight:700;color:var(--t3);cursor:pointer" data-i18n="grow.dmrule.add">+ 컨텐츠 추가</button>
+      <div class="tip" style="margin-top:10px" data-i18n="grow.dmrule.tip">댓글이 달리면 조건을 확인하고 내 말투로 DM을 보내요.</div>
     </div>
   </div>
 
@@ -2214,14 +2214,14 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div class="acc" id="acc-upload">
     <div class="acc-hdr" onclick="toggleAcc('acc-upload')">
       <div class="acc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="acc-copy"><div class="acc-name">업로드 즉시 자동 액션</div><div class="acc-sub">저장 · 공감 댓글 · 해시태그 3단계</div></div>
+      <div class="acc-copy"><div class="acc-name" data-i18n="grow.upload.title">업로드 즉시 자동 액션</div><div class="acc-sub" data-i18n="grow.upload.sub">저장 · 공감 댓글 · 해시태그 3단계</div></div>
       <div class="acc-aside"><label class="tog" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="tsl"></span></label><div class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
     </div>
     <div class="acc-body">
-      <div class="step"><div class="sn">1</div><div><div class="st">셀프 저장</div><div class="sd">업로드 직후 내 계정에서 게시물 저장 — 알고리즘 초기 신호 부스트</div></div></div>
-      <div class="step"><div class="sn">2</div><div><div class="st">공감 댓글 등록</div><div class="sd">내 말투로 게시물에 어울리는 댓글 1개 자동 작성</div><div class="seg">오늘도 너무 예쁘게 나왔다, 이 무드 너무 좋아!</div></div></div>
-      <div class="step"><div class="sn">3</div><div><div class="st">해시태그 답글</div><div class="sd">공감 댓글의 답글로 연관 해시태그 자동 추가</div><div class="seg">#스킨케어루틴 #데일리뷰티 #저장각 #BEST</div></div></div>
-      <div class="tip">업로드 후 3~7분 이내 랜덤 간격으로 자연스럽게 실행돼요</div>
+      <div class="step"><div class="sn">1</div><div><div class="st" data-i18n="grow.upload.step1">셀프 저장</div><div class="sd" data-i18n="grow.upload.step1.sub">업로드 직후 내 계정에서 게시물 저장 — 알고리즘 초기 신호 부스트</div></div></div>
+      <div class="step"><div class="sn">2</div><div><div class="st" data-i18n="grow.upload.step2">공감 댓글 등록</div><div class="sd" data-i18n="grow.upload.step2.sub">내 말투로 게시물에 어울리는 댓글 1개 자동 작성</div><div class="seg" data-i18n="grow.upload.step2.example">오늘도 너무 예쁘게 나왔다, 이 무드 너무 좋아!</div></div></div>
+      <div class="step"><div class="sn">3</div><div><div class="st" data-i18n="grow.upload.step3">해시태그 답글</div><div class="sd" data-i18n="grow.upload.step3.sub">공감 댓글의 답글로 연관 해시태그 자동 추가</div><div class="seg" data-i18n="grow.upload.step3.example">#스킨케어루틴 #데일리뷰티 #저장각 #BEST</div></div></div>
+      <div class="tip" data-i18n="grow.upload.tip">업로드 후 3~7분 이내 랜덤 간격으로 자연스럽게 실행돼요</div>
     </div>
   </div>
 
@@ -2630,13 +2630,13 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
   <div class="proof-banner">
     <div class="proof-live-dot"></div>
-    <div class="proof-num-slim"><span>312,847</span><span>명 사용 중</span></div>
-    <div class="proof-tag">공식 API 기반</div>
+    <div class="proof-num-slim"><span>312,847</span><span data-i18n="grow.proof.using">명 사용 중</span></div>
+    <div class="proof-tag" data-i18n="grow.proof.tag">공식 API 기반</div>
   </div>
 
   <div class="act-tabs">
-    <button onclick="go('activity')"><span class="act-dot"></span>SNS 자동화</button>
-    <button class="on"><span class="act-dot red"></span>실시간 관리 <span class="act-badge" id="urgent-badge" style="display:none">0</span></button>
+    <button onclick="go('activity')"><span class="act-dot"></span><span data-i18n="grow.tab.automation">SNS 자동화</span></button>
+    <button class="on"><span class="act-dot red"></span><span data-i18n="grow.tab.realtime">실시간 관리</span> <span class="act-badge" id="urgent-badge" style="display:none">0</span></button>
   </div>
 
   <div class="tbar">
@@ -2659,8 +2659,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div id="drafts-pending" style="margin-bottom:14px"></div>
     <!-- 빈 상태 -->
     <div id="urgent-empty" class="empty-soft">
-      <div class="empty-soft-t">긴급 응대 대기 없음</div>
-      <div>결제 오류·부정 이슈 같은 중요한 메시지가 도착하면 AI 초안이 여기로 올라옵니다.</div>
+      <div class="empty-soft-t" data-i18n="manage.urgent.empty">긴급 응대 대기 없음</div>
+      <div data-i18n="manage.urgent.empty_sub">결제 오류·부정 이슈 같은 중요한 메시지가 도착하면 AI 초안이 여기로 올라옵니다.</div>
     </div>
   </div>
 
@@ -2762,7 +2762,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
   <div class="p-stats">
     <div class="p-stat" onclick="openModal('m-plan')" style="cursor:pointer">
-      <div class="p-sv" style="font-size:15px" id="p-stat-plan">무료</div>
+      <div class="p-sv" style="font-size:15px" id="p-stat-plan" data-i18n="profile.plan.free">무료</div>
       <div class="p-sl" id="p-stat-plan-sub" data-i18n="profile.stat.plan">이용권</div>
     </div>
     <div class="p-stat" onclick="openModal('m-pt-use')" style="cursor:pointer">
@@ -2811,7 +2811,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       </select>
     </div>
     <div class="mitem mitem-kakao" onclick="openModal('m-kakao')"><div class="mico" style="background:#FEE500;border-color:#FEE500"><svg viewBox="0 0 24 24" fill="none" stroke="#3A1D1D" stroke-width="1.8"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mbd"><div class="mname2" style="color:#3A1D1D" data-i18n="profile.menu.kakao">카카오톡으로 알림 받기</div><div class="msub2" data-i18n="profile.menu.kakao_sub">요주의·수익제안·일일 리포트 즉시</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-    <div class="mitem" onclick="openModal('m-plan')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="mbd"><div class="mname2" data-i18n="profile.menu.plan">이용권</div><div class="msub2">프리미엄 · 무료체험 D-4</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    <div class="mitem" onclick="openModal('m-plan')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="mbd"><div class="mname2" data-i18n="profile.menu.plan">이용권</div><div class="msub2" data-i18n="profile.plan.premium_trial">프리미엄 · 무료체험 D-4</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
   </div>
   <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.3px;margin:16px 0 8px" data-i18n="profile.section.account">계정</div>
   <div class="menu">
@@ -2831,11 +2831,11 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     </div>
   </div>
 
-  <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.3px;margin:16px 0 8px">법적 고지 · 고객센터</div>
+  <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.3px;margin:16px 0 8px" data-i18n="profile.section.legal">법적 고지 · 고객센터</div>
   <div class="menu">
-    <a class="mitem" href="/terms" target="_blank" style="text-decoration:none;color:inherit"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="13" x2="8" y2="13" stroke-linecap="round"/><line x1="16" y1="17" x2="8" y2="17" stroke-linecap="round"/></svg></div><div class="mbd"><div class="mname2">이용약관</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></a>
-    <a class="mitem" href="/privacy" target="_blank" style="text-decoration:none;color:inherit"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mbd"><div class="mname2">개인정보처리방침</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></a>
-    <a class="mitem" href="/privacy#data-deletion" target="_blank" style="text-decoration:none;color:inherit;border:none"><div class="mico" style="background:var(--red-l);border-color:var(--red-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z" stroke-linecap="round" stroke-linejoin="round"/><line x1="10" y1="11" x2="10" y2="17" stroke-linecap="round"/><line x1="14" y1="11" x2="14" y2="17" stroke-linecap="round"/></svg></div><div class="mbd"><div class="mname2" style="color:var(--red)">계정 · 데이터 삭제 안내</div><div class="msub2">삭제 방법 및 처리 범위</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></a>
+    <a class="mitem" href="/terms" target="_blank" style="text-decoration:none;color:inherit"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="13" x2="8" y2="13" stroke-linecap="round"/><line x1="16" y1="17" x2="8" y2="17" stroke-linecap="round"/></svg></div><div class="mbd"><div class="mname2" data-i18n="profile.legal.terms">이용약관</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></a>
+    <a class="mitem" href="/privacy" target="_blank" style="text-decoration:none;color:inherit"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mbd"><div class="mname2" data-i18n="profile.legal.privacy">개인정보처리방침</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></a>
+    <a class="mitem" href="/privacy#data-deletion" target="_blank" style="text-decoration:none;color:inherit;border:none"><div class="mico" style="background:var(--red-l);border-color:var(--red-l)"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m3 0v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6h14z" stroke-linecap="round" stroke-linejoin="round"/><line x1="10" y1="11" x2="10" y2="17" stroke-linecap="round"/><line x1="14" y1="11" x2="14" y2="17" stroke-linecap="round"/></svg></div><div class="mbd"><div class="mname2" style="color:var(--red)" data-i18n="profile.legal.delete">계정 · 데이터 삭제 안내</div><div class="msub2" data-i18n="profile.legal.delete_sub">삭제 방법 및 처리 범위</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></a>
   </div>
   <div style="height:40px"></div>
 </div>
@@ -5415,6 +5415,42 @@ var I18N = {
     'auth.google':'Google로 로그인',
     'auth.no_account':'계정이 없으신가요?',
     'auth.start_free':'7일 무료로 시작',
+    // 홈 — 효율 strip
+    'home.eff.replied':'응대한',
+    'home.eff.midfix':'명 중',
+    'home.eff.returned':'명 재방문 · 관계 전환',
+    // 키우기 — DM 자동 발송 카드
+    'grow.dmrule.target':'대상 게시물 선택',
+    'grow.dmrule.recent':'최근',
+    'grow.dmrule.active':'진행 중인 DM 발송',
+    'grow.dmrule.see_all':'목록 더보기',
+    'grow.dmrule.empty_title':'설정된 룰 없음',
+    'grow.dmrule.empty_sub':'"+ 컨텐츠 추가"로 댓글 감지 룰을 만들 수 있습니다.',
+    'grow.dmrule.add':'+ 컨텐츠 추가',
+    'grow.dmrule.tip':'댓글이 달리면 조건을 확인하고 내 말투로 DM을 보내요.',
+    // 키우기 — 업로드 자동 액션 카드
+    'grow.upload.title':'업로드 즉시 자동 액션',
+    'grow.upload.sub':'저장 · 공감 댓글 · 해시태그 3단계',
+    // 만들기 — 트렌드 카드 뱃지
+    'create.trend.hot':'오늘 핫',
+    // 내정보 — plan
+    'profile.plan.free':'무료',
+    'profile.plan.premium_trial':'프리미엄 · 무료체험 D-4',
+    // 법적 섹션
+    'profile.legal.terms':'이용약관',
+    'profile.legal.privacy':'개인정보처리방침',
+    'profile.legal.delete':'계정 · 데이터 삭제 안내',
+    'profile.legal.delete_sub':'삭제 방법 및 처리 범위',
+    // 키우기 — 업로드 카드 step
+    'grow.upload.step1':'셀프 저장',
+    'grow.upload.step1.sub':'업로드 직후 내 계정에서 게시물 저장 — 알고리즘 초기 신호 부스트',
+    'grow.upload.step2':'공감 댓글 등록',
+    'grow.upload.step2.sub':'내 말투로 게시물에 어울리는 댓글 1개 자동 작성',
+    'grow.upload.step2.example':'오늘도 너무 예쁘게 나왔다, 이 무드 너무 좋아!',
+    'grow.upload.step3':'해시태그 답글',
+    'grow.upload.step3.sub':'공감 댓글의 답글로 연관 해시태그 자동 추가',
+    'grow.upload.step3.example':'#스킨케어루틴 #데일리뷰티 #저장각 #BEST',
+    'grow.upload.tip':'업로드 후 3~7분 이내 랜덤 간격으로 자연스럽게 실행돼요',
   },
   en: {
     // tab bar
@@ -5593,6 +5629,42 @@ var I18N = {
     'auth.google':'Sign in with Google',
     'auth.no_account':'Don\'t have an account?',
     'auth.start_free':'Start 7-day free trial',
+    // home — eff strip
+    'home.eff.replied':'Of',
+    'home.eff.midfix':'replied,',
+    'home.eff.returned':'returned · relationship rate',
+    // grow — DM trigger card
+    'grow.dmrule.target':'Choose target post',
+    'grow.dmrule.recent':'Recent',
+    'grow.dmrule.active':'Active DM rules',
+    'grow.dmrule.see_all':'See all',
+    'grow.dmrule.empty_title':'No rules configured',
+    'grow.dmrule.empty_sub':'Create comment-triggered rules with "+ Add content".',
+    'grow.dmrule.add':'+ Add content',
+    'grow.dmrule.tip':'When a matching comment arrives, Ssobi sends a DM in your tone.',
+    // grow — upload auto action card
+    'grow.upload.title':'Auto-action on upload',
+    'grow.upload.sub':'Save · supportive comments · 3-tier hashtags',
+    // create — trend badge
+    'create.trend.hot':'Hot',
+    // profile — plan
+    'profile.plan.free':'Free',
+    'profile.plan.premium_trial':'Premium · 4 days left in trial',
+    // legal
+    'profile.legal.terms':'Terms of Service',
+    'profile.legal.privacy':'Privacy Policy',
+    'profile.legal.delete':'Account & data deletion',
+    'profile.legal.delete_sub':'How to request and what is removed',
+    // grow — upload card steps
+    'grow.upload.step1':'Self-save',
+    'grow.upload.step1.sub':'Saves the post on your account right after upload — boosts the algorithm\'s early signal',
+    'grow.upload.step2':'Supportive comment',
+    'grow.upload.step2.sub':'Auto-writes one on-brand comment in your tone',
+    'grow.upload.step2.example':'Looking gorgeous as always — love this mood!',
+    'grow.upload.step3':'Hashtag reply',
+    'grow.upload.step3.sub':'Replies the supportive comment with related hashtags',
+    'grow.upload.step3.example':'#skincare #dailybeauty #save #BEST',
+    'grow.upload.tip':'Runs at a randomized 3–7 minute delay after upload to stay natural.',
   }
 };
 
@@ -5628,6 +5700,7 @@ function applyI18n(lang){
   // 동적 렌더 컴포넌트 재실행 (lang 따라 다르게 그리는 것들)
   try { if(typeof renderCalendar === 'function') renderCalendar(); } catch(_){}
   try { if(typeof renderTplCarousel === 'function') renderTplCarousel(); } catch(_){}
+  try { if(typeof renderDailyTrends === 'function') renderDailyTrends(); } catch(_){}
   // quota suffix 도 즉시 반영
   try {
     var unit = I18N[lang]['grow.quota.unit'] || '';
@@ -6041,7 +6114,8 @@ function renderDailyTrendsStatic(picks, freshness){
     if(/^[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}❤️📈💾💬✨🔥📊📍🛒📚]/u.test(rawMeta)){
       metaText = rawMeta.replace(/^[^\w가-힣]+\s*/, '').trim();
     } else if(typeof t.hook_score === 'number' && t.hook_score >= 8){
-      metaText = '오늘 핫';
+      var _lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+      metaText = (typeof I18N !== 'undefined' && I18N[_lang] && I18N[_lang]['create.trend.hot']) || '오늘 핫';
     }
     // 카테고리 라벨 fallback (다른 카테고리 카드일 때만)
     var savedKey = '';
