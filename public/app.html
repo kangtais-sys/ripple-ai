@@ -5369,24 +5369,11 @@ function goStep(n){
     } catch(_){}
   }
   if(n===4) {
-    // 기존 편집 상태가 있으면 보존 (미리보기/뒤로가기 시 리셋 방지)
-    //   edtSlides 가 비어있을 때만 새로 생성
-    //   또는 createData._editorDirty 플래그가 없을 때만
     setTimeout(function(){
-      if(!edtSlides || edtSlides.length === 0 || createData._editorSource !== (createData._lastJobId||createData._lastSource)){
-        initEditor();
-        createData._editorSource = createData._lastJobId || createData._lastSource;
-      } else {
-        // 슬라이드 보존 케이스라도 캔버스 사이즈 클래스·뱃지는 항상 최신으로 동기화
-        var canvas = document.getElementById('edt-canvas');
-        if(canvas){
-          canvas.classList.remove('sz-sq','sz-pt','sz-st','sz-ls');
-          var info = (typeof sizeInfo !== 'undefined' && sizeInfo[createData.size]) || sizeInfo.sq;
-          canvas.classList.add(info.cls);
-          var badge = document.getElementById('edt-size-badge');
-          if(badge) badge.textContent = info.label;
-        }
-      }
+      // cs-4 진입 시 항상 새로 빌드 — 사이즈/템플릿 변경에 항상 정확히 반영
+      // 기존 보존 로직은 사이즈 mismatch / 템플릿 mismatch 케이스에서 깨짐
+      try { initEditor(); } catch(e) { console.warn('initEditor failed', e); }
+      createData._editorSource = createData._lastJobId || createData._lastSource;
       // 미리보기 모드 잔존 방지 — cs-4 재진입 시 항상 편집 모드로 시작
       if(typeof edtSetMode === 'function') edtSetMode('edit');
     }, 80);
