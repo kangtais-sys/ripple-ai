@@ -1,29 +1,36 @@
 # Meta App Review — Resubmission Kit (Ssobi)
-
 **App ID**: 973683215179192
-**Permissions**: `instagram_business_basic` / `instagram_business_manage_comments` / `instagram_business_manage_messages` / `instagram_business_content_publish` / `instagram_business_manage_insights`
-**Last rejection**: 2026-04-24 (Policy 1.6 — screencast/use-case mismatch)
+**Permissions**: `instagram_business_basic` / `manage_comments` / `manage_messages` / `content_publish` / `manage_insights`
+**Last rejection**: 2026-04-24 (Policy 1.6 — screencast / use-case mismatch)
+**Updated**: 2026-05-05
 
 ---
 
-# 📋 너가 할 일 — 순서대로
-
-영문은 **건드리지 마**. 그대로 복붙. 너 손 없이도 통과될 수 있게 다 작성됨.
+# 🚀 지금 해야 할 일 — 순서대로
 
 ```
-1. ✅ Pre-flight 체크리스트 한 번에 통과 (Section 6)
-2. 🎬 영상 6개 녹화 (Section 4 의 시나리오 그대로) — Mac Cmd+Shift+5
-3. 📝 Section 1 의 Submission Notes (영문) → Meta 폼 "Submission Notes" 칸에 통째로 붙여넣기
-4. 📝 Section 2 의 권한별 Use Case (영문) → 각 권한 신청 칸에 해당 텍스트 붙여넣기
-5. 🚀 영상 6개 업로드 + 제출
+✅ 사전 작업 모두 완료:
+   ├─ App 영어 UI 시스템 (i18n) 배포
+   ├─ Auto-reply 토글 + 채널별 + 사용자 통제권 UI
+   ├─ DB 마이그레이션 012/013/014 적용
+   ├─ Production 배포 (commit ea0cf30)
+   └─ 권한별 진단 (publish 작동 / comments·DM 격리 확인)
+
+▶ 너 차례 — 영상 녹화부터:
+
+1. Pre-flight 체크리스트 (Section 6) 빠르게 통과 (5분)
+2. 영상 6개 녹화 (Section 4 시퀀스, Section 3 자막) — 30~40분
+3. Meta App Review 폼 제출 (Section 5)
+   ├─ Section 1 의 Submission Notes 그대로 붙여넣기
+   ├─ Section 2 의 권한별 Use Case 5개 붙여넣기
+   └─ 영상 6개 업로드
 ```
 
-질문 / 막히면 즉시 알려줘. 영문 표현 / 영상 시퀀스 어느 부분이든.
+영문은 단 한 글자도 손대지 마. **그대로 복붙**하면 됨.
 
 ---
 
-# 1. Submission Notes
-> Meta 검수 폼의 **"Submission Notes"** 또는 **"Notes for Reviewer"** 칸에 아래 박스 안 텍스트 통째로 복사 → 붙여넣기.
+# 1. Submission Notes (English — Submit form 의 "Notes for Reviewer" 칸에 그대로)
 
 ```
 Dear App Review Team,
@@ -138,13 +145,13 @@ Password: (provided in the test credentials field of this submission)
 
 The connected Instagram Business account (@sisru_doku) is registered
 as an Instagram Tester for this app. To exercise the OAuth flow during
-review, navigate to: Profile (내 정보) → Account → Instagram →
+review, navigate to: Profile → Account integration → Instagram →
 Disconnect, then re-connect via the OAuth button.
 
 ────────────────────────────────────────────────────────────
 
 We have addressed every item in the previous review feedback and
-structured each screencast to make the requirements straightforward to
+structured this resubmission to make every requirement straightforward to
 verify. We appreciate your time and look forward to your re-evaluation.
 
 Sincerely,
@@ -153,8 +160,7 @@ The Ssobi Engineering Team
 
 ---
 
-# 2. Use Cases (per permission)
-> 각 권한 신청 칸에 해당 박스 텍스트만 붙여넣기. 200-300단어, 시니어 엔지니어 톤.
+# 2. Use Cases (per permission — 각 권한 신청 칸에 해당 박스만 붙여넣기)
 
 ## 2.1 `instagram_business_basic`
 
@@ -371,10 +377,10 @@ Screencast: Video 5 (DM received + AI draft + send).
 
 ---
 
-# 3. Video Subtitle Bank
-> 영상 녹화 시 화면에 띄울 영문 자막. 각 시퀀스의 자막을 그대로 사용. iMovie 또는 Veed.io 에서 자막 트랙으로 추가.
+# 3. Video Subtitle Bank (영문 자막)
+> iMovie 또는 Veed.io 에서 자막 트랙으로 추가. 시간대별로 그대로 입력.
 
-## 3.1 Video 1 — OAuth & Login (60s)
+## 3.1 Video 1 — Login & OAuth (60s)
 
 ```
 [0:00] Ssobi — an AI assistant for K-MZ creators on Instagram.
@@ -486,159 +492,148 @@ Screencast: Video 5 (DM received + AI draft + send).
 
 ---
 
-# 4. Recording Guide (Mac)
+# 4. Recording Guide (Mac, Cmd+Shift+5)
 
-## A. Initial Setup (one-time, ~10 minutes)
+## A. Setup (단 한 번만, ~5분)
 
-1. **Switch app language to English**
-   `https://ssobi.ai/app` → Profile (내 정보) → Language → **English**
-   (모든 UI 가 영어로 바뀜. 영상 녹화 동안 유지.)
+```
+1. ssobi.ai/app 접속 → 본인 로그인
+2. Profile (내 정보) → Language → English  ← 영어 UI 활성화 (이미 빌드됨)
+3. Cmd+Shift+5 → "옵션" → "마우스 포인터 표시" 체크
+4. System Settings → Focus → Do Not Disturb ON
+5. 브라우저 zoom 100% (Cmd+0)
+6. 다른 탭 다 닫기 — ssobi.ai/app 만 남김
+```
 
-2. **Browser language to English** (선택, 더 깔끔)
-   Chrome: Settings → Languages → Add languages → **English (United States)** → Move to top → Restart browser.
+## B. 각 영상 녹화 흐름
 
-3. **Mouse cursor highlight** ON
-   `Cmd+Shift+5` → 옵션 → **마우스 포인터 표시** 체크
-
-4. **Disable notifications** during recording
-   System Settings → Focus → Do Not Disturb ON
-
-5. **Browser zoom** = 100% (`Cmd+0`)
-
-6. **Tab cleanup** — only `https://ssobi.ai/app` open
-
-## B. Recording Workflow
-
-각 영상마다:
-1. `Cmd+Shift+5` → "선택 영역 기록" → 1280×720 이상 영역 지정
-2. **녹화 시작** (3초 후 시작 옵션 권장)
-3. Section 4 의 시퀀스 그대로 진행
-4. **녹화 종료** (메뉴바 ⏹️)
+```
+1. Cmd+Shift+5 → "선택 영역 기록" → 1280×720 이상 영역 지정
+2. 녹화 시작 (3초 후 시작 옵션 권장)
+3. Section 3 의 시퀀스 그대로 진행
+4. 녹화 종료 (메뉴바 ⏹️)
 5. 데스크톱에 자동 저장 (.mov)
+```
 
 권장 파일명:
 ```
 ssobi_video_1_oauth.mov
 ssobi_video_2_basic_insights.mov
-ssobi_video_3_publish.mov     ← 가장 중요
+ssobi_video_3_publish.mov     ← 가장 중요 (Track A 증거)
 ssobi_video_4_comments.mov
 ssobi_video_5_messages.mov
-ssobi_video_6_compliance.mov
+ssobi_video_6_compliance.mov  (옵션, 시간 남으면)
 ```
 
-## C. Adding English Subtitles
+## C. 자막 추가 (옵션)
 
-각 영상에 Section 3 의 자막 추가:
+영문 자막은 Section 3 에 시간대별로 다 있음. 두 가지 방법:
 
-**Option 1 — iMovie (Mac 기본, 추천)**
-1. iMovie 열기 → 새 영화 → 영상 import
-2. 타임라인 위 "T" (Titles) → "Lower" 자막 스타일 선택
-3. 각 시간(예: 0:05) 에 맞춰 자막 텍스트 입력
-4. 영문 폰트: Helvetica 또는 SF Pro, 화이트 + 검정 outline
+**옵션 A — iMovie (Mac 기본, 추천)**:
+1. iMovie → 새 영화 → 영상 import
+2. "T" (Titles) → Lower 스타일
+3. Section 3 의 시간(0:05, 0:10 등) 에 맞춰 영문 입력
 
-**Option 2 — Veed.io (웹, 자동 자막)**
-1. https://www.veed.io 가입 (무료)
-2. 영상 업로드 → "Subtitles" → "Auto-translate" 영어로 → 수동 보정
-3. Export → mp4 다운로드
+**옵션 B — Veed.io (자동, 더 빠름)**:
+1. veed.io 가입 (무료) → 영상 업로드
+2. Subtitles → Auto-translate → English → 수동 보정
+3. Export mp4
 
-**Option 3 — 자막 안 넣기**
-Submission Notes 에서 영문 narrative 가 시퀀스 다 설명함. 자막 없어도 통과 가능. **시간 부족하면 스킵**.
+**옵션 C — 자막 안 넣기**:
+시간 없으면 스킵해도 됨. **Submission Notes 영문이 narrative 다 커버**. 검수 통과에 영향 거의 없음.
 
-## D. Export Settings
+## D. Export
 
-- 해상도: **1280×720 이상**
-- 포맷: **MP4** (Meta 권장) — iMovie 의 경우 Share → File → Resolution 720p+ → Quality High
-- 길이: 30~90초 사이 (Section 3 시간 가이드대로)
+- 해상도: 1280×720 이상 (iMovie: Share → File → 720p+ → High)
+- 포맷: MP4
 
 ---
 
-# 5. Submission Steps
+# 5. Submission Steps (제출)
 
-영상 다 찍고 자막 입혔으면 (자막은 옵션):
+영상 다 찍고 자막까지 (자막은 옵션) 끝나면:
 
-1. **Meta App Dashboard 접속**
-   `https://developers.facebook.com/apps/973683215179192/app-review/permissions/`
+```
+1. https://developers.facebook.com/apps/973683215179192/app-review/permissions/
 
-2. **각 권한별로 영상 업로드 + 사용 사례 입력**:
-   | 권한 | 영상 | Use Case 텍스트 |
-   |---|---|---|
-   | `instagram_business_basic` | Video 1 | Section 2.1 |
-   | `instagram_business_manage_insights` | Video 2 | Section 2.2 |
-   | `instagram_business_content_publish` | Video 3 | Section 2.3 |
-   | `instagram_business_manage_comments` | Video 4 | Section 2.4 |
-   | `instagram_business_manage_messages` | Video 5 | Section 2.5 |
+2. 각 권한 옆 [신청] 또는 [재신청] 클릭
 
-3. **Submission Notes**
-   App Review 신청 폼의 **"Notes for Reviewer"** 또는 **"Submission Notes"** 칸에 Section 1 의 박스 텍스트 통째로 붙여넣기.
+3. 입력:
+   ├─ Permission: 권한 이름 자동
+   ├─ Use Case: Section 2 의 해당 박스 그대로 붙여넣기
+   ├─ Screencast: Section 4 의 해당 영상 업로드
+   └─ Step-by-step instructions: "See Submission Notes" 라고 작성
 
-4. **Test credentials**
-   - Email: `kangtais@naver.com`
-   - Password: (너 계정 비번)
-   - 이미 sisru_doku 가 OAuth 연결돼 있어서 검수자가 바로 사용 가능
+4. App Settings → Notes for Reviewer (또는 Submission Notes):
+   Section 1 의 박스 통째로 붙여넣기
 
-5. **Submit for Review**
-   "검수 제출" 버튼.
+5. Test credentials:
+   Email:    kangtais@naver.com
+   Password: (네 비번)
+   Note:     "@sisru_doku is registered as Instagram Tester"
+
+6. [Submit for Review]
+```
 
 ---
 
-# 6. Pre-flight Checklist
+# 6. Pre-flight Checklist (영상 찍기 전 5분)
 
-영상 찍기 전 한 번에 다 체크.
-
-## A. 시스템 환경 (이미 완료된 거 — 확인만)
-- [x] Migration 012, 013, 014 적용됨 (오늘 검증)
-- [x] ssobi.ai 배포 최신 (commit ceeb972 이상)
-- [x] sisru_doku OAuth 연결 (token expires 2026-07-04)
+## A. 시스템 (이미 완료된 거 — 확인만)
+- [x] Migration 012, 013, 014 적용됨
+- [x] ssobi.ai 최신 코드 배포됨 (commit ea0cf30)
+- [x] sisru_doku OAuth 연결, token 유효 (2026-07-04 까지)
 - [x] tone_profile 학습 완료
 - [x] Anthropic 크레딧 충분
+- [x] **i18n 시스템 완성** — 208 keys, 145 elements 마킹
 
-## B. 영상 환경 셋업
-- [ ] **앱 언어 영어로** (Profile → Language → English)
-- [ ] 브라우저 zoom 100%
-- [ ] 마우스 클릭 효과 ON
-- [ ] 알림 OFF (Do Not Disturb)
-- [ ] 데스크톱 정리
+## B. 영상 환경
+- [ ] **앱 언어 영어로** (Profile → Language → English) ← 가장 중요
+- [ ] 브라우저 zoom 100% (Cmd+0)
+- [ ] 마우스 클릭 효과 ON (Cmd+Shift+5 → 옵션)
+- [ ] Do Not Disturb ON
+- [ ] 데스크톱 정리, 다른 탭 다 닫기
 
 ## C. 데이터 사전 준비
-- [ ] `?dev=0` 한 번 방문해서 dev sim 버튼 숨김 처리
-- [ ] 카드뉴스 1개 미리 만들어둠 (Video 3 빠르게 시작용)
-- [ ] reply_logs 깨끗한 상태 (이전 시뮬 항목 너무 많으면 정리)
+- [ ] `?dev=0` 한 번 방문해서 dev sim 버튼 숨김
+- [ ] 카드뉴스 1개 미리 만들어둠 (Video 3 빠르게 시작)
+- [ ] 본인 IG 폰 옆에 켜둠 (Video 3 의 IG 피드 확인용)
 
 ## D. Meta Dashboard 사전 열기 (Video 4·5 용)
-- [ ] `https://developers.facebook.com/apps/973683215179192/webhooks/` 탭으로 미리 열어두기
+- [ ] developers.facebook.com/apps/973683215179192/webhooks/ 탭 열어두기
 - [ ] Instagram → comments [Test] 버튼 위치 확인
 - [ ] Instagram → messages [Test] 버튼 위치 확인
 
-## E. 녹화 도구
-- [ ] `Cmd+Shift+5` 작동 확인
-- [ ] iMovie 설치 확인 (자막 추가 시)
-- [ ] 데스크톱 저장 공간 충분 (각 영상 50-100MB)
+## E. Tester 등록 (확인만)
+- [x] sisru_doku 등록됨, OAuth 수락 완료
+- [x] millimilli.kr 등록됨, OAuth 수락 완료
 
 ---
 
-# 7. 자주 막히는 지점 → 해결
+# 7. 막히는 지점 → 해결
 
-| 막힘 | 원인 | 해결 |
-|---|---|---|
-| OAuth 화면이 영어가 아닌 한국어로 뜸 | IG 앱 / 브라우저 언어가 한국어 | 무관. Meta 도 한국어 OAuth 익숙. 통과에 영향 X |
-| Video 3 발행 시 "container 생성 실패" | 카드뉴스 이미지 URL 미생성 | 카드뉴스 만든 후 발행하기 전 storage 업로드 완료 확인 |
-| Test Event 가 webhook 도착 안 함 | endpoint URL 변경됐을 가능성 | Meta App Dashboard → Webhooks → Edit → Callback URL 이 `https://ssobi.ai/api/webhook/instagram` 인지 확인 |
-| 영상 너무 길어짐 | 시퀀스 사이 lag | Section 4 시간 가이드 ±10초 안에서 진행. 길면 잘라내기 |
-| 자막 입히는 게 너무 어려워 | iMovie 익숙하지 않음 | 스킵. Submission Notes 영문이 narrative 다 커버함 |
-
----
-
-# 8. 통과 후 운영 (참고)
-
-검수 통과 후 (며칠~1주):
-1. Meta App Dashboard 에서 "Live Mode" 전환
-2. 일반 사용자 OAuth 가능해짐
-3. 베타 유저 모집 (목표 20-30명)
-4. 진짜 댓글/DM webhook 트래픽 들어오기 시작
-5. 다음 단계: PortOne 결제 통합, Solapi 알림톡 등
+| 막힘 | 해결 |
+|---|---|
+| Video 3 발행 시 "container 생성 실패" | 카드뉴스 만든 후 storage 업로드 완료 확인 (10초 대기) |
+| Test Event 가 webhook 도착 안 함 | Meta Dashboard → Webhooks → Edit → Callback URL = `https://ssobi.ai/api/webhook/instagram` 확인 |
+| 영상 너무 길어짐 | Section 3 시간 가이드 ±10초 안에서. 길면 잘라내기 |
+| 자막 입히는 게 너무 어려워 | 스킵. Submission Notes 가 narrative 다 커버 |
+| 영상이 한국어 UI 로 나옴 | Profile → Language → English 로 다시 전환 후 새로고침 |
 
 ---
 
-**끝.**
+# 8. 통과 후 (참고용)
 
-이 문서대로만 하면 너 손 안 거치고 통과 가능. 영상 녹화 시작하기 전에 Section 6 (체크리스트) 만 통과하면 돼.
+```
+검수 통과 → 며칠~1주 안에 권한 풀림 → Live Mode 전환
+→ 일반 사용자 OAuth 가능
+→ 베타 유저 모집 (목표 20-30명)
+→ 진짜 댓글/DM webhook 트래픽 → 자동 응대 라이브
+→ 다음: PortOne 결제 + Solapi 알림톡 통합
+```
+
+---
+
+**끝.** 이 문서대로만 하면 너 손 안 거치고 통과 가능. 영문은 절대 손대지 마. 그대로 복붙해.
+
+영상 찍다가 막히면 **Section 7** 보고. 그래도 안 되면 즉시 알려줘.
