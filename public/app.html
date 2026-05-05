@@ -2456,11 +2456,11 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     </div>
 
     <div class="edt-tools">
-      <button class="edt-tool" onclick="edtPanel('text')"><svg viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16" stroke-linecap="round" stroke-linejoin="round"/></svg>편집</button>
-      <button class="edt-tool" onclick="edtAddText()"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>텍스트</button>
-      <button class="edt-tool" onclick="document.getElementById('edt-img-input').click()"><svg viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>이미지</button>
-      <button class="edt-tool" onclick="edtPanel('layer')"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5M3 18l9 5 9-5" stroke-linecap="round" stroke-linejoin="round"/></svg>레이어</button>
-      <button class="edt-tool" onclick="edtDeleteSlide()" style="color:var(--red)"><svg viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7M10 11v6m4-6v6M1 7h22M8 7V4a2 2 0 012-2h4a2 2 0 012 2v3" stroke-linecap="round" stroke-linejoin="round"/></svg>슬라이드 삭제</button>
+      <button class="edt-tool" onclick="edtPanel('text')"><svg viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="edt.tool.edit">편집</span></button>
+      <button class="edt-tool" onclick="edtAddText()"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg><span data-i18n="edt.tool.text">텍스트</span></button>
+      <button class="edt-tool" onclick="document.getElementById('edt-img-input').click()"><svg viewBox="0 0 24 24"><path d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="edt.tool.image">이미지</span></button>
+      <button class="edt-tool" onclick="edtPanel('layer')"><svg viewBox="0 0 24 24"><path d="M12 3l9 5-9 5-9-5 9-5zM3 13l9 5 9-5M3 18l9 5 9-5" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="edt.tool.layer">레이어</span></button>
+      <button class="edt-tool" onclick="edtDeleteSlide()" style="color:var(--red)"><svg viewBox="0 0 24 24"><path d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7M10 11v6m4-6v6M1 7h22M8 7V4a2 2 0 012-2h4a2 2 0 012 2v3" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="edt.tool.delete_slide">슬라이드 삭제</span></button>
     </div>
 
     <input id="edt-img-input" type="file" accept="image/*" style="display:none" onchange="edtImgUpload(event)">
@@ -5807,6 +5807,67 @@ var I18N = {
     'mod.find.btn':'재설정 링크 보내기',
     // 템플릿 갤러리
     'mod.tpl.gallery':'템플릿 둘러보기',
+    // 생성 진행 popup
+    'gen.first.1':'쏘비 지금 집중 중',
+    'gen.first.2':'쏘비가 문장 조립 중',
+    'gen.first.3':'쏘비 후킹 짜는 중',
+    'gen.first.4':'잠깐, 쏘비 두근두근',
+    'gen.first.5':'쏘비 머리 굴리는 중',
+    'gen.first.6':'쏘비가 핫한 거 찾는 중',
+    'gen.first.7':'쏘비 펜 꺼낸다',
+    'gen.first.8':'쏘비 말투 꺼내는 중',
+    'gen.first.9':'쏘비 각 잡고 쓰는 중',
+    'gen.first.10':'쏘비 지금 엄청 진심',
+    'gen.regen.1':'쏘비 다시 간다',
+    'gen.regen.2':'쏘비 심호흡 한 번',
+    'gen.regen.3':'쏘비 각도 다시 잡는 중',
+    'gen.regen.4':'쏘비 이번엔 진짜',
+    'gen.regen.5':'쏘비 리테이크 들어감',
+    'gen.steps.tone':'말투 분석',
+    'gen.steps.hook':'후킹 문구 작성',
+    'gen.steps.slides':'슬라이드 구성',
+    'gen.steps.hashtag':'해시태그 선정',
+    'gen.steps.polish':'마지막 다듬기',
+    'gen.regen.tone':'말투 재적용',
+    'gen.regen.hook':'후킹 재구성',
+    'gen.regen.slides':'슬라이드 N장 만들기',
+    'gen.regen.polish':'톤 다듬기',
+    'gen.btn_loading':'AI 가 만드는 중',
+    'gen.fallback_title':'AI 가 만드는 중',
+    'gen.hint':'내 말투와 톤을 학습해 적용해요',
+    // cs2 카드 라벨 (slide role)
+    'cs2.role.cover':'표지',
+    'cs2.role.hook':'후킹',
+    'cs2.role.hook2':'이중 후킹',
+    'cs2.role.body':'본문',
+    'cs2.role.cta':'저장·팔로우 유도',
+    'cs2.role.toc':'목차',
+    'cs2.role.checklist':'체크리스트',
+    'cs2.role.summary':'요약',
+    // 편집 도구 (cs-4)
+    'edt.tool.edit':'편집',
+    'edt.tool.text':'텍스트',
+    'edt.tool.image':'이미지',
+    'edt.tool.layer':'레이어',
+    'edt.tool.delete_slide':'슬라이드 삭제',
+    'edt.tool.front':'맨 앞',
+    'edt.tool.up':'앞으로',
+    'edt.tool.down':'뒤로',
+    'edt.tool.back':'맨 뒤',
+    'edt.tool.dup':'요소 복제',
+    'edt.tool.del_el':'요소 삭제',
+    // 내 링크 settings sheet body
+    'lke.settings.handle':'숏링크 핸들',
+    'lke.settings.handle_ok':'사용 가능',
+    'lke.settings.handle_hint':'유저 아이디만 수정 가능해요. 중복이면 다른 핸들을 선택하세요.',
+    'lke.settings.feature':'기능 설정',
+    'lke.settings.multi_lang':'다국어 자동 전환',
+    'lke.settings.multi_lang_sub':'영어 방문자엔 Amazon',
+    'lke.settings.short_url':'숏링크 자동 생성',
+    'lke.settings.short_url_sub':'클릭마다 ssobi.ai/s/abc 링크 발급',
+    'lke.settings.footer_logo':'푸터 로고 표시',
+    'lke.settings.footer_logo_sub':'Made with Ssobi 표시',
+    'lke.settings.apply':'적용',
     // 플랜 모달
     'mod.plan.title':'이용권',
     'mod.plan.sub':'성장 단계에 맞는 플랜을 선택하세요',
@@ -6446,6 +6507,67 @@ var I18N = {
     'mod.find.btn':'Send reset link',
     // template gallery
     'mod.tpl.gallery':'Browse templates',
+    // generation progress popup
+    'gen.first.1':'Ssobi is focusing',
+    'gen.first.2':'Ssobi is composing',
+    'gen.first.3':'Crafting the hook',
+    'gen.first.4':'A heartbeat — Ssobi is on it',
+    'gen.first.5':'Ssobi is thinking',
+    'gen.first.6':'Looking for what\'s hot',
+    'gen.first.7':'Ssobi grabbed the pen',
+    'gen.first.8':'Pulling out your tone',
+    'gen.first.9':'Writing with intention',
+    'gen.first.10':'Ssobi is fully in',
+    'gen.regen.1':'Going again',
+    'gen.regen.2':'Taking a breath',
+    'gen.regen.3':'Resetting the angle',
+    'gen.regen.4':'Real take this time',
+    'gen.regen.5':'Re-take started',
+    'gen.steps.tone':'Tone analysis',
+    'gen.steps.hook':'Writing the hook',
+    'gen.steps.slides':'Building slides',
+    'gen.steps.hashtag':'Picking hashtags',
+    'gen.steps.polish':'Final polish',
+    'gen.regen.tone':'Re-applying tone',
+    'gen.regen.hook':'Rebuilding hook',
+    'gen.regen.slides':'Generating N slides',
+    'gen.regen.polish':'Refining the tone',
+    'gen.btn_loading':'AI is creating…',
+    'gen.fallback_title':'AI is creating…',
+    'gen.hint':'Learning and applying your tone.',
+    // cs2 card labels
+    'cs2.role.cover':'Cover',
+    'cs2.role.hook':'Hook',
+    'cs2.role.hook2':'Double hook',
+    'cs2.role.body':'Body',
+    'cs2.role.cta':'Save · Follow CTA',
+    'cs2.role.toc':'Contents',
+    'cs2.role.checklist':'Checklist',
+    'cs2.role.summary':'Summary',
+    // edit tools (cs-4)
+    'edt.tool.edit':'Edit',
+    'edt.tool.text':'Text',
+    'edt.tool.image':'Image',
+    'edt.tool.layer':'Layers',
+    'edt.tool.delete_slide':'Delete slide',
+    'edt.tool.front':'To front',
+    'edt.tool.up':'Forward',
+    'edt.tool.down':'Backward',
+    'edt.tool.back':'To back',
+    'edt.tool.dup':'Duplicate',
+    'edt.tool.del_el':'Delete',
+    // my link settings sheet body
+    'lke.settings.handle':'Short link handle',
+    'lke.settings.handle_ok':'Available',
+    'lke.settings.handle_hint':'Only your user ID is editable. Pick a different handle if it\'s taken.',
+    'lke.settings.feature':'Features',
+    'lke.settings.multi_lang':'Auto language switch',
+    'lke.settings.multi_lang_sub':'Switch to Amazon for English visitors',
+    'lke.settings.short_url':'Auto short links',
+    'lke.settings.short_url_sub':'ssobi.ai/s/abc generated per click',
+    'lke.settings.footer_logo':'Show footer logo',
+    'lke.settings.footer_logo_sub':'Display "Made with Ssobi"',
+    'lke.settings.apply':'Apply',
     // plan modal
     'mod.plan.title':'Subscription',
     'mod.plan.sub':'Pick the plan that matches your stage',
@@ -7256,8 +7378,16 @@ async function generatePrompt(){
   var btn = document.getElementById('direct-gen-btn');
   btn.disabled = true;
   btn.classList.add('loading');
-  btn.textContent = 'AI 가 만드는 중';
-  var steps = ['말투 분석', '후킹 문구 작성', '슬라이드 구성', '해시태그 선정', '마지막 다듬기'];
+  var _lang0 = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+  var _d0 = (typeof I18N !== 'undefined' && I18N[_lang0]) || {};
+  btn.textContent = _d0['gen.btn_loading'] || 'AI 가 만드는 중';
+  var steps = [
+    _d0['gen.steps.tone'] || '말투 분석',
+    _d0['gen.steps.hook'] || '후킹 문구 작성',
+    _d0['gen.steps.slides'] || '슬라이드 구성',
+    _d0['gen.steps.hashtag'] || '해시태그 선정',
+    _d0['gen.steps.polish'] || '마지막 다듬기',
+  ];
   showGenProgress(ssobiLoadingCopy('first'), topic, steps, 0);
   var si = 0;
   var stepTimer = setInterval(function(){
@@ -7383,7 +7513,15 @@ async function regenPrompt(){
     regenBtn.innerHTML = '<span>재생성 중...</span>';
   }
   // 풀스크린 생성 모달 (첫 생성과 동일)
-  var regenSteps = ['말투 재적용', '후킹 재구성', '슬라이드 ' + (createData.slides || 7) + '장 만들기', '톤 다듬기'];
+  var _langR = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+  var _dR = (typeof I18N !== 'undefined' && I18N[_langR]) || {};
+  var _slidesN = createData.slides || 7;
+  var regenSteps = [
+    _dR['gen.regen.tone'] || '말투 재적용',
+    _dR['gen.regen.hook'] || '후킹 재구성',
+    (_dR['gen.regen.slides'] || '슬라이드 N장 만들기').replace('N', _slidesN),
+    _dR['gen.regen.polish'] || '톤 다듬기',
+  ];
   showGenProgress(ssobiLoadingCopy('regen'), topic, regenSteps, 0);
   var rsi = 0;
   var regenTimer = setInterval(function(){
@@ -13814,16 +13952,22 @@ function renderBodyAsCards(bodySlides){
   var container = document.getElementById('cs2-body-list');
   if(!container) return;
   container.innerHTML = '';
+  var _lang2 = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+  var _d2 = (typeof I18N !== 'undefined' && I18N[_lang2]) || {};
+  var slideWord = _lang2 === 'en' ? 'Slide' : '슬라이드';
   (bodySlides || []).forEach(function(b, i){
     var idx = i + 2;
     var role = b.role || 'body';
     var isCta = (i === (bodySlides.length - 1));
-    var label = role === 'hook2' ? '이중 후킹'
-              : role === 'cta' || isCta ? '저장·팔로우 유도'
-              : role === 'checklist' ? '체크리스트'
-              : role === 'number' ? '숫자 임팩트'
-              : role === 'toc' ? '목차'
-              : '본문';
+    var labelKey = role === 'hook2' ? 'cs2.role.hook2'
+                : (role === 'cta' || isCta) ? 'cs2.role.cta'
+                : role === 'checklist' ? 'cs2.role.checklist'
+                : role === 'number' ? 'cs2.role.body'
+                : role === 'toc' ? 'cs2.role.toc'
+                : 'cs2.role.body';
+    var defaults = { 'cs2.role.hook2':'이중 후킹', 'cs2.role.cta':'저장·팔로우 유도',
+      'cs2.role.checklist':'체크리스트', 'cs2.role.toc':'목차', 'cs2.role.body':'본문' };
+    var label = _d2[labelKey] || defaults[labelKey] || '본문';
     var card = document.createElement('div');
     card.className = 'cs2-slide-card' + (isCta ? ' cta' : '');
     card.dataset.idx = String(idx);
@@ -13831,7 +13975,7 @@ function renderBodyAsCards(bodySlides){
     var head = document.createElement('div');
     head.className = 'cs2-slide-head';
     head.innerHTML = '<div class="cs2-slide-num">' + idx + '</div>' +
-      '<span>슬라이드 ' + idx + ' · ' + label + '</span>';
+      '<span>' + slideWord + ' ' + idx + ' · ' + label + '</span>';
     card.appendChild(head);
     var body = document.createElement('div');
     body.className = 'cs2-slide-text';
@@ -13889,27 +14033,13 @@ function collectBodyFromCards(){
 }
 // 쏘비 말투 로딩 카피 — 매번 랜덤 (compact 10자 내외)
 function ssobiLoadingCopy(mode){
-  var first = [
-    '쏘비 지금 집중 중',
-    '쏘비가 문장 조립 중',
-    '쏘비 후킹 짜는 중',
-    '잠깐, 쏘비 두근두근',
-    '쏘비 머리 굴리는 중',
-    '쏘비가 핫한 거 찾는 중',
-    '쏘비 펜 꺼낸다',
-    '쏘비 말투 꺼내는 중',
-    '쏘비가 각 잡고 쓰는 중',
-    '쏘비 지금 엄청 진심',
-  ];
-  var regen = [
-    '쏘비 다시 간다',
-    '쏘비 심호흡 한 번',
-    '쏘비 각도 다시 잡는 중',
-    '쏘비 이번엔 진짜',
-    '쏘비 리테이크 들어감',
-  ];
-  var pool = mode === 'regen' ? regen : first;
-  return pool[Math.floor(Math.random() * pool.length)];
+  var lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+  var dict = (typeof I18N !== 'undefined' && I18N[lang]) || {};
+  var firstKeys = ['gen.first.1','gen.first.2','gen.first.3','gen.first.4','gen.first.5','gen.first.6','gen.first.7','gen.first.8','gen.first.9','gen.first.10'];
+  var regenKeys = ['gen.regen.1','gen.regen.2','gen.regen.3','gen.regen.4','gen.regen.5'];
+  var keys = mode === 'regen' ? regenKeys : firstKeys;
+  var key = keys[Math.floor(Math.random() * keys.length)];
+  return dict[key] || (mode === 'regen' ? '쏘비 다시 간다' : '쏘비 지금 집중 중');
 }
 function showGenProgress(title, subtitle, steps, curIdx){
   __genSteps = Array.isArray(steps) ? steps.slice() : [];
@@ -13927,7 +14057,7 @@ function showGenProgress(title, subtitle, steps, curIdx){
         '<div class="gp-core" id="gp-core">AI</div>' +
         '<div class="gp-orbit"></div>' +
       '</div>' +
-      '<div class="gp-title" id="gp-title">' + (title || 'AI 가 만드는 중') + '</div>' +
+      '<div class="gp-title" id="gp-title">' + (title || (((typeof I18N !== 'undefined' && I18N[ssobiCurrentLang||'ko'])||{})['gen.fallback_title'] || 'AI 가 만드는 중')) + '</div>' +
       '<div class="gp-sub" id="gp-sub">' + (subtitle ? '「' + escapeHtml(subtitle) + '」' : '') + '</div>' +
       '<div class="gp-steps" id="gp-steps">' +
         __genSteps.map(function(s, i){
@@ -13938,7 +14068,7 @@ function showGenProgress(title, subtitle, steps, curIdx){
         }).join('') +
       '</div>' +
       '<div class="gp-bar"><div class="gp-bar-fill" id="gp-bar-fill"></div></div>' +
-      '<div class="gp-hint">내 말투와 톤을 학습해 적용해요</div>' +
+      '<div class="gp-hint">' + (((typeof I18N !== 'undefined' && I18N[ssobiCurrentLang||'ko'])||{})['gen.hint'] || '내 말투와 톤을 학습해 적용해요') + '</div>' +
     '</div>';
   ov.style.display = 'flex';
   updateGenProgress(curIdx || 0);
