@@ -3394,18 +3394,18 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
 <div class="vw" id="v-targets">
   <div class="hdr">
-    <button onclick="go('profile')" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:13px;font-weight:700;display:flex;align-items:center;gap:4px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>뒤로</button>
-    <div style="font-size:16px;font-weight:800">참고 계정 분석</div>
+    <button onclick="go('profile')" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:13px;font-weight:700;display:flex;align-items:center;gap:4px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="btn.back">뒤로</span></button>
+    <div style="font-size:16px;font-weight:800" data-i18n="targets.title">참고 계정 분석</div>
     <div style="width:40px"></div>
   </div>
   <div style="padding:0 0 8px">
-    <div style="font-size:13px;color:var(--t2);margin-bottom:14px;line-height:1.6">내가 분석할 경쟁·참고 계정을 추가하세요. 해시태그·게시 시간·포맷을 AI가 비교 분석해요.</div>
+    <div style="font-size:13px;color:var(--t2);margin-bottom:14px;line-height:1.6" data-i18n="targets.desc">내가 분석할 경쟁·참고 계정을 추가하세요. 해시태그·게시 시간·포맷을 AI가 비교 분석해요.</div>
     <div class="add-target-row">
-      <input class="inp" type="text" placeholder="@계정명 입력" id="target-input">
-      <button onclick="addTarget()">추가</button>
+      <input class="inp" type="text" placeholder="@계정명 입력" data-i18n-ph="targets.add_ph" id="target-input">
+      <button onclick="addTarget()" data-i18n="targets.add_btn">추가</button>
     </div>
 
-    <div style="font-size:12px;font-weight:700;color:var(--t3);margin-bottom:8px">내 참고 계정 <span style="color:var(--t1);font-weight:800">4</span></div>
+    <div style="font-size:12px;font-weight:700;color:var(--t3);margin-bottom:8px"><span data-i18n="targets.my">내 참고 계정</span> <span style="color:var(--t1);font-weight:800">4</span></div>
     <div class="target-card" id="target-list">
       <div class="target-item"><div class="target-av2">H</div><div class="target-info2"><div class="target-name2">@hazel_skin</div><div class="target-meta">#스킨케어 · 팔로워 2.4만</div></div><button class="target-del" onclick="delTarget(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
       <div class="target-item"><div class="target-av2">M</div><div class="target-info2"><div class="target-name2">@morning_glow_kr</div><div class="target-meta">#뷰티루틴 · 팔로워 1.1만</div></div><button class="target-del" onclick="delTarget(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
@@ -3413,8 +3413,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <div class="target-item"><div class="target-av2">S</div><div class="target-info2"><div class="target-name2">@seoulnista</div><div class="target-meta">#데일리룩 · 팔로워 8.2만</div></div><button class="target-del" onclick="delTarget(this)"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
     </div>
 
-    <div style="font-size:12px;font-weight:700;color:var(--t3);margin:18px 0 8px">유사 타겟 추천 <span style="font-size:10px;font-weight:500;color:var(--mint)">AI 분석</span></div>
-    <div style="font-size:12px;color:var(--t2);margin-bottom:10px;line-height:1.5">내 참고 계정과 비슷한 계정들이에요. 추가하면 해시태그·포맷 분석 범위가 넓어져요.</div>
+    <div style="font-size:12px;font-weight:700;color:var(--t3);margin:18px 0 8px"><span data-i18n="targets.similar">유사 타겟 추천</span> <span style="font-size:10px;font-weight:500;color:var(--mint)" data-i18n="targets.ai_label">AI 분석</span></div>
+    <div style="font-size:12px;color:var(--t2);margin-bottom:10px;line-height:1.5" data-i18n="targets.similar_sub">내 참고 계정과 비슷한 계정들이에요. 추가하면 해시태그·포맷 분석 범위가 넓어져요.</div>
     <div class="target-card">
       <div class="target-item">
         <div class="target-av2" style="background:var(--mint-l);color:var(--mint-d)">J</div>
@@ -3442,54 +3442,54 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         <button onclick="addSimilar(this,'@pink_routine_kr')" style="padding:5px 12px;border-radius:8px;border:1px solid var(--mint);background:none;color:var(--mint);font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0">추가</button>
       </div>
     </div>
-    <div style="font-size:12px;color:var(--t3);text-align:center;margin-top:12px;font-weight:500">공식 Graph API 기반 분석 · 계정 추적 없음</div>
-    <button class="btn-p" style="margin-top:16px" onclick="finalizeTargets()">확인 완료 · 적용하기</button>
-    <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:8px">추가 안 해도 괜찮아요. 추천 리스트만 확인해도 돼요.</div>
+    <div style="font-size:12px;color:var(--t3);text-align:center;margin-top:12px;font-weight:500" data-i18n="targets.api_note">공식 Graph API 기반 분석 · 계정 추적 없음</div>
+    <button class="btn-p" style="margin-top:16px" onclick="finalizeTargets()" data-i18n="targets.confirm">확인 완료 · 적용하기</button>
+    <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:8px" data-i18n="targets.skip_note">추가 안 해도 괜찮아요. 추천 리스트만 확인해도 돼요.</div>
   </div>
 </div>
 
 
 <!-- ════ 알림 히스토리 ════ -->
 <div class="vw" id="v-notif">
-  <div class="hdr"><div style="font-size:16px;font-weight:800">알림 기록</div></div>
+  <div class="hdr"><div style="font-size:16px;font-weight:800" data-i18n="notif.title">알림 기록</div></div>
   <div style="padding:0 20px">
-    <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:8px">오늘</div>
+    <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:8px" data-i18n="notif.today">오늘</div>
     <div class="notif-card">
       <div class="notif-row">
         <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
           <div class="notif-ico" style="background:var(--red-l)"><svg viewBox="0 0 24 24" stroke="var(--red)" stroke-width="1.8"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <div class="notif-body"><div class="notif-title">결제 문제 긴급 알림</div><div class="notif-sub">@beauty_lover99 · "공동구매 결제 오류..."</div></div>
+          <div class="notif-body"><div class="notif-title" data-i18n="notif.urgent_title">결제 문제 긴급 알림</div><div class="notif-sub">@beauty_lover99 · "공동구매 결제 오류..."</div></div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0"><div class="notif-time">2분 전</div><div class="notif-unread"></div></div>
       </div>
       <div class="notif-row">
         <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
           <div class="notif-ico" style="background:var(--amber-l)"><svg viewBox="0 0 24 24" stroke="var(--amber)" stroke-width="1.8"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <div class="notif-body"><div class="notif-title">수익 제안 도착</div><div class="notif-sub">@japan_import_co · 수출 문의 4,500만원</div></div>
+          <div class="notif-body"><div class="notif-title" data-i18n="notif.offer_title">수익 제안 도착</div><div class="notif-sub">@japan_import_co · 수출 문의 4,500만원</div></div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0"><div class="notif-time">1시간 전</div><div class="notif-unread"></div></div>
       </div>
       <div class="notif-row">
         <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
           <div class="notif-ico" style="background:var(--mint-l)"><svg viewBox="0 0 24 24" stroke="var(--mint)" stroke-width="1.8"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <div class="notif-body"><div class="notif-title">일일 리포트</div><div class="notif-sub">오늘 자동 응대 284건 · 신규 팔로워 +6명</div></div>
+          <div class="notif-body"><div class="notif-title" data-i18n="notif.daily_title">일일 리포트</div><div class="notif-sub">오늘 자동 응대 284건 · 신규 팔로워 +6명</div></div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;flex-shrink:0"><div class="notif-time">오전 9:00</div></div>
       </div>
     </div>
-    <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin:16px 0 8px">어제</div>
+    <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin:16px 0 8px" data-i18n="notif.yesterday">어제</div>
     <div class="notif-card">
       <div class="notif-row">
         <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
           <div class="notif-ico" style="background:var(--red-l)"><svg viewBox="0 0 24 24" stroke="var(--red)" stroke-width="1.8"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <div class="notif-body"><div class="notif-title">부정 이슈 감지</div><div class="notif-sub">@skin_trouble_k · 트러블 클레임</div></div>
+          <div class="notif-body"><div class="notif-title" data-i18n="notif.negative_title">부정 이슈 감지</div><div class="notif-sub">@skin_trouble_k · 트러블 클레임</div></div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0"><div class="notif-time">어제 3:22pm</div></div>
       </div>
       <div class="notif-row" style="border:none">
         <div style="display:flex;align-items:center;gap:10px;flex:1;min-width:0">
           <div class="notif-ico" style="background:var(--mint-l)"><svg viewBox="0 0 24 24" stroke="var(--mint)" stroke-width="1.8"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-          <div class="notif-body"><div class="notif-title">일일 리포트</div><div class="notif-sub">어제 자동 응대 312건 · 신규 팔로워 +11명</div></div>
+          <div class="notif-body"><div class="notif-title" data-i18n="notif.daily_title">일일 리포트</div><div class="notif-sub">어제 자동 응대 312건 · 신규 팔로워 +11명</div></div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;flex-shrink:0"><div class="notif-time">어제 9:00am</div></div>
       </div>
@@ -3874,40 +3874,40 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 <div class="ov" id="m-pt-use" onclick="co(event,'m-pt-use')">
   <div class="sheet">
     <div class="s-bar"></div>
-    <div class="s-title">보유 포인트</div>
-    <div class="s-sub">이 포인트로 무엇을 할 수 있는지 확인해요</div>
+    <div class="s-title" data-i18n="mod.pt.balance">보유 포인트</div>
+    <div class="s-sub" data-i18n="mod.pt.balance_sub">이 포인트로 무엇을 할 수 있는지 확인해요</div>
 
     <div style="display:flex;align-items:flex-end;gap:6px;margin:14px 0 16px">
       <div style="font-size:30px;font-weight:900;color:var(--t1);letter-spacing:-.8px;line-height:1">42,000<span style="font-size:16px;margin-left:1px">P</span></div>
-      <div style="font-size:11px;color:var(--t3);padding-bottom:6px">현재 잔액</div>
+      <div style="font-size:11px;color:var(--t3);padding-bottom:6px" data-i18n="mod.pt.current">현재 잔액</div>
     </div>
 
-    <div style="font-size:11px;font-weight:800;color:var(--t3);letter-spacing:.3px;margin-bottom:8px">이 포인트로 할 수 있는 것</div>
+    <div style="font-size:11px;font-weight:800;color:var(--t3);letter-spacing:.3px;margin-bottom:8px" data-i18n="mod.pt.can_use">이 포인트로 할 수 있는 것</div>
     <div class="pt-convert-grid" style="margin-bottom:14px">
       <div class="pt-use-item">
         <div class="pt-use-ico" style="background:var(--mint-l)">
           <svg viewBox="0 0 24 24" stroke="var(--mint-d)"><path d="M12 4v16m8-8H4" stroke-linecap="round"/></svg>
         </div>
-        <div class="pt-use-n"><span>8</span><span>회</span></div>
-        <div class="pt-use-l">카드뉴스 만들기</div>
+        <div class="pt-use-n"><span>8</span><span data-i18n="mod.pt.can.cards_unit">회</span></div>
+        <div class="pt-use-l" data-i18n="mod.pt.can.cards">카드뉴스 만들기</div>
       </div>
       <div class="pt-use-item">
         <div class="pt-use-ico" style="background:#F0F5FF">
           <svg viewBox="0 0 24 24" stroke="#3B82F6"><path d="M13 7l5 5-5 5M6 12h12" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
-        <div class="pt-use-n"><span>14</span><span>일</span></div>
-        <div class="pt-use-l">키우기 활동</div>
+        <div class="pt-use-n"><span>14</span><span data-i18n="mod.pt.can.grow_unit">일</span></div>
+        <div class="pt-use-l" data-i18n="mod.pt.can.grow">키우기 활동</div>
       </div>
       <div class="pt-use-item">
         <div class="pt-use-ico" style="background:#FFFBEB">
           <svg viewBox="0 0 24 24" stroke="var(--amber)"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round"/></svg>
         </div>
-        <div class="pt-use-n"><span>84</span><span>건</span></div>
-        <div class="pt-use-l">알림톡</div>
+        <div class="pt-use-n"><span>84</span><span data-i18n="mod.pt.can.alarm_unit">건</span></div>
+        <div class="pt-use-l" data-i18n="mod.pt.can.alarm">알림톡</div>
       </div>
     </div>
 
-    <button class="btn-s" style="margin-top:0" onclick="cm('m-pt-use');openModal('m-pt-history')">적립·사용 내역 자세히 보기</button>
+    <button class="btn-s" style="margin-top:0" onclick="cm('m-pt-use');openModal('m-pt-history')" data-i18n="mod.pt.history_btn">적립·사용 내역 자세히 보기</button>
     <button class="btn-s" onclick="cm('m-pt-use')"><span data-i18n="btn.close">닫기</span></button>
   </div>
 </div>
@@ -3916,25 +3916,25 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 <div class="ov" id="m-pt-history" onclick="co(event,'m-pt-history')">
   <div class="sheet">
     <div class="s-bar"></div>
-    <div class="s-title">적립·사용 내역</div>
-    <div class="s-sub">포인트 적립·사용 전체 흐름</div>
+    <div class="s-title" data-i18n="mod.pt.hist.title">적립·사용 내역</div>
+    <div class="s-sub" data-i18n="mod.pt.hist.sub">포인트 적립·사용 전체 흐름</div>
 
     <!-- 요약 -->
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:14px 0 16px">
       <div style="padding:14px;background:var(--mint-l);border-radius:14px;border:1px solid #A7F3D0">
-        <div style="font-size:10px;font-weight:800;color:var(--mint-d);margin-bottom:4px;letter-spacing:.3px">적립</div>
+        <div style="font-size:10px;font-weight:800;color:var(--mint-d);margin-bottom:4px;letter-spacing:.3px" data-i18n="mod.pt.hist.earn">적립</div>
         <div style="font-size:20px;font-weight:900;color:var(--mint-d);letter-spacing:-.5px;line-height:1">+47,000<span style="font-size:11px;margin-left:1px">P</span></div>
       </div>
       <div style="padding:14px;background:#FFF1F3;border-radius:14px;border:1px solid #FECACA">
-        <div style="font-size:10px;font-weight:800;color:var(--red);margin-bottom:4px;letter-spacing:.3px">사용</div>
+        <div style="font-size:10px;font-weight:800;color:var(--red);margin-bottom:4px;letter-spacing:.3px" data-i18n="mod.pt.hist.use">사용</div>
         <div style="font-size:20px;font-weight:900;color:var(--red);letter-spacing:-.5px;line-height:1">−5,000<span style="font-size:11px;margin-left:1px">P</span></div>
       </div>
     </div>
 
     <!-- 탭 -->
     <div style="display:flex;background:var(--bg);border-radius:12px;padding:3px;margin-bottom:12px">
-      <button id="pth-t-earn" onclick="switchPtTab('earn')" style="flex:1;padding:9px;border-radius:10px;background:var(--s);color:var(--t1);border:none;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06)">적립 내역</button>
-      <button id="pth-t-use" onclick="switchPtTab('use')" style="flex:1;padding:9px;border-radius:10px;background:none;color:var(--t3);border:none;font-size:12px;font-weight:700;cursor:pointer">사용 내역</button>
+      <button id="pth-t-earn" onclick="switchPtTab('earn')" style="flex:1;padding:9px;border-radius:10px;background:var(--s);color:var(--t1);border:none;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 1px 3px rgba(0,0,0,.06)" data-i18n="mod.pt.hist.tab.earn">적립 내역</button>
+      <button id="pth-t-use" onclick="switchPtTab('use')" style="flex:1;padding:9px;border-radius:10px;background:none;color:var(--t3);border:none;font-size:12px;font-weight:700;cursor:pointer" data-i18n="mod.pt.hist.tab.use">사용 내역</button>
     </div>
 
     <!-- 적립 -->
@@ -3998,17 +3998,17 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 <div class="ov" id="m-earn-detail" onclick="co(event,'m-earn-detail')">
   <div class="sheet">
     <div class="s-bar"></div>
-    <div class="s-title">내가 번 돈</div>
-    <div class="s-sub">완료 미션 수익 · 인출 가능 잔액</div>
+    <div class="s-title" data-i18n="mod.earn.title">내가 번 돈</div>
+    <div class="s-sub" data-i18n="mod.earn.sub">완료 미션 수익 · 인출 가능 잔액</div>
 
     <div style="background:linear-gradient(135deg,#991B1B 0%,#450A0A 100%);border-radius:16px;padding:16px;color:#fff;margin:14px 0 16px;position:relative;overflow:hidden">
       <div style="position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(255,210,51,.25),transparent 60%);border-radius:50%;pointer-events:none"></div>
-      <div style="font-size:11px;font-weight:700;opacity:.75;margin-bottom:4px;position:relative;z-index:1">인출 가능 금액</div>
+      <div style="font-size:11px;font-weight:700;opacity:.75;margin-bottom:4px;position:relative;z-index:1" data-i18n="mod.earn.withdrawable">인출 가능 금액</div>
       <div style="font-size:26px;font-weight:900;letter-spacing:-.6px;line-height:1;margin-bottom:6px;position:relative;z-index:1">₩<span id="earn-balance">50,000</span></div>
-      <div style="font-size:11px;opacity:.75;position:relative;z-index:1">수수료 <b style="color:#FFD233">8%</b> 공제 후 실지급 <b>₩<span id="earn-net">46,000</span></b></div>
+      <div style="font-size:11px;opacity:.75;position:relative;z-index:1" data-i18n="mod.earn.fee_after">수수료 8% 공제 후 실지급</div>
     </div>
 
-    <div style="font-size:12px;font-weight:800;color:var(--t3);letter-spacing:.3px;margin-bottom:8px">완료 미션 내역</div>
+    <div style="font-size:12px;font-weight:800;color:var(--t3);letter-spacing:.3px;margin-bottom:8px" data-i18n="mod.earn.completed">완료 미션 내역</div>
     <div style="background:var(--s);border:1px solid var(--b);border-radius:14px;overflow:hidden;margin-bottom:14px">
       <div class="invite-friend">
         <div class="invite-friend-av" style="background:var(--amber-l);color:var(--amber)">✓</div>
@@ -4017,10 +4017,10 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       </div>
     </div>
 
-    <div style="font-size:12px;font-weight:800;color:var(--t3);letter-spacing:.3px;margin-bottom:8px">인출 내역</div>
-    <div style="background:var(--bg);border-radius:14px;padding:20px;text-align:center;font-size:12px;color:var(--t3);margin-bottom:14px">아직 인출 내역이 없어요</div>
+    <div style="font-size:12px;font-weight:800;color:var(--t3);letter-spacing:.3px;margin-bottom:8px" data-i18n="mod.earn.withdraw_history">인출 내역</div>
+    <div style="background:var(--bg);border-radius:14px;padding:20px;text-align:center;font-size:12px;color:var(--t3);margin-bottom:14px" data-i18n="mod.earn.no_history">아직 인출 내역이 없어요</div>
 
-    <button class="btn-p" onclick="cm('m-earn-detail');openModal('m-wallet-withdraw')">인출하기 · 실지급 ₩46,000</button>
+    <button class="btn-p" onclick="cm('m-earn-detail');openModal('m-wallet-withdraw')"><span data-i18n="mod.earn.withdraw_btn">인출하기</span> · ₩46,000</button>
     <button class="btn-s" onclick="cm('m-earn-detail')"><span data-i18n="btn.close">닫기</span></button>
   </div>
 </div>
@@ -4029,31 +4029,31 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 <div class="ov" id="m-wallet-withdraw" onclick="co(event,'m-wallet-withdraw')">
   <div class="sheet">
     <div class="s-bar"></div>
-    <div class="s-title">수익 인출</div>
-    <div class="s-sub">완료된 미션 수익을 내 계좌로 받아요</div>
+    <div class="s-title" data-i18n="mod.wd.title">수익 인출</div>
+    <div class="s-sub" data-i18n="mod.wd.sub">완료된 미션 수익을 내 계좌로 받아요</div>
 
     <div style="background:var(--bg);border-radius:14px;padding:14px;margin:14px 0 16px">
       <div style="display:flex;justify-content:space-between;padding:6px 0">
-        <span style="font-size:12px;color:var(--t2)">인출 가능 금액</span>
+        <span style="font-size:12px;color:var(--t2)" data-i18n="mod.wd.amount">인출 가능 금액</span>
         <span style="font-size:14px;font-weight:800;color:var(--t1)">₩50,000</span>
       </div>
       <div style="display:flex;justify-content:space-between;padding:6px 0">
-        <span style="font-size:12px;color:var(--red)">플랫폼 수수료 (8%)</span>
+        <span style="font-size:12px;color:var(--red)" data-i18n="mod.wd.fee">플랫폼 수수료 (8%)</span>
         <span style="font-size:14px;font-weight:800;color:var(--red)">−₩4,000</span>
       </div>
       <div style="height:1px;background:var(--b);margin:8px 0"></div>
       <div style="display:flex;justify-content:space-between;padding:6px 0">
-        <span style="font-size:13px;font-weight:700;color:var(--t1)">실지급 금액</span>
+        <span style="font-size:13px;font-weight:700;color:var(--t1)" data-i18n="mod.wd.net">실지급 금액</span>
         <span style="font-size:18px;font-weight:900;color:var(--mint-d);letter-spacing:-.3px">₩46,000</span>
       </div>
     </div>
 
-    <div style="font-size:12px;font-weight:700;color:var(--t2);margin-bottom:6px">예금주</div>
-    <input class="sheet-in" type="text" placeholder="본인 명의 · 실명" id="wd-name" style="margin:0 0 10px">
+    <div style="font-size:12px;font-weight:700;color:var(--t2);margin-bottom:6px" data-i18n="mod.wd.holder">예금주</div>
+    <input class="sheet-in" type="text" placeholder="본인 명의 · 실명" data-i18n-ph="mod.wd.holder_ph" id="wd-name" style="margin:0 0 10px">
 
-    <div style="font-size:12px;font-weight:700;color:var(--t2);margin-bottom:6px">은행</div>
+    <div style="font-size:12px;font-weight:700;color:var(--t2);margin-bottom:6px" data-i18n="mod.wd.bank">은행</div>
     <select class="sheet-in" id="wd-bank" style="margin:0 0 10px;font-size:13px">
-      <option value="">은행 선택</option>
+      <option value="" data-i18n="mod.wd.bank_ph">은행 선택</option>
       <option>국민은행</option>
       <option>신한은행</option>
       <option>우리은행</option>
@@ -4063,14 +4063,14 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <option>토스뱅크</option>
     </select>
 
-    <div style="font-size:12px;font-weight:700;color:var(--t2);margin-bottom:6px">계좌번호</div>
-    <input class="sheet-in" type="text" placeholder="숫자만 입력" id="wd-account" style="margin:0 0 14px">
+    <div style="font-size:12px;font-weight:700;color:var(--t2);margin-bottom:6px" data-i18n="mod.wd.account">계좌번호</div>
+    <input class="sheet-in" type="text" placeholder="숫자만 입력" data-i18n-ph="mod.wd.account_ph" id="wd-account" style="margin:0 0 14px">
 
-    <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:10px 12px;font-size:11px;color:#92400E;line-height:1.6;margin-bottom:14px">
+    <div style="background:#FFFBEB;border:1px solid #FDE68A;border-radius:10px;padding:10px 12px;font-size:11px;color:#92400E;line-height:1.6;margin-bottom:14px" data-i18n="mod.wd.warning">
       본인 명의 계좌만 가능해요. 타인 명의 입력 시 지급이 거부됩니다. 처리는 영업일 기준 3일 이내.
     </div>
 
-    <button class="btn-p" onclick="submitWithdraw()">인출 신청</button>
+    <button class="btn-p" onclick="submitWithdraw()" data-i18n="mod.wd.submit">인출 신청</button>
     <button class="btn-s" onclick="cm('m-wallet-withdraw')"><span data-i18n="btn.cancel">취소</span></button>
   </div>
 </div>
@@ -5738,6 +5738,68 @@ var I18N = {
     'newbie.shade.title':'이런 기능이 있어요',
     'newbie.shade.sub':'3단계 완료하면 바로 쓸 수 있어요',
     'newbie.shade.cta':'지금 시작',
+    // 포인트 사용 모달
+    'mod.pt.balance':'보유 포인트',
+    'mod.pt.balance_sub':'이 포인트로 무엇을 할 수 있는지 확인해요',
+    'mod.pt.current':'현재 잔액',
+    'mod.pt.can_use':'이 포인트로 할 수 있는 것',
+    'mod.pt.can.cards':'카드뉴스 만들기',
+    'mod.pt.can.cards_unit':'회',
+    'mod.pt.can.grow':'키우기 활동',
+    'mod.pt.can.grow_unit':'일',
+    'mod.pt.can.alarm':'알림톡',
+    'mod.pt.can.alarm_unit':'건',
+    'mod.pt.history_btn':'적립·사용 내역 자세히 보기',
+    // 포인트 내역 모달
+    'mod.pt.hist.title':'적립·사용 내역',
+    'mod.pt.hist.sub':'포인트 적립·사용 전체 흐름',
+    'mod.pt.hist.earn':'적립',
+    'mod.pt.hist.use':'사용',
+    'mod.pt.hist.tab.earn':'적립 내역',
+    'mod.pt.hist.tab.use':'사용 내역',
+    // 수익 모달
+    'mod.earn.title':'내가 번 돈',
+    'mod.earn.sub':'완료 미션 수익 · 인출 가능 잔액',
+    'mod.earn.withdrawable':'인출 가능 금액',
+    'mod.earn.fee_after':'수수료 8% 공제 후 실지급',
+    'mod.earn.completed':'완료 미션 내역',
+    'mod.earn.withdraw_history':'인출 내역',
+    'mod.earn.no_history':'아직 인출 내역이 없어요',
+    'mod.earn.withdraw_btn':'인출하기',
+    // 인출 모달
+    'mod.wd.title':'수익 인출',
+    'mod.wd.sub':'완료된 미션 수익을 내 계좌로 받아요',
+    'mod.wd.amount':'인출 가능 금액',
+    'mod.wd.fee':'플랫폼 수수료 (8%)',
+    'mod.wd.net':'실지급 금액',
+    'mod.wd.holder':'예금주',
+    'mod.wd.holder_ph':'본인 명의 · 실명',
+    'mod.wd.bank':'은행',
+    'mod.wd.bank_ph':'은행 선택',
+    'mod.wd.account':'계좌번호',
+    'mod.wd.account_ph':'숫자만 입력',
+    'mod.wd.warning':'본인 명의 계좌만 가능해요. 타인 명의 입력 시 지급이 거부됩니다. 처리는 영업일 기준 3일 이내.',
+    'mod.wd.submit':'인출 신청',
+    // v-targets
+    'targets.title':'참고 계정 분석',
+    'targets.desc':'내가 분석할 경쟁·참고 계정을 추가하세요. 해시태그·게시 시간·포맷을 AI가 비교 분석해요.',
+    'targets.add_ph':'@계정명 입력',
+    'targets.add_btn':'추가',
+    'targets.my':'내 참고 계정',
+    'targets.similar':'유사 타겟 추천',
+    'targets.similar_sub':'내 참고 계정과 비슷한 계정들이에요. 추가하면 해시태그·포맷 분석 범위가 넓어져요.',
+    'targets.ai_label':'AI 분석',
+    'targets.api_note':'공식 Graph API 기반 분석 · 계정 추적 없음',
+    'targets.confirm':'확인 완료 · 적용하기',
+    'targets.skip_note':'추가 안 해도 괜찮아요. 추천 리스트만 확인해도 돼요.',
+    // v-notif
+    'notif.title':'알림 기록',
+    'notif.today':'오늘',
+    'notif.yesterday':'어제',
+    'notif.urgent_title':'결제 문제 긴급 알림',
+    'notif.offer_title':'수익 제안 도착',
+    'notif.daily_title':'일일 리포트',
+    'notif.negative_title':'부정 이슈 감지',
     // 플랜 모달
     'mod.plan.title':'이용권',
     'mod.plan.sub':'성장 단계에 맞는 플랜을 선택하세요',
@@ -6308,6 +6370,68 @@ var I18N = {
     'newbie.shade.title':'Here\'s what you\'ll get.',
     'newbie.shade.sub':'Complete the 3 steps to unlock.',
     'newbie.shade.cta':'Start now',
+    // points use modal
+    'mod.pt.balance':'Points balance',
+    'mod.pt.balance_sub':'See what you can do with these points.',
+    'mod.pt.current':'Current balance',
+    'mod.pt.can_use':'What you can do',
+    'mod.pt.can.cards':'Create carousel',
+    'mod.pt.can.cards_unit':'×',
+    'mod.pt.can.grow':'Grow activity',
+    'mod.pt.can.grow_unit':'days',
+    'mod.pt.can.alarm':'Alimtalk',
+    'mod.pt.can.alarm_unit':'msgs',
+    'mod.pt.history_btn':'See earn & spend history',
+    // points history modal
+    'mod.pt.hist.title':'Earn & spend history',
+    'mod.pt.hist.sub':'All point activity',
+    'mod.pt.hist.earn':'Earned',
+    'mod.pt.hist.use':'Spent',
+    'mod.pt.hist.tab.earn':'Earn history',
+    'mod.pt.hist.tab.use':'Spend history',
+    // earnings modal
+    'mod.earn.title':'My earnings',
+    'mod.earn.sub':'Completed missions · Withdrawable balance',
+    'mod.earn.withdrawable':'Withdrawable amount',
+    'mod.earn.fee_after':'After 8% fee, you receive',
+    'mod.earn.completed':'Completed missions',
+    'mod.earn.withdraw_history':'Withdrawal history',
+    'mod.earn.no_history':'No withdrawals yet',
+    'mod.earn.withdraw_btn':'Withdraw',
+    // withdraw modal
+    'mod.wd.title':'Withdraw earnings',
+    'mod.wd.sub':'Send completed-mission earnings to your bank account',
+    'mod.wd.amount':'Withdrawable amount',
+    'mod.wd.fee':'Platform fee (8%)',
+    'mod.wd.net':'Net amount',
+    'mod.wd.holder':'Account holder',
+    'mod.wd.holder_ph':'Your real name (must match the account)',
+    'mod.wd.bank':'Bank',
+    'mod.wd.bank_ph':'Choose a bank',
+    'mod.wd.account':'Account number',
+    'mod.wd.account_ph':'Numbers only',
+    'mod.wd.warning':'Only your own account is accepted. Withdrawals to third parties will be rejected. Processing takes up to 3 business days.',
+    'mod.wd.submit':'Submit withdrawal',
+    // v-targets (reference accounts)
+    'targets.title':'Reference account analysis',
+    'targets.desc':'Add competitor or reference accounts. The AI compares hashtags, posting times, and formats.',
+    'targets.add_ph':'Enter @username',
+    'targets.add_btn':'Add',
+    'targets.my':'My reference accounts',
+    'targets.similar':'Similar accounts',
+    'targets.similar_sub':'Accounts similar to your references. Adding them broadens the AI\'s hashtag and format analysis.',
+    'targets.ai_label':'AI analysis',
+    'targets.api_note':'Powered by official Graph API · No tracking of accounts',
+    'targets.confirm':'Confirm & apply',
+    'targets.skip_note':'You don\'t have to add any. Just reviewing the suggestions is fine.',
+    // v-notif
+    'notif.title':'Notification history',
+    'notif.today':'Today',
+    'notif.yesterday':'Yesterday',
+    'notif.urgent_title':'Urgent payment issue',
+    'notif.offer_title':'New offer received',
+    'notif.daily_title':'Daily report',
+    'notif.negative_title':'Critical issue detected',
     // plan modal
     'mod.plan.title':'Subscription',
     'mod.plan.sub':'Pick the plan that matches your stage',
