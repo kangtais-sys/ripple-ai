@@ -1901,26 +1901,26 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <!-- 신규 유저 모드 (기본 숨김) -->
   <div id="newbie-pane" style="display:none">
     <div class="nb-hero">
-      <div class="nb-hero-tag"><div class="nb-hero-tag-dot"></div>Ssobi 학습 중</div>
-      <div class="nb-hero-t">안녕, 유민혜님.<br>오늘이 Ssobi 첫날이에요</div>
-      <div class="nb-hero-s">3단계만 완료하면<br>AI가 24시간 자동으로 움직여요.</div>
+      <div class="nb-hero-tag"><div class="nb-hero-tag-dot"></div><span data-i18n="newbie.hero.tag">Ssobi 학습 중</span></div>
+      <div class="nb-hero-t" data-i18n="newbie.hero.title">안녕, 유민혜님. 오늘이 Ssobi 첫날이에요</div>
+      <div class="nb-hero-s" data-i18n="newbie.hero.sub">3단계만 완료하면 AI가 24시간 자동으로 움직여요.</div>
       <div class="nb-progress-wrap">
         <div class="nb-progress-meta">
-          <div class="nb-progress-lbl">준비 진행률</div>
+          <div class="nb-progress-lbl" data-i18n="newbie.progress.label">준비 진행률</div>
           <div class="nb-progress-n" id="nb-progress-n">0 / 5</div>
         </div>
         <div class="nb-progress-bar"><div class="nb-progress-fill" id="nb-progress-fill" style="width:0"></div></div>
       </div>
     </div>
 
-    <div class="sec-eye" style="margin-top:18px">CHECKLIST</div>
-    <div class="sec-t">오늘 할 일</div>
+    <div class="sec-eye" style="margin-top:18px" data-i18n="newbie.checklist.eyebrow">CHECKLIST</div>
+    <div class="sec-t" data-i18n="newbie.checklist.title">오늘 할 일</div>
     <div class="nb-check-list">
       <div class="nb-check active" id="ck-ig" onclick="startProcessStep('ig')">
         <div class="nb-check-num">1</div>
         <div class="nb-check-b">
-          <div class="nb-check-t">SNS 계정 연동</div>
-          <div class="nb-check-s">Instagram · TikTok · YouTube 공식 API</div>
+          <div class="nb-check-t" data-i18n="newbie.check.ig">SNS 계정 연동</div>
+          <div class="nb-check-s" data-i18n="newbie.check.ig.sub">Instagram · TikTok · YouTube 공식 API</div>
         </div>
         <span class="nb-check-reward">+5,000P</span>
         <div class="nb-check-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -1928,8 +1928,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <div class="nb-check" id="ck-tone" onclick="startProcessStep('tone')">
         <div class="nb-check-num">2</div>
         <div class="nb-check-b">
-          <div class="nb-check-t">AI 말투 학습</div>
-          <div class="nb-check-s">내 게시물 250개로 자동 학습 · 1분이면 끝</div>
+          <div class="nb-check-t" data-i18n="newbie.check.tone">AI 말투 학습</div>
+          <div class="nb-check-s" data-i18n="newbie.check.tone.sub">내 게시물 250개로 자동 학습 · 1분이면 끝</div>
         </div>
         <span class="nb-check-reward">+3,000P</span>
         <div class="nb-check-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -1937,8 +1937,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <div class="nb-check" id="ck-target" onclick="startProcessStep('target')">
         <div class="nb-check-num">3</div>
         <div class="nb-check-b">
-          <div class="nb-check-t">참고 계정·해시태그 설정</div>
-          <div class="nb-check-s">경쟁 계정 분석으로 틈새 해시태그 발굴</div>
+          <div class="nb-check-t" data-i18n="newbie.check.target">참고 계정·해시태그 설정</div>
+          <div class="nb-check-s" data-i18n="newbie.check.target.sub">경쟁 계정 분석으로 틈새 해시태그 발굴</div>
         </div>
         <span class="nb-check-reward">+2,000P</span>
         <div class="nb-check-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -1946,26 +1946,26 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <div class="nb-check" id="ck-kakao" onclick="startProcessStep('kakao')">
         <div class="nb-check-num">+</div>
         <div class="nb-check-b">
-          <div class="nb-check-t">카카오톡 알림 연동<span class="nb-check-optional">선택</span></div>
-          <div class="nb-check-s">긴급 메시지·수익 제안 즉시 알림</div>
+          <div class="nb-check-t"><span data-i18n="newbie.check.kakao">카카오톡 알림 연동</span><span class="nb-check-optional" data-i18n="newbie.optional">선택</span></div>
+          <div class="nb-check-s" data-i18n="newbie.check.kakao.sub">긴급 메시지·수익 제안 즉시 알림</div>
         </div>
         <span class="nb-check-reward">+2,000P</span>
         <div class="nb-check-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       </div>
     </div>
 
-    <div class="sec-eye">FORECAST</div>
-    <div class="sec-t">이렇게 자라요</div>
+    <div class="sec-eye" data-i18n="newbie.forecast.eyebrow">FORECAST</div>
+    <div class="sec-t" data-i18n="newbie.forecast.title">이렇게 자라요</div>
     <div class="nb-forecast">
       <div class="nb-forecast-top">
         <div class="nb-forecast-hd">
-          <div class="nb-forecast-t">7일 뒤 신규 팔로워</div>
-          <div class="nb-forecast-tag">AI 예측</div>
+          <div class="nb-forecast-t" data-i18n="newbie.forecast.followers">7일 뒤 신규 팔로워</div>
+          <div class="nb-forecast-tag" data-i18n="newbie.forecast.ai_predict">AI 예측</div>
         </div>
         <div class="nb-forecast-hero">
-          <div class="nb-forecast-hero-n"><span style="font-size:32px;vertical-align:6px">+</span>52<span style="font-size:22px">명</span></div>
+          <div class="nb-forecast-hero-n"><span style="font-size:32px;vertical-align:6px">+</span>52</div>
         </div>
-        <div class="nb-forecast-hero-l">자동 응대·스토리 조회·AI 선댓글 누적 효과</div>
+        <div class="nb-forecast-hero-l" data-i18n="newbie.forecast.hero_label">자동 응대·스토리 조회·AI 선댓글 누적 효과</div>
 
         <div class="nb-forecast-chart">
           <svg viewBox="0 0 300 52" preserveAspectRatio="none">
@@ -1989,26 +1989,26 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
           </svg>
         </div>
         <div class="nb-forecast-chart-labels">
-          <span>오늘</span><span>D+2</span><span>D+4</span><span style="color:var(--mint-d);font-weight:800">D+7</span>
+          <span data-i18n="newbie.forecast.today">오늘</span><span>D+2</span><span>D+4</span><span style="color:var(--mint-d);font-weight:800">D+7</span>
         </div>
       </div>
 
       <div class="nb-forecast-stats">
         <div class="nb-forecast-stat">
-          <div class="nb-forecast-stat-v">900<span>건</span></div>
-          <div class="nb-forecast-stat-l">자동 응대</div>
+          <div class="nb-forecast-stat-v">900</div>
+          <div class="nb-forecast-stat-l" data-i18n="newbie.forecast.replies">자동 응대</div>
         </div>
         <div class="nb-forecast-stat">
           <div class="nb-forecast-stat-v"><span class="pl">×</span>2.1</div>
-          <div class="nb-forecast-stat-l">평균 도달</div>
+          <div class="nb-forecast-stat-l" data-i18n="newbie.forecast.reach">평균 도달</div>
         </div>
         <div class="nb-forecast-stat">
           <div class="nb-forecast-stat-v"><span class="pl">+</span>38<span>%</span></div>
-          <div class="nb-forecast-stat-l">저장·공유</div>
+          <div class="nb-forecast-stat-l" data-i18n="newbie.forecast.save">저장·공유</div>
         </div>
       </div>
 
-      <div class="nb-forecast-note">같은 플랜 사용자 평균 기준 · 체크리스트 완료 후 24시간부터 실제 데이터</div>
+      <div class="nb-forecast-note" data-i18n="newbie.forecast.note">같은 플랜 사용자 평균 기준 · 체크리스트 완료 후 24시간부터 실제 데이터</div>
     </div>
 
     <div class="nb-live-wrap">
@@ -2022,9 +2022,9 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         <div class="lrow"><div class="ldash"></div>@hazel_skin님 댓글 → "어떤 피부타입이세요?" 질문형 답변</div>
       </div>
       <div class="nb-live-overlay">
-        <div class="nb-live-badge"><div class="nb-live-badge-dot"></div>곧 시작돼요</div>
-        <div class="nb-live-t">위 5개 완료하면 바로 움직여요</div>
-        <div class="nb-live-s">이건 다른 유저들의 실시간 활동이에요<br>체크리스트 끝나면 내 피드도 채워집니다</div>
+        <div class="nb-live-badge"><div class="nb-live-badge-dot"></div><span data-i18n="newbie.live.badge">곧 시작돼요</span></div>
+        <div class="nb-live-t" data-i18n="newbie.live.title">위 5개 완료하면 바로 움직여요</div>
+        <div class="nb-live-s" data-i18n="newbie.live.sub">이건 다른 유저들의 실시간 활동이에요. 체크리스트 끝나면 내 피드도 채워집니다</div>
       </div>
     </div>
   </div>
@@ -2884,57 +2884,57 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div class="hdr">
     <button onclick="go('onb1')" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:13px;font-weight:700;display:flex;align-items:center;gap:4px">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      뒤로
+      <span data-i18n="btn.back">뒤로</span>
     </button>
-    <div style="font-size:15px;font-weight:800;color:var(--t1)">회원가입</div>
+    <div style="font-size:15px;font-weight:800;color:var(--t1)" data-i18n="auth.signup.heading">회원가입</div>
     <div style="width:40px"></div>
   </div>
   <div class="auth-wrap">
     <div class="auth-hero">
       <div class="auth-logo">Ssobi<em>.</em></div>
-      <div class="auth-title">7일 무료 체험, 지금 시작</div>
-      <div class="auth-sub">카드 등록 없이 바로 시작해요</div>
+      <div class="auth-title" data-i18n="auth.signup.title2">7일 무료 체험, 지금 시작</div>
+      <div class="auth-sub" data-i18n="auth.signup.sub2">카드 등록 없이 바로 시작해요</div>
     </div>
 
     <div class="auth-card">
       <div class="input-group">
-        <div class="input-lbl">이름</div>
-        <input class="inp" type="text" placeholder="홍길동">
+        <div class="input-lbl" data-i18n="auth.signup.name">이름</div>
+        <input class="inp" type="text" placeholder="홍길동" data-i18n-ph="auth.signup.name_ph">
       </div>
       <div class="input-group">
-        <div class="input-lbl">이메일</div>
+        <div class="input-lbl" data-i18n="auth.email">이메일</div>
         <input class="inp" type="email" placeholder="hello@example.com">
       </div>
       <div class="input-group">
-        <div class="input-lbl">비밀번호</div>
+        <div class="input-lbl" data-i18n="auth.password">비밀번호</div>
         <div class="inp-pw">
-          <input class="inp" type="password" placeholder="6자 이상" id="signup-pw">
+          <input class="inp" type="password" placeholder="6자 이상" data-i18n-ph="auth.signup.pw_ph" id="signup-pw">
           <div class="inp-eye" onclick="togglePw('signup-pw')">
             <svg viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
         </div>
       </div>
       <div id="signup-error" style="color:var(--red);font-size:12px;margin-top:6px;display:none"></div>
-      <button class="btn-dark" style="margin-top:12px" onclick="doSignup()">7일 무료로 시작하기</button>
-      <div class="divider">또는</div>
+      <button class="btn-dark" style="margin-top:12px" onclick="doSignup()" data-i18n="auth.signup.btn_start">7일 무료로 시작하기</button>
+      <div class="divider" data-i18n="auth.divider">또는</div>
       <button class="social-btn social-kakao" onclick="doKakaoLogin()">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="#000"><path d="M12 3C6.48 3 2 6.48 2 10.8c0 2.76 1.83 5.17 4.57 6.54l-1.16 4.24c-.1.38.31.68.64.46l4.99-3.3c.32.03.64.06.96.06 5.52 0 10-3.48 10-7.8S17.52 3 12 3z"/></svg>
-        카카오로 계속하기
+        <span data-i18n="auth.signup.kakao">카카오로 계속하기</span>
       </button>
       <button class="social-btn" onclick="doGoogleLogin()" style="margin-top:8px">
         <svg width="18" height="18" viewBox="0 0 48 48"><path d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z" fill="#FFC107"/><path d="M5.3 14.7l7.4 5.4C14.3 16.2 18.8 13 24 13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 15.4 2 8.1 7.3 5.3 14.7z" fill="#FF3D00"/><path d="M24 46c5.4 0 10.3-1.8 14.1-5l-6.5-5.5C29.5 37.1 26.9 38 24 38c-6 0-11.1-4-12.8-9.5l-7.3 5.6C7.1 41.1 14.7 46 24 46z" fill="#4CAF50"/><path d="M44.5 20H24v8.5h11.8c-1 3.1-2.9 5.7-5.4 7.5l6.5 5.5c4.4-4.1 7.1-10.1 7.1-17.5 0-1.3-.2-2.7-.5-4z" fill="#1976D2"/></svg>
-        Google로 계속하기
+        <span data-i18n="auth.signup.google">Google로 계속하기</span>
       </button>
     </div>
 
     <div class="auth-trust">
-      <div class="auth-trust-chip"><svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/></svg>공식 API</div>
-      <div class="auth-trust-chip"><svg viewBox="0 0 24 24" fill="none"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-linecap="round" stroke-linejoin="round"/></svg>카드 등록 없음</div>
-      <div class="auth-trust-chip"><svg viewBox="0 0 24 24" fill="none"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>1분 설정</div>
+      <div class="auth-trust-chip"><svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="auth.signup.trust1">공식 API</span></div>
+      <div class="auth-trust-chip"><svg viewBox="0 0 24 24" fill="none"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="auth.signup.trust2">카드 등록 없음</span></div>
+      <div class="auth-trust-chip"><svg viewBox="0 0 24 24" fill="none"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="auth.signup.trust3">1분 설정</span></div>
     </div>
 
-    <div class="auth-switch">이미 계정이 있나요? <a onclick="go('login')">로그인</a></div>
-    <div class="auth-legal">가입하면 <a href="/terms">이용약관</a>과 <a href="/privacy">개인정보처리방침</a>에 동의하는 것으로 간주돼요</div>
+    <div class="auth-switch"><span data-i18n="auth.have_account">이미 계정이 있나요?</span> <a onclick="go('login')" data-i18n="auth.signin">로그인</a></div>
+    <div class="auth-legal" data-i18n="auth.signup.legal">가입하면 이용약관과 개인정보처리방침에 동의하는 것으로 간주돼요</div>
   </div>
 </div>
 
@@ -5571,6 +5571,19 @@ var I18N = {
     'auth.reset.sub':'가입 이메일로 재설정 링크를 보내드려요',
     'auth.reset.send':'재설정 링크 보내기',
     'auth.find.title':'아이디·비밀번호 찾기',
+    'auth.signup.btn_start':'7일 무료로 시작하기',
+    'auth.signup.kakao':'카카오로 계속하기',
+    'auth.signup.google':'Google로 계속하기',
+    'auth.signup.name':'이름',
+    'auth.signup.name_ph':'홍길동',
+    'auth.signup.pw_ph':'6자 이상',
+    'auth.signup.legal':'가입하면 이용약관과 개인정보처리방침에 동의하는 것으로 간주돼요',
+    'auth.signup.trust1':'공식 API',
+    'auth.signup.trust2':'카드 등록 없음',
+    'auth.signup.trust3':'1분 설정',
+    'auth.signup.title2':'7일 무료 체험, 지금 시작',
+    'auth.signup.sub2':'카드 등록 없이 바로 시작해요',
+    'auth.signup.heading':'회원가입',
     // 플랜 모달
     'mod.plan.title':'이용권',
     'mod.plan.sub':'성장 단계에 맞는 플랜을 선택하세요',
@@ -5974,6 +5987,19 @@ var I18N = {
     'auth.reset.sub':'We\'ll email you a reset link.',
     'auth.reset.send':'Send reset link',
     'auth.find.title':'Find ID / reset password',
+    'auth.signup.btn_start':'Start 7-day free trial',
+    'auth.signup.kakao':'Continue with Kakao',
+    'auth.signup.google':'Continue with Google',
+    'auth.signup.name':'Name',
+    'auth.signup.name_ph':'Jane Doe',
+    'auth.signup.pw_ph':'At least 6 characters',
+    'auth.signup.legal':'By signing up, you agree to our Terms and Privacy Policy.',
+    'auth.signup.trust1':'Official API',
+    'auth.signup.trust2':'No card needed',
+    'auth.signup.trust3':'1-minute setup',
+    'auth.signup.title2':'Start your 7-day free trial',
+    'auth.signup.sub2':'No card. Start in seconds.',
+    'auth.signup.heading':'Sign up',
     // plan modal
     'mod.plan.title':'Subscription',
     'mod.plan.sub':'Pick the plan that matches your stage',
