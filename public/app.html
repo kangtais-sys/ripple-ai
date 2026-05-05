@@ -4537,36 +4537,36 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 <div class="ov" id="m-account" onclick="co(event,'m-account')">
   <div class="sheet">
     <div class="s-bar"></div>
-    <div class="s-title">계정 연동</div>
-    <div class="s-sub">공식 API로만 연동돼요. 비밀번호를 입력하지 않아요.</div>
+    <div class="s-title" data-i18n="mod.acc.title">계정 연동</div>
+    <div class="s-sub" data-i18n="mod.acc.sub">공식 API로만 연동돼요. 비밀번호를 입력하지 않아요.</div>
     <div id="m-account-rows" style="display:flex;flex-direction:column;gap:8px;margin-top:14px">
       <!-- Instagram -->
       <div id="m-acc-ig" style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg);border-radius:14px;border:1px solid var(--b)">
         <div class="ch-av ch-ig" style="flex-shrink:0;border-radius:10px;width:38px;height:38px">IG</div>
         <div style="flex:1;cursor:pointer" onclick="connectIG()">
           <div style="font-size:13px;font-weight:700">Instagram</div>
-          <div style="font-size:11px;color:var(--t3);margin-top:1px" id="m-acc-ig-status">미연동</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:1px" id="m-acc-ig-status" data-i18n="mod.acc.status.unlinked">미연동</div>
         </div>
-        <button style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;background:var(--dark);color:#fff;border:none;cursor:pointer" id="m-acc-ig-btn" onclick="connectIG()">연동하기</button>
-        <button id="m-acc-ig-disconnect" style="display:none;padding:7px 10px;border-radius:8px;font-size:11px;font-weight:700;background:#fff;color:var(--red);border:1px solid var(--red);cursor:pointer" onclick="disconnectIG()">해제</button>
+        <button style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;background:var(--dark);color:#fff;border:none;cursor:pointer" id="m-acc-ig-btn" onclick="connectIG()" data-i18n="mod.acc.btn.connect">연동하기</button>
+        <button id="m-acc-ig-disconnect" style="display:none;padding:7px 10px;border-radius:8px;font-size:11px;font-weight:700;background:#fff;color:var(--red);border:1px solid var(--red);cursor:pointer" onclick="disconnectIG()" data-i18n="mod.acc.btn.disconnect">해제</button>
       </div>
       <!-- TikTok -->
       <div id="m-acc-tk" style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg);border-radius:14px;border:1px solid var(--b);cursor:pointer" onclick="connectTK()">
         <div class="ch-av ch-tk" style="flex-shrink:0;border-radius:10px;width:38px;height:38px">TK</div>
         <div style="flex:1">
           <div style="font-size:13px;font-weight:700">TikTok</div>
-          <div style="font-size:11px;color:var(--t3);margin-top:1px">준비 중 (API 심사)</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:1px" data-i18n="mod.acc.status.pending">준비 중 (API 심사)</div>
         </div>
-        <button style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;background:var(--b);color:var(--t3);border:none;cursor:not-allowed">대기 중</button>
+        <button style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;background:var(--b);color:var(--t3);border:none;cursor:not-allowed" data-i18n="mod.acc.btn.waiting">대기 중</button>
       </div>
       <!-- YouTube -->
       <div id="m-acc-yt" style="display:flex;align-items:center;gap:12px;padding:14px;background:var(--bg);border-radius:14px;border:1px solid var(--b);cursor:pointer" onclick="connectYT()">
         <div class="ch-av ch-yt" style="flex-shrink:0;border-radius:10px;width:38px;height:38px">YT</div>
         <div style="flex:1">
           <div style="font-size:13px;font-weight:700">YouTube</div>
-          <div style="font-size:11px;color:var(--t3);margin-top:1px">준비 중 (API 심사)</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:1px" data-i18n="mod.acc.status.pending">준비 중 (API 심사)</div>
         </div>
-        <button style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;background:var(--b);color:var(--t3);border:none;cursor:not-allowed">대기 중</button>
+        <button style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:700;background:var(--b);color:var(--t3);border:none;cursor:not-allowed" data-i18n="mod.acc.btn.waiting">대기 중</button>
       </div>
     </div>
   </div>
@@ -5467,6 +5467,16 @@ var I18N = {
     'link.demo.shop_now':'지금 보기',
     // 홈 — 날짜 단위
     'home.date.day':'일',
+    // 계정 연동 모달 (m-account)
+    'mod.acc.title':'계정 연동',
+    'mod.acc.sub':'공식 API로만 연동돼요. 비밀번호를 입력하지 않아요.',
+    'mod.acc.status.linked':'연동됨',
+    'mod.acc.status.unlinked':'미연동',
+    'mod.acc.status.pending':'준비 중 (API 심사)',
+    'mod.acc.btn.connect':'연동하기',
+    'mod.acc.btn.disconnect':'해제',
+    'mod.acc.btn.waiting':'대기 중',
+    'mod.acc.btn.connected':'연결 완료',
   },
   en: {
     // tab bar
@@ -5697,6 +5707,16 @@ var I18N = {
     'link.demo.shop_now':'View now',
     // home — date suffix
     'home.date.day':'',  // English: blank (just number)
+    // account integration modal
+    'mod.acc.title':'Connect accounts',
+    'mod.acc.sub':'Connected via official API only — no passwords are entered.',
+    'mod.acc.status.linked':'Connected',
+    'mod.acc.status.unlinked':'Not connected',
+    'mod.acc.status.pending':'Pending (API review)',
+    'mod.acc.btn.connect':'Connect',
+    'mod.acc.btn.disconnect':'Disconnect',
+    'mod.acc.btn.waiting':'Waiting',
+    'mod.acc.btn.connected':'Connected',
   }
 };
 
@@ -14984,15 +15004,22 @@ async function bootstrapUser(){
 }
 
 function updateIGConnectUI(connected, username){
+  var lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+  var dict = (typeof I18N !== 'undefined' && I18N[lang]) || {};
+  var T = function(k, fb){ return dict[k] !== undefined ? dict[k] : fb; };
   var status = document.getElementById('ig-status');
   var check = document.getElementById('ig-check');
   var btn = document.getElementById('ig-btn');
+  var connectedLabel = T('mod.acc.btn.connected','연동 완료');
+  var connectLabel = T('mod.acc.btn.connect','연동하기');
+  var unlinkedLabel = T('mod.acc.status.unlinked','미연동');
+  var tapToConnect = lang === 'en' ? 'Tap to connect' : '탭해서 연동하기';
   if(connected){
-    if(status) status.textContent = username ? ('연동 완료 · @' + username) : '연동 완료';
+    if(status) status.textContent = username ? (connectedLabel + ' · @' + username) : connectedLabel;
     if(check) check.style.display = 'block';
     if(btn) btn.style.cursor = 'default';
   } else {
-    if(status) status.textContent = '탭해서 연동하기';
+    if(status) status.textContent = tapToConnect;
     if(check) check.style.display = 'none';
   }
   // 내 정보 > 계정 연동 모달의 IG 행도 동기화
@@ -15001,23 +15028,29 @@ function updateIGConnectUI(connected, username){
   var accRow = document.getElementById('m-acc-ig');
   var accDisc = document.getElementById('m-acc-ig-disconnect');
   if(connected){
-    if(accStatus){ accStatus.textContent = (username ? '@' + username : '연동 완료'); accStatus.style.color = 'var(--mint-d)'; }
+    if(accStatus){ accStatus.textContent = (username ? '@' + username : connectedLabel); accStatus.style.color = 'var(--mint-d)'; }
     if(accBtn){ accBtn.style.display = 'none'; }
     if(accDisc){ accDisc.style.display = ''; }
     if(accRow){ accRow.style.background = 'var(--mint-l)'; accRow.style.borderColor = '#A7F3D0'; }
   } else {
-    if(accStatus){ accStatus.textContent = '미연동'; accStatus.style.color = 'var(--t3)'; }
-    if(accBtn){ accBtn.style.display = ''; accBtn.textContent = '연동하기'; accBtn.style.background = 'var(--dark)'; accBtn.style.color = '#fff'; }
+    if(accStatus){ accStatus.textContent = unlinkedLabel; accStatus.style.color = 'var(--t3)'; }
+    if(accBtn){ accBtn.style.display = ''; accBtn.textContent = connectLabel; accBtn.style.background = 'var(--dark)'; accBtn.style.color = '#fff'; }
     if(accDisc){ accDisc.style.display = 'none'; }
     if(accRow){ accRow.style.background = 'var(--bg)'; accRow.style.borderColor = 'var(--b)'; }
   }
 }
 
 async function disconnectIG(){
-  var msg = '정말 Instagram 연동을 해제할까요?\n\n' +
-    '• 저장된 access_token·계정 정보가 삭제돼요\n' +
-    '• 기존 댓글·DM 응대 기록은 남아요\n' +
-    '• 다시 연동하려면 "연동하기"로 OAuth 재진행';
+  var lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+  var msg = lang === 'en'
+    ? 'Disconnect Instagram?\n\n' +
+      '• The stored access_token and account info will be deleted.\n' +
+      '• Existing comment/DM reply history is preserved.\n' +
+      '• To reconnect, tap "Connect" to start OAuth again.'
+    : '정말 Instagram 연동을 해제할까요?\n\n' +
+      '• 저장된 access_token·계정 정보가 삭제돼요\n' +
+      '• 기존 댓글·DM 응대 기록은 남아요\n' +
+      '• 다시 연동하려면 "연동하기"로 OAuth 재진행';
   if(!confirm(msg)) return;
   try {
     var h = await authHeaders();
