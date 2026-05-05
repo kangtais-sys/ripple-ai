@@ -5376,7 +5376,19 @@ function goStep(n){
       if(!edtSlides || edtSlides.length === 0 || createData._editorSource !== (createData._lastJobId||createData._lastSource)){
         initEditor();
         createData._editorSource = createData._lastJobId || createData._lastSource;
+      } else {
+        // 슬라이드 보존 케이스라도 캔버스 사이즈 클래스·뱃지는 항상 최신으로 동기화
+        var canvas = document.getElementById('edt-canvas');
+        if(canvas){
+          canvas.classList.remove('sz-sq','sz-pt','sz-st','sz-ls');
+          var info = (typeof sizeInfo !== 'undefined' && sizeInfo[createData.size]) || sizeInfo.sq;
+          canvas.classList.add(info.cls);
+          var badge = document.getElementById('edt-size-badge');
+          if(badge) badge.textContent = info.label;
+        }
       }
+      // 미리보기 모드 잔존 방지 — cs-4 재진입 시 항상 편집 모드로 시작
+      if(typeof edtSetMode === 'function') edtSetMode('edit');
     }, 80);
     setTimeout(buildColorBar, 100);
   }
@@ -10114,7 +10126,8 @@ function buildSchemaElement(spec, ctx){
       el = document.createElement('div');
       el.className = 'edt-el text';
       el.textContent = pickContent(spec, ctx);
-      el.style.pointerEvents = 'none';
+      // 핵심: schema 기반 텍스트도 탭/드래그/더블탭 편집 가능해야 함
+      // attachEdt 는 renderFromSchema 에서 inner append 후 일괄 호출
       if(spec.lockColor) el.dataset.userColor = '1';
       break;
     }
@@ -10305,7 +10318,13 @@ function renderFromSchema(sl, schema, ctx){
   if(Array.isArray(schema.elements)){
     schema.elements.forEach(function(spec){
       var dom = buildSchemaElement(spec, ctx);
-      if(dom) inner.appendChild(dom);
+      if(!dom) return;
+      inner.appendChild(dom);
+      // 텍스트 요소만 인터랙션 활성화 (탭=선택+패널, 드래그=이동, 더블탭=편집)
+      // image/highlight/doodle/logo 는 attachEdt 안 붙임 (decorative)
+      if(spec.type === 'text' && typeof attachEdt === 'function'){
+        try { attachEdt(dom); } catch(e) { console.warn('attachEdt failed', e); }
+      }
     });
   }
 
