@@ -2105,40 +2105,40 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
   <!-- 자동화 / 실시간 관리 (underline 탭) -->
   <div class="act-tabs">
-    <button class="on"><span class="act-dot"></span>SNS 자동화</button>
-    <button onclick="go('manage')"><span class="act-dot red"></span>실시간 관리 <span class="act-badge" id="urgent-badge" style="display:none">0</span></button>
+    <button class="on"><span class="act-dot"></span><span data-i18n="grow.tab.automation">SNS 자동화</span></button>
+    <button onclick="go('manage')"><span class="act-dot red"></span><span data-i18n="grow.tab.realtime">실시간 관리</span> <span class="act-badge" id="urgent-badge" style="display:none">0</span></button>
   </div>
   <div id="sub-auto">
-  <div class="sec-eye" style="margin-top:4px">AUTOMATION</div>
+  <div class="sec-eye" style="margin-top:4px" data-i18n="grow.eyebrow.automation">AUTOMATION</div>
 
   <div class="acc" id="acc-auto">
     <div class="acc-hdr" onclick="toggleAcc('acc-auto')">
       <div class="acc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="acc-copy"><div class="acc-name">AI가 나 대신 댓글·DM 응대</div><div class="acc-sub" id="ar-master-sub">24시간 내 말투로 자동 처리 중</div></div>
+      <div class="acc-copy"><div class="acc-name" data-i18n="grow.ai_card.title">AI가 나 대신 댓글·DM 응대</div><div class="acc-sub" id="ar-master-sub" data-i18n="grow.ai_card.sub.on">24시간 내 말투로 자동 처리 중</div></div>
       <div class="acc-aside"><span id="ar-master-state" style="font-size:10px;font-weight:800;color:var(--mint-d);margin-right:6px;letter-spacing:.5px">ON</span><label class="tog" onclick="event.stopPropagation()"><input type="checkbox" id="ar-master-toggle" onchange="onAutoReplyMasterToggle(this)" checked><span class="tsl"></span></label><div class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
     </div>
     <div class="acc-body">
       <div class="ai-stats">
-        <div class="ai-stat"><div class="ai-stat-v" id="q-used">0</div><div class="ai-stat-l">오늘 응대</div></div>
-        <div class="ai-stat"><div class="ai-stat-v" id="q-left">—</div><div class="ai-stat-l">남은 응대</div></div>
-        <div class="ai-stat"><div class="ai-stat-v" id="q-tone">—</div><div class="ai-stat-l">말투 일치도</div></div>
+        <div class="ai-stat"><div class="ai-stat-v" id="q-used">0</div><div class="ai-stat-l" data-i18n="grow.stat.today">오늘 응대</div></div>
+        <div class="ai-stat"><div class="ai-stat-v" id="q-left">—</div><div class="ai-stat-l" data-i18n="grow.stat.left">남은 응대</div></div>
+        <div class="ai-stat"><div class="ai-stat-v" id="q-tone">—</div><div class="ai-stat-l" data-i18n="grow.stat.tone">말투 일치도</div></div>
       </div>
 
       <!-- 채널별 자동 응대 토글 (Meta App Review: 사용자 통제권 명시) -->
       <div style="background:var(--bg);border-radius:12px;padding:14px;margin-bottom:10px">
-        <div style="font-size:12px;font-weight:700;color:var(--t3);margin-bottom:10px">채널별 자동 응대 (Per-channel auto-reply)</div>
+        <div style="font-size:12px;font-weight:700;color:var(--t3);margin-bottom:10px" data-i18n="grow.channel.section">채널별 자동 응대</div>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b)">
           <div style="flex:1;min-width:0">
-            <div style="font-size:13px;font-weight:700;color:var(--t1)">댓글 자동 응대 <span style="font-size:11px;color:var(--t3);font-weight:500">· Comments</span></div>
-            <div style="font-size:11px;color:var(--t3);margin-top:2px;line-height:1.45">Instagram 댓글에 AI가 내 말투로 답변</div>
+            <div style="font-size:13px;font-weight:700;color:var(--t1)" data-i18n="grow.channel.comment.title">댓글 자동 응대</div>
+            <div style="font-size:11px;color:var(--t3);margin-top:2px;line-height:1.45" data-i18n="grow.channel.comment.sub">Instagram 댓글에 AI가 내 말투로 답변</div>
           </div>
           <span id="ar-ch-comment-state" style="font-size:10px;font-weight:800;color:var(--mint-d);margin-right:6px;letter-spacing:.5px">ON</span>
           <label class="tog" style="flex-shrink:0"><input type="checkbox" id="ar-ch-comment" onchange="onAutoReplyChannelToggle('ig_comment', this)" checked><span class="tsl"></span></label>
         </div>
         <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0">
           <div style="flex:1;min-width:0">
-            <div style="font-size:13px;font-weight:700;color:var(--t1)">DM 자동 응대 <span style="font-size:11px;color:var(--t3);font-weight:500">· Direct Messages</span></div>
-            <div style="font-size:11px;color:var(--t3);margin-top:2px;line-height:1.45">개별 대화는 직접 답변 모드로 전환 가능</div>
+            <div style="font-size:13px;font-weight:700;color:var(--t1)" data-i18n="grow.channel.dm.title">DM 자동 응대</div>
+            <div style="font-size:11px;color:var(--t3);margin-top:2px;line-height:1.45" data-i18n="grow.channel.dm.sub">개별 대화는 직접 답변 모드로 전환 가능</div>
           </div>
           <span id="ar-ch-dm-state" style="font-size:10px;font-weight:800;color:var(--mint-d);margin-right:6px;letter-spacing:.5px">ON</span>
           <label class="tog" style="flex-shrink:0"><input type="checkbox" id="ar-ch-dm" onchange="onAutoReplyChannelToggle('ig_dm', this)" checked><span class="tsl"></span></label>
@@ -2147,18 +2147,18 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
       <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg);border-radius:12px;margin-bottom:10px">
         <div style="flex:1;min-width:0">
-          <div style="font-size:13px;font-weight:700;color:var(--t1)">질문형 대댓글 모드</div>
-          <div style="font-size:11px;color:var(--t3);margin-top:2px;line-height:1.45">"어떤 타입이세요?" 같이 대화 유도 — 알고리즘 노출 ↑</div>
+          <div style="font-size:13px;font-weight:700;color:var(--t1)" data-i18n="grow.question_mode.title">질문형 대댓글 모드</div>
+          <div style="font-size:11px;color:var(--t3);margin-top:2px;line-height:1.45" data-i18n="grow.question_mode.sub">"어떤 타입이세요?" 같이 대화 유도 — 알고리즘 노출 ↑</div>
         </div>
         <label class="tog" style="flex-shrink:0"><input type="checkbox" checked><span class="tsl"></span></label>
       </div>
 
       <div style="background:var(--bg);border-radius:12px;padding:14px;margin-bottom:14px">
-        <div style="font-size:12px;font-weight:700;color:var(--t3);margin-bottom:10px">하루 응대량 설정</div>
-        <div class="quota-row"><div class="quota-lbl">댓글 응대</div><div class="quota-ctrl"><button class="qbtn" onclick="adj('c',-10)">−</button><div class="qval" id="q-comment">200건</div><button class="qbtn" onclick="adj('c',10)">+</button></div></div>
-        <div class="quota-row"><div class="quota-lbl">DM 응대</div><div class="quota-ctrl"><button class="qbtn" onclick="adj('d',-5)">−</button><div class="qval" id="q-dm">100건</div><button class="qbtn" onclick="adj('d',5)">+</button></div></div>
+        <div style="font-size:12px;font-weight:700;color:var(--t3);margin-bottom:10px" data-i18n="grow.quota.section">하루 응대량 설정</div>
+        <div class="quota-row"><div class="quota-lbl" data-i18n="grow.quota.comment">댓글 응대</div><div class="quota-ctrl"><button class="qbtn" onclick="adj('c',-10)">−</button><div class="qval" id="q-comment">200</div><button class="qbtn" onclick="adj('c',10)">+</button></div></div>
+        <div class="quota-row"><div class="quota-lbl" data-i18n="grow.quota.dm">DM 응대</div><div class="quota-ctrl"><button class="qbtn" onclick="adj('d',-5)">−</button><div class="qval" id="q-dm">100</div><button class="qbtn" onclick="adj('d',5)">+</button></div></div>
         <div class="quota-row" style="border:none;padding-bottom:0">
-          <div class="quota-lbl">응대 시간대</div>
+          <div class="quota-lbl" data-i18n="grow.quota.hours">응대 시간대</div>
           <div style="display:flex;align-items:center;gap:6px">
             <input type="time" value="08:00" class="sheet-in" style="padding:6px 8px;width:84px;margin:0;font-size:12px">
             <span style="color:var(--t3);font-size:12px">~</span>
@@ -2167,8 +2167,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         </div>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="dbtn db-e" style="flex:1;border-radius:10px;padding:12px;font-size:12px" onclick="go('manage');setTab('comments')">응대한 내용 보기</button>
-        <button class="dbtn db-s" style="flex:1;border-radius:10px;padding:12px;background:var(--mint-l);color:var(--mint-d);font-size:12px;font-weight:700" onclick="openModal('m-ai-style')">말투 수정하기</button>
+        <button class="dbtn db-e" style="flex:1;border-radius:10px;padding:12px;font-size:12px" onclick="go('manage');setTab('comments')" data-i18n="grow.btn.history">응대한 내용 보기</button>
+        <button class="dbtn db-s" style="flex:1;border-radius:10px;padding:12px;background:var(--mint-l);color:var(--mint-d);font-size:12px;font-weight:700" onclick="openModal('m-ai-style')" data-i18n="grow.btn.tone">말투 수정하기</button>
       </div>
     </div>
   </div>
@@ -2250,11 +2250,11 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <!-- 주제 변경 (얇은 바) -->
     <button class="first-bar" onclick="openOnboarding()">
       <span class="first-bar-ico">✨</span>
-      <span class="first-bar-txt" id="first-bar-txt">내 주제로 추천 받는 중 <strong>· 변경하기</strong></span>
+      <span class="first-bar-txt" id="first-bar-txt"><span data-i18n="create.first_bar">내 주제로 추천 받는 중</span> <strong>· <span data-i18n="create.first_bar_change">변경하기</span></strong></span>
       <span class="first-bar-arr">→</span>
     </button>
 
-    <div style="margin-top:6px;font-size:13px;font-weight:700;color:#64748B;letter-spacing:-.2px;margin-bottom:10px">템플릿</div>
+    <div style="margin-top:6px;font-size:13px;font-weight:700;color:#64748B;letter-spacing:-.2px;margin-bottom:10px" data-i18n="create.tpl_label">템플릿</div>
 
     <!-- 템플릿 가로 스와이프 — 4개 (기본 핀 표시 + PC 좌우 화살표) -->
     <div class="tpl-carousel-wrap">
@@ -2267,7 +2267,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       </button>
     </div>
 
-    <div id="for-you-title" style="margin-top:6px;font-size:13px;font-weight:700;color:#64748B;letter-spacing:-.2px;margin-bottom:10px">오늘 주제</div>
+    <div id="for-you-title" style="margin-top:6px;font-size:13px;font-weight:700;color:#64748B;letter-spacing:-.2px;margin-bottom:10px" data-i18n="create.today_topic">오늘 주제</div>
     <div class="trend-list" id="trend-carousel">
     <!-- 카드 3개는 renderDailyTrends()가 동적으로 주입 -->
     <div class="trend-card" onclick="useTrend(1)" style="display:none">
@@ -2313,15 +2313,15 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
     <button type="button" onclick="refreshTrends()" style="width:100%;margin-top:8px;padding:11px;background:#fff;border:1px solid #F0F2F5;font-size:12.5px;font-weight:700;color:#64748B;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 4v6h6M23 20v-6h-6M20.49 9A9 9 0 005.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 013.51 15" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      다른 주제 보기
+      <span data-i18n="create.btn.refresh">다른 주제 보기</span>
     </button>
 
-    <div class="trend-divider">또는</div>
+    <div class="trend-divider" data-i18n="create.divider">또는</div>
 
-    <textarea class="direct-ta" id="direct-topic" placeholder="어떤 카드뉴스 만들까?" oninput="toggleDirectBtn()" onkeyup="toggleDirectBtn()" oncompositionupdate="toggleDirectBtn()" oncompositionend="toggleDirectBtn()" onchange="toggleDirectBtn()"></textarea>
+    <textarea class="direct-ta" id="direct-topic" placeholder="어떤 카드뉴스 만들까?" data-i18n-ph="create.input.placeholder" oninput="toggleDirectBtn()" onkeyup="toggleDirectBtn()" oncompositionupdate="toggleDirectBtn()" oncompositionend="toggleDirectBtn()" onchange="toggleDirectBtn()"></textarea>
 
     <!-- 카드뉴스 만들기 (단일 액션) -->
-    <button class="direct-gen" id="direct-gen-btn" disabled onclick="generatePrompt()" style="margin-top:14px">카드뉴스 만들기</button>
+    <button class="direct-gen" id="direct-gen-btn" disabled onclick="generatePrompt()" style="margin-top:14px" data-i18n="create.btn.generate">카드뉴스 만들기</button>
   </div>
 
   <!-- STEP B: 후킹 3개 후보 선택 -->
@@ -2440,11 +2440,11 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <!-- STEP 4: 편집 & 미리보기 -->
   <div class="create-step" id="cs-4">
     <div class="edt-mode-tabs" style="display:flex;align-items:center;gap:6px">
-      <button class="edt-mode-tab on" id="edt-mode-edit" onclick="edtSetMode('edit')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke-linecap="round" stroke-linejoin="round"/></svg>편집</button>
-      <button class="edt-mode-tab" id="edt-mode-tpl" onclick="openTplChange()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" stroke-linecap="round" stroke-linejoin="round"/></svg>템플릿 변경</button>
-      <button class="edt-mode-tab" id="edt-mode-preview" onclick="edtSetMode('preview')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3"/></svg>미리보기</button>
+      <button class="edt-mode-tab on" id="edt-mode-edit" onclick="edtSetMode('edit')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="create.cs4.edit">편집</span></button>
+      <button class="edt-mode-tab" id="edt-mode-tpl" onclick="openTplChange()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="create.cs4.tplchange">템플릿 변경</span></button>
+      <button class="edt-mode-tab" id="edt-mode-preview" onclick="edtSetMode('preview')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3"/></svg><span data-i18n="create.cs4.preview">미리보기</span></button>
     </div>
-    <div style="font-size:11px;color:var(--t3);margin:2px 0 12px" id="edt-mode-hint">드래그로 위치 이동 · 모서리로 크기 조절 · 탭하면 편집</div>
+    <div style="font-size:11px;color:var(--t3);margin:2px 0 12px" id="edt-mode-hint" data-i18n="create.cs4.hint">드래그로 위치 이동 · 모서리로 크기 조절 · 탭하면 편집</div>
 
     <div class="edt-wrap">
       <div class="edt-size-badge" id="edt-size-badge" style="position:static;display:inline-block;margin:0 0 8px;background:var(--bg);color:var(--t3);font-size:10.5px;font-weight:700;padding:4px 9px;border-radius:6px;border:1px solid var(--b);letter-spacing:.2px;backdrop-filter:none">정사각 · 1080×1080</div>
@@ -2640,11 +2640,11 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   </div>
 
   <div class="tbar">
-    <button class="tab on" id="tab-urgent"   onclick="setTab('urgent')">긴급</button>
-    <button class="tab"    id="tab-comments" onclick="setTab('comments')">댓글·DM</button>
-    <button class="tab"    id="tab-crm"      onclick="setTab('crm')">주요 팔로워</button>
-    <button class="tab"    id="tab-revenue"  onclick="setTab('revenue')">협업/제안</button>
-    <button class="tab"    id="tab-insight"  onclick="setTab('insight')">분석</button>
+    <button class="tab on" id="tab-urgent"   onclick="setTab('urgent')" data-i18n="manage.tab.urgent">긴급</button>
+    <button class="tab"    id="tab-comments" onclick="setTab('comments')" data-i18n="manage.tab.comments">댓글·DM</button>
+    <button class="tab"    id="tab-crm"      onclick="setTab('crm')" data-i18n="manage.tab.crm">주요 팔로워</button>
+    <button class="tab"    id="tab-revenue"  onclick="setTab('revenue')" data-i18n="manage.tab.revenue">협업/제안</button>
+    <button class="tab"    id="tab-insight"  onclick="setTab('insight')" data-i18n="manage.tab.insight">분석</button>
   </div>
 
   <!-- 긴급 -->
@@ -2753,7 +2753,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
 <!-- 내 정보 -->
 <div class="vw" id="v-profile">
-  <div class="hdr"><div class="logo" style="font-size:18px">내 정보</div></div>
+  <div class="hdr"><div class="logo" style="font-size:18px" data-i18n="profile.title">내 정보</div></div>
 
   <div class="p-top" style="display:block;padding:4px 0 18px">
     <div id="p-display-name" style="font-size:24px;font-weight:900;color:var(--t1);letter-spacing:-.6px">—</div>
@@ -2763,29 +2763,29 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div class="p-stats">
     <div class="p-stat" onclick="openModal('m-plan')" style="cursor:pointer">
       <div class="p-sv" style="font-size:15px" id="p-stat-plan">무료</div>
-      <div class="p-sl" id="p-stat-plan-sub">이용권</div>
+      <div class="p-sl" id="p-stat-plan-sub" data-i18n="profile.stat.plan">이용권</div>
     </div>
     <div class="p-stat" onclick="openModal('m-pt-use')" style="cursor:pointer">
       <div class="p-sv g" style="font-size:16px"><span id="p-stat-pt">0</span>P</div>
-      <div class="p-sl">보유 포인트</div>
+      <div class="p-sl" data-i18n="profile.stat.point">보유 포인트</div>
     </div>
     <div class="p-stat" onclick="openModal('m-earn-detail')" style="cursor:pointer">
       <div class="p-sv g" style="font-size:16px">₩<span id="p-stat-earn">0</span></div>
-      <div class="p-sl">내가 번 돈</div>
+      <div class="p-sl" data-i18n="profile.stat.earn">내가 번 돈</div>
     </div>
   </div>
 
   <!-- 친구 초대 (축소) -->
-  <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.3px;margin-bottom:8px">친구 초대</div>
+  <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.3px;margin-bottom:8px" data-i18n="profile.invite_section">친구 초대</div>
   <div class="invite-card invite-card-sm">
     <div style="display:flex;align-items:center;gap:12px;position:relative;z-index:1">
       <div style="flex:1;min-width:0">
-        <div class="invite-tt" style="font-size:15px;margin-bottom:2px">친구 초대하고 포인트 받기</div>
-        <div class="invite-ss" style="font-size:11px;margin-bottom:0">가입 5,000P · 구독 20,000P 즉시 적립</div>
+        <div class="invite-tt" style="font-size:15px;margin-bottom:2px" data-i18n="profile.invite.title">친구 초대하고 포인트 받기</div>
+        <div class="invite-ss" style="font-size:11px;margin-bottom:0" data-i18n="profile.invite.sub">가입 5,000P · 구독 20,000P 즉시 적립</div>
       </div>
       <button onclick="openModal('m-invite-share')" style="padding:10px 16px;border-radius:10px;background:#fff;color:var(--mint-d);border:none;font-size:13px;font-weight:900;cursor:pointer;box-shadow:0 2px 0 rgba(0,0,0,.08);display:flex;align-items:center;gap:5px;flex-shrink:0">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a3 3 0 11-2.684-5.368 3 3 0 012.684 5.368zm0-5.368a3 3 0 10-2.684-5.368 3 3 0 002.684 5.368z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        공유
+        <span data-i18n="btn.share">공유</span>
       </button>
     </div>
   </div>
@@ -2793,37 +2793,37 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <!-- 프리미엄 업셀링 -->
   <div class="upsell-bar" onclick="openModal('m-plan')">
     <div class="upsell-spark">✦</div>
-    <div class="upsell-body"><b>프리미엄 전환 시</b><span>포인트 계산 없이 무한 혜택</span></div>
+    <div class="upsell-body"><b data-i18n="profile.upsell.head">프리미엄 전환 시</b><span data-i18n="profile.upsell.sub">포인트 계산 없이 무한 혜택</span></div>
     <div class="upsell-arr">→</div>
   </div>
 
-  <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.3px;margin-bottom:8px">설정</div>
+  <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.3px;margin-bottom:8px" data-i18n="profile.section.settings">설정</div>
   <div class="menu">
-    <div class="mitem" onclick="openModal('m-account')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><div class="mbd"><div class="mname2">계정 연동</div><div class="msub2">Instagram · TikTok · YouTube</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-    <div class="mitem" onclick="go('targets')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mbd"><div class="mname2">참고 계정 분석</div><div class="msub2">경쟁 계정 해시태그 · 게시 패턴 분석</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-    <div class="mitem" onclick="openModal('m-ai-style')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div><div class="mbd"><div class="mname2">AI 말투 학습</div><div class="msub2">일치도 98% · 게시물 250개 분석</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    <div class="mitem" onclick="openModal('m-account')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><div class="mbd"><div class="mname2" data-i18n="profile.menu.account_int">계정 연동</div><div class="msub2" data-i18n="profile.menu.account_int_sub">Instagram · TikTok · YouTube</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    <div class="mitem" onclick="go('targets')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mbd"><div class="mname2" data-i18n="profile.menu.target">참고 계정 분석</div><div class="msub2" data-i18n="profile.menu.target_sub">경쟁 계정 해시태그 · 게시 패턴 분석</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    <div class="mitem" onclick="openModal('m-ai-style')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg></div><div class="mbd"><div class="mname2" data-i18n="profile.menu.tone">AI 말투 학습</div><div class="msub2" data-i18n="profile.menu.tone_sub">일치도 98% · 게시물 250개 분석</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
     <div class="mitem" style="cursor:default">
       <div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg></div>
-      <div class="mbd"><div class="mname2">언어 · Language</div><div class="msub2">앱 표시 언어 설정</div></div>
+      <div class="mbd"><div class="mname2" data-i18n="profile.menu.lang">언어 · Language</div><div class="msub2" data-i18n="profile.menu.lang_sub">앱 표시 언어 설정</div></div>
       <select id="app-language-select" onchange="onAppLanguageChange(this)" style="margin-left:auto;flex-shrink:0;padding:8px 10px;border:1px solid var(--b);border-radius:8px;font-size:13px;font-weight:700;color:var(--t1);background:#fff">
         <option value="ko">한국어</option>
         <option value="en">English</option>
       </select>
     </div>
-    <div class="mitem mitem-kakao" onclick="openModal('m-kakao')"><div class="mico" style="background:#FEE500;border-color:#FEE500"><svg viewBox="0 0 24 24" fill="none" stroke="#3A1D1D" stroke-width="1.8"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mbd"><div class="mname2" style="color:#3A1D1D">카카오톡으로 알림 받기</div><div class="msub2">요주의·수익제안·일일 리포트 즉시 <span class="badge" style="background:#FEE500;color:#3A1D1D;margin-left:4px;font-weight:800">무료</span></div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-    <div class="mitem" onclick="openModal('m-plan')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="mbd"><div class="mname2">이용권</div><div class="msub2">프리미엄 · 무료체험 D-4</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    <div class="mitem mitem-kakao" onclick="openModal('m-kakao')"><div class="mico" style="background:#FEE500;border-color:#FEE500"><svg viewBox="0 0 24 24" fill="none" stroke="#3A1D1D" stroke-width="1.8"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mbd"><div class="mname2" style="color:#3A1D1D" data-i18n="profile.menu.kakao">카카오톡으로 알림 받기</div><div class="msub2" data-i18n="profile.menu.kakao_sub">요주의·수익제안·일일 리포트 즉시</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    <div class="mitem" onclick="openModal('m-plan')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="mbd"><div class="mname2" data-i18n="profile.menu.plan">이용권</div><div class="msub2">프리미엄 · 무료체험 D-4</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
   </div>
-  <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.3px;margin:16px 0 8px">계정</div>
+  <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.3px;margin:16px 0 8px" data-i18n="profile.section.account">계정</div>
   <div class="menu">
-    <div class="mitem" onclick="openModal('m-find-account')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mbd"><div class="mname2">아이디 · 비밀번호 찾기</div><div class="msub2">가입 이메일로 재설정 링크 발송</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
+    <div class="mitem" onclick="openModal('m-find-account')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mbd"><div class="mname2" data-i18n="profile.menu.find">아이디 · 비밀번호 찾기</div><div class="msub2" data-i18n="profile.menu.find_sub">가입 이메일로 재설정 링크 발송</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
     <div class="mitem" onclick="go('login')">
       <div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="mbd"><div class="mname2">다른 계정으로 로그인</div><div class="msub2">계정 전환</div></div>
+      <div class="mbd"><div class="mname2" data-i18n="profile.menu.switch">다른 계정으로 로그인</div><div class="msub2" data-i18n="profile.menu.switch_sub">계정 전환</div></div>
       <div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>
     <div class="mitem" onclick="if(confirm('로그아웃 하시겠어요?')) doLogout()" style="border:none">
       <div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="mbd"><div class="mname2" style="color:var(--red)">로그아웃</div></div>
+      <div class="mbd"><div class="mname2" style="color:var(--red)" data-i18n="profile.menu.logout">로그아웃</div></div>
     </div>
     <div class="mitem dev-only" onclick="devResetState()" style="border:none;display:none">
       <div class="mico" style="background:#FEF3C7;border-color:#F59E0B"><svg viewBox="0 0 24 24" fill="none" stroke="#78350F" stroke-width="1.8"><path d="M4 4v6h6M20 20v-6h-6" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 10a8 8 0 0114-5M20 14a8 8 0 01-14 5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -3694,11 +3694,11 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
 <!-- NAV -->
 <nav class="nav">
-  <button class="nb on" id="nb-home" onclick="go('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round"/></svg>홈</button>
-  <button class="nb" id="nb-activity" data-lock="1" onclick="go('activity')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 7l5 5-5 5M6 12h12" stroke-linecap="round" stroke-linejoin="round"/></svg>키우기</button>
-  <button class="nb" id="nb-create" data-lock="1" onclick="go('create')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"/></svg>만들기</button>
-  <button class="nb" id="nb-link" onclick="go('link')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.72M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke-linecap="round" stroke-linejoin="round"/></svg>내 링크</button>
-  <button class="nb" id="nb-profile" onclick="go('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>내 정보</button>
+  <button class="nb on" id="nb-home" onclick="go('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="tab.home">홈</span></button>
+  <button class="nb" id="nb-activity" data-lock="1" onclick="go('activity')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 7l5 5-5 5M6 12h12" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="tab.grow">키우기</span></button>
+  <button class="nb" id="nb-create" data-lock="1" onclick="go('create')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2"/></svg><span data-i18n="tab.create">만들기</span></button>
+  <button class="nb" id="nb-link" onclick="go('link')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.72M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="tab.link">내 링크</span></button>
+  <button class="nb" id="nb-profile" onclick="go('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="tab.profile">내 정보</span></button>
 </nav>
 
 <!-- 첫날 모드 프리뷰 잠금 플로팅 배너 -->
@@ -5221,6 +5221,317 @@ function syncToneChip(){
 }
 document.addEventListener('DOMContentLoaded', syncToneChip);
 
+// ═══════════════════════════════════════════════════════════════════
+// i18n — Korean / English UI strings (data-i18n="key" 마킹된 요소만 swap)
+//   확장: 일본어 등 추가 시 ja: {...} 추가하면 끝
+// ═══════════════════════════════════════════════════════════════════
+var I18N = {
+  ko: {
+    // 탭바
+    'tab.home':'홈', 'tab.grow':'키우기', 'tab.create':'만들기',
+    'tab.link':'내 링크', 'tab.profile':'내 정보',
+    // 공통 버튼
+    'btn.next':'다음', 'btn.back':'이전', 'btn.save':'저장',
+    'btn.cancel':'취소', 'btn.confirm':'확인', 'btn.close':'닫기',
+    'btn.send':'발송', 'btn.approve':'승인', 'btn.skip':'스킵',
+    'btn.edit':'수정', 'btn.apply':'적용', 'btn.regenerate':'다시 생성',
+    'btn.share':'공유', 'btn.start':'시작하기', 'btn.delete':'삭제',
+    // 홈
+    'home.greeting':'안녕하세요',
+    'home.urgent_pending':'긴급 응대 대기',
+    'home.urgent_sub':'긴급 · 비즈니스 제안',
+    'home.live_calendar':'실시간 캘린더',
+    // 키우기 — SNS 자동화
+    'grow.tab.automation':'SNS 자동화',
+    'grow.tab.realtime':'실시간 관리',
+    'grow.proof.label':'명 사용 중',
+    'grow.proof.tag':'공식 API 기반',
+    'grow.eyebrow.automation':'AUTOMATION',
+    'grow.ai_card.title':'AI가 나 대신 댓글·DM 응대',
+    'grow.ai_card.sub.on':'24시간 내 말투로 자동 처리 중',
+    'grow.ai_card.sub.off':'자동 응대 OFF · 직접 답변 모드',
+    'grow.stat.today':'오늘 응대',
+    'grow.stat.left':'남은 응대',
+    'grow.stat.tone':'말투 일치도',
+    'grow.channel.section':'채널별 자동 응대',
+    'grow.channel.comment.title':'댓글 자동 응대',
+    'grow.channel.comment.sub':'Instagram 댓글에 AI가 내 말투로 답변',
+    'grow.channel.dm.title':'DM 자동 응대',
+    'grow.channel.dm.sub':'개별 대화는 직접 답변 모드로 전환 가능',
+    'grow.question_mode.title':'질문형 대댓글 모드',
+    'grow.question_mode.sub':'"어떤 타입이세요?" 같이 대화 유도 — 알고리즘 노출 ↑',
+    'grow.quota.section':'하루 응대량 설정',
+    'grow.quota.comment':'댓글 응대',
+    'grow.quota.dm':'DM 응대',
+    'grow.quota.hours':'응대 시간대',
+    'grow.btn.history':'응대한 내용 보기',
+    'grow.btn.tone':'말투 수정하기',
+    'grow.dmrule.title':'댓글 감지 → DM 자동 발송',
+    'grow.dmrule.empty':'설정된 룰 없음',
+    // 키우기 — 실시간 관리 탭
+    'manage.tab.urgent':'긴급',
+    'manage.tab.comments':'댓글·DM',
+    'manage.tab.crm':'주요 팔로워',
+    'manage.tab.revenue':'협업·제안',
+    'manage.tab.insight':'분석',
+    'manage.urgent.empty':'긴급 응대 대기 없음',
+    'manage.urgent.empty_sub':'결제 오류·부정 이슈 같은 중요한 메시지가 도착하면 AI 초안이 여기로 올라옵니다.',
+    'manage.comments.empty':'자동 응대 내역 없음',
+    'manage.comments.empty_sub':'일반 댓글·DM이 도착하면 AI가 답장하고 여기에 쌓입니다.',
+    'manage.crm.positive':'긍정 팔로워',
+    'manage.crm.negative':'부정 팔로워',
+    'manage.crm.empty':'팔로워 데이터 없음',
+    // 만들기
+    'create.first_bar':'내 주제로 추천 받는 중',
+    'create.first_bar_change':'변경하기',
+    'create.tpl_label':'템플릿',
+    'create.today_topic':'오늘 주제',
+    'create.btn.refresh':'다른 주제 보기',
+    'create.divider':'또는',
+    'create.input.placeholder':'어떤 카드뉴스 만들까?',
+    'create.btn.generate':'카드뉴스 만들기',
+    'create.cs2.label':'카드뉴스 문체로 작성된 캐러셀 프롬프트',
+    'create.cs2.slide_prompt':'슬라이드별 프롬프트',
+    'create.cs2.tap_to_edit':'탭해서 수정',
+    'create.cs2.caption':'게시 캡션',
+    'create.body_size':'본문 및 사이즈 설정',
+    'create.image_count':'이미지 장수',
+    'create.image_ratio':'이미지 비율',
+    'create.size.sq':'정사각',
+    'create.size.pt':'세로형',
+    'create.size.st':'스토리/릴스',
+    'create.size.feed':'IG 피드',
+    'create.size.story':'IG 스토리',
+    'create.btn.next_gen':'다음 — 카드 생성',
+    'create.tpl.title':'템플릿 선택',
+    'create.tpl.sub':'클릭하면 바로 디자인이 적용돼요.',
+    'create.tpl.clean':'클린',
+    'create.tpl.noir':'감성',
+    'create.tpl.mag':'매거진',
+    'create.tpl.bold':'팝',
+    'create.tpl.my':'내 템플릿 만들기',
+    'create.btn.go':'생성하기',
+    'create.cs4.edit':'편집',
+    'create.cs4.tplchange':'템플릿 변경',
+    'create.cs4.preview':'미리보기',
+    'create.cs4.hint':'드래그로 위치 이동 · 모서리로 크기 조절 · 탭하면 편집',
+    'create.cs4.text':'텍스트',
+    'create.cs4.image':'이미지',
+    'create.cs4.layer':'레이어',
+    'create.cs4.delete_slide':'슬라이드 삭제',
+    // 내 정보
+    'profile.title':'내 정보',
+    'profile.invite_section':'친구 초대',
+    'profile.invite.title':'친구 초대하고 포인트 받기',
+    'profile.invite.sub':'가입 5,000P · 구독 20,000P 즉시 적립',
+    'profile.upsell.head':'프리미엄 전환 시',
+    'profile.upsell.sub':'포인트 계산 없이 무한 혜택',
+    'profile.section.settings':'설정',
+    'profile.section.account':'계정',
+    'profile.section.legal':'법적 고지 · 고객센터',
+    'profile.menu.account_int':'계정 연동',
+    'profile.menu.account_int_sub':'Instagram · TikTok · YouTube',
+    'profile.menu.target':'참고 계정 분석',
+    'profile.menu.target_sub':'경쟁 계정 해시태그 · 게시 패턴 분석',
+    'profile.menu.tone':'AI 말투 학습',
+    'profile.menu.tone_sub':'일치도 98% · 게시물 250개 분석',
+    'profile.menu.lang':'언어 · Language',
+    'profile.menu.lang_sub':'앱 표시 언어 설정',
+    'profile.menu.kakao':'카카오톡으로 알림 받기',
+    'profile.menu.kakao_sub':'요주의·수익제안·일일 리포트 즉시',
+    'profile.menu.plan':'이용권',
+    'profile.menu.find':'아이디 · 비밀번호 찾기',
+    'profile.menu.find_sub':'가입 이메일로 재설정 링크 발송',
+    'profile.menu.switch':'다른 계정으로 로그인',
+    'profile.menu.switch_sub':'계정 전환',
+    'profile.menu.logout':'로그아웃',
+    'profile.menu.terms':'이용약관',
+    'profile.menu.privacy':'개인정보처리방침',
+    'profile.menu.delete':'계정 · 데이터 삭제 안내',
+    'profile.menu.delete_sub':'삭제 방법 및 처리 범위',
+    'profile.stat.plan':'이용권',
+    'profile.stat.point':'보유 포인트',
+    'profile.stat.earn':'내가 번 돈',
+  },
+  en: {
+    // tab bar
+    'tab.home':'Home', 'tab.grow':'Grow', 'tab.create':'Create',
+    'tab.link':'My Link', 'tab.profile':'Profile',
+    // common
+    'btn.next':'Next', 'btn.back':'Back', 'btn.save':'Save',
+    'btn.cancel':'Cancel', 'btn.confirm':'Confirm', 'btn.close':'Close',
+    'btn.send':'Send', 'btn.approve':'Approve', 'btn.skip':'Skip',
+    'btn.edit':'Edit', 'btn.apply':'Apply', 'btn.regenerate':'Regenerate',
+    'btn.share':'Share', 'btn.start':'Start', 'btn.delete':'Delete',
+    // home
+    'home.greeting':'Hi',
+    'home.urgent_pending':'Pending urgent replies',
+    'home.urgent_sub':'Urgent · Business inquiries',
+    'home.live_calendar':'Live Calendar',
+    // grow — automation
+    'grow.tab.automation':'SNS Automation',
+    'grow.tab.realtime':'Real-time Management',
+    'grow.proof.label':'creators using Ssobi',
+    'grow.proof.tag':'Official API',
+    'grow.eyebrow.automation':'AUTOMATION',
+    'grow.ai_card.title':'AI auto-replies on your behalf',
+    'grow.ai_card.sub.on':'Auto-replying in your tone, 24/7',
+    'grow.ai_card.sub.off':'Auto-reply OFF · Manual mode',
+    'grow.stat.today':'Replies today',
+    'grow.stat.left':'Remaining',
+    'grow.stat.tone':'Tone match',
+    'grow.channel.section':'Per-channel auto-reply',
+    'grow.channel.comment.title':'Comment auto-reply',
+    'grow.channel.comment.sub':'AI replies to Instagram comments in your tone',
+    'grow.channel.dm.title':'DM auto-reply',
+    'grow.channel.dm.sub':'Specific conversations can be set to manual',
+    'grow.question_mode.title':'Question-style reply mode',
+    'grow.question_mode.sub':'Engage with questions like "What\'s your type?" — boosts algorithm reach',
+    'grow.quota.section':'Daily reply limits',
+    'grow.quota.comment':'Comments',
+    'grow.quota.dm':'DMs',
+    'grow.quota.hours':'Active hours',
+    'grow.btn.history':'View reply history',
+    'grow.btn.tone':'Edit tone',
+    'grow.dmrule.title':'Comment-triggered DM',
+    'grow.dmrule.empty':'No rules configured',
+    // manage tabs
+    'manage.tab.urgent':'Urgent',
+    'manage.tab.comments':'Comments & DMs',
+    'manage.tab.crm':'Top followers',
+    'manage.tab.revenue':'Collabs / Offers',
+    'manage.tab.insight':'Analytics',
+    'manage.urgent.empty':'No urgent items waiting',
+    'manage.urgent.empty_sub':'Drafts for important messages (refunds, complaints) appear here.',
+    'manage.comments.empty':'No auto-replies yet',
+    'manage.comments.empty_sub':'When a normal comment or DM arrives, the AI reply will appear here.',
+    'manage.crm.positive':'Positive followers',
+    'manage.crm.negative':'Critical followers',
+    'manage.crm.empty':'No follower data yet',
+    // create
+    'create.first_bar':'Recommending topics for you',
+    'create.first_bar_change':'Change',
+    'create.tpl_label':'Templates',
+    'create.today_topic':'Today\'s topics',
+    'create.btn.refresh':'Show different topics',
+    'create.divider':'or',
+    'create.input.placeholder':'What carousel should we make?',
+    'create.btn.generate':'Generate carousel',
+    'create.cs2.label':'Carousel prompts written in carousel-post tone',
+    'create.cs2.slide_prompt':'Per-slide prompts',
+    'create.cs2.tap_to_edit':'tap to edit',
+    'create.cs2.caption':'Post caption',
+    'create.body_size':'Body & size settings',
+    'create.image_count':'Number of slides',
+    'create.image_ratio':'Image ratio',
+    'create.size.sq':'Square',
+    'create.size.pt':'Portrait',
+    'create.size.st':'Story / Reel',
+    'create.size.feed':'IG Feed',
+    'create.size.story':'IG Story',
+    'create.btn.next_gen':'Next — Generate cards',
+    'create.tpl.title':'Choose a template',
+    'create.tpl.sub':'Tap to apply the design.',
+    'create.tpl.clean':'Clean',
+    'create.tpl.noir':'Mood',
+    'create.tpl.mag':'Magazine',
+    'create.tpl.bold':'Pop',
+    'create.tpl.my':'Create my template',
+    'create.btn.go':'Generate',
+    'create.cs4.edit':'Edit',
+    'create.cs4.tplchange':'Change template',
+    'create.cs4.preview':'Preview',
+    'create.cs4.hint':'Drag to move · pinch to resize · tap to edit',
+    'create.cs4.text':'Text',
+    'create.cs4.image':'Image',
+    'create.cs4.layer':'Layers',
+    'create.cs4.delete_slide':'Delete slide',
+    // profile
+    'profile.title':'Profile',
+    'profile.invite_section':'Invite friends',
+    'profile.invite.title':'Invite friends, earn points',
+    'profile.invite.sub':'5,000P on signup · 20,000P on subscription',
+    'profile.upsell.head':'Upgrade to Premium',
+    'profile.upsell.sub':'Unlimited benefits — no point counting',
+    'profile.section.settings':'Settings',
+    'profile.section.account':'Account',
+    'profile.section.legal':'Legal · Support',
+    'profile.menu.account_int':'Connected accounts',
+    'profile.menu.account_int_sub':'Instagram · TikTok · YouTube',
+    'profile.menu.target':'Reference account analysis',
+    'profile.menu.target_sub':'Hashtag and post-pattern analysis of competitor accounts',
+    'profile.menu.tone':'AI tone learning',
+    'profile.menu.tone_sub':'98% match · 250 posts analyzed',
+    'profile.menu.lang':'Language',
+    'profile.menu.lang_sub':'App display language',
+    'profile.menu.kakao':'Get alerts via KakaoTalk',
+    'profile.menu.kakao_sub':'Urgent · Offers · Daily report',
+    'profile.menu.plan':'Subscription',
+    'profile.menu.find':'Find ID / reset password',
+    'profile.menu.find_sub':'Sends a reset link to your email',
+    'profile.menu.switch':'Sign in with another account',
+    'profile.menu.switch_sub':'Switch accounts',
+    'profile.menu.logout':'Sign out',
+    'profile.menu.terms':'Terms of Service',
+    'profile.menu.privacy':'Privacy Policy',
+    'profile.menu.delete':'Account & data deletion',
+    'profile.menu.delete_sub':'How to request deletion and what is removed',
+    'profile.stat.plan':'Plan',
+    'profile.stat.point':'Points',
+    'profile.stat.earn':'Earnings',
+  }
+};
+
+var ssobiCurrentLang = 'ko';
+
+function applyI18n(lang){
+  if(!I18N[lang]) lang = 'ko';
+  ssobiCurrentLang = lang;
+  document.documentElement.setAttribute('lang', lang);
+  // textContent
+  document.querySelectorAll('[data-i18n]').forEach(function(el){
+    var key = el.getAttribute('data-i18n');
+    var txt = I18N[lang][key];
+    if(txt !== undefined) el.textContent = txt;
+  });
+  // placeholder
+  document.querySelectorAll('[data-i18n-ph]').forEach(function(el){
+    var key = el.getAttribute('data-i18n-ph');
+    var txt = I18N[lang][key];
+    if(txt !== undefined) el.placeholder = txt;
+  });
+  // title attribute
+  document.querySelectorAll('[data-i18n-title]').forEach(function(el){
+    var key = el.getAttribute('data-i18n-title');
+    var txt = I18N[lang][key];
+    if(txt !== undefined) el.title = txt;
+  });
+  // localStorage
+  try { localStorage.setItem('ssobi_lang', lang); } catch(_){}
+  // 언어 select 동기화
+  var sel = document.getElementById('app-language-select');
+  if(sel && sel.value !== lang) sel.value = lang;
+}
+
+// 페이지 로드 시 부트스트랩: localStorage > server profile > navigator > 'ko'
+async function bootI18n(){
+  var lang = 'ko';
+  try {
+    var saved = localStorage.getItem('ssobi_lang');
+    if(saved && I18N[saved]) lang = saved;
+  } catch(_){}
+  // 서버 동기화 시도 (인증 안 됐으면 그냥 fallback)
+  try {
+    var res = await fetch('/api/profile/language');
+    if(res.ok){
+      var d = await res.json();
+      if(d.ok && d.language && I18N[d.language]) lang = d.language;
+    }
+  } catch(_){}
+  applyI18n(lang);
+}
+document.addEventListener('DOMContentLoaded', bootI18n);
+
 // ─── 자동 응대 토글 (Meta App Review: 사용자 통제권 명시) ───
 //   1) 페이지 로드 시 GET /api/auto-reply/toggle → UI 동기화
 //   2) 마스터/채널 토글 onchange → POST 로 즉시 반영
@@ -5307,6 +5618,16 @@ async function onAutoReplyChannelToggle(channel, el){
 
 async function onAppLanguageChange(el){
   var lang = el.value;
+  // 즉시 UI 적용 (서버 저장은 백그라운드)
+  if(typeof applyI18n === 'function') applyI18n(lang);
+  // 자동 응대 sub 라벨도 lang 따라 갱신
+  var masterSub = document.getElementById('ar-master-sub');
+  var master = document.getElementById('ar-master-toggle');
+  if(masterSub && master){
+    masterSub.textContent = master.checked
+      ? (I18N[lang]['grow.ai_card.sub.on'] || '24시간 내 말투로 자동 처리 중')
+      : (I18N[lang]['grow.ai_card.sub.off'] || '자동 응대 OFF · 직접 답변 모드');
+  }
   try{
     var res = await fetch('/api/profile/language', {
       method:'POST', headers:{'Content-Type':'application/json'},
@@ -5314,9 +5635,10 @@ async function onAppLanguageChange(el){
     });
     var d = await res.json();
     if(!d.ok) throw new Error(d.error||'failed');
-    if(typeof lkeShowToast === 'function') lkeShowToast('언어 설정 저장됨 · ' + lang.toUpperCase());
+    if(typeof lkeShowToast === 'function') lkeShowToast(lang === 'en' ? 'Language: English' : '언어: 한국어');
   }catch(e){
-    alert('언어 설정 저장 실패: ' + (e.message||e));
+    // 서버 저장 실패해도 UI 는 이미 바뀐 상태 — 경고만 console
+    console.warn('[lang] save failed', e);
   }
 }
 
