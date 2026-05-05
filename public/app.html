@@ -5800,6 +5800,13 @@ var I18N = {
     'notif.offer_title':'수익 제안 도착',
     'notif.daily_title':'일일 리포트',
     'notif.negative_title':'부정 이슈 감지',
+    // m-find-account
+    'mod.find.title2':'아이디 · 비밀번호 찾기',
+    'mod.find.sub':'가입 시 등록한 이메일로 재설정 링크를 보내드려요',
+    'mod.find.email_lbl':'가입 이메일',
+    'mod.find.btn':'재설정 링크 보내기',
+    // 템플릿 갤러리
+    'mod.tpl.gallery':'템플릿 둘러보기',
     // 플랜 모달
     'mod.plan.title':'이용권',
     'mod.plan.sub':'성장 단계에 맞는 플랜을 선택하세요',
@@ -6432,6 +6439,13 @@ var I18N = {
     'notif.offer_title':'New offer received',
     'notif.daily_title':'Daily report',
     'notif.negative_title':'Critical issue detected',
+    // m-find-account
+    'mod.find.title2':'Find ID / reset password',
+    'mod.find.sub':'We\'ll email a reset link to your registered email.',
+    'mod.find.email_lbl':'Registered email',
+    'mod.find.btn':'Send reset link',
+    // template gallery
+    'mod.tpl.gallery':'Browse templates',
     // plan modal
     'mod.plan.title':'Subscription',
     'mod.plan.sub':'Pick the plan that matches your stage',
@@ -16089,13 +16103,13 @@ window.addEventListener('load', function(){
 
 <!-- 아이디/비밀번호 찾기 모달 -->
 <div class="ov" id="m-find-account" onclick="co(event,'m-find-account')"><div class="sheet"><div class="s-bar"></div>
-  <div class="s-title">아이디 · 비밀번호 찾기</div>
-  <div class="s-sub">가입 시 등록한 이메일로 재설정 링크를 보내드려요</div>
+  <div class="s-title" data-i18n="mod.find.title2">아이디 · 비밀번호 찾기</div>
+  <div class="s-sub" data-i18n="mod.find.sub">가입 시 등록한 이메일로 재설정 링크를 보내드려요</div>
   <div class="input-group">
-    <div class="input-lbl">가입 이메일</div>
+    <div class="input-lbl" data-i18n="mod.find.email_lbl">가입 이메일</div>
     <input class="inp" type="email" placeholder="hello@example.com">
   </div>
-  <button class="btn-p" onclick="doResetPassword()">재설정 링크 보내기</button>
+  <button class="btn-p" onclick="doResetPassword()" data-i18n="mod.find.btn">재설정 링크 보내기</button>
   <button class="btn-s" onclick="cm('m-find-account')"><span data-i18n="btn.close">닫기</span></button>
 </div></div>
 
@@ -16103,7 +16117,7 @@ window.addEventListener('load', function(){
 <div class="ov" id="m-tpl-gallery" onclick="co(event,'m-tpl-gallery')">
   <div class="sheet" style="padding:0;max-height:88vh;overflow:hidden;display:flex;flex-direction:column">
     <div style="position:sticky;top:0;z-index:2;background:#fff;border-bottom:1px solid #F0F2F5;padding:14px 16px;display:flex;align-items:center;justify-content:space-between">
-      <div style="font-size:15px;color:#1A1F27;font-weight:800">템플릿 둘러보기</div>
+      <div style="font-size:15px;color:#1A1F27;font-weight:800" data-i18n="mod.tpl.gallery">템플릿 둘러보기</div>
       <button onclick="cm('m-tpl-gallery')" style="border:none;background:#F3F4F6;width:30px;height:30px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px"><path d="M18 6L6 18M6 6l12 12" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
