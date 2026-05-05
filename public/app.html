@@ -1059,7 +1059,8 @@ body.edt-fullscreen #create-back{display:none}
 .edt-el.text[contenteditable=true]{outline:none!important;caret-color:var(--mint);background:transparent}
 /* 텍스트 요소만 박스 일체 비표시 — 글자 그 자체로 떠 있어야 함 */
 .edt-el.text:focus,.edt-el.text:focus-visible{outline:none!important;box-shadow:none}
-.edt-el.text.sel{outline:none}
+.edt-el.text.sel{outline:2px solid var(--mint);outline-offset:3px;background:rgba(0,200,150,.06)}
+.edt-el.text.sel .edt-hnd{display:block}
 /* 이미지 슬롯은 sel 시 핸들/테두리 보여야 드래그·리사이즈 가능 */
 .edt-el.img.sel{outline:2px dashed var(--mint);outline-offset:2px}
 .edt-el.img.sel .edt-hnd{display:block}
@@ -10167,18 +10168,17 @@ function buildSchemaElement(spec, ctx){
       return el;
     }
     case 'logo': {
+      // 텍스트 컨텐츠라 편집 가능해야 함 (탭/드래그/더블탭)
       el = document.createElement('div');
-      el.className = 'edt-deco';
+      el.className = 'edt-el text';
       el.textContent = spec.text || (spec.style && spec.style.text) || ctx.logoText || 'logo';
-      el.style.pointerEvents = 'none';
       break;
     }
     case 'badge': {
-      // 사각형 라벨 (검정 배지 — Focus / STEP1 등)
+      // 사각형 라벨 (검정 배지 — Focus / STEP1 등) — 편집 가능
       el = document.createElement('div');
-      el.className = 'edt-deco';
+      el.className = 'edt-el text';
       el.textContent = pickContent(spec, ctx);
-      el.style.pointerEvents = 'none';
       el.style.display = 'inline-block';
       break;
     }
@@ -10204,8 +10204,7 @@ function buildSchemaElement(spec, ctx){
     }
     case 'pill-button': {
       el = document.createElement('div');
-      el.className = 'edt-deco';
-      el.style.pointerEvents = 'none';
+      el.className = 'edt-el text';
       var label = pickContent(spec, ctx) || 'Learn more';
       var iconColor = (spec.style && spec.style.color) || '#FFFFFF';
       el.innerHTML = '<span>' + label + '</span><svg viewBox="0 0 24 24" fill="none" stroke="' + iconColor + '" stroke-width="2" style="width:14px;height:14px;flex-shrink:0"><path d="M5 12h14M13 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -10311,9 +10310,10 @@ function renderFromSchema(sl, schema, ctx){
       var dom = buildSchemaElement(spec, ctx);
       if(!dom) return;
       inner.appendChild(dom);
-      // 텍스트 요소만 인터랙션 활성화 (탭=선택+패널, 드래그=이동, 더블탭=편집)
-      // image/highlight/doodle/logo 는 attachEdt 안 붙임 (decorative)
-      if(spec.type === 'text' && typeof attachEdt === 'function'){
+      // 텍스트 컨텐츠 요소 모두 인터랙션 활성화 (탭=선택+패널, 드래그=이동, 더블탭=편집)
+      // image/highlight/doodle/circle 등 decorative 는 제외
+      var INTERACTIVE = { text:1, logo:1, badge:1, 'pill-button':1 };
+      if(INTERACTIVE[spec.type] && typeof attachEdt === 'function'){
         try { attachEdt(dom); } catch(e) { console.warn('attachEdt failed', e); }
       }
     });
@@ -10347,6 +10347,12 @@ function renderPerTemplate(sl, tpl, kind, i, N, p, kws, titleTxt, createData){
   var schemaKey = tpl + ':' + kind;
   var schema = TEMPLATE_SCHEMAS[schemaKey];
   if(!schema) return false;
+  // 로고 자동 채움: 사용자 IG 핸들 → linkState.handle → 'logo' 순으로 fallback
+  var autoLogo = '';
+  try {
+    if(typeof igState !== 'undefined' && igState && igState.username) autoLogo = '@' + igState.username;
+    else if(typeof linkState !== 'undefined' && linkState && linkState.handle) autoLogo = '@' + linkState.handle;
+  } catch(_){}
   var ctx = {
     title: titleTxt,
     subtitle: (createData && createData.coverSubtitle) || '',
@@ -10358,7 +10364,7 @@ function renderPerTemplate(sl, tpl, kind, i, N, p, kws, titleTxt, createData){
     slideIdx: i,
     p: p,
     createData: createData,
-    logoText: 'logo',
+    logoText: autoLogo || 'logo',
   };
   renderFromSchema(sl, schema, ctx);
   return true;
@@ -10380,7 +10386,7 @@ TEMPLATE_SCHEMAS['mag:cover'] = {
       style:{ fontSize:90, fontWeight:800, color:'#1A1A1A', lineHeight:1.15, letterSpacing:-2.5, fontFamily:'Pretendard,sans-serif' },
       zIndex:5, lockColor:true },
     { type:'highlight',
-      position:{ top:15.5, left:4, width:62, height:9 },
+      position:{ top:18, left:4, width:62, height:3.2 },
       style:{ background:'#E8FF4D', rotate:-1.5, borderRadius:2 },
       zIndex:4 },
     { type:'text', content:'title-line-2',
@@ -10707,10 +10713,10 @@ TEMPLATE_SCHEMAS['noir:hook'] = {
       position:{ top:8, left:6, width:88 },
       style:{ fontSize:60, fontWeight:900, color:'#FFFFFF', lineHeight:1.0, letterSpacing:-1.4, fontFamily:'Pretendard,sans-serif', textShadow:'0 4px 20px rgba(0,0,0,.85)' },
       zIndex:5, lockColor:true },
-    // 부제 (얇은)
+    // 부제 (얇은) — 시드 비교해서 키움
     { type:'text', content:'subtitle', fallback:'라는 말보다\n가끔은 \'쉬어도 돼\'라는 말이\n더 필요할 때가 있죠.',
       position:{ top:16, left:6, width:88 },
-      style:{ fontSize:32, fontWeight:500, color:'#FFFFFF', lineHeight:1.45, letterSpacing:-0.4, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line', opacity:0.95, textShadow:'0 2px 10px rgba(0,0,0,.6)' },
+      style:{ fontSize:40, fontWeight:500, color:'#FFFFFF', lineHeight:1.42, letterSpacing:-0.5, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line', opacity:0.96, textShadow:'0 2px 10px rgba(0,0,0,.6)' },
       zIndex:5, lockColor:true },
     // 흰 테두리 사각 배지 (쉬어도 돼) — 투명 배경 + 얇은 흰 테두리
     { type:'badge', content:'literal', text:'쉬어도 돼',
@@ -10742,10 +10748,10 @@ TEMPLATE_SCHEMAS['noir:body'] = {
       position:{ top:54, left:6, width:88 },
       style:{ fontSize:54, fontWeight:900, color:'#FFFFFF', lineHeight:1.25, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif', textShadow:'0 3px 14px rgba(0,0,0,.7)' },
       zIndex:5, lockColor:true },
-    // 본문 (얇은)
+    // 본문 (얇은) — 시드 비교해서 키움
     { type:'text', content:'body',
-      position:{ top:64, left:6, width:88 },
-      style:{ fontSize:30, fontWeight:500, color:'#FFFFFF', lineHeight:1.5, letterSpacing:-0.5, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line', opacity:0.92, textShadow:'0 2px 10px rgba(0,0,0,.6)' },
+      position:{ top:65, left:6, width:88 },
+      style:{ fontSize:42, fontWeight:500, color:'#FFFFFF', lineHeight:1.45, letterSpacing:-0.6, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line', opacity:0.94, textShadow:'0 2px 10px rgba(0,0,0,.6)' },
       zIndex:5, lockColor:true },
     // 가운데 logo
     { type:'logo',
@@ -10769,10 +10775,10 @@ TEMPLATE_SCHEMAS['noir:cta'] = {
       position:{ top:20, left:6, width:88 },
       style:{ fontSize:56, fontWeight:900, color:'#FFFFFF', lineHeight:1.0, letterSpacing:-1.2, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line' },
       zIndex:5, lockColor:true },
-    // 본문
+    // 본문 — 시드 비교해서 키움
     { type:'text', content:'body', fallback:'지금 생각나는 사람에게\n들려주고픈 이야기를 댓글로 남겨주세요. :)',
       position:{ top:36, left:6, width:88 },
-      style:{ fontSize:28, fontWeight:500, color:'#FFFFFF', lineHeight:1.6, letterSpacing:-0.4, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line', opacity:0.92 },
+      style:{ fontSize:38, fontWeight:500, color:'#FFFFFF', lineHeight:1.55, letterSpacing:-0.5, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line', opacity:0.94 },
       zIndex:5, lockColor:true },
     // 가운데 logo
     { type:'logo',
@@ -10797,15 +10803,15 @@ TEMPLATE_SCHEMAS['bold:cover'] = {
       position:{ top:42, left:6, width:88 },
       style:{ fontSize:36, fontWeight:800, color:'#1A1A1A', letterSpacing:-0.6, fontFamily:'Pretendard,sans-serif' },
       zIndex:5, lockColor:true },
-    // 거대 한글 제목 (살짝 잘릴 정도로 큰) — Pretendard 900 으로 (Black Han Sans 제거)
+    // 거대 한글 제목 (살짝 잘릴 정도로 큰) — 시드 매칭 위해 Black Han Sans 우선
     { type:'text', content:'title',
       position:{ top:48, left:6, width:120 },
-      style:{ fontSize:130, fontWeight:900, color:'#1A1A1A', lineHeight:0.95, letterSpacing:-4, fontFamily:'Pretendard,sans-serif', whiteSpace:'pre-line' },
+      style:{ fontSize:130, fontWeight:900, color:'#1A1A1A', lineHeight:0.95, letterSpacing:-4, fontFamily:"'Black Han Sans','Pretendard',sans-serif", whiteSpace:'pre-line' },
       zIndex:5, lockColor:true },
-    // 이탤릭 영문 LIST
+    // 이탤릭 영문 LIST — 디스플레이 폰트
     { type:'text', content:'literal', text:'LIST',
       position:{ top:67, left:6 },
-      style:{ fontSize:108, fontWeight:900, color:'#1A1A1A', fontStyle:'italic', letterSpacing:-3, lineHeight:0.95, fontFamily:'Pretendard,sans-serif' },
+      style:{ fontSize:108, fontWeight:900, color:'#1A1A1A', fontStyle:'italic', letterSpacing:-3, lineHeight:0.95, fontFamily:"'Black Han Sans','Pretendard',sans-serif" },
       zIndex:5, lockColor:true },
     // 검정 pill 버튼
     { type:'pill-button', content:'literal', text:'Learn more',
@@ -10847,15 +10853,15 @@ TEMPLATE_SCHEMAS['bold:body'] = {
   background: '#0E1B2C',
   layout: 'bold-body',
   elements: [
-    // 큰 오렌지 번호 (좌상단)
+    // 큰 오렌지 번호 (좌상단) — 디스플레이 폰트
     { type:'big-number', content:'page-number-only',
       position:{ top:4, left:6 },
-      style:{ fontSize:120, fontWeight:900, color:'#D55A35', letterSpacing:-4, lineHeight:1, fontFamily:'Pretendard,sans-serif' },
+      style:{ fontSize:120, fontWeight:900, color:'#D55A35', letterSpacing:-4, lineHeight:1, fontFamily:"'Black Han Sans','Pretendard',sans-serif" },
       zIndex:5 },
-    // 영문 + 굵은 제목 (오렌지 italic)
+    // 영문 + 굵은 제목 (오렌지 italic) — 디스플레이 폰트
     { type:'text', content:'body-title', fallback:'HAUS BY.',
       position:{ top:17, left:6, width:88 },
-      style:{ fontSize:62, fontWeight:900, color:'#D55A35', lineHeight:1, letterSpacing:-1.5, fontStyle:'italic', fontFamily:'Pretendard,sans-serif' },
+      style:{ fontSize:62, fontWeight:900, color:'#D55A35', lineHeight:1, letterSpacing:-1.5, fontStyle:'italic', fontFamily:"'Black Han Sans','Pretendard',sans-serif" },
       zIndex:5, lockColor:true },
     // 한글 본문
     { type:'text', content:'body',
@@ -10878,10 +10884,10 @@ TEMPLATE_SCHEMAS['bold:cta'] = {
       position:{ top:38, left:50, transform:'translateX(-50%)', width:30, height:24 },
       style:{ background:'#2E1AE3', borderRadius:'50%' },
       zIndex:5 },
-    // 작은 logo 텍스트 아래
-    { type:'logo', text:'aenz',
+    // 가운데 logo (시드의 'aenz' 자리 — 사용자 IG 핸들 또는 브랜드로 자동)
+    { type:'logo',
       position:{ top:64, left:50, transform:'translateX(-50%)' },
-      style:{ fontSize:44, fontWeight:800, color:'#1A1A1A', fontFamily:'Pretendard,sans-serif' },
+      style:{ fontSize:44, fontWeight:800, color:'#1A1A1A', fontFamily:"'Black Han Sans','Pretendard',sans-serif" },
       zIndex:6 },
   ],
 };
