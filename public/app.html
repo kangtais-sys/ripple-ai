@@ -3314,24 +3314,6 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 </div>
 
 <!-- m-link-share: 공유 -->
-<!-- 첫날 모드 튜토리얼 오버레이 -->
-<div class="tut-ov" id="tut-ov" onclick="tutNext(event)">
-  <button class="tut-skip" onclick="event.stopPropagation();tutClose()">건너뛰기</button>
-  <div class="tut-card">
-    <div class="tut-eyebrow">SSOBI · 시작하기</div>
-    <div class="tut-title">5개의 탭으로<br><em>나 대신 일하는 SNS.</em></div>
-    <ul class="tut-list">
-      <li><span class="tut-ico">🏠</span><div><b>홈</b><span>하루 요약·시간값·자동화 캘린더</span></div></li>
-      <li><span class="tut-ico">🌱</span><div><b>키우기</b><span>댓글·DM 자동 응대, 실시간 관리</span></div></li>
-      <li><span class="tut-ico">✨</span><div><b>만들기</b><span>오늘 주제 추천·카드뉴스 생성</span></div></li>
-      <li><span class="tut-ico">🔗</span><div><b>내 링크</b><span>내 스타일대로 꾸미는 링크 페이지</span></div></li>
-      <li><span class="tut-ico">👤</span><div><b>내 정보</b><span>연동·플랜·설정 한 곳에서</span></div></li>
-    </ul>
-    <button class="tut-cta" onclick="event.stopPropagation();tutClose()">시작하기 →</button>
-    <div class="tut-hint">화면 아무 곳이나 탭하면 계속 진행돼요</div>
-  </div>
-</div>
-
 <!-- 첫날 모드 · 내 링크 welcome -->
 <div class="ov" id="m-link-welcome" onclick="co(event,'m-link-welcome')">
   <div class="sheet" style="padding:30px 24px 28px;text-align:center">
@@ -3764,35 +3746,35 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
 <!-- AI 말투 학습 -->
 <div class="ov" id="m-ai-style" onclick="co(event,'m-ai-style')"><div class="sheet"><div class="s-bar"></div>
-  <div class="s-title">AI 말투 학습</div>
-  <div class="s-sub">내 Instagram 게시물 캡션으로 말투·뉘앙스를 학습해요</div>
+  <div class="s-title" data-i18n="mod.tone.title">AI 말투 학습</div>
+  <div class="s-sub" data-i18n="mod.tone.sub">내 Instagram 게시물 캡션으로 말투·뉘앙스를 학습해요</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px">
-    <div style="background:var(--mint-l);border-radius:14px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:900;color:var(--mint)" id="tone-status-label">미학습</div><div style="font-size:11px;color:var(--mint-d);font-weight:600;margin-top:4px">현재 상태</div></div>
-    <div style="background:var(--bg);border-radius:14px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:900;color:var(--t1)" id="tone-sample-count">0</div><div style="font-size:11px;color:var(--t3);font-weight:600;margin-top:4px">분석한 캡션</div></div>
+    <div style="background:var(--mint-l);border-radius:14px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:900;color:var(--mint)" id="tone-status-label" data-i18n="mod.tone.status.unlearned">미학습</div><div style="font-size:11px;color:var(--mint-d);font-weight:600;margin-top:4px" data-i18n="mod.tone.status_label">현재 상태</div></div>
+    <div style="background:var(--bg);border-radius:14px;padding:14px;text-align:center"><div style="font-size:22px;font-weight:900;color:var(--t1)" id="tone-sample-count">0</div><div style="font-size:11px;color:var(--t3);font-weight:600;margin-top:4px" data-i18n="mod.tone.sample_label">분석한 캡션</div></div>
   </div>
-  <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:10px">AI가 학습한 내 말투</div>
-  <div id="tone-characteristics" style="background:var(--bg);border-radius:12px;padding:14px;margin-bottom:18px;font-size:12px;color:var(--t2);line-height:1.9">
+  <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:10px" data-i18n="mod.tone.learned_section">AI가 학습한 내 말투</div>
+  <div id="tone-characteristics" style="background:var(--bg);border-radius:12px;padding:14px;margin-bottom:18px;font-size:12px;color:var(--t2);line-height:1.9" data-i18n="mod.tone.empty_text">
     아직 학습된 말투가 없어요. 아래 버튼으로 학습을 시작해주세요.
   </div>
-  <button class="btn-p" onclick="triggerToneLearn()" id="tone-learn-btn" style="margin-top:6px">내 게시물로 말투 학습하기</button>
-  <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:8px;line-height:1.5">Instagram 연동 필수 · 최근 게시물 캡션 25개까지 분석</div>
+  <button class="btn-p" onclick="triggerToneLearn()" id="tone-learn-btn" style="margin-top:6px" data-i18n="mod.tone.learn_btn">내 게시물로 말투 학습하기</button>
+  <div style="font-size:11px;color:var(--t3);text-align:center;margin-top:8px;line-height:1.5" data-i18n="mod.tone.learn_hint">Instagram 연동 필수 · 최근 게시물 캡션 25개까지 분석</div>
 
   <!-- 계정 추가 정보 -->
   <div style="margin-top:24px;padding-top:18px;border-top:1px solid var(--b)">
-    <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:6px">내 계정 추가 정보</div>
-    <div style="font-size:12px;color:var(--t3);margin-bottom:8px;line-height:1.55">Ssobi가 꼭 알아야 할 것. 사이트·카카오채널·대표 제품·일정·성향·활동 영역 등 자유롭게</div>
-    <textarea id="tone-brand-context" class="sheet-ta" rows="4" placeholder="예1) Millimilli — 감성 K-뷰티 브랜드. 공식 사이트 millimilli.co · 카카오 @millimilli · 매주 토요일 공구&#10;예2) 서울 거주, 독서·러닝 주제 계정. 협업 문의는 이메일(me@mail.com)로만 받음. 아직 제품·공구 없음"></textarea>
+    <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:6px" data-i18n="mod.tone.brand_section">내 계정 추가 정보</div>
+    <div style="font-size:12px;color:var(--t3);margin-bottom:8px;line-height:1.55" data-i18n="mod.tone.brand_sub">Ssobi가 꼭 알아야 할 것. 사이트·카카오채널·대표 제품·일정·성향·활동 영역 등 자유롭게</div>
+    <textarea id="tone-brand-context" class="sheet-ta" rows="4" placeholder="예1) Millimilli — 감성 K-뷰티 브랜드. 공식 사이트 millimilli.co · 카카오 @millimilli · 매주 토요일 공구&#10;예2) 서울 거주, 독서·러닝 주제 계정. 협업 문의는 이메일(me@mail.com)로만 받음. 아직 제품·공구 없음" data-i18n-ph="mod.tone.brand_ph"></textarea>
   </div>
 
   <!-- 금지어 -->
   <div style="margin-top:18px">
-    <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:6px">사용하지 않을 표현</div>
-    <div style="font-size:12px;color:var(--t3);margin-bottom:8px;line-height:1.55">AI가 절대 쓰지 않을 단어·문구. 콤마로 구분</div>
-    <input id="tone-banned-words" class="sheet-in" type="text" placeholder="예) 고객님, 부탁드립니다, 구매하세요">
+    <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:6px" data-i18n="mod.tone.banned_section">사용하지 않을 표현</div>
+    <div style="font-size:12px;color:var(--t3);margin-bottom:8px;line-height:1.55" data-i18n="mod.tone.banned_sub">AI가 절대 쓰지 않을 단어·문구. 콤마로 구분</div>
+    <input id="tone-banned-words" class="sheet-in" type="text" placeholder="예) 고객님, 부탁드립니다, 구매하세요" data-i18n-ph="mod.tone.banned_ph">
   </div>
 
-  <button class="btn-p" onclick="saveToneContext()" id="tone-context-save" style="margin-top:16px">브랜드 정보·금지어 저장</button>
-  <button class="btn-s" onclick="cm('m-ai-style')" style="margin-top:12px">닫기</button>
+  <button class="btn-p" onclick="saveToneContext()" id="tone-context-save" style="margin-top:16px" data-i18n="mod.tone.save_btn">브랜드 정보·금지어 저장</button>
+  <button class="btn-s" onclick="cm('m-ai-style')" style="margin-top:12px" data-i18n="btn.close">닫기</button>
 </div></div>
 
 <!-- 인스타 프로필 미리보기 -->
@@ -4687,25 +4669,20 @@ function toggleNewbie(){
   if(real) real.style.display = newbieMode ? 'none' : 'block';
   if(btn){
     btn.classList.toggle('on', newbieMode);
-    btn.textContent = newbieMode ? '실데이터 모드로' : '첫날 모드';
+    var _lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+    var dict = (typeof I18N !== 'undefined' && I18N[_lang]) || {};
+    var key = newbieMode ? 'app.header.realdata' : 'app.header.newbie';
+    btn.setAttribute('data-i18n', key);
+    btn.textContent = dict[key] || (newbieMode ? '실데이터 모드로' : '첫날 모드');
   }
   refreshNavLock();
   window.scrollTo(0,0);
-  // 첫날 모드 시작 시 튜토리얼 (최초 1회)
-  if(newbieMode){
-    try{
-      if(!localStorage.getItem('ssobi_tut_seen')){
-        setTimeout(tutOpen, 260);
-      }
-    }catch(e){}
-  }
+  // 튜토리얼 오버레이 제거됨 — 더 이상 트리거 안 함
 }
-function tutOpen(){ var el=document.getElementById('tut-ov'); if(el) el.classList.add('on'); }
-function tutClose(){
-  var el=document.getElementById('tut-ov'); if(el) el.classList.remove('on');
-  try{ localStorage.setItem('ssobi_tut_seen','1'); }catch(e){}
-}
-function tutNext(e){ if(e.target===e.currentTarget) tutClose(); }
+// 튜토리얼 오버레이 제거됨 — stub 으로 호출 안전 유지
+function tutOpen(){ /* removed */ }
+function tutClose(){ try{ localStorage.setItem('ssobi_tut_seen','1'); }catch(e){} }
+function tutNext(e){ /* no-op */ }
 
 function refreshNavLock(){
   // 자물쇠 대신 블러 프리뷰 방식으로 변경됨. 남겨진 훅은 비워둠.
@@ -5527,6 +5504,24 @@ var I18N = {
     'create.cs5.demo_date2':'4월 21일 월요일 · 오전 9:00',
     'create.cs5.demo_title2':'피부과 의사가 절대 안 산다는 성분 3가지',
     'create.cs5.caption_ph':'AI가 생성한 캡션이 여기에 들어와요. 자유롭게 편집하세요.',
+    // AI 말투 학습 모달 (m-ai-style)
+    'mod.tone.title':'AI 말투 학습',
+    'mod.tone.sub':'내 Instagram 게시물 캡션으로 말투·뉘앙스를 학습해요',
+    'mod.tone.status.unlearned':'미학습',
+    'mod.tone.status.learned':'학습 완료',
+    'mod.tone.status_label':'현재 상태',
+    'mod.tone.sample_label':'분석한 캡션',
+    'mod.tone.learned_section':'AI가 학습한 내 말투',
+    'mod.tone.empty_text':'아직 학습된 말투가 없어요. 아래 버튼으로 학습을 시작해주세요.',
+    'mod.tone.learn_btn':'내 게시물로 말투 학습하기',
+    'mod.tone.learn_hint':'Instagram 연동 필수 · 최근 게시물 캡션 25개까지 분석',
+    'mod.tone.brand_section':'내 계정 추가 정보',
+    'mod.tone.brand_sub':'Ssobi가 꼭 알아야 할 것. 사이트·카카오채널·대표 제품·일정·성향·활동 영역 등 자유롭게',
+    'mod.tone.brand_ph':'예1) Millimilli — 감성 K-뷰티 브랜드. 공식 사이트 millimilli.co · 카카오 @millimilli · 매주 토요일 공구\n예2) 서울 거주, 독서·러닝 주제 계정. 협업 문의는 이메일(me@mail.com)로만 받음.',
+    'mod.tone.banned_section':'사용하지 않을 표현',
+    'mod.tone.banned_sub':'AI가 절대 쓰지 않을 단어·문구. 콤마로 구분',
+    'mod.tone.banned_ph':'예) 고객님, 부탁드립니다, 구매하세요',
+    'mod.tone.save_btn':'브랜드 정보·금지어 저장',
   },
   en: {
     // tab bar
@@ -5817,6 +5812,24 @@ var I18N = {
     'create.cs5.demo_date2':'Apr 21, Monday · 9:00 AM',
     'create.cs5.demo_title2':'3 ingredients dermatologists never buy',
     'create.cs5.caption_ph':'AI-generated caption will appear here. Edit freely.',
+    // AI tone learning modal
+    'mod.tone.title':'AI tone learning',
+    'mod.tone.sub':'Ssobi learns your tone and nuance from your Instagram post captions.',
+    'mod.tone.status.unlearned':'Not learned',
+    'mod.tone.status.learned':'Learned',
+    'mod.tone.status_label':'Status',
+    'mod.tone.sample_label':'Captions analyzed',
+    'mod.tone.learned_section':'Your learned tone',
+    'mod.tone.empty_text':'No tone learned yet. Tap the button below to start.',
+    'mod.tone.learn_btn':'Learn my tone from posts',
+    'mod.tone.learn_hint':'Instagram connection required · Up to 25 recent captions analyzed',
+    'mod.tone.brand_section':'Account context',
+    'mod.tone.brand_sub':'Anything Ssobi should know — site, channels, products, schedule, personality, niche.',
+    'mod.tone.brand_ph':'e.g. 1) Millimilli — emotive K-beauty brand. millimilli.co · KakaoTalk @millimilli · group buys every Saturday\ne.g. 2) Based in Seoul, books & running niche. Inquiries by email only (me@mail.com).',
+    'mod.tone.banned_section':'Banned expressions',
+    'mod.tone.banned_sub':'Words/phrases the AI must never use. Separate by commas.',
+    'mod.tone.banned_ph':'e.g. dear customer, please, buy now',
+    'mod.tone.save_btn':'Save brand info & banned words',
   }
 };
 
