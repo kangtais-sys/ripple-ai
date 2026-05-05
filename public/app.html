@@ -3508,8 +3508,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <!-- STEP 1: 메인 주제 (10 카테고리) -->
     <div class="ob-step on" id="ob-1">
       <div class="ob-progress"><span class="ob-progress-dot on"></span><span class="ob-progress-dot"></span></div>
-      <div class="ob-h1">어떤 주제로 계정을 키울 거야?</div>
-      <div class="ob-sub">메인 주제 하나만 골라줘. 나중에 바꿀 수 있어.</div>
+      <div class="ob-h1" data-i18n="mod.onb.title1">어떤 주제로 계정을 키울 거야?</div>
+      <div class="ob-sub" data-i18n="mod.onb.sub1">메인 주제 하나만 골라줘. 나중에 바꿀 수 있어.</div>
       <div class="ob-grid" id="ob-topics">
         <button type="button" class="ob-chip" data-topic="beauty">뷰티·메이크업</button>
         <button type="button" class="ob-chip" data-topic="fashion">패션·스타일</button>
@@ -3522,13 +3522,13 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         <button type="button" class="ob-chip" data-topic="content">K팝·콘텐츠</button>
         <button type="button" class="ob-chip" data-topic="family">육아·반려</button>
       </div>
-      <button class="ob-next" id="ob-1-next" disabled onclick="obNext(2)">다음</button>
+      <button class="ob-next" id="ob-1-next" disabled onclick="obNext(2)" data-i18n="mod.onb.next">다음</button>
     </div>
     <!-- STEP 2: 말투 (6톤 chip) -->
     <div class="ob-step" id="ob-2">
       <div class="ob-progress"><span class="ob-progress-dot on"></span><span class="ob-progress-dot on"></span></div>
-      <div class="ob-h1">어떤 스타일로 올릴 거야?</div>
-      <div class="ob-sub">내 계정 분위기를 정해줘. IG 연동 시 자동 학습돼.</div>
+      <div class="ob-h1" data-i18n="mod.onb.title2">어떤 스타일로 올릴 거야?</div>
+      <div class="ob-sub" data-i18n="mod.onb.sub2">내 계정 분위기를 정해줘. IG 연동 시 자동 학습돼.</div>
       <div class="ob-tone-grid" id="ob-tones">
         <button type="button" class="ob-tone" data-tone="warm"><div class="ob-tone-name">다정한</div><div class="ob-tone-eg">"속상했지? 나도 그랬어"</div></button>
         <button type="button" class="ob-tone" data-tone="friendly"><div class="ob-tone-name">친근한</div><div class="ob-tone-eg">"이거 찐이야 진짜"</div></button>
@@ -3537,8 +3537,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         <button type="button" class="ob-tone" data-tone="witty"><div class="ob-tone-name">재치있는</div><div class="ob-tone-eg">"이 퀄리티? 제정신이야?"</div></button>
         <button type="button" class="ob-tone" data-tone="chic"><div class="ob-tone-name">시크한</div><div class="ob-tone-eg">"3만원. 15일 썼음. 끝."</div></button>
       </div>
-      <button class="ob-next" id="ob-2-next" disabled onclick="obFinish()">완료</button>
-      <button class="ob-back" onclick="obNext(1)">이전</button>
+      <button class="ob-next" id="ob-2-next" disabled onclick="obFinish()" data-i18n="mod.onb.finish">완료</button>
+      <button class="ob-back" onclick="obNext(1)" data-i18n="mod.onb.back">이전</button>
     </div>
   </div>
 </div>
@@ -3547,8 +3547,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 <div class="ov" id="m-discover" onclick="co(event,'m-discover')">
   <div class="sheet" style="padding:14px 20px 28px">
     <div class="s-bar"></div>
-    <div class="s-title">처음이면 여기부터</div>
-    <div class="s-sub">주제·참고 계정·프로필을 3단계로 세팅해요</div>
+    <div class="s-title" data-i18n="mod.disc.title">처음이면 여기부터</div>
+    <div class="s-sub" data-i18n="mod.disc.sub">주제·참고 계정·프로필을 3단계로 세팅해요</div>
     <div class="discover-body" style="display:block">
       <div class="disc-step" id="ds-1">
         <div class="disc-step-lbl">① 관심 주제 선택</div>
@@ -3622,9 +3622,9 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div class="sheet" style="padding:14px 20px 28px">
     <div class="s-bar"></div>
     <div class="plan-hero" style="padding:4px 0 16px">
-      <div class="plan-badge">무료체험 D-4 · 지금 바로 구독하기</div>
-      <div class="plan-title">플랜을 선택하세요</div>
-      <div class="plan-sub">언제든지 취소할 수 있어요. 약정 없음.</div>
+      <div class="plan-badge" data-i18n="mod.plan.hero_badge">무료체험 D-4 · 지금 바로 구독하기</div>
+      <div class="plan-title" data-i18n="mod.plan.hero_title">플랜을 선택하세요</div>
+      <div class="plan-sub" data-i18n="mod.plan.hero_sub">언제든지 취소할 수 있어요. 약정 없음.</div>
     </div>
     <div class="plan-cards" style="padding:0">
       <div class="plan-card" id="plan-basic" onclick="selectPlan('basic')">
@@ -5626,6 +5626,22 @@ var I18N = {
     'link.theme_title':'테마',
     'link.settings_title':'설정',
     'link.block_edit_title':'블록 편집',
+    // 온보딩 모달
+    'mod.onb.title1':'어떤 주제로 계정을 키울 거야?',
+    'mod.onb.sub1':'메인 주제 하나만 골라줘. 나중에 바꿀 수 있어.',
+    'mod.onb.title2':'어떤 스타일로 올릴 거야?',
+    'mod.onb.sub2':'내 계정 분위기를 정해줘. IG 연동 시 자동 학습돼.',
+    'mod.onb.next':'다음',
+    'mod.onb.back':'이전',
+    'mod.onb.finish':'완료',
+    // discover
+    'mod.disc.title':'처음이면 여기부터',
+    'mod.disc.sub':'주제·참고 계정·프로필을 3단계로 세팅해요',
+    // 이용권 (결제) 모달
+    'mod.plan.hero_badge':'무료체험 D-4 · 지금 바로 구독하기',
+    'mod.plan.hero_title':'플랜을 선택하세요',
+    'mod.plan.hero_sub':'언제든지 취소할 수 있어요. 약정 없음.',
+    'mod.plan.subscribe':'구독 관리',
     // 플랜 모달
     'mod.plan.title':'이용권',
     'mod.plan.sub':'성장 단계에 맞는 플랜을 선택하세요',
@@ -6084,6 +6100,22 @@ var I18N = {
     'link.theme_title':'Theme',
     'link.settings_title':'Settings',
     'link.block_edit_title':'Edit block',
+    // onboarding modal
+    'mod.onb.title1':'What topic will your account focus on?',
+    'mod.onb.sub1':'Pick one main topic. You can change it later.',
+    'mod.onb.title2':'What style do you want to post in?',
+    'mod.onb.sub2':'Set your account vibe. Auto-learned once Instagram is connected.',
+    'mod.onb.next':'Next',
+    'mod.onb.back':'Back',
+    'mod.onb.finish':'Finish',
+    // discover
+    'mod.disc.title':'First time? Start here.',
+    'mod.disc.sub':'Set topic, reference accounts, and profile in 3 steps.',
+    // plan / billing modal
+    'mod.plan.hero_badge':'Trial: 4 days left · Subscribe now',
+    'mod.plan.hero_title':'Choose your plan',
+    'mod.plan.hero_sub':'Cancel anytime. No commitment.',
+    'mod.plan.subscribe':'Manage subscription',
     // plan modal
     'mod.plan.title':'Subscription',
     'mod.plan.sub':'Pick the plan that matches your stage',
