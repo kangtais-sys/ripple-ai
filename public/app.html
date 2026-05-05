@@ -6827,7 +6827,8 @@ document.addEventListener('DOMContentLoaded', bootI18n);
 //   3) ON/OFF 라벨로 시각적 명시 (Meta 리뷰어용)
 async function loadAutoReplySettings(){
   try{
-    var res = await fetch('/api/auto-reply/toggle');
+    var h = await authHeaders();
+    var res = await fetch('/api/auto-reply/toggle', { headers: h, credentials:'include' });
     if(!res.ok) return;
     var d = await res.json();
     if(!d.ok) return;
@@ -6868,8 +6869,9 @@ async function onAutoReplyMasterToggle(el){
   if(state){ state.textContent = enabled ? 'ON' : 'OFF'; state.style.color = enabled ? 'var(--mint-d)' : 'var(--red)'; }
   if(sub) sub.textContent = enabled ? '24시간 내 말투로 자동 처리 중' : '자동 응대 OFF · 직접 답변 모드';
   try{
+    var h = await authHeaders();
     var res = await fetch('/api/auto-reply/toggle', {
-      method:'POST', headers:{'Content-Type':'application/json'},
+      method:'POST', headers: h, credentials:'include',
       body: JSON.stringify({ enabled: enabled })
     });
     var d = await res.json();
@@ -6890,8 +6892,9 @@ async function onAutoReplyChannelToggle(channel, el){
   try{
     var body = { channels: {} };
     body.channels[channel] = enabled;
+    var h = await authHeaders();
     var res = await fetch('/api/auto-reply/toggle', {
-      method:'POST', headers:{'Content-Type':'application/json'},
+      method:'POST', headers: h, credentials:'include',
       body: JSON.stringify(body)
     });
     var d = await res.json();
@@ -6918,8 +6921,9 @@ async function onAppLanguageChange(el){
       : (I18N[lang]['grow.ai_card.sub.off'] || '자동 응대 OFF · 직접 답변 모드');
   }
   try{
+    var h = await authHeaders();
     var res = await fetch('/api/profile/language', {
-      method:'POST', headers:{'Content-Type':'application/json'},
+      method:'POST', headers: h, credentials:'include',
       body: JSON.stringify({ language: lang })
     });
     var d = await res.json();
