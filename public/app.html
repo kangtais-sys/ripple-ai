@@ -3199,21 +3199,21 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div class="lke-sheet-header"><div class="lke-sheet-title" data-i18n="link.settings_title">설정</div><button class="lke-sheet-close" onclick="lkeCloseSheet()">✕</button></div>
   <div class="lke-sheet-body">
     <div class="lke-field-group">
-      <div class="lke-field-label">숏링크 핸들</div>
+      <div class="lke-field-label" data-i18n="lke.settings.handle">숏링크 핸들</div>
       <div class="lke-handle-wrap">
         <span class="lke-handle-prefix">ssobi.ai/u/</span>
         <input type="text" class="lke-handle-input" id="lke-settings-handle" value="yuminhye" oninput="lkeHandleCheck(this)" placeholder="영문/숫자/_/-">
-        <span class="lke-handle-status ok" id="lke-handle-status">사용 가능</span>
+        <span class="lke-handle-status ok" id="lke-handle-status" data-i18n="lke.settings.handle_ok">사용 가능</span>
       </div>
-      <div style="font-size:11px;color:var(--t3);margin-top:6px">유저 아이디만 수정 가능해요. 중복이면 다른 핸들을 선택하세요.</div>
+      <div style="font-size:11px;color:var(--t3);margin-top:6px" data-i18n="lke.settings.handle_hint">유저 아이디만 수정 가능해요. 중복이면 다른 핸들을 선택하세요.</div>
     </div>
     <div class="lke-field-group">
-      <div class="lke-field-label">기능 설정</div>
-      <div class="lke-toggle-row"><div class="lke-toggle-info"><strong>다국어 자동 전환</strong><span>영어 방문자엔 Amazon</span></div><div class="lke-toggle on" onclick="this.classList.toggle('on')"></div></div>
-      <div class="lke-toggle-row"><div class="lke-toggle-info"><strong>숏링크 자동 생성</strong><span>ssobi.ai/s/a1b2c3</span></div><div class="lke-toggle on" onclick="this.classList.toggle('on')"></div></div>
-      <div class="lke-toggle-row"><div class="lke-toggle-info"><strong>Powered by Ssobi</strong><span>푸터 로고 표시</span></div><div class="lke-toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="lke-field-label" data-i18n="lke.settings.feature">기능 설정</div>
+      <div class="lke-toggle-row"><div class="lke-toggle-info"><strong data-i18n="lke.settings.multi_lang">다국어 자동 전환</strong><span data-i18n="lke.settings.multi_lang_sub">영어 방문자엔 Amazon</span></div><div class="lke-toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="lke-toggle-row"><div class="lke-toggle-info"><strong data-i18n="lke.settings.short_url">숏링크 자동 생성</strong><span>ssobi.ai/s/a1b2c3</span></div><div class="lke-toggle on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="lke-toggle-row"><div class="lke-toggle-info"><strong>Powered by Ssobi</strong><span data-i18n="lke.settings.footer_logo">푸터 로고 표시</span></div><div class="lke-toggle on" onclick="this.classList.toggle('on')"></div></div>
     </div>
-    <button class="lke-top-btn primary" style="width:100%;padding:14px;margin-top:8px" onclick="lkeApplySettings()">적용</button>
+    <button class="lke-top-btn primary" style="width:100%;padding:14px;margin-top:8px" onclick="lkeApplySettings()" data-i18n="lke.settings.apply">적용</button>
   </div>
 </div>
 
