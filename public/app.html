@@ -2037,7 +2037,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div class="roi-amt">₩<span id="roi-v">0</span></div>
     <div class="roi-track"><div class="roi-fill" id="roi-fill" style="width:0"></div></div>
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
-      <div style="font-size:11px;font-weight:400;color:var(--t3)"><span id="roi-day">—</span>/<span id="roi-days">—</span>일 <span id="roi-pct" style="color:var(--mint);font-weight:700;margin-left:2px">0%</span></div>
+      <div style="font-size:11px;font-weight:400;color:var(--t3)"><span id="roi-day">—</span>/<span id="roi-days">—</span><span data-i18n="home.date.day">일</span> <span id="roi-pct" style="color:var(--mint);font-weight:700;margin-left:2px">0%</span></div>
       <div style="font-size:11px;font-weight:400;color:var(--t3)" id="roi-date">—</div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;margin-top:18px">
@@ -3154,13 +3154,13 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <button class="lke-share-btn" onclick="openModal('m-link-share')" aria-label="공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
     <div class="lke-topbar-row2">
-      <button class="lke-act-btn" onclick="lkeTogglePreview()" id="lke-act-preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3"/></svg>미리보기</button>
+      <button class="lke-act-btn" onclick="lkeTogglePreview()" id="lke-act-preview"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8S1 12 1 12z" stroke-linecap="round" stroke-linejoin="round"/><circle cx="12" cy="12" r="3"/></svg><span data-i18n="link.preview">미리보기</span></button>
       <div class="lke-act-sep"></div>
-      <button class="lke-act-btn" onclick="lkeOpenSheet('theme')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M8 10h8M10 8v8" stroke-linecap="round"/></svg>테마</button>
+      <button class="lke-act-btn" onclick="lkeOpenSheet('theme')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="9"/><path d="M8 10h8M10 8v8" stroke-linecap="round"/></svg><span data-i18n="link.theme">테마</span></button>
       <div class="lke-act-sep"></div>
-      <button class="lke-act-btn primary" onclick="lkeOpenSheet('add-block')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>블록 추가</button>
+      <button class="lke-act-btn primary" onclick="lkeOpenSheet('add-block')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg><span data-i18n="link.add_block">블록 추가</span></button>
       <div class="lke-act-sep"></div>
-      <button class="lke-act-btn" onclick="lkeOpenSheet('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33h.01a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v.01a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke-linecap="round" stroke-linejoin="round"/></svg>설정</button>
+      <button class="lke-act-btn" onclick="lkeOpenSheet('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33h.01a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v.01a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="link.settings">설정</span></button>
     </div>
   </div>
 
@@ -5451,6 +5451,22 @@ var I18N = {
     'grow.upload.step3.sub':'공감 댓글의 답글로 연관 해시태그 자동 추가',
     'grow.upload.step3.example':'#스킨케어루틴 #데일리뷰티 #저장각 #BEST',
     'grow.upload.tip':'업로드 후 3~7분 이내 랜덤 간격으로 자연스럽게 실행돼요',
+    // 만들기 단계 제목 (goStep 동적 렌더)
+    'create.step2.title':'사이즈 설정',
+    'create.step3.title':'템플릿 선택',
+    'create.step4.title':'편집 & 미리보기',
+    'create.step5.title':'게시·예약',
+    // 내 링크 — 상단 액션바
+    'link.preview':'미리보기',
+    'link.theme':'테마',
+    'link.add_block':'블록 추가',
+    'link.settings':'설정',
+    // 내 링크 — 데모 콘텐츠 (사용자 콘텐츠지만 영문도 영상용)
+    'link.demo.groupbuy':'공동구매',
+    'link.demo.deadline':'공구 마감까지',
+    'link.demo.shop_now':'지금 보기',
+    // 홈 — 날짜 단위
+    'home.date.day':'일',
   },
   en: {
     // tab bar
@@ -5665,6 +5681,22 @@ var I18N = {
     'grow.upload.step3.sub':'Replies the supportive comment with related hashtags',
     'grow.upload.step3.example':'#skincare #dailybeauty #save #BEST',
     'grow.upload.tip':'Runs at a randomized 3–7 minute delay after upload to stay natural.',
+    // create — step titles (dynamic via goStep)
+    'create.step2.title':'Size Settings',
+    'create.step3.title':'Choose Template',
+    'create.step4.title':'Edit & Preview',
+    'create.step5.title':'Publish & Schedule',
+    // my link — top action bar
+    'link.preview':'Preview',
+    'link.theme':'Theme',
+    'link.add_block':'Add Block',
+    'link.settings':'Settings',
+    // my link — demo content
+    'link.demo.groupbuy':'Group Buy',
+    'link.demo.deadline':'Group buy ends in',
+    'link.demo.shop_now':'View now',
+    // home — date suffix
+    'home.date.day':'',  // English: blank (just number)
   }
 };
 
@@ -5920,7 +5952,11 @@ function goStep(n){
   if(back) back.style.display = n>1 ? 'flex' : 'none';
   var title = document.getElementById('create-hdr-title');
   if(title){
-    title.textContent = ({1:'만들기',2:'사이즈 설정',3:'템플릿 선택',4:'편집 & 미리보기',5:'게시·예약'})[n];
+    var _lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+    var keys = {1:'app.title.create',2:'create.step2.title',3:'create.step3.title',4:'create.step4.title',5:'create.step5.title'};
+    var fallback = {1:'만들기',2:'사이즈 설정',3:'템플릿 선택',4:'편집 & 미리보기',5:'게시·예약'};
+    title.setAttribute('data-i18n', keys[n] || 'app.title.create');
+    title.textContent = (typeof I18N !== 'undefined' && I18N[_lang] && I18N[_lang][keys[n]]) || fallback[n];
   }
   // 템플릿 선택 화면 진입 시 썸네일 갱신 + 저장된 기본 템플릿 하이라이트
   if(n === 3){
@@ -14718,7 +14754,18 @@ function applyDashboard(d) {
   var pctEl = document.getElementById('roi-pct');
   if (pctEl) pctEl.textContent = d.percent + '%';
   var dateEl = document.getElementById('roi-date');
-  if (dateEl && d.dateLabel) dateEl.textContent = d.dateLabel;
+  if (dateEl && d.dateLabel) {
+    var _lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+    if(_lang === 'en'){
+      // "5월 31일" / "5/31일" 같은 포맷 → "May 31"
+      var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      var m = String(d.dateLabel).match(/(\d{1,2})[월\/]\s*(\d{1,2})/);
+      if(m){ dateEl.textContent = months[parseInt(m[1],10)-1] + ' ' + parseInt(m[2],10); }
+      else { dateEl.textContent = d.dateLabel; }
+    } else {
+      dateEl.textContent = d.dateLabel;
+    }
+  }
   // 날짜 기반 진행률
   var dayEl = document.getElementById('roi-day');
   var daysEl = document.getElementById('roi-days');
