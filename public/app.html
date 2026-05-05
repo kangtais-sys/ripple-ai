@@ -2992,12 +2992,12 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div class="auth-wrap">
     <div class="auth-card">
       <div class="auth-logo">Ssobi<em>.</em></div>
-      <h1 class="auth-title" style="margin-top:20px">새 비밀번호 설정</h1>
-      <p class="auth-sub" style="margin-top:6px;margin-bottom:20px">비밀번호를 변경하고 다시 로그인하세요</p>
-      <input class="inp" type="password" id="new-pw" placeholder="새 비밀번호 (6자 이상)" autocomplete="new-password">
-      <input class="inp" type="password" id="new-pw2" placeholder="비밀번호 확인" autocomplete="new-password" style="margin-top:10px">
+      <h1 class="auth-title" style="margin-top:20px" data-i18n="auth.reset.heading">새 비밀번호 설정</h1>
+      <p class="auth-sub" style="margin-top:6px;margin-bottom:20px" data-i18n="auth.reset.sub_text">비밀번호를 변경하고 다시 로그인하세요</p>
+      <input class="inp" type="password" id="new-pw" placeholder="새 비밀번호 (6자 이상)" data-i18n-ph="auth.reset.new_pw_ph" autocomplete="new-password">
+      <input class="inp" type="password" id="new-pw2" placeholder="비밀번호 확인" data-i18n-ph="auth.reset.confirm_pw_ph" autocomplete="new-password" style="margin-top:10px">
       <div id="reset-pw-error" style="color:var(--red);font-size:12px;margin-top:6px;display:none"></div>
-      <button class="btn-dark" style="margin-top:14px" onclick="doUpdatePassword()">비밀번호 변경</button>
+      <button class="btn-dark" style="margin-top:14px" onclick="doUpdatePassword()" data-i18n="auth.reset.btn">비밀번호 변경</button>
     </div>
   </div>
 </div>
@@ -3007,9 +3007,9 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div class="hdr">
     <button onclick="go('signup')" style="background:none;border:none;cursor:pointer;color:var(--t3);font-size:13px;font-weight:700;display:flex;align-items:center;gap:4px">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
-      뒤로
+      <span data-i18n="btn.back">뒤로</span>
     </button>
-    <div style="font-size:15px;font-weight:800">계정 연동</div>
+    <div style="font-size:15px;font-weight:800" data-i18n="onb.step.1">계정 연동</div>
     <div style="font-size:12px;font-weight:700;color:var(--t3)">1/3</div>
   </div>
   <div style="padding:0 20px">
@@ -3018,8 +3018,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <div style="flex:1;height:3px;border-radius:2px;background:var(--b)"></div>
       <div style="flex:1;height:3px;border-radius:2px;background:var(--b)"></div>
     </div>
-    <div style="font-size:22px;font-weight:900;letter-spacing:-.8px;margin-bottom:6px">SNS 계정 연결하기</div>
-    <div style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:28px">공식 API로만 연동돼요. 비밀번호를 입력하지 않아요.</div>
+    <div style="font-size:22px;font-weight:900;letter-spacing:-.8px;margin-bottom:6px" data-i18n="onb.connect.title">SNS 계정 연결하기</div>
+    <div style="font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:28px" data-i18n="onb.connect.sub">공식 API로만 연동돼요. 비밀번호를 입력하지 않아요.</div>
     <div style="display:flex;flex-direction:column;gap:10px">
       <div style="display:flex;align-items:center;gap:12px;padding:16px;background:var(--mint-l);border-radius:16px;border:1px solid #A7F3D0;cursor:pointer" id="ig-btn" onclick="connectIG()">
         <div class="ch-av ch-ig" style="flex-shrink:0;border-radius:12px;width:42px;height:42px;font-size:11px">IG</div>
@@ -3043,16 +3043,16 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         </div>
       </div>
     </div>
-    <div style="background:var(--mint-l);border-radius:12px;padding:12px 14px;margin-top:16px;font-size:12px;color:var(--mint-d);font-weight:500;line-height:1.6">비밀번호는 저장되지 않아요. Meta, TikTok, YouTube 공식 OAuth를 통해 안전하게 연동돼요.</div>
-    <button class="btn-dark" style="margin-top:20px" onclick="go('v-learn')">다음 — AI 말투 학습</button>
-    <button class="btn-outline" onclick="go('v-learn')">나중에 연동하기</button>
+    <div style="background:var(--mint-l);border-radius:12px;padding:12px 14px;margin-top:16px;font-size:12px;color:var(--mint-d);font-weight:500;line-height:1.6" data-i18n="onb.connect.security">비밀번호는 저장되지 않아요. Meta, TikTok, YouTube 공식 OAuth를 통해 안전하게 연동돼요.</div>
+    <button class="btn-dark" style="margin-top:20px" onclick="go('v-learn')" data-i18n="onb.connect.next">다음 — AI 말투 학습</button>
+    <button class="btn-outline" onclick="go('v-learn')" data-i18n="onb.connect.later">나중에 연동하기</button>
   </div>
 </div>
 
 <!-- ════ AI 말투 학습 진행 ════ -->
 <div class="vw" id="v-learn">
   <div class="hdr">
-    <div style="font-size:15px;font-weight:800">AI 말투 학습</div>
+    <div style="font-size:15px;font-weight:800" data-i18n="onb.step.2">AI 말투 학습</div>
     <div style="font-size:12px;font-weight:700;color:var(--t3)">2/3</div>
   </div>
   <div style="padding:0 20px">
@@ -3073,8 +3073,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         <div class="learn-pct-lbl">%</div>
       </div>
     </div>
-    <div class="learn-status" id="learn-status">게시물 분석 중...</div>
-    <div class="learn-detail" id="learn-detail">최근 게시물 250개를 읽고 있어요.<br>말투·이모지·뉘앙스를 학습해요.</div>
+    <div class="learn-status" id="learn-status" data-i18n="onb.learn.status">게시물 분석 중...</div>
+    <div class="learn-detail" id="learn-detail" data-i18n="onb.learn.detail">최근 게시물 250개를 읽고 있어요. 말투·이모지·뉘앙스를 학습해요.</div>
   </div>
 
   <div class="learn-log">
@@ -3097,15 +3097,15 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   </div>
 
   <div style="padding:0 24px">
-    <div style="font-size:12px;font-weight:700;color:var(--t3);margin-bottom:10px">학습된 말투 특징</div>
+    <div style="font-size:12px;font-weight:700;color:var(--t3);margin-bottom:10px" data-i18n="onb.learn.tags_label">학습된 말투 특징</div>
     <div class="learn-tags" id="learn-tags" style="padding:0">
-      <div class="learn-tag" style="animation-delay:.2s">친근한 어투</div>
-      <div class="learn-tag" style="animation-delay:.5s">이모지 적절히</div>
-      <div class="learn-tag" style="animation-delay:.8s">반말 없음</div>
-      <div class="learn-tag" style="animation-delay:1.1s">감사 표현 자주</div>
-      <div class="learn-tag" style="animation-delay:1.4s">플랫폼 직접 안내</div>
+      <div class="learn-tag" style="animation-delay:.2s" data-i18n="onb.learn.tag1">친근한 어투</div>
+      <div class="learn-tag" style="animation-delay:.5s" data-i18n="onb.learn.tag2">이모지 적절히</div>
+      <div class="learn-tag" style="animation-delay:.8s" data-i18n="onb.learn.tag3">반말 없음</div>
+      <div class="learn-tag" style="animation-delay:1.1s" data-i18n="onb.learn.tag4">감사 표현 자주</div>
+      <div class="learn-tag" style="animation-delay:1.4s" data-i18n="onb.learn.tag5">플랫폼 직접 안내</div>
     </div>
-    <button class="btn-dark" id="learn-btn" onclick="go('v-complete')" style="margin-top:20px;opacity:.4;pointer-events:none">학습 완료 대기 중...</button>
+    <button class="btn-dark" id="learn-btn" onclick="go('v-complete')" style="margin-top:20px;opacity:.4;pointer-events:none" data-i18n="onb.learn.btn_wait">학습 완료 대기 중...</button>
   </div>
 </div>
 
@@ -3122,26 +3122,26 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div style="width:80px;height:80px;border-radius:28px;background:var(--mint-l);border:1px solid #A7F3D0;display:flex;align-items:center;justify-content:center;margin-bottom:24px">
       <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="var(--mint)" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>
     </div>
-    <div style="font-size:26px;font-weight:900;letter-spacing:-1px;margin-bottom:10px">준비 완료!</div>
-    <div style="font-size:15px;color:var(--t2);line-height:1.7;margin-bottom:40px">AI가 말투 학습을 마쳤어요.<br>이제부터 Ssobi가<br>나 대신 관리해드릴게요.</div>
+    <div style="font-size:26px;font-weight:900;letter-spacing:-1px;margin-bottom:10px" data-i18n="onb.done.title">준비 완료!</div>
+    <div style="font-size:15px;color:var(--t2);line-height:1.7;margin-bottom:40px" data-i18n="onb.done.sub">AI가 말투 학습을 마쳤어요. 이제부터 Ssobi가 나 대신 관리해드릴게요.</div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;width:100%;margin-bottom:32px">
       <div style="background:var(--bg);border-radius:14px;padding:14px 8px;text-align:center;border:1px solid var(--b)">
         <div style="font-size:20px;font-weight:900;color:var(--mint)">98%</div>
-        <div style="font-size:10px;color:var(--t3);font-weight:600;margin-top:3px">말투 일치도</div>
+        <div style="font-size:10px;color:var(--t3);font-weight:600;margin-top:3px" data-i18n="onb.done.match">말투 일치도</div>
       </div>
       <div style="background:var(--bg);border-radius:14px;padding:14px 8px;text-align:center;border:1px solid var(--b)">
         <div style="font-size:20px;font-weight:900;color:var(--t1)">250</div>
-        <div style="font-size:10px;color:var(--t3);font-weight:600;margin-top:3px">학습 게시물</div>
+        <div style="font-size:10px;color:var(--t3);font-weight:600;margin-top:3px" data-i18n="onb.done.posts">학습 게시물</div>
       </div>
       <div style="background:var(--bg);border-radius:14px;padding:14px 8px;text-align:center;border:1px solid var(--b)">
         <div style="font-size:20px;font-weight:900;color:var(--t1)">24h</div>
-        <div style="font-size:10px;color:var(--t3);font-weight:600;margin-top:3px">자동 운영</div>
+        <div style="font-size:10px;color:var(--t3);font-weight:600;margin-top:3px" data-i18n="onb.done.uptime">자동 운영</div>
       </div>
     </div>
   </div>
   <div style="padding:0 24px calc(32px + env(safe-area-inset-bottom))">
-    <button class="btn-mint-full" onclick="go('home')">대시보드로 이동하기</button>
+    <button class="btn-mint-full" onclick="go('home')" data-i18n="onb.done.dashboard">대시보드로 이동하기</button>
   </div>
 </div>
 
@@ -3167,7 +3167,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <!-- 편집기 본체 - 동적 렌더 -->
   <div class="lke-editor" id="lke-editor"></div>
 
-  <button class="lke-preview-exit" onclick="lkeTogglePreview()">✕ 편집으로</button>
+  <button class="lke-preview-exit" onclick="lkeTogglePreview()" data-i18n="link.exit_preview">✕ 편집으로</button>
 
   <!-- 히어로 텍스트 정렬 미니 툴바 -->
   <div class="lke-align-bar" id="lke-align-bar" onmousedown="event.preventDefault()">
@@ -3182,21 +3182,21 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 <!-- Sheet: 블록 추가 (미리보기 카드 큰 버전) -->
 <div class="lke-edit-sheet" id="lke-sheet-add-block">
   <div class="lke-sheet-handle"></div>
-  <div class="lke-sheet-header"><div class="lke-sheet-title">블록 추가</div><button class="lke-sheet-close" onclick="lkeCloseSheet()">✕</button></div>
+  <div class="lke-sheet-header"><div class="lke-sheet-title" data-i18n="link.add_block_title">블록 추가</div><button class="lke-sheet-close" onclick="lkeCloseSheet()">✕</button></div>
   <div class="lke-sheet-body"><div class="lke-block-picker-v2" id="lke-block-picker"></div></div>
 </div>
 
 <!-- Sheet: 테마 -->
 <div class="lke-edit-sheet" id="lke-sheet-theme">
   <div class="lke-sheet-handle"></div>
-  <div class="lke-sheet-header"><div class="lke-sheet-title">테마</div><button class="lke-sheet-close" onclick="lkeCloseSheet()">✕</button></div>
+  <div class="lke-sheet-header"><div class="lke-sheet-title" data-i18n="link.theme_title">테마</div><button class="lke-sheet-close" onclick="lkeCloseSheet()">✕</button></div>
   <div class="lke-sheet-body" id="lke-theme-body"></div>
 </div>
 
 <!-- Sheet: 설정 -->
 <div class="lke-edit-sheet" id="lke-sheet-settings">
   <div class="lke-sheet-handle"></div>
-  <div class="lke-sheet-header"><div class="lke-sheet-title">설정</div><button class="lke-sheet-close" onclick="lkeCloseSheet()">✕</button></div>
+  <div class="lke-sheet-header"><div class="lke-sheet-title" data-i18n="link.settings_title">설정</div><button class="lke-sheet-close" onclick="lkeCloseSheet()">✕</button></div>
   <div class="lke-sheet-body">
     <div class="lke-field-group">
       <div class="lke-field-label">숏링크 핸들</div>
@@ -3220,7 +3220,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 <!-- Sheet: 블록 편집 (type별 동적 폼) -->
 <div class="lke-edit-sheet" id="lke-sheet-edit">
   <div class="lke-sheet-handle"></div>
-  <div class="lke-sheet-header"><div class="lke-sheet-title" id="lke-edit-title">블록 편집</div><button class="lke-sheet-close" onclick="lkeCloseSheet()">✕</button></div>
+  <div class="lke-sheet-header"><div class="lke-sheet-title" id="lke-edit-title" data-i18n="link.block_edit_title">블록 편집</div><button class="lke-sheet-close" onclick="lkeCloseSheet()">✕</button></div>
   <div class="lke-sheet-body" id="lke-edit-body"></div>
 </div>
 
@@ -5584,6 +5584,48 @@ var I18N = {
     'auth.signup.title2':'7일 무료 체험, 지금 시작',
     'auth.signup.sub2':'카드 등록 없이 바로 시작해요',
     'auth.signup.heading':'회원가입',
+    // 비번 재설정
+    'auth.reset.heading':'새 비밀번호 설정',
+    'auth.reset.sub_text':'비밀번호를 변경하고 다시 로그인하세요',
+    'auth.reset.new_pw_ph':'새 비밀번호 (6자 이상)',
+    'auth.reset.confirm_pw_ph':'비밀번호 확인',
+    'auth.reset.btn':'비밀번호 변경',
+    // 온보딩 (3 단계)
+    'onb.step.1':'계정 연동',
+    'onb.step.2':'AI 말투 학습',
+    'onb.step.3':'설정 완료',
+    'onb.step_n_of':'1/3',
+    'onb.step_n_of_2':'2/3',
+    'onb.step_n_of_3':'3/3',
+    'onb.connect.title':'SNS 계정 연결하기',
+    'onb.connect.sub':'공식 API로만 연동돼요. 비밀번호를 입력하지 않아요.',
+    'onb.connect.tap':'탭해서 연동하기',
+    'onb.connect.security':'비밀번호는 저장되지 않아요. Meta, TikTok, YouTube 공식 OAuth를 통해 안전하게 연동돼요.',
+    'onb.connect.next':'다음 — AI 말투 학습',
+    'onb.connect.later':'나중에 연동하기',
+    // AI 말투 학습 진행
+    'onb.learn.status':'게시물 분석 중...',
+    'onb.learn.detail':'최근 게시물 250개를 읽고 있어요. 말투·이모지·뉘앙스를 학습해요.',
+    'onb.learn.tag1':'친근한 어투',
+    'onb.learn.tag2':'이모지 적절히',
+    'onb.learn.tag3':'반말 없음',
+    'onb.learn.tag4':'감사 표현 자주',
+    'onb.learn.tag5':'플랫폼 직접 안내',
+    'onb.learn.tags_label':'학습된 말투 특징',
+    'onb.learn.btn_wait':'학습 완료 대기 중...',
+    // 설정 완료
+    'onb.done.title':'준비 완료!',
+    'onb.done.sub':'AI가 말투 학습을 마쳤어요. 이제부터 Ssobi가 나 대신 관리해드릴게요.',
+    'onb.done.match':'말투 일치도',
+    'onb.done.posts':'학습 게시물',
+    'onb.done.uptime':'자동 운영',
+    'onb.done.dashboard':'대시보드로 이동하기',
+    // 내 링크 시트
+    'link.exit_preview':'✕ 편집으로',
+    'link.add_block_title':'블록 추가',
+    'link.theme_title':'테마',
+    'link.settings_title':'설정',
+    'link.block_edit_title':'블록 편집',
     // 플랜 모달
     'mod.plan.title':'이용권',
     'mod.plan.sub':'성장 단계에 맞는 플랜을 선택하세요',
@@ -6000,6 +6042,48 @@ var I18N = {
     'auth.signup.title2':'Start your 7-day free trial',
     'auth.signup.sub2':'No card. Start in seconds.',
     'auth.signup.heading':'Sign up',
+    // password reset
+    'auth.reset.heading':'Set new password',
+    'auth.reset.sub_text':'Update your password and sign in again.',
+    'auth.reset.new_pw_ph':'New password (6+ characters)',
+    'auth.reset.confirm_pw_ph':'Confirm password',
+    'auth.reset.btn':'Update password',
+    // onboarding (3 steps)
+    'onb.step.1':'Connect accounts',
+    'onb.step.2':'AI tone learning',
+    'onb.step.3':'Setup complete',
+    'onb.step_n_of':'1/3',
+    'onb.step_n_of_2':'2/3',
+    'onb.step_n_of_3':'3/3',
+    'onb.connect.title':'Connect your SNS accounts',
+    'onb.connect.sub':'Connected via official API only — no passwords are entered.',
+    'onb.connect.tap':'Tap to connect',
+    'onb.connect.security':'No passwords are stored. Connection is secured by official OAuth from Meta, TikTok, and YouTube.',
+    'onb.connect.next':'Next — AI tone learning',
+    'onb.connect.later':'Connect later',
+    // AI tone learning progress
+    'onb.learn.status':'Analyzing posts…',
+    'onb.learn.detail':'Reading your most recent 250 posts. Learning tone, emoji style, and nuance.',
+    'onb.learn.tag1':'Friendly tone',
+    'onb.learn.tag2':'Tasteful emoji',
+    'onb.learn.tag3':'Polite (no banmal)',
+    'onb.learn.tag4':'Frequent thanks',
+    'onb.learn.tag5':'Direct platform links',
+    'onb.learn.tags_label':'Learned tone traits',
+    'onb.learn.btn_wait':'Waiting for learning to finish…',
+    // setup done
+    'onb.done.title':'Setup complete.',
+    'onb.done.sub':'AI has learned your tone. From now on, Ssobi handles things in your voice.',
+    'onb.done.match':'Tone match',
+    'onb.done.posts':'Posts analyzed',
+    'onb.done.uptime':'Auto-run',
+    'onb.done.dashboard':'Go to dashboard',
+    // my link sheets
+    'link.exit_preview':'✕ Exit preview',
+    'link.add_block_title':'Add block',
+    'link.theme_title':'Theme',
+    'link.settings_title':'Settings',
+    'link.block_edit_title':'Edit block',
     // plan modal
     'mod.plan.title':'Subscription',
     'mod.plan.sub':'Pick the plan that matches your stage',
