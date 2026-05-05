@@ -19,11 +19,12 @@
 ▶ 너 차례 — 영상 녹화부터:
 
 1. Pre-flight 체크리스트 (Section 6) 빠르게 통과 (5분)
-2. 영상 6개 녹화 (Section 4 시퀀스, Section 3 자막) — 30~40분
+2. 영상 5개 녹화 (Section 4 시퀀스, Section 3 자막) — 30~40분
+   └─ 권한 5개 × 영상 1개씩, Video 5 끝에 사용자 통제권 10초 추가
 3. Meta App Review 폼 제출 (Section 5)
    ├─ Section 1 의 Submission Notes 그대로 붙여넣기
    ├─ Section 2 의 권한별 Use Case 5개 붙여넣기
-   └─ 영상 6개 업로드
+   └─ 영상 5개 업로드 (각 권한 신청 칸에 해당 영상)
 ```
 
 영문은 단 한 글자도 손대지 마. **그대로 복붙**하면 됨.
@@ -455,7 +456,9 @@ Screencast: Video 5 (DM received + AI draft + send).
        requires this permission to be approved.
 ```
 
-## 3.5 Video 5 — Direct Messages (60s)
+## 3.5 Video 5 — Direct Messages + User Control (75s)
+
+> Video 5 끝에 **사용자 통제권 시연 10초** 추가. 별도 영상 X.
 
 ```
 [0:00] Asset selection: @sisru_doku is the connected account.
@@ -472,22 +475,10 @@ Screencast: Video 5 (DM received + AI draft + send).
        24-hour Standard Messaging Window.
 [0:55] Reply marked as sent in the audit log.
 [1:00] In production traffic, the reply will be delivered to the
-       user's Instagram inbox. Native client delivery requires
-       this permission to be approved.
-```
-
-## 3.6 Video 6 — User Control & Compliance (45s, 보너스)
-
-```
-[0:00] Ssobi gives users full control over auto-reply behavior.
-[0:05] Master toggle: ON — auto-reply enabled.
-[0:12] Per-channel toggles: comments and DMs can be enabled
-       independently.
-[0:20] Toggle DMs OFF.
-[0:25] Audit log shows the next incoming event was skipped with
-       skip_reason="channel_toggle_off".
-[0:35] Language switcher: English / Korean — Profile → Language.
-[0:42] Meta-aligned user controls and full transparency.
+       user's Instagram inbox.
+[1:05] Demonstrating user control: master auto-reply toggle is OFF.
+[1:10] Audit log shows the next incoming event was skipped with
+       skip_reason="global_toggle_off" — user retains full control.
 ```
 
 ---
@@ -517,13 +508,15 @@ Screencast: Video 5 (DM received + AI draft + send).
 
 권장 파일명:
 ```
-ssobi_video_1_oauth.mov
-ssobi_video_2_basic_insights.mov
-ssobi_video_3_publish.mov     ← 가장 중요 (Track A 증거)
-ssobi_video_4_comments.mov
-ssobi_video_5_messages.mov
-ssobi_video_6_compliance.mov  (옵션, 시간 남으면)
+ssobi_video_1_oauth.mov              → instagram_business_basic
+ssobi_video_2_basic_insights.mov     → instagram_business_manage_insights
+ssobi_video_3_publish.mov            → instagram_business_content_publish ★
+ssobi_video_4_comments.mov           → instagram_business_manage_comments
+ssobi_video_5_messages_control.mov   → instagram_business_manage_messages
+                                        (+ 사용자 통제권 시연 10초)
 ```
+
+총 5개. 권한 1개당 영상 1개.
 
 ## C. 자막 추가 (옵션)
 
