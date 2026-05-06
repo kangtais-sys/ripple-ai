@@ -473,6 +473,9 @@ window.addEventListener('load', function(){
   var params = new URLSearchParams(window.location.search);
   var tab = params.get('tab');
   var hash = window.location.hash.slice(1); // "data-deletion" 등
+  var path = window.location.pathname;
+  // /privacy 경로면 자동으로 privacy 탭 (Vercel rewrite 이후 query 가 사라지므로 path 로 판단)
+  if(!tab && (path === '/privacy' || path.endsWith('/privacy'))) tab = 'privacy';
   // 해시가 #data-deletion 이면 privacy 탭으로 자동 전환
   if(hash === 'data-deletion' && !tab) tab = 'privacy';
   if(tab === 'privacy') switchTab('privacy', hash);
