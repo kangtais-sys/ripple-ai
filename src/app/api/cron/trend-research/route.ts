@@ -148,7 +148,10 @@ ${JSON.stringify(catSearchTrim, null, 2)}
           'anthropic-version': '2023-06-01',
         },
         body: JSON.stringify({
-          model: 'claude-sonnet-4-5-20250929',
+          // 2026-05 변경: Sonnet 4.5 → Haiku 4.5 (180개 토픽 출력 시 sonnet 은 300s timeout)
+          //   Haiku 4.5 가 3~5배 빠름, 토픽 후킹 품질 차이 미미 (formulaic copy)
+          //   /api/trends/more 도 동일 모델 사용 → 일관성
+          model: 'claude-haiku-4-5-20251001',
           max_tokens: maxTokens,
           system: '너는 JSON-only API 다. 응답은 반드시 valid JSON 객체 하나로만. 마크다운 코드블록 (```), 설명, 인사말, 그 어떤 prefix/suffix 도 절대 금지. 첫 글자 { 로 시작해서 마지막 글자 } 로 끝나는 단일 JSON.',
           messages: [
@@ -244,7 +247,7 @@ ${JSON.stringify(catSearchTrim, null, 2)}
       meta: {
         stats,
         usage: (claudeResp as { usage?: Record<string, unknown> })?.usage || null,
-        model: 'claude-sonnet-4-5-20250929',
+        model: 'claude-haiku-4-5-20251001',
       },
     }, { onConflict: 'date_kst' })
 
