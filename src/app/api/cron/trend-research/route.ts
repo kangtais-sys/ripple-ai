@@ -187,10 +187,12 @@ ${JSON.stringify(catSearchTrim, null, 2)}
   }
 
   // ─── 1차 시도 ───
-  //   18 cat × 8 topic = 144 topics, 평균 80 token = ~12,000 출력 토큰
-  //   Haiku 4.5 throughput ~100 tok/s → ~120s 출력 시간
-  //   retry 비활성화 (300s budget 안에서 1회 시도만, 실패하면 다음 cron 까지 대기)
-  const attempt = await callClaude(16000)
+  //   18 cat × 8 topic = 144 topics + recommended_topics 3 + top5 5 = 152 entries
+  //   각 entry 평균 ~130 token (topic + why + preview_hook + body_preview + sources)
+  //   = ~20,000 출력 토큰. max_tokens 22000 으로 잘림 방지 (16000 은 부족 — 검증됨)
+  //   Haiku 4.5 ~100 tok/s → ~200s. 전체 budget 300s 안에서 fits (RSS+Tavily 병렬)
+  //   retry 비활성화: cron 매일 도니까 1회 실패해도 다음날 자동 복구
+  const attempt = await callClaude(22000)
   if (attempt.ok && attempt.text) {
     claudeResp = attempt.resp || {}
     claudeRawText = attempt.text
