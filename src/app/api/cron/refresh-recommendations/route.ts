@@ -49,8 +49,10 @@ async function processUser(
   userId: string,
   userTopics: string[],
   dateKst: string,
-  pool: { recs: Topic[]; top5: Topic[] }
+  pool: { recs: Topic[]; top5: Topic[]; byCategory: Topic[] }
 ) {
+  // 후보 풀: recommended_topics (3) + top5 (5) + topics_by_category 평탄화 (18 × 10 = 180)
+  //   유저별 매칭 점수 매겨 상위 15개 (mirra 급 풍부함)
   const candidates: Topic[] = [
     ...pool.recs,
     ...pool.top5.map(t => ({
@@ -59,23 +61,40 @@ async function processUser(
       why: undefined,
       preview_hook: undefined,
     })),
+    ...pool.byCategory,
   ].filter(t => !!t.topic)
 
-  // 점수 매겨 정렬 → 상위 3개
-  const scored = candidates
+  // dedupe by topic
+  const seen = new Set<string>()
+  const dedup: Topic[] = []
+  for (const t of candidates) {
+    const key = (t.topic || '').trim()
+    if (!key || seen.has(key)) continue
+    seen.add(key)
+    dedup.push(t)
+  }
+
+  // 점수 매겨 정렬 → 상위 15개
+  const scored = dedup
     .map(t => ({ t, score: scoreTopic(t, userTopics) }))
     .sort((a, b) => b.score - a.score)
 
-  const top3 = (scored[0]?.score ?? 0) > 0
-    ? scored.filter(s => s.score > 0).slice(0, 3).map(s => s.t)
-    : pool.recs.slice(0, 3) // 매칭 없으면 공용 추천 그대로
+  // 매칭된 게 있으면 매칭 우선 + 매칭 0짜리도 fill 해서 15개 맞춤 (다양성 보장)
+  const matched = scored.filter(s => s.score > 0).map(s => s.t)
+  const unmatched = scored.filter(s => s.score === 0).map(s => s.t)
+  const final = [...matched, ...unmatched].slice(0, 15)
 
   await sb.from('user_daily_recs').upsert({
     user_id: userId,
     date_kst: dateKst,
     generated_at: new Date().toISOString(),
-    topics: top3,
-    meta: { onboarding_topics: userTopics, matched: top3.length, mode: scored[0]?.score ? 'matched' : 'fallback' },
+    topics: final,
+    meta: {
+      onboarding_topics: userTopics,
+      matched: matched.length,
+      total: final.length,
+      mode: matched.length > 0 ? 'matched' : 'fallback',
+    },
   }, { onConflict: 'user_id,date_kst' })
 }
 
@@ -95,21 +114,39 @@ export async function GET(req: NextRequest) {
   const kstNow = new Date(now.getTime() + (9 * 60 - now.getTimezoneOffset()) * 60 * 1000)
   const dateKst = kstNow.toISOString().slice(0, 10)
 
-  // 1) 오늘의 daily_trends 풀 — 없으면 최근 7일
+  // 1) 오늘의 daily_trends 풀 — topics_by_category 까지 가져와서 후보 폭 확대
   const { data: today } = await sb
     .from('daily_trends')
-    .select('date_kst, top5, recommended_topics')
+    .select('date_kst, top5, recommended_topics, topics_by_category')
     .lte('date_kst', dateKst)
     .order('date_kst', { ascending: false })
     .limit(1)
     .maybeSingle()
 
+  // topics_by_category 평탄화 — 각 토픽에 카테고리 자동 첨부
+  const byCategory: Topic[] = []
+  const tbc = (today?.topics_by_category as Record<string, Array<Record<string, unknown>>>) || {}
+  Object.keys(tbc).forEach(cat => {
+    const arr = Array.isArray(tbc[cat]) ? tbc[cat] : []
+    arr.forEach(t => {
+      if (t && typeof t === 'object' && typeof t.topic === 'string') {
+        byCategory.push({
+          topic: t.topic as string,
+          category: cat,
+          why: typeof t.why === 'string' ? t.why : undefined,
+          preview_hook: typeof t.preview_hook === 'string' ? t.preview_hook : undefined,
+        })
+      }
+    })
+  })
+
   const pool = {
     recs: (today?.recommended_topics as Topic[]) || [],
     top5: (today?.top5 as Topic[]) || [],
+    byCategory,
   }
 
-  if (pool.recs.length === 0 && pool.top5.length === 0) {
+  if (pool.recs.length === 0 && pool.top5.length === 0 && pool.byCategory.length === 0) {
     return NextResponse.json({ ok: false, reason: 'no_daily_trends' })
   }
 
@@ -140,6 +177,6 @@ export async function GET(req: NextRequest) {
     date_kst: dateKst,
     processed,
     failed,
-    pool_size: { recs: pool.recs.length, top5: pool.top5.length },
+    pool_size: { recs: pool.recs.length, top5: pool.top5.length, byCategory: pool.byCategory.length },
   })
 }
