@@ -14006,7 +14006,11 @@ function showPublishProgress(title, sub, step){
     ov.id = 'publish-progress';
     ov.style.cssText = 'position:fixed;inset:0;background:rgba(15,19,25,.72);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
     ov.innerHTML =
-      '<div style="background:#fff;border-radius:22px;padding:28px 24px 24px;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)">' +
+      '<div style="background:#fff;border-radius:22px;padding:28px 24px 24px;max-width:360px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3);position:relative">' +
+        // 닫기 버튼 (백그라운드 발행 시작 후 또는 실패 시 노출)
+        '<button id="pp-close" type="button" onclick="hidePublishProgress()" aria-label="닫기" style="display:none;position:absolute;top:12px;right:12px;width:32px;height:32px;border:none;background:#F3F4F6;border-radius:50%;cursor:pointer;align-items:center;justify-content:center;color:var(--t2);font-size:18px;line-height:1">' +
+          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:14px;height:14px"><line x1="18" y1="6" x2="6" y2="18" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke-linecap="round"/></svg>' +
+        '</button>' +
         // 스피너
         '<div style="display:flex;justify-content:center;margin-bottom:18px">' +
           '<div id="pp-spin" style="width:44px;height:44px;border:3px solid #D1FAE5;border-top-color:var(--mint);border-radius:50%;animation:pp-spin .8s linear infinite"></div>' +
@@ -14028,8 +14032,12 @@ function showPublishProgress(title, sub, step){
         '<div style="margin-top:18px;height:4px;background:#F3F4F6;border-radius:2px;overflow:hidden">' +
           '<div id="pp-progress" style="height:100%;width:0%;background:var(--mint);transition:width .4s ease"></div>' +
         '</div>' +
+        // 백그라운드 발행 시작 시 노출되는 안내 + 닫기 버튼
+        '<button id="pp-dismiss" type="button" onclick="hidePublishProgress()" style="display:none;width:100%;margin-top:18px;padding:12px;border:none;background:#F3F4F6;color:var(--t1);font-size:13px;font-weight:700;border-radius:10px;cursor:pointer">' +
+          '백그라운드에서 계속 — 닫기' +
+        '</button>' +
       '</div>' +
-      '<style>@keyframes pp-spin { from {transform:rotate(0)} to {transform:rotate(360deg)} }</style>';
+      '<style>@keyframes pp-spin { from {transform:rotate(0)} to {transform:rotate(360deg)} } #pp-close:hover{background:#E5E7EB !important} #pp-dismiss:hover{background:#E5E7EB !important}</style>';
     document.body.appendChild(ov);
   }
   updatePublishProgress(title, sub, step);
@@ -14092,6 +14100,13 @@ function updatePublishProgress(title, sub, step){
       spin.innerHTML = '';
     }
   }
+  // 닫기 버튼 노출 — step 3 (백그라운드 발행 시작) 또는 step 0 (실패) 또는 완료
+  //   step 1·2 (저장·전송 중) 에는 모달 못 닫음 — 끊기면 발행 자체가 무산되니까
+  var closeX = document.getElementById('pp-close');
+  var dismissBtn = document.getElementById('pp-dismiss');
+  var canDismiss = (step === 3 || step === 0 || step === PP_STEPS.length);
+  if(closeX) closeX.style.display = canDismiss ? 'flex' : 'none';
+  if(dismissBtn) dismissBtn.style.display = (step === 3) ? 'block' : 'none';
 }
 function hidePublishProgress(){
   var ov = document.getElementById('publish-progress');
@@ -14913,55 +14928,80 @@ function setTab(t){
   if(t==='insight') loadInsights();
 }
 
+function _renderInsights(j){
+  var content = document.getElementById('insight-content');
+  if(!content) return;
+  var fmt = function(n){ return (n||0).toLocaleString('ko-KR'); };
+  document.getElementById('ins-followers').textContent = fmt(j.profile.followers_count);
+  document.getElementById('ins-media').textContent = fmt(j.profile.media_count);
+  document.getElementById('ins-reach').textContent = fmt(j.last_7_days.reach);
+  document.getElementById('ins-imp').textContent = fmt(j.last_7_days.impressions);
+  document.getElementById('ins-pv').textContent = fmt(j.last_7_days.profile_views);
+  document.getElementById('ins-wc').textContent = fmt(j.last_7_days.website_clicks);
+  var list = document.getElementById('ins-media-list');
+  while(list.firstChild) list.removeChild(list.firstChild);
+  (j.media||[]).forEach(function(m){
+    var card = document.createElement('div');
+    card.style.cssText='background:#fff;border:1px solid var(--b);border-radius:12px;padding:12px 14px;margin-bottom:8px';
+    var cap = (m.caption||'').slice(0,80).replace(/\n/g,' ');
+    card.innerHTML =
+      '<div style="font-size:12px;color:var(--t1);line-height:1.5;margin-bottom:8px">'+(cap||'(캡션 없음)')+'</div>'+
+      '<div style="display:flex;gap:12px;font-size:11px;color:var(--t3);font-weight:700">'+
+        '<span>❤ '+fmt(m.like_count)+'</span>'+
+        '<span>💬 '+fmt(m.comments_count)+'</span>'+
+        (m.reach?'<span>👁 도달 '+fmt(m.reach)+'</span>':'')+
+        (m.impressions?'<span>🔁 노출 '+fmt(m.impressions)+'</span>':'')+
+      '</div>';
+    list.appendChild(card);
+  });
+}
+
 async function loadInsights(){
   var loading = document.getElementById('insight-loading');
   var content = document.getElementById('insight-content');
   var empty = document.getElementById('insight-empty');
   var errBox = document.getElementById('insight-error');
   if(!content) return;
-  loading.style.display='';
-  content.style.display='none';
-  empty.style.display='none';
-  errBox.style.display='none';
+
+  // 1) 캐시 즉시 적용 — 빈 로딩 스크린 회피
+  var cached = _cacheRead('ssobi_insights_v1');
+  if (cached && cached.profile) {
+    loading.style.display='none';
+    empty.style.display='none';
+    errBox.style.display='none';
+    content.style.display='';
+    _renderInsights(cached);
+  } else {
+    loading.style.display='';
+    content.style.display='none';
+    empty.style.display='none';
+    errBox.style.display='none';
+  }
+
+  // 2) 백그라운드 fresh fetch (SWR)
   try {
     var h = await authHeaders();
     var res = await fetch('/api/insights', {credentials:'include', headers: h});
     var j = await res.json();
     loading.style.display='none';
     if(!res.ok){
-      if(j.error && j.error.indexOf('미연동')>=0){ empty.style.display=''; return; }
-      errBox.textContent = 'Insights 조회 실패: '+(j.detail||j.error||'unknown');
-      errBox.style.display='';
+      if(j.error && j.error.indexOf('미연동')>=0){ empty.style.display=''; content.style.display='none'; return; }
+      // 캐시 표시되어 있으면 에러 박스 안 띄움 (사일런트 fail)
+      if (!cached) {
+        errBox.textContent = 'Insights 조회 실패: '+(j.detail||j.error||'unknown');
+        errBox.style.display='';
+      }
       return;
     }
     content.style.display='';
-    var fmt = function(n){ return (n||0).toLocaleString('ko-KR'); };
-    document.getElementById('ins-followers').textContent = fmt(j.profile.followers_count);
-    document.getElementById('ins-media').textContent = fmt(j.profile.media_count);
-    document.getElementById('ins-reach').textContent = fmt(j.last_7_days.reach);
-    document.getElementById('ins-imp').textContent = fmt(j.last_7_days.impressions);
-    document.getElementById('ins-pv').textContent = fmt(j.last_7_days.profile_views);
-    document.getElementById('ins-wc').textContent = fmt(j.last_7_days.website_clicks);
-    var list = document.getElementById('ins-media-list');
-    while(list.firstChild) list.removeChild(list.firstChild);
-    (j.media||[]).forEach(function(m){
-      var card = document.createElement('div');
-      card.style.cssText='background:#fff;border:1px solid var(--b);border-radius:12px;padding:12px 14px;margin-bottom:8px';
-      var cap = (m.caption||'').slice(0,80).replace(/\n/g,' ');
-      card.innerHTML =
-        '<div style="font-size:12px;color:var(--t1);line-height:1.5;margin-bottom:8px">'+(cap||'(캡션 없음)')+'</div>'+
-        '<div style="display:flex;gap:12px;font-size:11px;color:var(--t3);font-weight:700">'+
-          '<span>❤ '+fmt(m.like_count)+'</span>'+
-          '<span>💬 '+fmt(m.comments_count)+'</span>'+
-          (m.reach?'<span>👁 도달 '+fmt(m.reach)+'</span>':'')+
-          (m.impressions?'<span>🔁 노출 '+fmt(m.impressions)+'</span>':'')+
-        '</div>';
-      list.appendChild(card);
-    });
+    _renderInsights(j);
+    _cacheWrite('ssobi_insights_v1', j);
   } catch(e){
     loading.style.display='none';
-    errBox.textContent = 'Insights 로드 에러: '+e.message;
-    errBox.style.display='';
+    if (!cached) {
+      errBox.textContent = 'Insights 로드 에러: '+e.message;
+      errBox.style.display='';
+    }
   }
 }
 
@@ -16168,40 +16208,66 @@ var demoDashboard = {
   kakaoLinked: false
 };
 
+// localStorage 캐시 헬퍼 — stale-while-revalidate
+//   read: TTL 무시하고 일단 보여주기 (있으면). null 반환 시 데모값 사용
+//   write: 성공 fetch 후 저장. timestamp 같이 넣음 (디버깅 용)
+function _cacheRead(key){
+  try {
+    var raw = localStorage.getItem(key);
+    if(!raw) return null;
+    var obj = JSON.parse(raw);
+    return obj && obj.data ? obj.data : null;
+  } catch(_){ return null; }
+}
+function _cacheWrite(key, data){
+  try { localStorage.setItem(key, JSON.stringify({ data: data, ts: Date.now() })); } catch(_){}
+}
+
+function _applyHomeFromResponse(j){
+  if (!j || !j.current_month) return;
+  var cm = j.current_month;
+  applyDashboard({
+    savedWon: cm.total_krw,
+    percent: cm.progress_pct,
+    savedHours: cm.total_hours,
+    commentCount: cm.comment_count,
+    dmCount: cm.dm_count,
+    cardCount: cm.cardnews_count,
+    schedCount: cm.schedule_count,
+    today: cm.today,
+    daysInMonth: cm.days_in_month,
+    total: cm.comment_count + cm.dm_count,
+    monthReach: j.month_ig_reach,
+    dateLabel: demoDashboard.dateLabel,
+  });
+  // 재방문 strip
+  var strip = document.getElementById('eff-repeat-strip');
+  if (strip && j.repeat_engagement && j.repeat_engagement.total_users >= 5){
+    document.getElementById('eff-total-users').textContent = j.repeat_engagement.total_users;
+    document.getElementById('eff-repeat-users').textContent = j.repeat_engagement.repeat_users;
+    document.getElementById('eff-repeat-rate').textContent = Math.round(j.repeat_engagement.rate * 100);
+    strip.style.display = '';
+  }
+}
+
 async function loadDashboardData() {
-  // 먼저 데모값으로 UI 채움 (세션 없어도 보이게)
-  applyDashboard(demoDashboard);
-  // 실제 세션이 있으면 API로 덮어쓰기
+  // 1) 캐시 즉시 적용 (없으면 데모값) — 빈 화면 방지
+  var cached = _cacheRead('ssobi_home_dash_v1');
+  if (cached) {
+    _applyHomeFromResponse(cached);
+  } else {
+    applyDashboard(demoDashboard);
+  }
+  // 2) 백그라운드로 fresh fetch → 받으면 다시 적용 + 캐시 갱신 (SWR)
   try {
     var h = await authHeaders();
     var res = await fetch('/api/home/ssobi-effect', {credentials:'include', headers: h});
     if (!res.ok) return;
     var j = await res.json();
     if (!j || !j.current_month) return;
-    var cm = j.current_month;
-    applyDashboard({
-      savedWon: cm.total_krw,
-      percent: cm.progress_pct,
-      savedHours: cm.total_hours,
-      commentCount: cm.comment_count,
-      dmCount: cm.dm_count,
-      cardCount: cm.cardnews_count,
-      schedCount: cm.schedule_count,
-      today: cm.today,
-      daysInMonth: cm.days_in_month,
-      total: cm.comment_count + cm.dm_count,
-      monthReach: j.month_ig_reach,
-      dateLabel: demoDashboard.dateLabel,
-    });
-    // 재방문 strip
-    var strip = document.getElementById('eff-repeat-strip');
-    if (j.repeat_engagement && j.repeat_engagement.total_users >= 5){
-      document.getElementById('eff-total-users').textContent = j.repeat_engagement.total_users;
-      document.getElementById('eff-repeat-users').textContent = j.repeat_engagement.repeat_users;
-      document.getElementById('eff-repeat-rate').textContent = Math.round(j.repeat_engagement.rate * 100);
-      strip.style.display = '';
-    }
-  } catch (e) { /* 네트워크 실패해도 데모값 유지 */ }
+    _applyHomeFromResponse(j);
+    _cacheWrite('ssobi_home_dash_v1', j);
+  } catch (e) { /* 네트워크 실패해도 캐시·데모값 유지 */ }
 }
 
 // 페이지 로드 시 세션 확인 + 해시 라우팅 + IG 연동 결과
