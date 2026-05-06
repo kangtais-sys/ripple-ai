@@ -53,13 +53,13 @@ TRACK A — EVIDENCE-FIRST (instagram_business_content_publish)
 
 We provide a complete, uncut end-to-end screencast for content publishing:
 
-  • Asset selection: the connected Instagram Business account (@sisru_doku)
+  • Asset selection: the connected Instagram Business account (@millimilli.kr)
     is visible in the app header throughout
   • OAuth flow: the user grants Instagram permissions on camera
   • Live send action: the user generates a 7-card carousel via the Ssobi
     UI and clicks the "Publish to Instagram" button
   • Delivery in native client: the published carousel appears in the
-    @sisru_doku Instagram feed at the end of the video
+    @millimilli.kr Instagram feed at the end of the video
 
 This permission is functional in Development Mode, so we are able to
 demonstrate the full flow including final delivery in the native Instagram
@@ -89,7 +89,7 @@ use Meta's official "Send Test Event" feature in the App Dashboard
 identical in structure to production traffic, signed by Meta's
 infrastructure. The Track B screencasts show:
 
-  (a) Asset selection — @sisru_doku visible in the app header
+  (a) Asset selection — @millimilli.kr visible in the app header
   (b) Test event dispatched from Meta's App Dashboard
   (c) Our webhook endpoint (/api/webhook/instagram) receiving and
       parsing the event — verified by a database row written to our
@@ -100,6 +100,21 @@ infrastructure. The Track B screencasts show:
       backend invokes the appropriate Graph API endpoint
       (POST /{comment_id}/replies for comments, POST /me/messages for
       direct messages)
+
+Note on the screencast methodology: After the Meta Test Event delivery
+(which serves as proof that our webhook endpoint correctly receives
+events signed by Meta's infrastructure), we additionally use an internal
+simulation endpoint (visibly marked with a 🧪 test-tube icon in the UI)
+to scope an identical payload to the authenticated test user account.
+This is necessary because Meta's Test Event payload uses placeholder
+account IDs (entry.id = "0") that do not map to any real user record
+in our database, so the AI draft cannot be surfaced to the correct UI
+inbox via that path alone. The internal simulation creates a
+webhook-equivalent record under the authenticated user, enabling the
+screencast to show the complete end-to-end flow in one continuous take:
+webhook receipt → AI draft generation → owner review → live send action.
+Both paths invoke identical backend code; only the source of the
+user-ID mapping differs.
 
 Track A's end-to-end demonstration of native client delivery for content
 publishing serves as proof that our system correctly delivers to the
@@ -144,7 +159,7 @@ TEST CREDENTIALS
 Email:    kangtais@naver.com
 Password: (provided in the test credentials field of this submission)
 
-The connected Instagram Business account (@sisru_doku) is registered
+The connected Instagram Business account (@millimilli.kr) is registered
 as an Instagram Tester for this app. To exercise the OAuth flow during
 review, navigate to: Profile → Account integration → Instagram →
 Disconnect, then re-connect via the OAuth button.
@@ -393,13 +408,13 @@ Screencast: Video 5 (DM received + AI draft + send).
 [0:38] Instagram permission consent screen — user grants access
        to the requested permissions.
 [0:48] OAuth callback — token securely exchanged on our backend.
-[0:55] Connected: @sisru_doku is now the active business asset.
+[0:55] Connected: @millimilli.kr is now the active business asset.
 ```
 
 ## 3.2 Video 2 — Profile & Insights (45s)
 
 ```
-[0:00] Asset selection: @sisru_doku is the connected business
+[0:00] Asset selection: @millimilli.kr is the connected business
        account, visible in the app header.
 [0:05] Opening Grow → Real-time → Analytics.
 [0:10] Calling GET /me/insights for reach, follower count, and
@@ -414,7 +429,7 @@ Screencast: Video 5 (DM received + AI draft + send).
 ## 3.3 Video 3 — Content Publish (75s, 핵심)
 
 ```
-[0:00] Asset selection: @sisru_doku is the connected publishing
+[0:00] Asset selection: @millimilli.kr is the connected publishing
        account.
 [0:05] Opening Create — selecting a trending topic.
 [0:12] Ssobi calls Anthropic Claude to generate a 7-card carousel
@@ -429,7 +444,7 @@ Screencast: Video 5 (DM received + AI draft + send).
        - POST /me/media_publish (publishes the container)
 [0:55] Success toast — published.
 [1:00] Switching to the native Instagram app on the recorder's phone.
-[1:05] @sisru_doku feed: the published carousel is visible.
+[1:05] @millimilli.kr feed: the published carousel is visible.
 [1:15] End-to-end content publishing flow confirmed in the native
        Instagram client.
 ```
@@ -437,7 +452,7 @@ Screencast: Video 5 (DM received + AI draft + send).
 ## 3.4 Video 4 — Comments (60s)
 
 ```
-[0:00] Asset selection: @sisru_doku is the connected account.
+[0:00] Asset selection: @millimilli.kr is the connected account.
 [0:05] Note: real comment events are restricted in Development Mode
        per Meta policy. To demonstrate the system, we use Meta's
        official "Send Test Event" feature in the App Dashboard.
@@ -461,7 +476,7 @@ Screencast: Video 5 (DM received + AI draft + send).
 > Video 5 끝에 **사용자 통제권 시연 10초** 추가. 별도 영상 X.
 
 ```
-[0:00] Asset selection: @sisru_doku is the connected account.
+[0:00] Asset selection: @millimilli.kr is the connected account.
 [0:05] Note: real DM events are restricted in Development Mode
        per Meta policy. To demonstrate the system, we use Meta's
        official "Send Test Event" feature in the App Dashboard.
@@ -563,7 +578,7 @@ ssobi_video_5_messages_control.mov   → instagram_business_manage_messages
 5. Test credentials:
    Email:    kangtais@naver.com
    Password: (네 비번)
-   Note:     "@sisru_doku is registered as Instagram Tester"
+   Note:     "@millimilli.kr is registered as Instagram Tester"
 
 6. [Submit for Review]
 ```
@@ -575,7 +590,7 @@ ssobi_video_5_messages_control.mov   → instagram_business_manage_messages
 ## A. 시스템 (이미 완료된 거 — 확인만)
 - [x] Migration 012, 013, 014 적용됨
 - [x] ssobi.ai 최신 코드 배포됨 (commit ea0cf30)
-- [x] sisru_doku OAuth 연결, token 유효 (2026-07-04 까지)
+- [x] millimilli.kr OAuth 연결, token 유효 (2026-07-04 까지)
 - [x] tone_profile 학습 완료
 - [x] Anthropic 크레딧 충분
 - [x] **i18n 시스템 완성** — 208 keys, 145 elements 마킹
@@ -598,7 +613,7 @@ ssobi_video_5_messages_control.mov   → instagram_business_manage_messages
 - [ ] Instagram → messages [Test] 버튼 위치 확인
 
 ## E. Tester 등록 (확인만)
-- [x] sisru_doku 등록됨, OAuth 수락 완료
+- [x] millimilli.kr 등록됨, OAuth 수락 완료
 - [x] millimilli.kr 등록됨, OAuth 수락 완료
 
 ---
