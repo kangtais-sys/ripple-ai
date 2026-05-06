@@ -69,39 +69,14 @@ ${JSON.stringify(top20, null, 2)}
 ## 입력 데이터 B (카테고리별 Tavily 검색 결과 · 매일 회전 키워드)
 ${JSON.stringify(catSearchTrim, null, 2)}
 
-## 출력 형식 (JSON 만, 다른 텍스트 X)
-{
-  "top5": [
-    { "title": "...", "source": "...", "engagement": 80, "category": "...", "researchable": true, "hook_score": 9 }
-  ],
-  "recommended_topics": [
-    { "topic": "후킹 문구 15자 이내", "category": "trend|beauty|fashion|food|cafe|travel|interior|fitness|money|book|baby|pet|kpop|movie|music|psych|mystery|life", "why": "왜 지금 뜨는지 한 줄", "preview_hook": "10자 이내 짧은 후킹", "body_preview": "카드뉴스 첫 슬라이드 본문 톤 2~3줄 (60~100자). 구체 사실/이름/수치 포함.", "sources": ["domain1", "domain2"] }
-  ],
-  "topics_by_category": {
-    "beauty":   [{ "topic": "...", "why": "...", "preview_hook": "...", "body_preview": "2~3줄", "hook_score": 8, "sources": ["domain1", "domain2"] }, ...6개],
-    "fashion":  [...6개],
-    "food":     [...6개],
-    "cafe":     [...6개],
-    "travel":   [...6개],
-    "interior": [...6개],
-    "fitness":  [...6개],
-    "money":    [...6개],
-    "book":     [...6개],
-    "baby":     [...6개],
-    "pet":      [...6개],
-    "kpop":     [...6개],
-    "movie":    [...6개],
-    "music":    [...6개],
-    "psych":    [...6개],
-    "mystery":  [...6개],
-    "life":     [...6개],
-    "trend":    [...6개]
-  }
-}
+## 출력 형식 (compact JSON · 들여쓰기·줄바꿈 최소화 — 토큰 절약)
+
+{"recommended_topics":[{"topic":"...","category":"trend|beauty|fashion|food|cafe|travel|interior|fitness|money|book|baby|pet|kpop|movie|music|psych|mystery|life","why":"...","preview_hook":"...","body_preview":"...","sources":["d1","d2"]}],"topics_by_category":{"beauty":[{"topic":"...","why":"...","preview_hook":"...","body_preview":"...","hook_score":8,"sources":["d1","d2"]},...6개],"fashion":[...6개],"food":[...6개],"cafe":[...6개],"travel":[...6개],"interior":[...6개],"fitness":[...6개],"money":[...6개],"book":[...6개],"baby":[...6개],"pet":[...6개],"kpop":[...6개],"movie":[...6개],"music":[...6개],"psych":[...6개],"mystery":[...6개],"life":[...6개],"trend":[...6개]}}
 
 룰:
+- 출력은 위 compact JSON 한 줄 (들여쓰기·불필요 공백 X). 가독성 X, 정확성·완결성 O.
 - recommended_topics 3개: 카테고리 무관 오늘 가장 핫한 주제. hook_score 9~10 만.
-- topics_by_category: 16개 카테고리 각 정확히 **6개**. 같은 카테고리 안에서도 서브토픽 다양하게 (제품 / 시술 / 트렌드 / 비교 / 후기 / 가성비 / 실패담 / 순위 골고루). 입력 데이터 B 의 카테고리별 검색 결과를 우선 활용, 부족하면 입력 데이터 A 와 모델 일반 지식으로 보강.
+- topics_by_category: 18개 카테고리 각 정확히 **6개**. 같은 카테고리 안에서도 서브토픽 다양하게 (제품 / 시술 / 트렌드 / 비교 / 후기 / 가성비 / 실패담 / 순위 골고루). 입력 데이터 B 의 카테고리별 검색 결과를 우선 활용, 부족하면 입력 데이터 A 와 모델 일반 지식으로 보강.
 - **hook_score (1~10)**: 토픽 후킹 강도 (10 = 클릭 안 할 수 없음 / 7 = 평균 / 5 이하는 만들지 말 것). 모든 토픽 7 이상.
 - **sources (배열, 1~3개)**: 그 토픽이 어디서 나온 정보인지 도메인 배열 — 입력 데이터 B 에서 활용한 도메인 우선 (예: ["vogue.com", "reddit.com"]). 입력 데이터에 해당 카테고리 정보 없으면 ["일반"] 하나.
 - topic 은 항상 한국어 자연어. 영문 제목은 한국 SNS 톤으로 의역.
@@ -154,7 +129,7 @@ ${JSON.stringify(catSearchTrim, null, 2)}
           //   /api/trends/more 도 동일 모델 사용 → 일관성
           model: 'claude-haiku-4-5-20251001',
           max_tokens: maxTokens,
-          system: '너는 JSON-only API 다. 응답은 반드시 valid JSON 객체 하나로만. 마크다운 코드블록 (```), 설명, 인사말, 그 어떤 prefix/suffix 도 절대 금지. 첫 글자 { 로 시작해서 마지막 글자 } 로 끝나는 단일 JSON.',
+          system: '너는 JSON-only API 다. 응답은 반드시 valid JSON 객체 하나로만 — **들여쓰기·줄바꿈·불필요한 공백 모두 제거된 compact JSON**. 마크다운 코드블록 (```), 설명, 인사말, 그 어떤 prefix/suffix 도 절대 금지. 첫 글자 { 로 시작해서 마지막 글자 } 로 끝나는 단일 한 줄 JSON.',
           messages: [
             { role: 'user', content: userPrompt },
             { role: 'assistant', content: '{' },  // 프리필: JSON 시작 강제
@@ -187,12 +162,12 @@ ${JSON.stringify(catSearchTrim, null, 2)}
   }
 
   // ─── 1차 시도 ───
-  //   18 cat × 6 topic = 108 + recommended 3 + top5 5 = 116 entries
-  //   각 entry 평균 ~150 token (indent 포함, sources 배열 등) = ~17,400 출력 토큰
-  //   max_tokens 22000 = 안전 margin 25% (16000 은 부족, 22000 도 8개일 때 부족했음)
-  //   Haiku 4.5 ~100 tok/s → ~175s 출력. 300s 안에서 fits (RSS+Tavily 병렬 ~50s 추가)
-  //   retry 비활성화: cron 매일 도니까 1회 실패해도 다음날 자동 복구
-  const attempt = await callClaude(22000)
+  //   18 cat × 6 + recommended 3 = 111 entries (top5 제거 — 다운스트림 미사용)
+  //   compact JSON 출력 강제 → 들여쓰기 토큰 ~30% 절약
+  //   각 entry compact ~80 token = ~9,000 출력 토큰. 안전 margin 80%
+  //   max_tokens 16000 (이전 22000 → 16000 감축, compact 로 맞음)
+  //   Haiku 4.5 ~100 tok/s → ~90s. budget 충분
+  const attempt = await callClaude(16000)
   if (attempt.ok && attempt.text) {
     claudeResp = attempt.resp || {}
     claudeRawText = attempt.text
@@ -230,7 +205,7 @@ ${JSON.stringify(catSearchTrim, null, 2)}
     .upsert({
       date_kst: dateKst,
       generated_at: new Date().toISOString(),
-      top5: parsed.top5 || [],
+      top5: [],  // 더 이상 생성 안 함 (recommended_topics + topics_by_category 만 사용)
       recommended_topics: parsed.recommended_topics || [],
       topics_by_category: parsed.topics_by_category || {},
       raw_feed_snapshot: top20,
