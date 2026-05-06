@@ -3,7 +3,7 @@
 // 2026-05 업데이트: Tavily 카테고리별 검색을 메인으로, 기존 RSS 17개는 fallback 보강.
 //   1) collectAllTrends() — RSS 17개 + IG hashtag 풀 (engagement TOP 20)
 //   2) searchAllCategories() — 카테고리당 3 query × 4 결과 (= 약 200개 풀, 도메인 다양)
-//   3) Claude 에 두 풀 모두 전달 → recommended_topics 3개 + topics_by_category 18카×10개
+//   3) Claude 에 두 풀 모두 전달 → recommended_topics 3개 + topics_by_category 18카×8개
 //      각 토픽에 sources (도메인 배열 1~3개) 자동 첨부 → multi-source 카드 가능
 //   4) daily_trends upsert (date_kst 기준)
 //
@@ -43,13 +43,14 @@ export async function GET(req: NextRequest) {
 
   // 카테고리별 검색 풀 — Claude 에 직접 전달 (토픽 생성 시 직접 인용 + sources 추출)
   // 형태: { beauty: [{title, snippet, domain}, ...], fashion: [...], ... }
+  // 입력 토큰 절약을 위해 카테고리당 최대 6개 (도메인 다양성은 이미 보장됨)
   const catSearchTrim: Record<string, Array<{ title: string; snippet: string; domain: string }>> = {}
   let catSearchTotal = 0
   Object.keys(catSearchMap).forEach(cat => {
     const items = (catSearchMap as Record<string, Array<{ title: string; snippet: string; domain: string }>>)[cat] || []
-    catSearchTrim[cat] = items.slice(0, 12).map(it => ({
+    catSearchTrim[cat] = items.slice(0, 6).map(it => ({
       title: it.title,
-      snippet: it.snippet,
+      snippet: it.snippet.slice(0, 150),  // snippet 길이도 제한
       domain: it.domain,
     }))
     catSearchTotal += catSearchTrim[cat].length
@@ -59,7 +60,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: false, reason: 'no_feed_items', stats })
   }
 
-  // 2) Claude 호출 — 두 풀 모두 던지고 카테고리당 10개 토픽 (multi-source)
+  // 2) Claude 호출 — 두 풀 모두 던지고 카테고리당 8개 토픽 (multi-source)
   const userPrompt = `${TREND_RESEARCH_PROMPT}
 
 ## 입력 데이터 A (rawFeedItems · RSS·뉴스·IG hashtag pool)
@@ -77,30 +78,30 @@ ${JSON.stringify(catSearchTrim, null, 2)}
     { "topic": "후킹 문구 15자 이내", "category": "trend|beauty|fashion|food|cafe|travel|interior|fitness|money|book|baby|pet|kpop|movie|music|psych|mystery|life", "why": "왜 지금 뜨는지 한 줄", "preview_hook": "10자 이내 짧은 후킹", "body_preview": "카드뉴스 첫 슬라이드 본문 톤 2~3줄 (60~100자). 구체 사실/이름/수치 포함.", "sources": ["domain1", "domain2"] }
   ],
   "topics_by_category": {
-    "beauty":   [{ "topic": "...", "why": "...", "preview_hook": "...", "body_preview": "2~3줄", "hook_score": 8, "sources": ["domain1", "domain2"] }, ...10개],
-    "fashion":  [...10개],
-    "food":     [...10개],
-    "cafe":     [...10개],
-    "travel":   [...10개],
-    "interior": [...10개],
-    "fitness":  [...10개],
-    "money":    [...10개],
-    "book":     [...10개],
-    "baby":     [...10개],
-    "pet":      [...10개],
-    "kpop":     [...10개],
-    "movie":    [...10개],
-    "music":    [...10개],
-    "psych":    [...10개],
-    "mystery":  [...10개],
-    "life":     [...10개],
-    "trend":    [...10개]
+    "beauty":   [{ "topic": "...", "why": "...", "preview_hook": "...", "body_preview": "2~3줄", "hook_score": 8, "sources": ["domain1", "domain2"] }, ...8개],
+    "fashion":  [...8개],
+    "food":     [...8개],
+    "cafe":     [...8개],
+    "travel":   [...8개],
+    "interior": [...8개],
+    "fitness":  [...8개],
+    "money":    [...8개],
+    "book":     [...8개],
+    "baby":     [...8개],
+    "pet":      [...8개],
+    "kpop":     [...8개],
+    "movie":    [...8개],
+    "music":    [...8개],
+    "psych":    [...8개],
+    "mystery":  [...8개],
+    "life":     [...8개],
+    "trend":    [...8개]
   }
 }
 
 룰:
 - recommended_topics 3개: 카테고리 무관 오늘 가장 핫한 주제. hook_score 9~10 만.
-- topics_by_category: 18개 카테고리 각 정확히 **10개**. 같은 카테고리 안에서도 서브토픽 다양하게 (제품 / 시술 / 트렌드 / 비교 / 후기 / 가성비 / 실패담 / 순위 골고루). 입력 데이터 B 의 카테고리별 검색 결과를 우선 활용, 부족하면 입력 데이터 A 와 모델 일반 지식으로 보강.
+- topics_by_category: 18개 카테고리 각 정확히 **8개**. 같은 카테고리 안에서도 서브토픽 다양하게 (제품 / 시술 / 트렌드 / 비교 / 후기 / 가성비 / 실패담 / 순위 골고루). 입력 데이터 B 의 카테고리별 검색 결과를 우선 활용, 부족하면 입력 데이터 A 와 모델 일반 지식으로 보강.
 - **hook_score (1~10)**: 토픽 후킹 강도 (10 = 클릭 안 할 수 없음 / 7 = 평균 / 5 이하는 만들지 말 것). 모든 토픽 7 이상.
 - **sources (배열, 1~3개)**: 그 토픽이 어디서 나온 정보인지 도메인 배열 — 입력 데이터 B 에서 활용한 도메인 우선 (예: ["vogue.com", "reddit.com"]). 입력 데이터에 해당 카테고리 정보 없으면 ["일반"] 하나.
 - topic 은 항상 한국어 자연어. 영문 제목은 한국 SNS 톤으로 의역.
@@ -186,7 +187,10 @@ ${JSON.stringify(catSearchTrim, null, 2)}
   }
 
   // ─── 1차 시도 ───
-  const attempt = await callClaude(20000)
+  //   18 cat × 8 topic = 144 topics, 평균 80 token = ~12,000 출력 토큰
+  //   Haiku 4.5 throughput ~100 tok/s → ~120s 출력 시간
+  //   retry 비활성화 (300s budget 안에서 1회 시도만, 실패하면 다음 cron 까지 대기)
+  const attempt = await callClaude(16000)
   if (attempt.ok && attempt.text) {
     claudeResp = attempt.resp || {}
     claudeRawText = attempt.text
@@ -195,22 +199,6 @@ ${JSON.stringify(catSearchTrim, null, 2)}
     else lastError = p.err || 'parse_unknown'
   } else {
     lastError = attempt.err || 'unknown'
-  }
-
-  // ─── 1차 실패 또는 topics_by_category 비었으면 재시도 (max_tokens 늘려서) ───
-  const hasValidTopics = parsed.topics_by_category && Object.keys(parsed.topics_by_category).length > 0
-  if (!hasValidTopics) {
-    console.warn('[cron] 1차 시도 실패 또는 topics_by_category 비어있음. 재시도. lastError:', lastError, 'rawText 길이:', claudeRawText.length, 'sample:', claudeRawText.slice(0, 500))
-    const retry = await callClaude(28000)  // max_tokens 늘림
-    if (retry.ok && retry.text) {
-      claudeResp = retry.resp || claudeResp
-      claudeRawText = retry.text
-      const p = tryParseJSON(retry.text)
-      if (p.ok && p.data) parsed = p.data
-      else lastError = (p.err || 'parse_unknown') + ' (retry)'
-    } else {
-      lastError = (retry.err || 'unknown') + ' (retry)'
-    }
   }
 
   // ─── 최종 검증: topics_by_category 비어있으면 silent fail 차단 ───
