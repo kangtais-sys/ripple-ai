@@ -3,7 +3,7 @@
 // 2026-05 업데이트: Tavily 카테고리별 검색을 메인으로, 기존 RSS 17개는 fallback 보강.
 //   1) collectAllTrends() — RSS 17개 + IG hashtag 풀 (engagement TOP 20)
 //   2) searchAllCategories() — 카테고리당 3 query × 4 결과 (= 약 200개 풀, 도메인 다양)
-//   3) Claude 에 두 풀 모두 전달 → recommended_topics 3개 + topics_by_category 18카×8개
+//   3) Claude 에 두 풀 모두 전달 → recommended_topics 3개 + topics_by_category 18카×6개
 //      각 토픽에 sources (도메인 배열 1~3개) 자동 첨부 → multi-source 카드 가능
 //   4) daily_trends upsert (date_kst 기준)
 //
@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: false, reason: 'no_feed_items', stats })
   }
 
-  // 2) Claude 호출 — 두 풀 모두 던지고 카테고리당 8개 토픽 (multi-source)
+  // 2) Claude 호출 — 두 풀 모두 던지고 카테고리당 6개 토픽 (multi-source)
   const userPrompt = `${TREND_RESEARCH_PROMPT}
 
 ## 입력 데이터 A (rawFeedItems · RSS·뉴스·IG hashtag pool)
@@ -78,30 +78,30 @@ ${JSON.stringify(catSearchTrim, null, 2)}
     { "topic": "후킹 문구 15자 이내", "category": "trend|beauty|fashion|food|cafe|travel|interior|fitness|money|book|baby|pet|kpop|movie|music|psych|mystery|life", "why": "왜 지금 뜨는지 한 줄", "preview_hook": "10자 이내 짧은 후킹", "body_preview": "카드뉴스 첫 슬라이드 본문 톤 2~3줄 (60~100자). 구체 사실/이름/수치 포함.", "sources": ["domain1", "domain2"] }
   ],
   "topics_by_category": {
-    "beauty":   [{ "topic": "...", "why": "...", "preview_hook": "...", "body_preview": "2~3줄", "hook_score": 8, "sources": ["domain1", "domain2"] }, ...8개],
-    "fashion":  [...8개],
-    "food":     [...8개],
-    "cafe":     [...8개],
-    "travel":   [...8개],
-    "interior": [...8개],
-    "fitness":  [...8개],
-    "money":    [...8개],
-    "book":     [...8개],
-    "baby":     [...8개],
-    "pet":      [...8개],
-    "kpop":     [...8개],
-    "movie":    [...8개],
-    "music":    [...8개],
-    "psych":    [...8개],
-    "mystery":  [...8개],
-    "life":     [...8개],
-    "trend":    [...8개]
+    "beauty":   [{ "topic": "...", "why": "...", "preview_hook": "...", "body_preview": "2~3줄", "hook_score": 8, "sources": ["domain1", "domain2"] }, ...6개],
+    "fashion":  [...6개],
+    "food":     [...6개],
+    "cafe":     [...6개],
+    "travel":   [...6개],
+    "interior": [...6개],
+    "fitness":  [...6개],
+    "money":    [...6개],
+    "book":     [...6개],
+    "baby":     [...6개],
+    "pet":      [...6개],
+    "kpop":     [...6개],
+    "movie":    [...6개],
+    "music":    [...6개],
+    "psych":    [...6개],
+    "mystery":  [...6개],
+    "life":     [...6개],
+    "trend":    [...6개]
   }
 }
 
 룰:
 - recommended_topics 3개: 카테고리 무관 오늘 가장 핫한 주제. hook_score 9~10 만.
-- topics_by_category: 18개 카테고리 각 정확히 **8개**. 같은 카테고리 안에서도 서브토픽 다양하게 (제품 / 시술 / 트렌드 / 비교 / 후기 / 가성비 / 실패담 / 순위 골고루). 입력 데이터 B 의 카테고리별 검색 결과를 우선 활용, 부족하면 입력 데이터 A 와 모델 일반 지식으로 보강.
+- topics_by_category: 16개 카테고리 각 정확히 **6개**. 같은 카테고리 안에서도 서브토픽 다양하게 (제품 / 시술 / 트렌드 / 비교 / 후기 / 가성비 / 실패담 / 순위 골고루). 입력 데이터 B 의 카테고리별 검색 결과를 우선 활용, 부족하면 입력 데이터 A 와 모델 일반 지식으로 보강.
 - **hook_score (1~10)**: 토픽 후킹 강도 (10 = 클릭 안 할 수 없음 / 7 = 평균 / 5 이하는 만들지 말 것). 모든 토픽 7 이상.
 - **sources (배열, 1~3개)**: 그 토픽이 어디서 나온 정보인지 도메인 배열 — 입력 데이터 B 에서 활용한 도메인 우선 (예: ["vogue.com", "reddit.com"]). 입력 데이터에 해당 카테고리 정보 없으면 ["일반"] 하나.
 - topic 은 항상 한국어 자연어. 영문 제목은 한국 SNS 톤으로 의역.
@@ -187,10 +187,10 @@ ${JSON.stringify(catSearchTrim, null, 2)}
   }
 
   // ─── 1차 시도 ───
-  //   18 cat × 8 topic = 144 topics + recommended_topics 3 + top5 5 = 152 entries
-  //   각 entry 평균 ~130 token (topic + why + preview_hook + body_preview + sources)
-  //   = ~20,000 출력 토큰. max_tokens 22000 으로 잘림 방지 (16000 은 부족 — 검증됨)
-  //   Haiku 4.5 ~100 tok/s → ~200s. 전체 budget 300s 안에서 fits (RSS+Tavily 병렬)
+  //   18 cat × 6 topic = 108 + recommended 3 + top5 5 = 116 entries
+  //   각 entry 평균 ~150 token (indent 포함, sources 배열 등) = ~17,400 출력 토큰
+  //   max_tokens 22000 = 안전 margin 25% (16000 은 부족, 22000 도 8개일 때 부족했음)
+  //   Haiku 4.5 ~100 tok/s → ~175s 출력. 300s 안에서 fits (RSS+Tavily 병렬 ~50s 추가)
   //   retry 비활성화: cron 매일 도니까 1회 실패해도 다음날 자동 복구
   const attempt = await callClaude(22000)
   if (attempt.ok && attempt.text) {
