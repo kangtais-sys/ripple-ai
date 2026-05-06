@@ -2732,19 +2732,19 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     </div>
     <div id="insight-content" style="display:none">
       <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px">
-        <div class="ins-card"><div class="ins-lbl">팔로워</div><div class="ins-val" id="ins-followers">—</div></div>
-        <div class="ins-card"><div class="ins-lbl">게시물</div><div class="ins-val" id="ins-media">—</div></div>
-        <div class="ins-card"><div class="ins-lbl">최근 7일 도달</div><div class="ins-val" id="ins-reach">—</div></div>
-        <div class="ins-card"><div class="ins-lbl">최근 7일 노출</div><div class="ins-val" id="ins-imp">—</div></div>
-        <div class="ins-card"><div class="ins-lbl">프로필 방문</div><div class="ins-val" id="ins-pv">—</div></div>
-        <div class="ins-card"><div class="ins-lbl">웹사이트 클릭</div><div class="ins-val" id="ins-wc">—</div></div>
+        <div class="ins-card"><div class="ins-lbl" data-i18n="manage.insight.followers">팔로워</div><div class="ins-val" id="ins-followers">—</div></div>
+        <div class="ins-card"><div class="ins-lbl" data-i18n="manage.insight.posts">게시물</div><div class="ins-val" id="ins-media">—</div></div>
+        <div class="ins-card"><div class="ins-lbl" data-i18n="manage.insight.reach_7d">최근 7일 도달</div><div class="ins-val" id="ins-reach">—</div></div>
+        <div class="ins-card"><div class="ins-lbl" data-i18n="manage.insight.imp_7d">최근 7일 노출</div><div class="ins-val" id="ins-imp">—</div></div>
+        <div class="ins-card"><div class="ins-lbl" data-i18n="manage.insight.profile_views">프로필 방문</div><div class="ins-val" id="ins-pv">—</div></div>
+        <div class="ins-card"><div class="ins-lbl" data-i18n="manage.insight.website_clicks">웹사이트 클릭</div><div class="ins-val" id="ins-wc">—</div></div>
       </div>
-      <div style="font-size:13px;font-weight:800;color:var(--t1);margin:10px 0 8px">최근 게시물</div>
+      <div style="font-size:13px;font-weight:800;color:var(--t1);margin:10px 0 8px" data-i18n="manage.insight.recent_posts">최근 게시물</div>
       <div id="ins-media-list"></div>
     </div>
     <div id="insight-empty" class="empty-soft" style="display:none">
-      <div class="empty-soft-t">Instagram 연동이 필요합니다</div>
-      <div>연동 후 실데이터 분석이 여기에 나타납니다.</div>
+      <div class="empty-soft-t" data-i18n="manage.insight.connect_required">Instagram 연동이 필요합니다</div>
+      <div data-i18n="manage.insight.connect_sub">연동 후 실데이터 분석이 여기에 나타납니다.</div>
     </div>
     <div id="insight-error" style="display:none;padding:40px 16px;text-align:center;color:var(--red);font-size:12.5px;background:#FEF2F2;border-radius:14px;border:1px dashed var(--red-l);line-height:1.6"></div>
   </div>
@@ -5510,6 +5510,15 @@ var I18N = {
     // Manage — Insights
     'manage.insight.loading':'인사이트 불러오는 중',
     'manage.insight.loading_sub':'Graph API 실데이터 동기화 중…',
+    'manage.insight.followers':'팔로워',
+    'manage.insight.posts':'게시물',
+    'manage.insight.reach_7d':'최근 7일 도달',
+    'manage.insight.imp_7d':'최근 7일 노출',
+    'manage.insight.profile_views':'프로필 방문',
+    'manage.insight.website_clicks':'웹사이트 클릭',
+    'manage.insight.recent_posts':'최근 게시물',
+    'manage.insight.connect_required':'Instagram 연동이 필요합니다',
+    'manage.insight.connect_sub':'연동 후 실데이터 분석이 여기에 나타납니다.',
     // cs-2 — prompt + size
     'create.cs2.ai_badge':'AI · 카드뉴스 문체',
     'create.cs2.slide1_hook':'슬라이드 1 · 후킹 제목',
@@ -6242,6 +6251,15 @@ var I18N = {
     // Manage — Insights
     'manage.insight.loading':'Loading insights',
     'manage.insight.loading_sub':'Syncing live data from Graph API…',
+    'manage.insight.followers':'Followers',
+    'manage.insight.posts':'Posts',
+    'manage.insight.reach_7d':'Reach (7d)',
+    'manage.insight.imp_7d':'Impressions (7d)',
+    'manage.insight.profile_views':'Profile views',
+    'manage.insight.website_clicks':'Website clicks',
+    'manage.insight.recent_posts':'Recent posts',
+    'manage.insight.connect_required':'Instagram connection required',
+    'manage.insight.connect_sub':'Live analytics will appear here once connected.',
     // cs-2 — prompt + size
     'create.cs2.ai_badge':'AI · Carousel tone',
     'create.cs2.slide1_hook':'Slide 1 · Hook title',
@@ -16006,9 +16024,10 @@ async function doKakaoLogin() {
 
 async function doLogout() {
   try { await sb.auth.signOut(); } catch(e){}
-  // localStorage에 저장된 UI 상태·데모 데이터 전부 정리 (개발자 플래그만 유지)
+  // localStorage에 저장된 UI 상태·데모 데이터 전부 정리 (개발자 플래그·언어 설정 유지)
+  //   ssobi_lang 을 유지해야 다음 로그인 화면이 같은 언어로 뜸
   try {
-    var keep = ['ssobi_dev'];
+    var keep = ['ssobi_dev', 'ssobi_lang'];
     var toRemove = [];
     for (var i = 0; i < localStorage.length; i++) {
       var k = localStorage.key(i);
