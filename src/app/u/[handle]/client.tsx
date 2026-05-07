@@ -89,7 +89,7 @@ const PUBLIC_CSS = `
 .ssobi-public .lke-hero-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:48px;font-weight:300;line-height:1.02;letter-spacing:-.035em;margin:0 0 14px;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.25)}
 .ssobi-public .lke-hero-title em{font-style:italic;color:var(--mint);font-weight:500}
 .ssobi-public .lke-hero-subtitle{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:14.5px;font-style:italic;opacity:.92;margin-bottom:16px;max-width:280px;line-height:1.5;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.3)}
-.ssobi-public .lke-hero-banner-bottom{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:flex-end}
+.ssobi-public .lke-hero-banner-bottom{position:relative;z-index:2;display:flex;justify-content:flex-end;align-items:flex-end}
 .ssobi-public .lke-hero-stats{display:flex;gap:18px}
 .ssobi-public .lke-hero-stat{position:relative;padding:4px 8px}
 .ssobi-public .lke-hero-stat .num{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:20px;font-weight:500;letter-spacing:-.02em;line-height:1}
@@ -296,25 +296,11 @@ function Hero({ slide, handle, compact }: { slide: HeroSlide; handle: string; co
             <div className="lke-hero-subtitle" dangerouslySetInnerHTML={safeHtml(slide.sub)} />
           )}
         </div>
-        <div className="lke-hero-banner-bottom">
-          <div className="lke-hero-stats">
-            {!slide.stat1_hidden && slide.stat1n && (
-              <div className="lke-hero-stat">
-                <div className="num">{slide.stat1n}</div>
-                <div className="lbl">{slide.stat1l}</div>
-              </div>
-            )}
-            {!slide.stat2_hidden && slide.stat2n && (
-              <div className="lke-hero-stat">
-                <div className="num">{slide.stat2n}</div>
-                <div className="lbl">{slide.stat2l}</div>
-              </div>
-            )}
-          </div>
-          {slide.cta && !slide.cta_hidden && (
+        {slide.cta && !slide.cta_hidden && (
+          <div className="lke-hero-banner-bottom">
             <a className="lke-hero-cta" href={slide.ctaUrl || '#'} dangerouslySetInnerHTML={safeHtml(slide.cta)} />
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   )
