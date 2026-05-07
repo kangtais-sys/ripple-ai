@@ -198,7 +198,9 @@ const PUBLIC_CSS = `
 .ssobi-public .lke-block-divider{margin:14px 18px;border:none;height:1px;background:rgba(15,19,25,.1)}
 .ssobi-public .lke-block-spacer{height:18px}
 /* GLOBAL FOOTER + FAB */
-.ssobi-public .ssobi-cta{display:block;margin:32px 18px 0;padding:16px;background:#1F1317;color:#fff;text-align:center;border-radius:14px;font-size:13.5px;font-weight:800;text-decoration:none;letter-spacing:-.2px;box-shadow:0 4px 14px rgba(31,19,23,.18);transition:transform .15s}
+.ssobi-public .ssobi-cta{display:flex;align-items:center;justify-content:center;gap:8px;margin:36px 18px 0;padding:18px 20px;background:var(--dark);color:#fff;text-align:center;border-radius:100px;font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:14.5px;font-weight:500;text-decoration:none;letter-spacing:-.01em;box-shadow:0 8px 24px rgba(15,19,25,.18);transition:transform .15s,box-shadow .15s}
+.ssobi-public .ssobi-cta:active{transform:scale(.99);box-shadow:0 4px 14px rgba(15,19,25,.18)}
+.ssobi-public .ssobi-cta em{font-style:italic;color:var(--mint);font-weight:600;margin:0 2px}
 .ssobi-public .ssobi-cta:active{transform:scale(.99)}
 .ssobi-public .ssobi-credit{text-align:center;font-size:10px;opacity:.5;font-weight:600;margin:16px 0 90px;letter-spacing:.4px}
 .ssobi-public .ssobi-credit a{color:inherit;text-decoration:none}
@@ -241,7 +243,7 @@ export default function LinkPageClient({ page }: { page: PageData }) {
       <div className="ssobi-public">
         <Hero slide={firstSlide} handle={page.handle} compact={isHeroCompact} />
         {page.blocks?.map((b, i) => renderBlock(b, i))}
-        <a className="ssobi-cta" href="https://ssobi.ai/?ref=u">✨ 나도 1초만에 내 링크 만들기 →</a>
+        <a className="ssobi-cta" href="https://ssobi.ai/?ref=u" dangerouslySetInnerHTML={{ __html: '나만의 링크 페이지 <em>1초만에</em> 만들기 →' }} />
         <div className="ssobi-credit">Powered by <a href="https://ssobi.ai">Ssobi<em>.</em></a></div>
 
         <button className="ssobi-fab" onClick={() => setProposing(true)} aria-label="제안하기">💌</button>
