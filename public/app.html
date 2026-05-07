@@ -2481,25 +2481,25 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
     <div class="edt-panel" id="edt-panel-text">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <div style="font-size:11px;font-weight:700;color:var(--t3)">선택 요소 꾸미기 <span style="color:var(--t3);font-weight:500;margin-left:4px">·  더블탭해서 텍스트 수정</span></div>
+        <div style="font-size:11px;font-weight:700;color:var(--t3)"><span data-i18n="edt.deco.title">선택 요소 꾸미기</span> <span style="color:var(--t3);font-weight:500;margin-left:4px" data-i18n="edt.deco.hint">·  더블탭해서 텍스트 수정</span></div>
         <button type="button" onclick="edtClosePanel()" style="width:24px;height:24px;border-radius:50%;border:none;background:var(--bg);color:var(--t2);font-size:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;line-height:1;flex-shrink:0" aria-label="닫기">✕</button>
       </div>
       <div class="edt-row">
-        <div class="edt-row-lbl">크기</div>
+        <div class="edt-row-lbl" data-i18n="edt.size">크기</div>
         <input type="range" id="edt-text-size" min="12" max="64" value="24">
         <div style="font-size:11px;font-weight:700;color:var(--t2);min-width:36px;text-align:right" id="edt-text-size-v">24px</div>
       </div>
       <div class="edt-style-row">
-        <div class="edt-row-lbl" style="margin-right:4px">폰트</div>
+        <div class="edt-row-lbl" style="margin-right:4px" data-i18n="edt.font">폰트</div>
         <select class="edt-weight-select" id="edt-font-sel" onchange="edtSetFont(this.value)" style="flex:1;min-width:0">
-          <option value="sans">Pretendard (기본)</option>
-          <option value="serif">Fraunces (세리프)</option>
+          <option value="sans" data-i18n="edt.font.sans">Pretendard (기본)</option>
+          <option value="serif" data-i18n="edt.font.serif">Fraunces (세리프)</option>
           <option value="noto-serif">Noto Serif KR</option>
           <option value="mono">JetBrains Mono</option>
         </select>
       </div>
       <div class="edt-style-row">
-        <div class="edt-row-lbl" style="margin-right:4px">스타일</div>
+        <div class="edt-row-lbl" style="margin-right:4px" data-i18n="edt.style">스타일</div>
         <button type="button" class="edt-style-btn" id="edt-bold-btn" onclick="edtToggleBold()" style="font-weight:900"><b>B</b></button>
         <button type="button" class="edt-style-btn" id="edt-italic-btn" onclick="edtToggleItalic()" style="font-style:italic"><i>I</i></button>
         <select class="edt-weight-select" id="edt-weight-sel" onchange="edtSetWeight(this.value)">
@@ -2512,7 +2512,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         </select>
       </div>
       <div style="margin-top:10px">
-        <div class="edt-row-lbl" style="margin-bottom:6px">색상 팔레트</div>
+        <div class="edt-row-lbl" style="margin-bottom:6px" data-i18n="edt.palette">색상 팔레트</div>
         <div class="edt-colors" id="edt-color-palette">
           <div class="edt-c" style="background:#1A1F27" onclick="edtTextColor('#1A1F27')"></div>
           <div class="edt-c" style="background:#64748B" onclick="edtTextColor('#64748B')"></div>
@@ -2530,10 +2530,10 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
             <input type="color" value="#00C896" oninput="edtTextColor(this.value)">
           </div>
         </div>
-        <div class="edt-row-lbl edt-spectrum-lbl" style="margin-top:10px;margin-bottom:4px;display:none">색상 스펙트럼</div>
+        <div class="edt-row-lbl edt-spectrum-lbl" style="margin-top:10px;margin-bottom:4px;display:none" data-i18n="edt.spectrum">색상 스펙트럼</div>
         <div class="edt-color-bar" id="edt-color-bar"></div>
       </div>
-      <button class="edt-apply" onclick="edtApplyText()">적용</button>
+      <button class="edt-apply" onclick="edtApplyText()" data-i18n="btn.apply">적용</button>
     </div>
 
     <div class="edt-panel" id="edt-panel-layer">
@@ -2870,25 +2870,25 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
           <div style="width:36px;height:36px;border-radius:10px;background:var(--mint-l);display:flex;align-items:center;justify-content:center;flex-shrink:0">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--mint-d)" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
           </div>
-          <div><div style="font-size:14px;font-weight:700;color:var(--t1)">계정 연동</div><div style="font-size:12px;color:var(--t3);margin-top:1px">Instagram, TikTok, YouTube 공식 API</div></div>
+          <div><div style="font-size:14px;font-weight:700;color:var(--t1)" data-i18n="onb.feat1.title">계정 연동</div><div style="font-size:12px;color:var(--t3);margin-top:1px" data-i18n="onb.feat1.sub">Instagram, TikTok, YouTube 공식 API</div></div>
         </div>
         <div style="display:flex;align-items:center;gap:14px;text-align:left">
           <div style="width:36px;height:36px;border-radius:10px;background:var(--mint-l);display:flex;align-items:center;justify-content:center;flex-shrink:0">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--mint-d)" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
           </div>
-          <div><div style="font-size:14px;font-weight:700;color:var(--t1)">AI 말투 학습</div><div style="font-size:12px;color:var(--t3);margin-top:1px">내 게시물로 말투·뉘앙스 자동 학습</div></div>
+          <div><div style="font-size:14px;font-weight:700;color:var(--t1)" data-i18n="onb.feat2.title">AI 말투 학습</div><div style="font-size:12px;color:var(--t3);margin-top:1px" data-i18n="onb.feat2.sub">내 게시물로 말투·뉘앙스 자동 학습</div></div>
         </div>
         <div style="display:flex;align-items:center;gap:14px;text-align:left">
           <div style="width:36px;height:36px;border-radius:10px;background:var(--mint-l);display:flex;align-items:center;justify-content:center;flex-shrink:0">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--mint-d)" stroke-width="2"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
-          <div><div style="font-size:14px;font-weight:700;color:var(--t1)">자동 운영 시작</div><div style="font-size:12px;color:var(--t3);margin-top:1px">24시간 댓글·DM·스토리 자동 관리</div></div>
+          <div><div style="font-size:14px;font-weight:700;color:var(--t1)" data-i18n="onb.feat3.title">자동 운영 시작</div><div style="font-size:12px;color:var(--t3);margin-top:1px" data-i18n="onb.feat3.sub">24시간 댓글·DM·스토리 자동 관리</div></div>
         </div>
       </div>
     </div>
     <div class="onb-footer">
-      <button class="btn-dark" onclick="go('signup')">무료로 시작하기</button>
-      <button class="btn-outline" onclick="go('login')">이미 계정이 있어요</button>
+      <button class="btn-dark" onclick="go('signup')" data-i18n="onb.cta_signup">무료로 시작하기</button>
+      <button class="btn-outline" onclick="go('login')" data-i18n="onb.cta_login">이미 계정이 있어요</button>
     </div>
   </div>
 </div>
@@ -5260,6 +5260,23 @@ var I18N = {
     'btn.cancel':'취소', 'btn.confirm':'확인', 'btn.close':'닫기',
     'btn.send':'발송', 'btn.approve':'승인', 'btn.skip':'스킵',
     'btn.edit':'수정', 'btn.apply':'적용', 'btn.regenerate':'다시 생성',
+    'edt.deco.title':'선택 요소 꾸미기',
+    'edt.deco.hint':'· 더블탭해서 텍스트 수정',
+    'edt.size':'크기',
+    'edt.font':'폰트',
+    'edt.font.sans':'Pretendard (기본)',
+    'edt.font.serif':'Fraunces (세리프)',
+    'edt.style':'스타일',
+    'edt.palette':'색상 팔레트',
+    'edt.spectrum':'색상 스펙트럼',
+    'onb.feat1.title':'계정 연동',
+    'onb.feat1.sub':'Instagram, TikTok, YouTube 공식 API',
+    'onb.feat2.title':'AI 말투 학습',
+    'onb.feat2.sub':'내 게시물로 말투·뉘앙스 자동 학습',
+    'onb.feat3.title':'자동 운영 시작',
+    'onb.feat3.sub':'24시간 댓글·DM·스토리 자동 관리',
+    'onb.cta_signup':'무료로 시작하기',
+    'onb.cta_login':'이미 계정이 있어요',
     'btn.share':'공유', 'btn.start':'시작하기', 'btn.delete':'삭제',
     // 홈
     'home.greeting':'안녕하세요',
@@ -6031,6 +6048,23 @@ var I18N = {
     'btn.cancel':'Cancel', 'btn.confirm':'Confirm', 'btn.close':'Close',
     'btn.send':'Send', 'btn.approve':'Approve', 'btn.skip':'Skip',
     'btn.edit':'Edit', 'btn.apply':'Apply', 'btn.regenerate':'Regenerate',
+    'edt.deco.title':'Style selected element',
+    'edt.deco.hint':'· double-tap to edit text',
+    'edt.size':'Size',
+    'edt.font':'Font',
+    'edt.font.sans':'Pretendard (default)',
+    'edt.font.serif':'Fraunces (serif)',
+    'edt.style':'Style',
+    'edt.palette':'Color palette',
+    'edt.spectrum':'Color spectrum',
+    'onb.feat1.title':'Connect accounts',
+    'onb.feat1.sub':'Instagram, TikTok, YouTube official APIs',
+    'onb.feat2.title':'Learn your tone',
+    'onb.feat2.sub':'Auto-trained on your posts',
+    'onb.feat3.title':'Auto-run',
+    'onb.feat3.sub':'24/7 comment·DM·story handling',
+    'onb.cta_signup':'Start free',
+    'onb.cta_login':'I have an account',
     'btn.share':'Share', 'btn.start':'Start', 'btn.delete':'Delete',
     // home
     'home.greeting':'Hi',
@@ -10290,12 +10324,16 @@ function lkeRenderPicker(){
   while(wrap.firstChild) wrap.removeChild(wrap.firstChild);
   var order=['event','countdown','section','grid','bigbanner','contact','magazine','link','image','quicklinks','socials','spacer','divider'];
   var premium = lkeIsPremium();
+  var lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+  var lockLbl = lang === 'en' ? 'Premium' : '프리미엄';
   order.forEach(function(k){
     var t=LKE_TYPES[k]; if(!t) return;
     var locked = t.premium && !premium;
     var card=document.createElement('button'); card.className='lke-bpv-card'+(locked?' locked':'');
+    var name = (lang === 'en' && t.nameEn) ? t.nameEn : t.name;
+    var desc = (lang === 'en' && t.descEn) ? t.descEn : t.desc;
     card.innerHTML='<div class="lke-bpv-prev '+t.preview+'"></div>'+
-      '<div class="lke-bpv-body"><div class="lke-bpv-name">'+t.name+(locked?' <span class="lke-lock">프리미엄</span>':'')+'</div><div class="lke-bpv-desc">'+t.desc+'</div></div>';
+      '<div class="lke-bpv-body"><div class="lke-bpv-name">'+name+(locked?' <span class="lke-lock">'+lockLbl+'</span>':'')+'</div><div class="lke-bpv-desc">'+desc+'</div></div>';
     if(locked){
       card.onclick = function(){ cm('m-link-add'); openModal('m-plan'); };
     } else {
