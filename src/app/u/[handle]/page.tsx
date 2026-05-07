@@ -1,9 +1,15 @@
 // 공개 링크 페이지 /u/[handle] — Supabase에서 link_pages 조회 후 SSR 렌더
+//
+// 2026-05-07: dynamic='force-dynamic' 추가 — 유저 편집 즉시 반영
+//   기본 Next.js 동작은 정적 캐싱 → 새 편집이 페이지에 안 보이는 버그 발생
 import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Script from 'next/script'
 import LinkPageClient from './client'
+
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 // anon 키 사용 — RLS의 "Public reads published link_pages" 정책으로 접근
 function publicClient() {
