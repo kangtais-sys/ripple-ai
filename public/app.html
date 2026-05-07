@@ -9205,7 +9205,7 @@ function lkeSyncToServer(){
     _lkeSyncNow();
   }, 2000);
 }
-function _lkeSyncNow(){
+async function _lkeSyncNow(){
   var state = (typeof lkeState !== 'undefined' && lkeState) ? lkeState : null;
   if(!state || !state.handle) return;
   var payload = {
@@ -9217,9 +9217,10 @@ function _lkeSyncNow(){
     published: state.published !== false,
   };
   try {
+    var h = await authHeaders();
     fetch('/api/link', {
       method:'POST',
-      headers:{'Content-Type':'application/json'},
+      headers: h,
       body: JSON.stringify(payload),
       credentials:'include',
     }).then(function(r){
@@ -9302,6 +9303,59 @@ var lkeState = {
   ],
   proposals:[]
 };
+
+// 서버 → lkeState 하이드레이션 — 로그인 직후 호출
+//   1) GET /api/link 으로 link_pages 행 조회
+//   2) 행 있으면 lkeState 의 handle/hero/theme/settings/blocks 덮어쓰기
+//   3) v-link 뷰 활성화 시 lkeRender() 자동 호출됨 (initLinkView 에서)
+//   4) 행 없으면 (첫 진입) hardcoded 데모 그대로 — 유저가 수정·저장하면 그때 행 생성
+window._lkeHydrated = false;
+async function lkeHydrateFromServer(){
+  if(window._lkeHydrated) return;
+  try {
+    var h = await authHeaders();
+    var res = await fetch('/api/link', { headers: h, credentials:'include' });
+    if(!res.ok) return;
+    var j = await res.json();
+    var p = j && j.page;
+    if(!p || !p.handle) {
+      // 첫 진입 → 서버에 행 없음. 유저 이메일로 기본 핸들 추천
+      //   (영문/숫자/_/- 만 허용, 3자 미만이면 demo 유지)
+      try {
+        var u = (await sb.auth.getUser())?.data?.user;
+        var email = u?.email || '';
+        var sug = (email.split('@')[0] || '').toLowerCase().replace(/[^a-z0-9_\-]/g, '').slice(0, 30);
+        if(sug && sug.length >= 3 && typeof lkeState !== 'undefined') {
+          lkeState.handle = sug;
+          var hd = document.getElementById('lk-handle-disp'); if(hd) hd.textContent = sug;
+          var hd2 = document.getElementById('lk-handle-disp-2'); if(hd2) hd2.textContent = sug;
+          var hi = document.getElementById('lke-settings-handle'); if(hi) hi.value = sug;
+        }
+      } catch(_){}
+      window._lkeHydrated = true;
+      return;
+    }
+    // 서버 행 → lkeState 덮어쓰기
+    if(typeof lkeState === 'undefined') return;
+    lkeState.handle = p.handle;
+    if(p.hero && typeof p.hero === 'object') lkeState.hero = p.hero;
+    if(p.theme && typeof p.theme === 'object') lkeState.theme = p.theme;
+    if(p.settings && typeof p.settings === 'object') lkeState.settings = p.settings;
+    if(Array.isArray(p.blocks) && p.blocks.length > 0) lkeState.blocks = p.blocks;
+    if(typeof p.published === 'boolean') lkeState.published = p.published;
+    window._lkeHydrated = true;
+    // 현재 v-link 뷰가 활성화된 상태면 즉시 재렌더
+    var lv = document.getElementById('v-link');
+    if(lv && lv.classList.contains('on')){
+      var hd = document.getElementById('lk-handle-disp'); if(hd) hd.textContent = lkeState.handle;
+      var hd2 = document.getElementById('lk-handle-disp-2'); if(hd2) hd2.textContent = lkeState.handle;
+      if(typeof lkeRender === 'function') lkeRender();
+    }
+    console.debug('[ssobi] link hydrated from server:', lkeState.handle);
+  } catch(e) {
+    console.warn('[ssobi] link hydrate failed', e);
+  }
+}
 
 var LKE_TYPES = {
   hero:{name:'히어로 배너 (캐러셀)',desc:'여러 장 좌우 스와이프 · 배경 이미지 + 텍스트 편집',preview:'hero'},
@@ -10422,23 +10476,37 @@ function lkeApplySettings(){
   lkeCloseSheet();
 }
 
-// 핸들 중복 체크 (데모 — 실제로는 API)
-var LKE_TAKEN_HANDLES = ['yuna','jjin_beauty','seoulnista','admin','ssobi','help','test','root'];
+// 핸들 중복 체크 — /api/link/check 호출 (debounce 400ms)
 var _lkeHandleDebounce = null;
 function lkeHandleCheck(inp){
   clearTimeout(_lkeHandleDebounce);
   var st = document.getElementById('lke-handle-status');
   var v = (inp.value||'').trim().replace(/[^a-z0-9_\-]/gi,'');
   if(v!==inp.value) inp.value=v;
-  if(!v){ st.className='lke-handle-status'; st.textContent=''; return; }
-  if(v.length<3){ st.className='lke-handle-status bad'; st.textContent='3자 이상'; return; }
-  st.className='lke-handle-status checking'; st.textContent='확인 중…';
+  var _lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+  var msg = _lang === 'en'
+    ? { empty:'', short:'3+ chars', checking:'Checking…', ok:'Available', taken:'Already taken', invalid:'Invalid', reserved:'Reserved', error:'Error' }
+    : { empty:'', short:'3자 이상', checking:'확인 중…',  ok:'사용 가능', taken:'이미 사용 중', invalid:'잘못된 형식', reserved:'예약어', error:'오류' };
+  if(!v){ st.className='lke-handle-status'; st.textContent=msg.empty; return; }
+  if(v.length<3){ st.className='lke-handle-status bad'; st.textContent=msg.short; return; }
+  st.className='lke-handle-status checking'; st.textContent=msg.checking;
   _lkeHandleDebounce = setTimeout(function(){
-    if(LKE_TAKEN_HANDLES.indexOf(v.toLowerCase()) >= 0){
-      st.className='lke-handle-status bad'; st.textContent='이미 사용 중';
-    } else {
-      st.className='lke-handle-status ok'; st.textContent='사용 가능';
-    }
+    authHeaders().then(function(h){
+      return fetch('/api/link/check?handle=' + encodeURIComponent(v), { headers: h, credentials:'include' });
+    }).then(function(r){ return r.ok ? r.json() : { ok:false, reason:'error' }; })
+      .then(function(j){
+        // 다른 입력이 들어왔으면 무시 (race condition)
+        if((inp.value||'').trim().toLowerCase() !== v.toLowerCase()) return;
+        if(j.ok){
+          st.className='lke-handle-status ok'; st.textContent=msg.ok;
+        } else {
+          st.className='lke-handle-status bad';
+          st.textContent = msg[j.reason] || msg.taken;
+        }
+      })
+      .catch(function(){
+        st.className='lke-handle-status bad'; st.textContent=msg.error;
+      });
   }, 400);
 }
 
@@ -16064,6 +16132,8 @@ async function doKakaoLogin() {
 
 async function doLogout() {
   try { await sb.auth.signOut(); } catch(e){}
+  // 내 링크 hydration 플래그 리셋 (다음 유저 로그인 시 다시 hydrate)
+  try { window._lkeHydrated = false; } catch(_){}
   // localStorage에 저장된 UI 상태·데모 데이터 전부 정리 (개발자 플래그·언어 설정 유지)
   //   ssobi_lang 을 유지해야 다음 로그인 화면이 같은 언어로 뜸
   try {
@@ -16334,6 +16404,10 @@ async function bootstrapUser(){
     var userRes = await sb.auth.getUser();
     var user = userRes?.data?.user;
     if(!user) return;
+
+    // 내 링크 백그라운드 하이드레이션 — 로그인 즉시 서버 데이터 fetch
+    //   v-link 탭 안 들어가도 미리 lkeState 업데이트해서 진입 시 즉시 표시
+    try { lkeHydrateFromServer(); } catch(_){}
 
     var email = user.email || '';
     var displayName = user.user_metadata?.display_name;
