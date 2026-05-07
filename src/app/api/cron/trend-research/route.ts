@@ -71,14 +71,14 @@ ${JSON.stringify(catSearchTrim, null, 2)}
 
 ## 출력 형식 (compact JSON · 들여쓰기·줄바꿈 최소화 — 토큰 절약)
 
-{"recommended_topics":[{"topic":"...","category":"trend|beauty|fashion|food|cafe|travel|interior|fitness|money|book|baby|pet|kpop|movie|music|psych|mystery|life","why":"...","preview_hook":"...","body_preview":"...","sources":["d1","d2"]}],"topics_by_category":{"beauty":[{"topic":"...","why":"...","preview_hook":"...","body_preview":"...","hook_score":8,"sources":["d1","d2"]},...5개],"fashion":[...5개],"food":[...5개],"cafe":[...5개],"travel":[...5개],"interior":[...5개],"fitness":[...5개],"money":[...5개],"book":[...5개],"baby":[...5개],"pet":[...5개],"kpop":[...5개],"movie":[...5개],"music":[...5개],"psych":[...5개],"mystery":[...5개],"life":[...5개],"trend":[...5개]}}
+{"recommended_topics":[{"topic":"...","category":"trend|beauty|fashion|food|cafe|travel|interior|fitness|money|book|baby|pet|kpop|movie|music|psych|mystery|life","why":"...","preview_hook":"...","body_preview":"...","source":"domain"}],"topics_by_category":{"beauty":[{"topic":"...","why":"...","preview_hook":"...","body_preview":"...","hook_score":8,"source":"domain"},...5개],"fashion":[...5개],"food":[...5개],"cafe":[...5개],"travel":[...5개],"interior":[...5개],"fitness":[...5개],"money":[...5개],"book":[...5개],"baby":[...5개],"pet":[...5개],"kpop":[...5개],"movie":[...5개],"music":[...5개],"psych":[...5개],"mystery":[...5개],"life":[...5개],"trend":[...5개]}}
 
 룰:
 - 출력은 위 compact JSON 한 줄 (들여쓰기·불필요 공백 X). 가독성 X, 정확성·완결성 O.
 - recommended_topics 3개: 카테고리 무관 오늘 가장 핫한 주제. hook_score 9~10 만.
 - topics_by_category: 18개 카테고리 각 정확히 **5개**. 같은 카테고리 안에서도 서브토픽 다양하게 (제품 / 시술 / 트렌드 / 비교 / 후기 / 가성비 / 실패담 / 순위 골고루). 입력 데이터 B 의 카테고리별 검색 결과를 우선 활용, 부족하면 입력 데이터 A 와 모델 일반 지식으로 보강.
 - **hook_score (1~10)**: 토픽 후킹 강도 (10 = 클릭 안 할 수 없음 / 7 = 평균 / 5 이하는 만들지 말 것). 모든 토픽 7 이상.
-- **sources (배열, 1~3개)**: 그 토픽이 어디서 나온 정보인지 도메인 배열 — 입력 데이터 B 에서 활용한 도메인 우선 (예: ["vogue.com", "reddit.com"]). 입력 데이터에 해당 카테고리 정보 없으면 ["일반"] 하나.
+- **source (string)**: 그 토픽 핵심 출처 도메인 1개 — 입력 데이터 B 에서 활용한 도메인 우선 (예: "vogue.com"). 없으면 빈 문자열 "".
 - topic 은 항상 한국어 자연어. 영문 제목은 한국 SNS 톤으로 의역.
 - **topic 은 후킹 6패턴 중 1개 적용**: 대비형 / 숫자+연도형 / 역추적형 / 비밀공개형 / 경험자 증언형 / 순위 리스트형
   · 단순 정보 나열 금지: "스킨케어 방법 소개" X / "30대가 결국 정착한 토너 4개" O
@@ -132,9 +132,7 @@ ${JSON.stringify(catSearchTrim, null, 2)}
           system: '너는 JSON-only API 다. 응답은 반드시 valid JSON 객체 하나로만 — **들여쓰기·줄바꿈·불필요한 공백 모두 제거된 compact JSON**. 마크다운 코드블록 (```), 설명, 인사말, 그 어떤 prefix/suffix 도 절대 금지. 첫 글자 { 로 시작해서 마지막 글자 } 로 끝나는 단일 한 줄 JSON.',
           messages: [
             { role: 'user', content: userPrompt },
-            // 프리필 강화: compact JSON 시작 패턴 박아서 Haiku 가 indent JSON 못 만들게 강제
-            //   assistant 가 `{"recommended_topics":[{"topic":"` 부터 이어가니 같은 스타일 유지
-            { role: 'assistant', content: '{"recommended_topics":[{"topic":"' },
+            { role: 'assistant', content: '{' },  // 프리필 단순 — Haiku 가 안정적
           ],
         }),
       })
@@ -143,8 +141,8 @@ ${JSON.stringify(catSearchTrim, null, 2)}
         return { ok: false, err: 'http_' + res.status + ': ' + errText.slice(0, 300), status: res.status }
       }
       const j = (await res.json()) as ClaudeResp
-      // 프리필 `{"recommended_topics":[{"topic":"` 추가 → 응답에서 빠져있을 것 → 다시 붙임
-      const text = '{"recommended_topics":[{"topic":"' + ((j.content?.[0]?.text) || '')
+      // 프리필 `{` 추가 → 응답에서 첫 `{` 가 빠져있을 것 → 다시 붙임
+      const text = '{' + ((j.content?.[0]?.text) || '')
       return { ok: true, resp: j, text }
     } catch (e) {
       return { ok: false, err: 'exception: ' + String(e) }
@@ -164,9 +162,10 @@ ${JSON.stringify(catSearchTrim, null, 2)}
   }
 
   // ─── 1차 시도 ───
-  //   18 cat × 5 + recommended 3 = 93 entries (이전 6개에서 5개로 축소 — 22000 막힘)
-  //   compact JSON + body_preview 60~80자 강제로 토큰 추가 절약
-  //   218초 (22000, 6개 cat) → 5개 cat = ~180초 + 5000 token margin
+  //   18 cat × 5 + recommended 3 = 93 entries
+  //   sources 배열 → source string (단순화), 프리필 `{` (단순), compact JSON 유지
+  //   ~12,000 출력 토큰 예상 → 22000 max 면 80% 안전 margin
+  //   166초 (Haiku, 17000 토큰) 검증됨 → 22000 = ~210초. budget 안에서 fits
   const attempt = await callClaude(22000)
   if (attempt.ok && attempt.text) {
     claudeResp = attempt.resp || {}
