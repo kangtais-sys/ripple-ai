@@ -30,21 +30,18 @@ function adminClient() {
 }
 
 // 조회수 + 일일 통계 비동기 기록 (페이지 렌더 차단 X)
-//   service_role 로 RLS 우회. atomic increment 는 SQL function 없이 read-then-write
-//   (동시성 충돌은 매우 낮은 트래픽이라 무시 가능 — 추후 RPC 로 atomic 화 가능)
+//   migration 015 의 atomic RPC 우선 사용. RPC 없으면 read-then-write fallback.
 async function trackPageView(linkPageId: string) {
   try {
     const sb = adminClient()
-    // 1) total view_count 증가
-    const { data: cur } = await sb
-      .from('link_pages')
-      .select('view_count')
-      .eq('id', linkPageId)
-      .maybeSingle()
-    const newCount = ((cur?.view_count as number) || 0) + 1
-    await sb.from('link_pages').update({ view_count: newCount }).eq('id', linkPageId)
-    // 2) 일일 통계 upsert (KST 기준)
     const dateKst = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10)
+    // 1) atomic RPC 시도
+    const r1 = await sb.rpc('increment_link_view', { p_id: linkPageId })
+    const r2 = await sb.rpc('increment_link_day_view', { p_id: linkPageId, p_date: dateKst })
+    if (!r1.error && !r2.error) return
+    // 2) RPC 없거나 실패 시 fallback (read-then-write, race-prone but functional)
+    const { data: cur } = await sb.from('link_pages').select('view_count').eq('id', linkPageId).maybeSingle()
+    await sb.from('link_pages').update({ view_count: ((cur?.view_count as number) || 0) + 1 }).eq('id', linkPageId)
     const { data: dayRow } = await sb
       .from('link_page_daily_stats')
       .select('views')
