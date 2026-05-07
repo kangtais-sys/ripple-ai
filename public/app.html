@@ -1559,8 +1559,10 @@ body.dev-mode .mitem.dev-only{display:flex!important}
 #v-link .lke-hero-banner{aspect-ratio:4/5;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff;position:relative;overflow:hidden;padding:28px 22px;display:flex;flex-direction:column;justify-content:space-between}
 #v-link .lke-hero-banner::before{content:'';position:absolute;top:-100px;right:-100px;width:380px;height:380px;background:radial-gradient(circle,rgba(0,200,150,.35),transparent 70%)}
 #v-link .lke-hero-banner-top{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:flex-start}
-#v-link .lke-hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--mint);display:inline-flex;align-items:center;gap:10px}
-#v-link .lke-hero-eyebrow::before{content:'';width:24px;height:1px;background:var(--mint);animation:lke-pulse 2s infinite}
+#v-link .lke-hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--mint);display:inline-flex;align-items:center;gap:10px;min-height:14px}
+#v-link .lke-hero-eyebrow:not(.is-empty)::before{content:'';width:24px;height:1px;background:var(--mint);animation:lke-pulse 2s infinite}
+#v-link .lke-hero-eyebrow.is-empty{opacity:.55;font-style:italic}
+#v-link .lke-hero-eyebrow.is-empty::after{content:'태그 추가';opacity:.7}
 @keyframes lke-pulse{0%,100%{opacity:1}50%{opacity:.4}}
 #v-link .lke-hero-avatar-mini{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#A7F3D0,#00A87E);display:flex;align-items:center;justify-content:center;font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-style:italic;font-weight:500;font-size:17px;color:#fff}
 #v-link .lke-hero-banner-main{position:relative;z-index:2}
@@ -1849,8 +1851,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 #v-link .lke-drag:active{transform:scale(.92);background:var(--mint);color:#fff;border-color:var(--mint)}
 /* 블록 hover/select 시 우상단에 "편집" 힌트 — 첫 사용자가 탭 가능 인지 */
 #v-link .lke-block::after{content:'';display:none}
-#v-link .lke-block:not(.lke-block-divider):not(.lke-block-spacer):not(.lke-block-footer):hover::after,
-#v-link .lke-block.selected::after{
+#v-link .lke-block:not(.lke-block-divider):not(.lke-block-spacer):not(.lke-block-footer):not(.lke-block-hero):hover::after,
+#v-link .lke-block:not(.lke-block-hero).selected::after{
   content:'✎';display:flex;position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;
   background:var(--mint);color:#fff;font-size:13px;font-weight:700;align-items:center;justify-content:center;
   z-index:9;box-shadow:0 3px 10px rgba(0,200,150,.3);pointer-events:none;
@@ -4674,6 +4676,12 @@ function go(v){
   var hideNav = ['onb1','signup','login','connect-account-onb','learn','complete'];
   var nav = document.querySelector('.nav');
   if(nav) nav.style.display = hideNav.indexOf(id) >= 0 ? 'none' : 'flex';
+  // 메인 탭(홈/키우기/만들기/링크/내정보)은 URL 해시에 기록 — 탭 전환 후 돌아와도 같은 자리
+  //   브라우저 새 탭/외부 링크에서 돌아왔을 때 home 으로 튕기지 않게
+  var persistViews = ['home','activity','create','link','me'];
+  if(persistViews.indexOf(id) >= 0){
+    try { history.replaceState({}, '', '#v-'+id); } catch(_){}
+  }
   window.scrollTo(0,0);
 }
 
@@ -9738,13 +9746,15 @@ function lkeRenderHero(){
     }
     var stat1Html = statHtml(1);
     var stat2Html = statHtml(2);
+    var canDelete = lkeState.hero.slides.length > 1;
     slide.innerHTML =
       '<div class="lke-hero-tools">'+
         '<button class="lke-hero-tool" aria-label="배너 추가" onclick="event.stopPropagation();lkeAddHeroSlide()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></button>'+
         '<button class="lke-hero-tool" aria-label="배경 변경" onclick="event.stopPropagation();lkeHeroUploadBg('+si+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button>'+
+        (canDelete ? '<button class="lke-hero-tool del" aria-label="배너 삭제" onclick="event.stopPropagation();lkeDeleteHeroSlide('+si+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M6 18L18 6" stroke-linecap="round"/></svg></button>' : '')+
       '</div>'+
       '<div class="lke-hero-banner-top" style="text-align:'+(s.eyebrow_align||'left')+'">'+
-        '<div class="lke-hero-eyebrow lke-editable-text" data-key="eyebrow" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].eyebrow=this.innerText">'+s.eyebrow+'</div>'+
+        '<div class="lke-hero-eyebrow lke-editable-text'+(s.eyebrow ? '' : ' is-empty')+'" data-key="eyebrow" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this);this.classList.remove(\'is-empty\')" onblur="lkeHideAlignBar();this.classList.toggle(\'is-empty\',!this.innerText.trim())" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].eyebrow=this.innerText.trim()">'+(s.eyebrow||'')+'</div>'+
       '</div>'+
       '<div class="lke-hero-banner-main" style="text-align:'+(s.main_align||'left')+'">'+
         '<div class="lke-hero-brand lke-editable-text" data-key="brand" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].brand=this.innerText">'+s.brand+'</div>'+
@@ -9769,22 +9779,43 @@ function lkeRenderHero(){
     carousel.appendChild(prev); carousel.appendChild(next);
     track.addEventListener('scroll', function(){
       var i=Math.round(track.scrollLeft/track.clientWidth);
+      window.lkeActiveSlide = i;
       dots.querySelectorAll('.lke-hero-dot').forEach(function(d,idx){ d.classList.toggle('on', idx===i); });
     });
   }
   wrap.appendChild(carousel);
   lkeAttachDnD(wrap);
+  // 재렌더 후 활성 슬라이드 자리로 스크롤 복원 — 편집 중 첫장 튕김 방지
+  setTimeout(function(){
+    var n = lkeState.hero.slides.length;
+    var idx = Math.max(0, Math.min(window.lkeActiveSlide||0, n-1));
+    if(idx > 0 && track.clientWidth){
+      track.scrollLeft = idx * track.clientWidth;
+      var dotsEl = carousel.querySelector('.lke-hero-dots');
+      if(dotsEl) dotsEl.querySelectorAll('.lke-hero-dot').forEach(function(d,i){ d.classList.toggle('on', i===idx); });
+    }
+  }, 30);
   return wrap;
 }
 
+// 활성 슬라이드 인덱스 — 재렌더 후 같은 자리로 스크롤 복원
+window.lkeActiveSlide = window.lkeActiveSlide || 0;
 function lkeAddHeroSlide(){
   var idx=lkeState.hero.slides.length;
-  lkeState.hero.slides.push({bg:'',eyebrow:'NEW · Launch',brand:'YUMINHYE STUDIO',title:'New <em>Drop.</em>',sub:'텍스트를 바꿔주세요',stat1n:'312K',stat1l:'Followers',stat2n:'10/20',stat2l:'남음',cta:'지금 보기 →',ctaUrl:''});
+  lkeState.hero.slides.push({bg:'',eyebrow:'',brand:'',title:'New <em>Drop.</em>',sub:'텍스트를 바꿔주세요',cta:'',ctaUrl:''});
+  window.lkeActiveSlide = idx; // 새 슬라이드로 자동 점프
+  lkeRender();
+}
+function lkeDeleteHeroSlide(si){
+  if(lkeState.hero.slides.length <= 1) return;
+  if(!confirm('이 배너를 삭제할까요?')) return;
+  lkeState.hero.slides.splice(si,1);
+  window.lkeActiveSlide = Math.max(0, Math.min(si, lkeState.hero.slides.length-1));
   lkeRender();
 }
 function lkeHeroUploadBg(si){
   var inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
-  inp.onchange=function(){ var f=inp.files&&inp.files[0]; if(!f) return; var r=new FileReader(); r.onload=function(e){ lkeState.hero.slides[si].bg=e.target.result; lkeRender(); }; r.readAsDataURL(f); };
+  inp.onchange=function(){ var f=inp.files&&inp.files[0]; if(!f) return; var r=new FileReader(); r.onload=function(e){ lkeState.hero.slides[si].bg=e.target.result; window.lkeActiveSlide=si; lkeRender(); }; r.readAsDataURL(f); };
   inp.click();
 }
 function lkeEditHeroCta(si){
@@ -16862,7 +16893,10 @@ async function checkAuth() {
   }
 
   if (res.data.session) {
-    go('home');
+    // 해시에 메인 탭이 지정돼 있으면 그 탭으로, 없으면 home
+    var mainTabs = ['v-home','v-activity','v-create','v-link','v-me'];
+    var initialView = mainTabs.indexOf(hash) >= 0 ? hash.slice(2) : 'home';
+    go(initialView);
     loadDashboardData();
     bootstrapUser();
     // 가입 직후 또는 온보딩 미완료 → 통합 온보딩 자동 트리거 (주제·말투)
