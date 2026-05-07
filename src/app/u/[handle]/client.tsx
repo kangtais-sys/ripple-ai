@@ -74,7 +74,7 @@ function safeHtml(s: string | undefined): { __html: string } {
 const PUBLIC_CSS = `
 :root{--dark:#1A1F27;--mint:#00C896;--mint-l:#F0FDF9;--mint-d:#00A87E;--red:#FF4D4D;--bg:#F9FAFB;--b:#F0F2F5;--t1:#1A1F27;--t2:#64748B;--t3:#94A3B8}
 @keyframes lke-pulse{0%,100%{opacity:1}50%{opacity:.4}}
-.ssobi-public{font-family:'Pretendard Variable','Pretendard',sans-serif;color:var(--t1);max-width:480px;margin:0 auto;min-height:100vh;background:var(--bg);overflow-x:hidden;-webkit-font-smoothing:antialiased}
+.ssobi-public{font-family:'Pretendard Variable','Pretendard',sans-serif;color:var(--t1);width:100%;max-width:480px;margin:0 auto;min-height:100vh;background:var(--bg);overflow-x:hidden;-webkit-font-smoothing:antialiased;align-self:center}
 /* HERO — has-bg 시 강한 그라디언트 오버레이로 텍스트 가독성 확보 */
 .ssobi-public .lke-hero-carousel{position:relative}
 .ssobi-public .lke-hero-banner{aspect-ratio:4/5;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff;position:relative;overflow:hidden;padding:32px 24px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box}
