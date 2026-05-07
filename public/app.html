@@ -10337,12 +10337,32 @@ var LKE_TEMPLATES = {
 function lkeTemplateBlocks(key){
   var t = Date.now();
   if(key==='minimal'){
+    // 미니멀 테마 — 깔끔한 텍스트 위주, Fraunces italic 으로 살짝 personality
+    //   이미지 링크 1개로 시각적 포인트, 일반 링크는 sub URL 미리보기 포함
     return {
-      hero: { slides:[{bg:'',eyebrow:'LINK IN BIO',brand:'',title:'@유민혜',sub:'신상만 밝히는 코덕 사생활',stat1_hidden:true,stat2_hidden:true,cta_hidden:true}] },
+      hero: { slides:[{
+        bg:'',
+        eyebrow:'',
+        brand:'',
+        title:'@yourname',
+        sub:'한 줄로 본인 소개 ✨<br><span style="font-family:Fraunces,serif;font-style:italic;font-weight:500">welcome.</span>',
+        stat1_hidden:true,stat2_hidden:true,cta_hidden:true
+      }] },
       blocks:[
-        {type:'link',id:'lm1'+t,title:'올리브영에서 사기',url:''},
-        {type:'link',id:'lm2'+t,title:'유튜브 채널',url:''},
-        {type:'link',id:'lm3'+t,title:'인스타그램',url:''},
+        // 추천 — Fraunces italic 으로 살짝 에디토리얼 느낌
+        {type:'section',id:'sm0'+t,title:'Today\'s <em>Picks.</em>',seeAll:''},
+        // 핵심 1개는 이미지 블록으로 시각 포인트
+        {type:'image',id:'lim1'+t,title:'오늘의 추천',sub:'대표 링크를 여기에',image:'',url:''},
+        // 일반 링크 — sub 에 URL 또는 짧은 설명
+        {type:'link',id:'lm1'+t,title:'유튜브 채널',sub:'youtube.com/your',url:''},
+        {type:'link',id:'lm2'+t,title:'블로그',sub:'blog.naver.com',url:''},
+        {type:'link',id:'lm3'+t,title:'쇼핑몰',sub:'smartstore',url:''},
+        // 연락 섹션
+        {type:'section',id:'sm1'+t,title:'<em>Contact.</em>',seeAll:''},
+        {type:'quicklinks',id:'qm'+t,items:[
+          {label:'협업·광고 문의',sub:'이메일',url:''},
+          {label:'뉴스레터 구독',sub:'free',url:''},
+        ]},
         {type:'socials',id:'sm'+t,items:[{ch:'ig',url:''},{ch:'tk',url:''},{ch:'yt',url:''},{ch:'email',url:''}]},
         {type:'footer',id:'fm'+t,logo:'Ssobi<span>.</span>',text:'Powered by Ssobi Links'}
       ]
