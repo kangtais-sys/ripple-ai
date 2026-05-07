@@ -1727,11 +1727,14 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 .lke-preview-exit{display:none;position:fixed;top:14px;right:14px;padding:9px 14px;background:var(--dark);color:#fff;border:none;border-radius:100px;font-family:'Pretendard',sans-serif;font-size:12px;font-weight:700;cursor:pointer;z-index:320;align-items:center;gap:5px}
 
 /* 히어로 정렬 미니 툴바 */
-.lke-align-bar{position:fixed;display:none;z-index:55;background:var(--dark);border-radius:100px;padding:5px 6px;gap:2px;box-shadow:0 10px 26px rgba(15,19,25,.22)}
-.lke-align-bar.on{display:flex}
-.lke-align-bar button{width:32px;height:28px;border-radius:100px;border:none;background:none;color:#fff;font-size:14px;font-weight:700;cursor:pointer}
+.lke-align-bar{position:fixed;display:none;z-index:55;background:var(--dark);border-radius:10px;padding:5px;gap:2px;box-shadow:0 10px 26px rgba(15,19,25,.22)}
+.lke-align-bar.on{display:flex;align-items:center}
+.lke-align-bar button{padding:7px 11px;border-radius:7px;border:none;background:none;color:#fff;font-size:11.5px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif;letter-spacing:-.2px;display:flex;align-items:center;gap:4px}
 .lke-align-bar button:active{background:rgba(255,255,255,.15)}
-.lke-align-bar button:hover{background:rgba(255,255,255,.08)}
+.lke-align-bar button:hover{background:rgba(255,255,255,.10)}
+.lke-align-bar button.del{color:#FCA5A5}
+.lke-align-bar button.del:hover{background:rgba(252,165,165,.18);color:#fff}
+.lke-align-bar .sep{width:1px;height:16px;background:rgba(255,255,255,.12);margin:0 2px}
 
 /* Drag handle & DnD */
 #v-link .lke-block{position:relative}
@@ -1757,8 +1760,10 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 #v-link .lke-hero-tools{position:absolute;top:12px;right:12px;z-index:3;display:flex;flex-direction:column;gap:6px}
 #v-link .lke-hero-tool{width:32px;height:32px;border:none;background:rgba(0,0,0,.5);backdrop-filter:blur(8px);color:#fff;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center}
 #v-link .lke-hero-tool svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2.2}
-#v-link .lke-hero-stat{position:relative}
-#v-link .lke-hero-stat-x{position:absolute;top:-8px;right:-8px;width:22px;height:22px;border-radius:50%;border:none;background:rgba(255,77,77,.95);color:#fff;font-size:13px;line-height:1;cursor:pointer;display:none;align-items:center;justify-content:center;z-index:4;box-shadow:0 2px 6px rgba(0,0,0,.25)}
+#v-link .lke-hero-stat{position:relative;padding:4px 8px;border-radius:8px;transition:background .15s;cursor:pointer}
+#v-link .lke-hero-stat.menu-on{background:rgba(255,255,255,.08)}
+/* X 버튼은 메뉴의 [삭제] 와 중복이라 제거 — 완전 숨김 */
+#v-link .lke-hero-stat-x{display:none !important}
 #v-link .lke-hero-stat.menu-on .lke-hero-stat-x{display:flex}
 #v-link .lke-hero-stat-menu{position:absolute;top:calc(100% + 6px);left:0;z-index:5;background:#fff;border:1px solid var(--b);border-radius:8px;box-shadow:0 8px 22px rgba(15,19,25,.18);padding:4px;display:none;flex-direction:column;gap:2px;min-width:80px}
 #v-link .lke-hero-stat.menu-on .lke-hero-stat-menu{display:flex}
@@ -3171,9 +3176,14 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
   <!-- 히어로 텍스트 정렬 미니 툴바 -->
   <div class="lke-align-bar" id="lke-align-bar" onmousedown="event.preventDefault()">
-    <button type="button" onmousedown="event.preventDefault()" onclick="lkeSetAlign('left')" title="왼쪽">⇤</button>
-    <button type="button" onmousedown="event.preventDefault()" onclick="lkeSetAlign('center')" title="중앙">↔</button>
-    <button type="button" onmousedown="event.preventDefault()" onclick="lkeSetAlign('right')" title="오른쪽">⇥</button>
+    <button type="button" onmousedown="event.preventDefault()" onclick="lkeSetAlign('left')" title="왼쪽 정렬"><span data-i18n="lke.align.left">왼쪽</span></button>
+    <button type="button" onmousedown="event.preventDefault()" onclick="lkeSetAlign('center')" title="가운데 정렬"><span data-i18n="lke.align.center">가운데</span></button>
+    <button type="button" onmousedown="event.preventDefault()" onclick="lkeSetAlign('right')" title="오른쪽 정렬"><span data-i18n="lke.align.right">오른쪽</span></button>
+    <span class="sep"></span>
+    <button type="button" class="del" onmousedown="event.preventDefault()" onclick="lkeDeleteEditingText()" title="텍스트 삭제">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:12px;height:12px"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m-1 0v14a2 2 0 01-2 2H9a2 2 0 01-2-2V6h10z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span data-i18n="lke.align.delete">삭제</span>
+    </button>
   </div>
 </div>
 
@@ -5904,6 +5914,10 @@ var I18N = {
     // 내 링크 settings sheet body
     'lke.settings.handle':'숏링크 핸들',
     'lke.settings.handle_ok':'사용 가능',
+    'lke.align.left':'왼쪽',
+    'lke.align.center':'가운데',
+    'lke.align.right':'오른쪽',
+    'lke.align.delete':'삭제',
     'lke.settings.handle_hint':'유저 아이디만 수정 가능해요. 중복이면 다른 핸들을 선택하세요.',
     'lke.settings.feature':'기능 설정',
     'lke.settings.multi_lang':'다국어 자동 전환',
@@ -6645,6 +6659,10 @@ var I18N = {
     // my link settings sheet body
     'lke.settings.handle':'Short link handle',
     'lke.settings.handle_ok':'Available',
+    'lke.align.left':'Left',
+    'lke.align.center':'Center',
+    'lke.align.right':'Right',
+    'lke.align.delete':'Delete',
     'lke.settings.handle_hint':'Only your user ID is editable. Pick a different handle if it\'s taken.',
     'lke.settings.feature':'Features',
     'lke.settings.multi_lang':'Auto language switch',
@@ -10542,6 +10560,25 @@ function lkeSetAlign(align){
     var newEl = document.querySelector('.lke-editable-text[data-si="'+si+'"][data-key="'+key+'"]');
     if(newEl) newEl.focus();
   }, 50);
+}
+
+// 정렬 바의 삭제 — 현재 편집 중인 hero 텍스트 비우기 (eyebrow/brand/title/sub)
+//   eyebrow 는 element 자체 hidden, 나머지는 빈 문자열로 (구조 유지)
+function lkeDeleteEditingText(){
+  if(!_lkeAlignEl) return;
+  var si = +_lkeAlignEl.dataset.si;
+  var key = _lkeAlignEl.dataset.key;
+  if(typeof si !== 'number' || !key || !lkeState.hero || !lkeState.hero.slides) return;
+  var s = lkeState.hero.slides[si];
+  if(!s) return;
+  if(key === 'eyebrow') s.eyebrow = '';
+  else if(key === 'brand') s.brand = '';
+  else if(key === 'title') s.title = '';
+  else if(key === 'sub') s.sub = '';
+  document.getElementById('lke-align-bar').classList.remove('on');
+  _lkeAlignEl = null;
+  lkeRender();
+  if(typeof lkeSyncToServer === 'function') lkeSyncToServer();
 }
 
 // 히어로 스탯 삭제
