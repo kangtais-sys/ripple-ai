@@ -132,7 +132,9 @@ ${JSON.stringify(catSearchTrim, null, 2)}
           system: '너는 JSON-only API 다. 응답은 반드시 valid JSON 객체 하나로만 — **들여쓰기·줄바꿈·불필요한 공백 모두 제거된 compact JSON**. 마크다운 코드블록 (```), 설명, 인사말, 그 어떤 prefix/suffix 도 절대 금지. 첫 글자 { 로 시작해서 마지막 글자 } 로 끝나는 단일 한 줄 JSON.',
           messages: [
             { role: 'user', content: userPrompt },
-            { role: 'assistant', content: '{' },  // 프리필: JSON 시작 강제
+            // 프리필 강화: compact JSON 시작 패턴 박아서 Haiku 가 indent JSON 못 만들게 강제
+            //   assistant 가 `{"recommended_topics":[{"topic":"` 부터 이어가니 같은 스타일 유지
+            { role: 'assistant', content: '{"recommended_topics":[{"topic":"' },
           ],
         }),
       })
@@ -141,8 +143,8 @@ ${JSON.stringify(catSearchTrim, null, 2)}
         return { ok: false, err: 'http_' + res.status + ': ' + errText.slice(0, 300), status: res.status }
       }
       const j = (await res.json()) as ClaudeResp
-      // 프리필 `{` 추가 → 응답에서 첫 `{` 가 빠져있을 것 → 다시 붙임
-      const text = '{' + ((j.content?.[0]?.text) || '')
+      // 프리필 `{"recommended_topics":[{"topic":"` 추가 → 응답에서 빠져있을 것 → 다시 붙임
+      const text = '{"recommended_topics":[{"topic":"' + ((j.content?.[0]?.text) || '')
       return { ok: true, resp: j, text }
     } catch (e) {
       return { ok: false, err: 'exception: ' + String(e) }
@@ -162,12 +164,11 @@ ${JSON.stringify(catSearchTrim, null, 2)}
   }
 
   // ─── 1차 시도 ───
-  //   18 cat × 6 + recommended 3 = 111 entries (top5 제거 — 다운스트림 미사용)
-  //   compact JSON 출력 강제 → 들여쓰기 토큰 ~30% 절약
-  //   각 entry compact ~80 token = ~9,000 출력 토큰. 안전 margin 80%
-  //   max_tokens 16000 (이전 22000 → 16000 감축, compact 로 맞음)
-  //   Haiku 4.5 ~100 tok/s → ~90s. budget 충분
-  const attempt = await callClaude(16000)
+  //   18 cat × 6 + recommended 3 = 111 entries
+  //   Haiku 가 system 의 compact JSON 지시 무시하고 indent 출력하는 경향 → 22000 안전선
+  //   prefill `{"recommended_topics":[{"topic":"` 으로 compact 시작 패턴 강제
+  //   142초 (16000) → 22000 ≈ 195초. 300s budget 안에서 fits
+  const attempt = await callClaude(22000)
   if (attempt.ok && attempt.text) {
     claudeResp = attempt.resp || {}
     claudeRawText = attempt.text
