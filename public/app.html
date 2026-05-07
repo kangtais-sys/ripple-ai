@@ -9730,8 +9730,10 @@ function lkeRenderEditForm(b, idx){
     html+=lkeField('카테고리 라벨 (비우면 숨김)','text','f-label',b.label);
     html+=lkeRich('제목','f-title',b.title);
     html+=lkeField('이동 URL','url','f-url',b.url);
+    html+=lkeImageUploadHtml(idx, b.img, '배경 이미지 (선택)');
   } else if(b.type==='image'){
     html+=lkeField('제목','text','f-title',b.title);
+    html+=lkeImageUploadHtml(idx, b.img, '이미지');  // 이미지 블록의 핵심 — 사진 업로드
     html+=lkeTextStyleHtml(b);
     html+=lkeField('이동 URL','url','f-url',b.url);
   } else if(b.type==='link'){
@@ -10140,9 +10142,47 @@ function lkeQlDel(idx, i){ lkeState.blocks[idx].items.splice(i,1); lkeRenderEdit
 function lkeQlAdd(idx){ lkeState.blocks[idx].items.push({label:'새 링크',sub:'',url:''}); lkeRenderEditForm(lkeState.blocks[idx],idx); lkeRender(); }
 function lkeImageUpload(idx, inp){
   var f=inp.files&&inp.files[0]; if(!f) return;
+  // 재렌더 전 현재 폼 입력값 commit (제목/URL 등 타이핑 보존)
+  if(typeof lkeCommitEditFormInputs === 'function') lkeCommitEditFormInputs(idx);
   var r=new FileReader();
   r.onload=function(e){ lkeState.blocks[idx].img=e.target.result; lkeRender(); lkeRenderEditForm(lkeState.blocks[idx],idx); };
   r.readAsDataURL(f);
+}
+
+// 일반 블록 edit form 의 입력값을 state 로 commit (재렌더 전 호출)
+//   image upload 등 sheet 재렌더 트리거 동작 전에 호출해서 타이핑 보존
+function lkeCommitEditFormInputs(idx){
+  var b = lkeState.blocks[idx]; if(!b) return;
+  function v(id){ var el=document.getElementById(id); return el?el.value:undefined; }
+  function rich(id){ return (typeof lkeRichVal === 'function') ? lkeRichVal(id) : v(id); }
+  // 블록 타입별 필드 commit (lkeSaveBlock 와 동일한 매핑이지만 lkeRender 호출은 안 함)
+  if(b.type==='event'){
+    var t=v('f-text'); if(t!==undefined) b.text=t;
+    var s=v('f-sub'); if(s!==undefined) b.sub=s;
+    var u=v('f-url'); if(u!==undefined) b.url=u;
+  } else if(b.type==='countdown'){
+    var ey=v('f-eyebrow'); if(ey!==undefined) b.eyebrow=ey;
+    var ti=rich('f-title'); if(ti!==undefined) b.title=ti;
+    var su=v('f-sub'); if(su!==undefined) b.sub=su;
+    var en=v('f-ends'); if(en!==undefined) b.endsAt=en;
+    var sl=v('f-slots'); if(sl!==undefined) b.slots=sl;
+    var ul=v('f-url'); if(ul!==undefined) b.url=ul;
+  } else if(b.type==='contact' || b.type==='bigbanner'){
+    var eb=v('f-eyebrow'); if(eb!==undefined) b.eyebrow=eb;
+    var tb=rich('f-title'); if(tb!==undefined) b.title=tb;
+    var ub=v('f-url'); if(ub!==undefined) b.url=ub;
+    var fd=v('f-formDesc'); if(fd!==undefined && b.type==='contact') b.formDesc=fd;
+  } else if(b.type==='magazine'){
+    var lb=v('f-label'); if(lb!==undefined) b.label=lb;
+    var tm=rich('f-title'); if(tm!==undefined) b.title=tm;
+    var um=v('f-url'); if(um!==undefined) b.url=um;
+  } else if(b.type==='image'){
+    var ti2=v('f-title'); if(ti2!==undefined) b.title=ti2;
+    var ui=v('f-url'); if(ui!==undefined) b.url=ui;
+  } else if(b.type==='link'){
+    var tl=v('f-title'); if(tl!==undefined) b.title=tl;
+    var ul2=v('f-url'); if(ul2!==undefined) b.url=ul2;
+  }
 }
 
 // 블록 추가 picker
