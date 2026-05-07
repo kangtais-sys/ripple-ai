@@ -7591,11 +7591,8 @@ async function generatePrompt(){
     _d0['gen.steps.polish'] || '마지막 다듬기',
   ];
   showGenProgress(ssobiLoadingCopy('first'), topic, steps, 0);
-  var si = 0;
-  var stepTimer = setInterval(function(){
-    si = Math.min(si + 1, steps.length - 1);
-    updateGenProgress(si);
-  }, 2500);
+  // showGenProgress 가 자체 setInterval 로 25s 가정해 부드럽게 진행 — 별도 stepTimer 불필요
+  var stepTimer = null;
   try {
     var h = await authHeaders();
     var res = await fetch('/api/cardnews/generate', {
@@ -7665,10 +7662,10 @@ async function generatePrompt(){
     if(typeof lkeShowToast === 'function') lkeShowToast('AI 생성에 실패해 임시 템플릿으로 채웠어요. 다시 생성해보세요.');
     goStep(2);
   } finally {
-    clearInterval(stepTimer);
-    updateGenProgress(steps.length); // 모두 완료 체크
-    setTimeout(hideGenProgress, 450);
-    btn.textContent = '카드뉴스 생성하기';
+    if(stepTimer) clearInterval(stepTimer);
+    finishGenProgress();  // 92% → 100%, 완성됐어요 메시지
+    setTimeout(hideGenProgress, 600);  // 사용자가 "완성" 잠깐 보고 페이드아웃
+    btn.textContent = (((typeof I18N !== 'undefined' && I18N[ssobiCurrentLang||'ko'])||{})['create.btn.generate'] || '카드뉴스 생성하기');
     btn.disabled = false;
     btn.classList.remove('loading');
   }
@@ -7725,11 +7722,8 @@ async function regenPrompt(){
     _dR['gen.regen.polish'] || '톤 다듬기',
   ];
   showGenProgress(ssobiLoadingCopy('regen'), topic, regenSteps, 0);
-  var rsi = 0;
-  var regenTimer = setInterval(function(){
-    rsi = Math.min(rsi + 1, regenSteps.length - 1);
-    updateGenProgress(rsi);
-  }, 2200);
+  // showGenProgress 의 자체 setInterval 이 진행 처리 — regenTimer 별도 불필요
+  var regenTimer = null;
   // 본문 placeholder 표시
   var hookEl = document.getElementById('cs2-hook');
   var bodyEl = document.getElementById('cs2-body');
@@ -7779,9 +7773,9 @@ async function regenPrompt(){
     renderBodyAsCards(createData.bodySlides);
     document.getElementById('cs2-caption').textContent = g.caption;
   } finally {
-    clearInterval(regenTimer);
-    updateGenProgress(regenSteps.length);
-    setTimeout(hideGenProgress, 450);
+    if(regenTimer) clearInterval(regenTimer);
+    finishGenProgress();
+    setTimeout(hideGenProgress, 600);
     if(regenBtn){
       regenBtn.classList.remove('shimmer-text');
       regenBtn.disabled = false;
@@ -14564,8 +14558,14 @@ function ssobiLoadingCopy(mode){
   var key = keys[Math.floor(Math.random() * keys.length)];
   return dict[key] || (mode === 'regen' ? '쏘비 다시 간다' : '쏘비 지금 집중 중');
 }
+// 진행 시각 — 자동 progress bar 가 25초에 걸쳐 0 → 92% 으로 부드럽게 차오름
+//   실제 Claude 응답 도착 시 finishGenProgress() 호출 → 92% → 100% + 완성 메시지
+var __genStartedAt = 0;
+var __genTimer = null;
 function showGenProgress(title, subtitle, steps, curIdx){
   __genSteps = Array.isArray(steps) ? steps.slice() : [];
+  __genStartedAt = Date.now();
+  if(__genTimer) { clearInterval(__genTimer); __genTimer = null; }
   var ov = document.getElementById('gen-progress-overlay');
   if(!ov){
     ov = document.createElement('div');
@@ -14595,36 +14595,57 @@ function showGenProgress(title, subtitle, steps, curIdx){
     '</div>';
   ov.style.display = 'flex';
   updateGenProgress(curIdx || 0);
+
+  // 자동 진행 — 25초 가정. 25초 동안 부드럽게 0 → 92%, 그 이후엔 92% 유지
+  //   실제 응답 도착 시 finishGenProgress() 호출 → 92→100 + 완성 메시지
+  __genTimer = setInterval(function(){
+    var elapsed = (Date.now() - __genStartedAt) / 1000;
+    var ratio = Math.min(elapsed / 25, 0.92);  // 25초 가정, 92% 캡
+    var fill = document.getElementById('gp-bar-fill');
+    if(fill) fill.style.width = (ratio * 100).toFixed(1) + '%';
+    // step row 동기화 — ratio 에 비례해서 단계 진행
+    var total = __genSteps.length || 5;
+    var stepIdx = Math.min(Math.floor(ratio * total), total - 1);
+    syncGenStepRows(stepIdx, false);
+  }, 200);
 }
-function updateGenProgress(idx){
+function syncGenStepRows(cur, finished){
   var rows = document.querySelectorAll('#gen-progress-overlay .gp-step-row');
   if(!rows.length) return;
-  var total = __genSteps.length || rows.length;
-  var cur = Math.max(0, Math.min(idx, total));
   rows.forEach(function(r, i){
     r.classList.remove('on','done');
     var ico = r.querySelector('.gp-step-ico');
-    if(i < cur){
+    if(finished || i < cur){
       r.classList.add('done');
       if(ico) ico.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" style="width:12px;height:12px"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-    } else if(i === cur && cur < total){
+    } else if(i === cur){
       r.classList.add('on');
       if(ico) ico.textContent = (i+1);
     } else {
       if(ico) ico.textContent = (i+1);
     }
   });
+}
+function updateGenProgress(idx){
+  // legacy 호환 — 실제 진행은 setInterval 이 알아서 함. 외부 강제 호출만 반영.
+  syncGenStepRows(idx, false);
+}
+// Claude 응답 도착 시 — bar 92→100% + 완성 메시지 + step 모두 done 표시
+function finishGenProgress(){
+  if(__genTimer) { clearInterval(__genTimer); __genTimer = null; }
+  syncGenStepRows(__genSteps.length, true);
   var fill = document.getElementById('gp-bar-fill');
-  if(fill) fill.style.width = Math.min(100, (cur/total)*100) + '%';
-  // 전체 완료 시 코어 체크
-  if(cur >= total){
-    var core = document.getElementById('gp-core');
-    if(core) core.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" style="width:22px;height:22px"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-    var t = document.getElementById('gp-title');
-    if(t) t.textContent = '완성됐어요';
+  if(fill) fill.style.width = '100%';
+  var core = document.getElementById('gp-core');
+  if(core) core.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" style="width:22px;height:22px"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var t = document.getElementById('gp-title');
+  if(t){
+    var lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+    t.textContent = lang === 'en' ? 'Done!' : '완성됐어요';
   }
 }
 function hideGenProgress(){
+  if(__genTimer) { clearInterval(__genTimer); __genTimer = null; }
   var ov = document.getElementById('gen-progress-overlay');
   if(ov) ov.style.display = 'none';
 }
