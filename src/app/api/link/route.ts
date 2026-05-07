@@ -63,12 +63,32 @@ export async function POST(req: NextRequest) {
     published: body.published ?? true,
   }
 
-  // upsert by user_id (한 유저당 한 페이지)
-  const { data, error } = await sb
+  // 2026-05-07 fix: link_pages.user_id 에 UNIQUE 제약 없어서 onConflict:'user_id' 가 500 에러
+  //   manual upsert: 기존 행 있으면 UPDATE, 없으면 INSERT
+  const { data: existing } = await sb
     .from('link_pages')
-    .upsert(payload, { onConflict: 'user_id' })
-    .select()
-    .single()
+    .select('id')
+    .eq('user_id', user.id)
+    .maybeSingle()
+
+  let data: Record<string, unknown> | null = null
+  let error: { message: string } | null = null
+  if (existing) {
+    const r = await sb
+      .from('link_pages')
+      .update({ ...payload, updated_at: new Date().toISOString() })
+      .eq('id', existing.id)
+      .select()
+      .single()
+    data = r.data; error = r.error
+  } else {
+    const r = await sb
+      .from('link_pages')
+      .insert(payload)
+      .select()
+      .single()
+    data = r.data; error = r.error
+  }
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
