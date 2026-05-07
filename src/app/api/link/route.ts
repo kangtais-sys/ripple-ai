@@ -1,15 +1,19 @@
 // GET  /api/link        → 현재 유저의 link_page 조회 (로그인 필요)
 // POST /api/link        → 생성/업데이트 (upsert by user_id, handle)
+//
+// 2026-05-07 fix: Bearer 토큰 인증 추가 (이전엔 cookie 만 사용 → Supabase JS CDN
+//   localStorage 세션 유저는 항상 401 → 편집해도 link_pages 행이 절대 안 생김)
+//   getUserFromRequest 가 Bearer 우선 + cookie fallback 둘 다 처리
 
-import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { getUserFromRequest, adminClient } from '@/lib/auth-helper'
 
 const HANDLE_RE = /^[a-z0-9_-]{3,30}$/
 
-export async function GET() {
-  const sb = await createClient()
-  const { data: { user } } = await sb.auth.getUser()
+export async function GET(req: NextRequest) {
+  const user = await getUserFromRequest(req).catch(() => null)
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  const sb = adminClient()  // Bearer/cookie 인증 통과 — RLS 우회 OK
 
   const { data, error } = await sb
     .from('link_pages')
@@ -21,10 +25,10 @@ export async function GET() {
   return NextResponse.json({ page: data })
 }
 
-export async function POST(req: Request) {
-  const sb = await createClient()
-  const { data: { user } } = await sb.auth.getUser()
+export async function POST(req: NextRequest) {
+  const user = await getUserFromRequest(req).catch(() => null)
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  const sb = adminClient()
 
   const body = await req.json().catch(() => ({})) as {
     handle?: string

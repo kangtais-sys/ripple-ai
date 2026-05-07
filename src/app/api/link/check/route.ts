@@ -1,8 +1,10 @@
 // GET /api/link/check?handle=xxx
 // 핸들 사용 가능 여부 (중복/유효성)
+//
+// 2026-05-07 fix: Bearer 토큰 인증 fallback 으로 owns 판정 정확화
 
-import { NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { getUserFromRequest, adminClient } from '@/lib/auth-helper'
 
 const HANDLE_RE = /^[a-z0-9_-]{3,30}$/
 const RESERVED = new Set([
@@ -11,7 +13,7 @@ const RESERVED = new Set([
   'u', 's', 'me', 'home', 'about', 'terms', 'privacy',
 ])
 
-export async function GET(req: Request) {
+export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url)
   const handle = (searchParams.get('handle') || '').toLowerCase().trim()
 
@@ -22,8 +24,9 @@ export async function GET(req: Request) {
     return NextResponse.json({ ok: false, reason: 'reserved' })
   }
 
-  const sb = await createClient()
-  const { data: { user } } = await sb.auth.getUser()
+  // 인증은 선택 — 비로그인도 핸들 가용성 체크 가능
+  const user = await getUserFromRequest(req).catch(() => null)
+  const sb = adminClient()
 
   const { data, error } = await sb
     .from('link_pages')

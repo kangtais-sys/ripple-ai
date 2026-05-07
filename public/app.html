@@ -10748,8 +10748,27 @@ function lkeEditGridCard(blockIdx, cardIdx){
   body.innerHTML=html;
   lkeOpenSheet('edit');
 }
-function lkeGridKindOnly(bIdx, cIdx, kind){ lkeState.blocks[bIdx].items[cIdx].kind=kind; lkeEditGridCard(bIdx, cIdx); lkeRender(); }
+// 카드 입력값 commit (재렌더 전에 호출 — 종류/태그 변경 시 타이핑 안 잃게)
+function lkeCommitGridCardInputs(bIdx, cIdx){
+  var it = lkeState.blocks[bIdx] && lkeState.blocks[bIdx].items && lkeState.blocks[bIdx].items[cIdx];
+  if(!it) return;
+  function v(id){ var el=document.getElementById(id); return el?el.value:undefined; }
+  var t = v('ci-title'); if(t !== undefined) it.title = t;
+  var d = v('ci-date'); if(d !== undefined) it.date = d;
+  if(it.kind==='product' || !it.kind){
+    var p = v('ci-price'); if(p !== undefined) it.price = p;
+    var o = v('ci-orig'); if(o !== undefined) it.origPrice = o;
+  }
+  var u = v('ci-url'); if(u !== undefined) it.url = u;
+}
+function lkeGridKindOnly(bIdx, cIdx, kind){
+  lkeCommitGridCardInputs(bIdx, cIdx);  // 재렌더 전 입력값 보존
+  lkeState.blocks[bIdx].items[cIdx].kind = kind;
+  lkeEditGridCard(bIdx, cIdx);
+  lkeRender();
+}
 function lkeGridTagOnly(bIdx, cIdx, tag){
+  lkeCommitGridCardInputs(bIdx, cIdx);  // 재렌더 전 입력값 보존
   lkeState.blocks[bIdx].items[cIdx].tag = tag;
   lkeState.blocks[bIdx].items[cIdx].tagStyle = tag==='HOT'?'hot':((tag==='BEST'||tag==='공구')?'dark':'');
   lkeEditGridCard(bIdx, cIdx);
@@ -10761,12 +10780,7 @@ function lkeGridDelCard(bIdx, cIdx){
   lkeRender(); lkeCloseSheet();
 }
 function lkeSaveGridCard(bIdx, cIdx){
-  var it = lkeState.blocks[bIdx].items[cIdx];
-  function v(id){ var el=document.getElementById(id); return el?el.value:undefined; }
-  it.title = v('ci-title') ?? it.title;
-  it.date = v('ci-date') ?? it.date;
-  if(it.kind==='product' || !it.kind){ it.price = v('ci-price') ?? it.price; it.origPrice = v('ci-orig') ?? it.origPrice; }
-  it.url = v('ci-url') ?? it.url;
+  lkeCommitGridCardInputs(bIdx, cIdx);
   lkeRender(); lkeCloseSheet();
 }
 
