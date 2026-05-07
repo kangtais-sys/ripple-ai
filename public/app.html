@@ -1843,6 +1843,39 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 /* 기본 블록 간격 (편집 모드) — add-zone 이 12px 추가로 끼어들어 적당함 */
 #v-link .lke-block-countdown,#v-link .lke-block-bigbanner,#v-link .lke-block-mag,#v-link .lke-block-image{margin-top:8px;margin-bottom:8px}
 #v-link .lke-block-section-title{padding-top:32px;padding-bottom:10px}
+/* 2026-05-07 모바일 UX 폴리시 */
+/* 드래그 핸들 — 모바일 친화 (32→40px), 항상 보이는 mint 외곽선 */
+#v-link .lke-drag{width:40px;height:40px;border-radius:12px;background:#fff;border:1.5px solid var(--mint-l);color:var(--mint-d);box-shadow:0 3px 10px rgba(0,200,150,.15);font-size:16px}
+#v-link .lke-drag:active{transform:scale(.92);background:var(--mint);color:#fff;border-color:var(--mint)}
+/* 블록 hover/select 시 우상단에 "편집" 힌트 — 첫 사용자가 탭 가능 인지 */
+#v-link .lke-block::after{content:'';display:none}
+#v-link .lke-block:not(.lke-block-divider):not(.lke-block-spacer):not(.lke-block-footer):hover::after,
+#v-link .lke-block.selected::after{
+  content:'✎';display:flex;position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;
+  background:var(--mint);color:#fff;font-size:13px;font-weight:700;align-items:center;justify-content:center;
+  z-index:9;box-shadow:0 3px 10px rgba(0,200,150,.3);pointer-events:none;
+}
+/* FAB 블록 추가 — 우하단 sticky */
+#v-link .lke-fab-add{
+  position:fixed;bottom:calc(env(safe-area-inset-bottom) + 24px);right:18px;
+  background:var(--mint);color:#fff;border:none;border-radius:100px;
+  padding:13px 18px 13px 16px;font-size:14px;font-weight:800;letter-spacing:-.3px;
+  cursor:pointer;box-shadow:0 6px 22px rgba(0,200,150,.42);
+  display:flex;align-items:center;gap:7px;z-index:50;
+  transition:transform .15s,box-shadow .15s;
+  font-family:'Pretendard',sans-serif;
+}
+#v-link .lke-fab-add svg{width:18px;height:18px;stroke:currentColor;fill:none}
+#v-link .lke-fab-add:active{transform:scale(.94);box-shadow:0 4px 14px rgba(0,200,150,.5)}
+#v-link.lke-preview .lke-fab-add{display:none}
+/* 빈 상태 — 블록 0개 시 가운데 큰 CTA */
+#v-link .lke-empty{
+  text-align:center;padding:60px 20px 80px;
+}
+#v-link .lke-empty-ico{font-size:48px;margin-bottom:12px;opacity:.4}
+#v-link .lke-empty-t{font-size:17px;font-weight:800;color:var(--t1);margin-bottom:6px;letter-spacing:-.3px}
+#v-link .lke-empty-s{font-size:13px;color:var(--t3);line-height:1.5;margin-bottom:18px}
+#v-link .lke-empty-cta{padding:14px 24px;background:var(--mint);color:#fff;border:none;border-radius:100px;font-size:14px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(0,200,150,.3)}
 /* 미리보기 모드 — add-zone 사라진 공간 보상 */
 #v-link.lke-preview .lke-block-countdown,#v-link.lke-preview .lke-block-bigbanner,#v-link.lke-preview .lke-block-mag,#v-link.lke-preview .lke-block-image,#v-link.lke-preview .lke-block-grid,#v-link.lke-preview .lke-block-quicklinks,#v-link.lke-preview .lke-block-socials{margin-top:16px;margin-bottom:16px}
 #v-link.lke-preview .lke-block-event{margin-top:0;margin-bottom:12px}
@@ -3164,7 +3197,10 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div class="lke-topbar">
     <div class="lke-topbar-row1">
       <button class="lke-back-btn" onclick="go('create')" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <div class="lke-mini-url" onclick="editHandle()">ssobi.ai/u/<strong id="lk-handle-disp">yuminhye</strong></div>
+      <div class="lke-mini-url" onclick="editHandle()" style="position:relative">
+        ssobi.ai/u/<strong id="lk-handle-disp">yuminhye</strong>
+        <span id="lke-save-status" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);display:flex;align-items:center;opacity:0;transition:opacity .2s"></span>
+      </div>
       <button class="lke-share-btn" onclick="openModal('m-link-share')" aria-label="공유"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a2 2 0 002 2h12a2 2 0 002-2v-7M16 6l-4-4-4 4M12 2v13" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
     <div class="lke-topbar-row2">
@@ -3182,6 +3218,12 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
   <!-- 편집기 본체 - 동적 렌더 -->
   <div class="lke-editor" id="lke-editor"></div>
+
+  <!-- FAB 블록 추가 (sticky bottom-right) — 모바일에서 한 손 접근 쉽게 -->
+  <button class="lke-fab-add" onclick="lkeOpenSheet('add-block')" aria-label="블록 추가">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+    <span data-i18n="link.add_block_short">추가</span>
+  </button>
 
   <button class="lke-preview-exit" onclick="lkeTogglePreview()" data-i18n="link.exit_preview">✕ 편집으로</button>
 
@@ -5283,6 +5325,10 @@ var I18N = {
     'alert.enter_handle':'핸들을 입력해주세요',
     'alert.copied':'복사됐어요!',
     'alert.write_bio_first':'바이오를 먼저 작성해주세요',
+    'link.add_block_short':'추가',
+    'lke.empty.title':'첫 블록을 추가해보세요',
+    'lke.empty.sub':'링크·이미지·이벤트 등 다양한 블록으로<br>나만의 페이지를 꾸밀 수 있어요.',
+    'lke.empty.cta':'+ 블록 추가하기',
     'btn.share':'공유', 'btn.start':'시작하기', 'btn.delete':'삭제',
     // 홈
     'home.greeting':'안녕하세요',
@@ -6077,6 +6123,10 @@ var I18N = {
     'alert.enter_handle':'Please enter a handle',
     'alert.copied':'Copied!',
     'alert.write_bio_first':'Please write your bio first',
+    'link.add_block_short':'Add',
+    'lke.empty.title':'Add your first block',
+    'lke.empty.sub':'Links, images, events and more —<br>build your page your way.',
+    'lke.empty.cta':'+ Add a block',
     'btn.share':'Share', 'btn.start':'Start', 'btn.delete':'Delete',
     // home
     'home.greeting':'Hi',
@@ -9333,6 +9383,30 @@ function saveLink(){
   copyLinkUrl();
 }
 
+// 저장 상태 indicator — topbar 의 mini-url 옆에 작은 dot
+//   states: idle (default) / syncing (회전 dot) / saved (mint check) / error (red x)
+function lkeUpdateSaveStatus(state){
+  var el = document.getElementById('lke-save-status'); if(!el) return;
+  var lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+  var labels = lang === 'en'
+    ? { syncing:'Saving…', saved:'Saved', error:'Save failed' }
+    : { syncing:'저장 중…', saved:'저장됨', error:'저장 실패' };
+  if(state === 'syncing'){
+    el.innerHTML = '<span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--mint);animation:lke-pulse 1.2s infinite"></span><span style="margin-left:6px;font-size:10.5px;color:var(--t3)">' + labels.syncing + '</span>';
+    el.style.opacity = '1';
+  } else if(state === 'saved'){
+    el.innerHTML = '<span style="display:inline-flex;align-items:center;gap:4px;color:var(--mint-d);font-size:10.5px;font-weight:700"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg>' + labels.saved + '</span>';
+    el.style.opacity = '1';
+    setTimeout(function(){ if(el.dataset.state==='saved') el.style.opacity = '0.5'; }, 2000);
+    el.dataset.state = 'saved';
+  } else if(state === 'error'){
+    el.innerHTML = '<span style="display:inline-flex;align-items:center;gap:4px;color:var(--red);font-size:10.5px;font-weight:700"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18" stroke-linecap="round"/><line x1="6" y1="6" x2="18" y2="18" stroke-linecap="round"/></svg>' + labels.error + '</span>';
+    el.style.opacity = '1';
+  } else {
+    el.innerHTML = ''; el.style.opacity = '0';
+  }
+}
+
 // 서버 자동 동기화 (디바운스 2초)
 var _lkeSyncTimer = null;
 function lkeSyncToServer(){
@@ -9345,6 +9419,8 @@ function lkeSyncToServer(){
 async function _lkeSyncNow(){
   var state = (typeof lkeState !== 'undefined' && lkeState) ? lkeState : null;
   if(!state || !state.handle) return;
+  // 동기화 시작 — topbar 상태 indicator 'syncing'
+  lkeUpdateSaveStatus('syncing');
   var payload = {
     handle: state.handle,
     hero: state.hero || {},
@@ -9361,10 +9437,18 @@ async function _lkeSyncNow(){
       body: JSON.stringify(payload),
       credentials:'include',
     }).then(function(r){
-      if(!r.ok){ console.warn('[ssobi] link sync failed', r.status); }
-      else { console.debug('[ssobi] link synced'); }
-    }).catch(function(e){ console.warn('[ssobi] link sync error', e); });
-  } catch(e) { console.warn(e); }
+      if(!r.ok){
+        console.warn('[ssobi] link sync failed', r.status);
+        lkeUpdateSaveStatus('error');
+      } else {
+        console.debug('[ssobi] link synced');
+        lkeUpdateSaveStatus('saved');
+      }
+    }).catch(function(e){
+      console.warn('[ssobi] link sync error', e);
+      lkeUpdateSaveStatus('error');
+    });
+  } catch(e) { console.warn(e); lkeUpdateSaveStatus('error'); }
   try{ localStorage.setItem('ssobi_lke_state', JSON.stringify(state)); }catch(e){}
 }
 // 링크 통계 모달 열기 — /api/link/stats fetch + 렌더
@@ -9596,6 +9680,19 @@ function lkeRender(){
     root.appendChild(el);
     root.appendChild(lkeAddZone(i+1));
   });
+  // 빈 상태 — 블록 0개일 때 큰 CTA (히어로 외 모든 콘텐츠 비어있을 때)
+  if(!lkeState.blocks || lkeState.blocks.length === 0){
+    var lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+    var dict = (typeof I18N !== 'undefined' && I18N[lang]) || {};
+    var empty = document.createElement('div');
+    empty.className = 'lke-empty';
+    empty.innerHTML =
+      '<div class="lke-empty-ico">🔗</div>' +
+      '<div class="lke-empty-t">' + (dict['lke.empty.title'] || '첫 블록을 추가해보세요') + '</div>' +
+      '<div class="lke-empty-s">' + (dict['lke.empty.sub'] || '링크·이미지·이벤트 등 다양한 블록으로<br>나만의 페이지를 꾸밀 수 있어요.') + '</div>' +
+      '<button class="lke-empty-cta" onclick="lkeOpenSheet(\'add-block\')">' + (dict['lke.empty.cta'] || '+ 블록 추가하기') + '</button>';
+    root.appendChild(empty);
+  }
   // 상태 변경 후 서버 동기화 (디바운스)
   if(typeof lkeSyncToServer === 'function') lkeSyncToServer();
 }
