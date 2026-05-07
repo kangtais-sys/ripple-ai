@@ -5918,6 +5918,16 @@ var I18N = {
     'lke.align.center':'가운데',
     'lke.align.right':'오른쪽',
     'lke.align.delete':'삭제',
+    'lke.theme.layout':'레이아웃 시작점',
+    'lke.theme.layout_desc':'선택하면 기본 블록이 자동 세팅돼요. 이후 세부 편집 가능.',
+    'lke.theme.appearance':'페이지 꾸미기',
+    'lke.theme.bg_grad':'배경 그라디',
+    'lke.theme.bg_solid':'배경 단색',
+    'lke.theme.text_color':'기본 글자색',
+    'lke.theme.title_color':'제목 글자색',
+    'lke.theme.title_font':'제목 폰트',
+    'lke.theme.body_font':'본문 폰트',
+    'lke.theme.apply':'적용',
     'lke.settings.handle_hint':'유저 아이디만 수정 가능해요. 중복이면 다른 핸들을 선택하세요.',
     'lke.settings.feature':'기능 설정',
     'lke.settings.multi_lang':'다국어 자동 전환',
@@ -6663,6 +6673,16 @@ var I18N = {
     'lke.align.center':'Center',
     'lke.align.right':'Right',
     'lke.align.delete':'Delete',
+    'lke.theme.layout':'Starting layout',
+    'lke.theme.layout_desc':'Picking one auto-fills default blocks. You can edit further afterward.',
+    'lke.theme.appearance':'Page appearance',
+    'lke.theme.bg_grad':'Background gradient',
+    'lke.theme.bg_solid':'Background solid',
+    'lke.theme.text_color':'Default text color',
+    'lke.theme.title_color':'Title color',
+    'lke.theme.title_font':'Title font',
+    'lke.theme.body_font':'Body font',
+    'lke.theme.apply':'Apply',
     'lke.settings.handle_hint':'Only your user ID is editable. Pick a different handle if it\'s taken.',
     'lke.settings.feature':'Features',
     'lke.settings.multi_lang':'Auto language switch',
@@ -9292,7 +9312,7 @@ var lkeState = {
   handle:'yuminhye',
   hero:{
     slides:[
-      {bg:'',eyebrow:'LIVE · 공동구매',brand:'YUMINHYE STUDIO',title:'Glow <em>Drop.</em><br>Spring \'26',sub:'신상만 밝히는 코덕의<br>진짜 효자템 모음.',stat1n:'312K',stat1l:'Followers',stat2n:'7/20',stat2l:'공구남음',cta:'지금 보기 →',ctaUrl:''}
+      {bg:'',eyebrow:'LIVE · 공동구매',brand:'YUMINHYE STUDIO',title:'Glow <em>Drop.</em><br>Spring \'26',sub:'신상만 밝히는 코덕의<br>진짜 효자템 모음.',stat1_hidden:true,stat2_hidden:true,cta:'지금 보기 →',ctaUrl:''}
     ]
   },
   blocks:[
@@ -10316,9 +10336,9 @@ function lkeTogglePreview(){
 // 테마/레이아웃/설정 적용
 // 3종 레이아웃 시작점 템플릿
 var LKE_TEMPLATES = {
-  minimal: { name:'미니멀', desc:'링크만 심플하게', preview:'m' },
-  shop: { name:'쇼핑몰', desc:'제품 판매 중심', preview:'s', premium:true },
-  editorial: { name:'에디토리얼', desc:'매거진 스타일', preview:'e', premium:true }
+  minimal: { name:'미니멀', nameEn:'Minimal', desc:'링크만 심플하게', descEn:'Just clean links', preview:'m' },
+  shop: { name:'쇼핑몰', nameEn:'Shop', desc:'제품 판매 중심', descEn:'Product-focused', preview:'s', premium:true },
+  editorial: { name:'에디토리얼', nameEn:'Editorial', desc:'매거진 스타일', descEn:'Magazine style', preview:'e', premium:true }
 };
 function lkeTemplateBlocks(key){
   var t = Date.now();
@@ -10336,7 +10356,7 @@ function lkeTemplateBlocks(key){
   }
   if(key==='shop'){
     return {
-      hero: { slides:[{bg:'',eyebrow:'LIVE · 공동구매',brand:'YUMINHYE STUDIO',title:'Glow <em>Drop.</em><br>Spring \'26',sub:'신상만 밝히는 코덕의<br>진짜 효자템 모음.',stat1n:'312K',stat1l:'Followers',stat2n:'7/20',stat2l:'공구남음',cta:'지금 보기 →'}] },
+      hero: { slides:[{bg:'',eyebrow:'LIVE · 공동구매',brand:'YUMINHYE STUDIO',title:'Glow <em>Drop.</em><br>Spring \'26',sub:'신상만 밝히는 코덕의<br>진짜 효자템 모음.',stat1_hidden:true,stat2_hidden:true,cta:'지금 보기 →'}] },
       blocks:[
         {type:'event',id:'es'+t,text:'30% OFF',sub:'글로우 세럼 공동구매 중',url:''},
         {type:'countdown',id:'cs'+t,title:'글로우 세럼 <em>50ml</em>',sub:'100% 페이백 · 선착순 20명',eyebrow:'공구 마감까지',slots:'7 / 20명',url:''},
@@ -10384,11 +10404,14 @@ function lkeRenderThemeSheet(){
   var body = document.getElementById('lke-theme-body'); if(!body) return;
   var st = lkeState.theme || (lkeState.theme = {bg:null, bgSolid:null, textColor:'#1A1F27', titleColor:'#1A1F27', titleFont:'Pretendard', bodyFont:'Pretendard'});
   var g = lkeParseGrad(st.bg);
+  var _lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+  var _d = (typeof I18N !== 'undefined' && I18N[_lang]) || {};
+  var L = function(k, fallback){ return _d['lke.theme.'+k] || fallback; };
   var html = '';
 
   // 레이아웃 시작점
-  html += '<div class="lke-field-label" style="margin-top:10px">레이아웃 시작점</div>';
-  html += '<div style="font-size:11px;color:var(--t2);line-height:1.5;margin-bottom:10px">선택하면 기본 블록이 자동 세팅돼요. 이후 세부 편집 가능.</div>';
+  html += '<div class="lke-field-label" style="margin-top:10px">' + L('layout','레이아웃 시작점') + '</div>';
+  html += '<div style="font-size:11px;color:var(--t2);line-height:1.5;margin-bottom:10px">' + L('layout_desc','선택하면 기본 블록이 자동 세팅돼요. 이후 세부 편집 가능.') + '</div>';
   html += '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:20px">';
   var premium = lkeIsPremium();
   Object.keys(LKE_TEMPLATES).forEach(function(k){
@@ -10400,17 +10423,20 @@ function lkeRenderThemeSheet(){
       editorial:'<div style="height:18px;background:linear-gradient(135deg,#A7F3D0,#00A87E);border-radius:2px;margin-bottom:3px"></div><div style="height:14px;background:linear-gradient(135deg,#67E8F9,#06B6D4);border-radius:2px;margin-bottom:3px"></div><div style="height:10px;background:linear-gradient(135deg,#C4B5FD,#8B5CF6);border-radius:2px"></div>'
     }[k];
     var onclickFn = locked ? "cm('m-link-theme');cm('lke-sheet-theme');lkeCloseSheet();openModal('m-plan')" : 'lkeApplyTemplate(\''+k+'\')';
+    var _tname = (_lang === 'en' && t.nameEn) ? t.nameEn : t.name;
+    var _tdesc = (_lang === 'en' && t.descEn) ? t.descEn : t.desc;
+    var _lockLbl = _lang === 'en' ? 'Premium' : '프리미엄';
     html += '<button onclick="'+onclickFn+'" style="background:#fff;border:1px solid var(--b);border-radius:10px;padding:10px 10px 12px;cursor:pointer;text-align:left;transition:all .15s;opacity:'+(locked?'.6':'1')+';position:relative" onmouseover="this.style.borderColor=\'var(--mint)\'" onmouseout="this.style.borderColor=\'var(--b)\'">'+
       '<div style="height:42px;background:var(--bg);border-radius:6px;padding:8px;margin-bottom:8px;display:flex;flex-direction:column;justify-content:center'+(locked?';filter:grayscale(.5)':'')+'">'+viz+'</div>'+
-      '<div style="font-size:12.5px;font-weight:800;color:var(--t1);letter-spacing:-.2px">'+t.name+(locked?' <span class="lke-lock">프리미엄</span>':'')+'</div>'+
-      '<div style="font-size:10px;color:var(--t3);margin-top:2px">'+t.desc+'</div>'+
+      '<div style="font-size:12.5px;font-weight:800;color:var(--t1);letter-spacing:-.2px">'+_tname+(locked?' <span class="lke-lock">'+_lockLbl+'</span>':'')+'</div>'+
+      '<div style="font-size:10px;color:var(--t3);margin-top:2px">'+_tdesc+'</div>'+
     '</button>';
   });
   html += '</div>';
 
   // 페이지 배경 (블록 꾸미기와 동일한 패턴)
-  html += '<div class="lke-appearance"><div class="lke-app-head">페이지 꾸미기</div>';
-  html += '<div class="lke-pick-row"><label>배경 그라디</label><div class="lke-pick-col" id="theme-bg-grad">'+
+  html += '<div class="lke-appearance"><div class="lke-app-head">' + L('appearance','페이지 꾸미기') + '</div>';
+  html += '<div class="lke-pick-row"><label>' + L('bg_grad','배경 그라디') + '</label><div class="lke-pick-col" id="theme-bg-grad">'+
     '<input type="color" class="lke-color-dot lke-grad-c1" value="'+g.c1+'">'+
     '<select class="lke-grad-sel">'+
       [['135','↘'],['180','↓'],['90','→'],['45','↗'],['radial','⊙']].map(function(d){
@@ -10419,26 +10445,26 @@ function lkeRenderThemeSheet(){
     '</select>'+
     '<input type="color" class="lke-color-dot lke-grad-c2" value="'+g.c2+'">'+
   '</div></div>';
-  html += '<div class="lke-pick-row"><label>배경 단색</label><div class="lke-pick-col"><span class="lke-pick-hex" id="theme-bg-solid-hex">'+((st.bgSolid||'#F9FAFB').toUpperCase())+'</span><input type="color" class="lke-color-dot" id="theme-bg-solid" value="'+(st.bgSolid||'#F9FAFB')+'" oninput="document.getElementById(\'theme-bg-solid-hex\').textContent=this.value.toUpperCase()"></div></div>';
-  html += '<div class="lke-pick-row"><label>기본 글자색</label><div class="lke-pick-col"><span class="lke-pick-hex" id="theme-text-hex">'+((st.textColor||'#1A1F27').toUpperCase())+'</span><input type="color" class="lke-color-dot" id="theme-text" value="'+(st.textColor||'#1A1F27')+'" oninput="document.getElementById(\'theme-text-hex\').textContent=this.value.toUpperCase()"></div></div>';
-  html += '<div class="lke-pick-row"><label>제목 글자색</label><div class="lke-pick-col"><span class="lke-pick-hex" id="theme-title-hex">'+((st.titleColor||'#1A1F27').toUpperCase())+'</span><input type="color" class="lke-color-dot" id="theme-title-c" value="'+(st.titleColor||'#1A1F27')+'" oninput="document.getElementById(\'theme-title-hex\').textContent=this.value.toUpperCase()"></div></div>';
+  html += '<div class="lke-pick-row"><label>' + L('bg_solid','배경 단색') + '</label><div class="lke-pick-col"><span class="lke-pick-hex" id="theme-bg-solid-hex">'+((st.bgSolid||'#F9FAFB').toUpperCase())+'</span><input type="color" class="lke-color-dot" id="theme-bg-solid" value="'+(st.bgSolid||'#F9FAFB')+'" oninput="document.getElementById(\'theme-bg-solid-hex\').textContent=this.value.toUpperCase()"></div></div>';
+  html += '<div class="lke-pick-row"><label>' + L('text_color','기본 글자색') + '</label><div class="lke-pick-col"><span class="lke-pick-hex" id="theme-text-hex">'+((st.textColor||'#1A1F27').toUpperCase())+'</span><input type="color" class="lke-color-dot" id="theme-text" value="'+(st.textColor||'#1A1F27')+'" oninput="document.getElementById(\'theme-text-hex\').textContent=this.value.toUpperCase()"></div></div>';
+  html += '<div class="lke-pick-row"><label>' + L('title_color','제목 글자색') + '</label><div class="lke-pick-col"><span class="lke-pick-hex" id="theme-title-hex">'+((st.titleColor||'#1A1F27').toUpperCase())+'</span><input type="color" class="lke-color-dot" id="theme-title-c" value="'+(st.titleColor||'#1A1F27')+'" oninput="document.getElementById(\'theme-title-hex\').textContent=this.value.toUpperCase()"></div></div>';
   html += '</div>';
 
   // 폰트
-  html += '<div class="lke-field-label" style="margin-top:14px">제목 폰트</div>'+
+  html += '<div class="lke-field-label" style="margin-top:14px">' + L('title_font','제목 폰트') + '</div>'+
     '<div class="lke-font-list" id="theme-title-font">'+
       [['Pretendard',''],['Fraunces','fra'],['Noto Sans KR',''],['Noto Serif KR','fra']].map(function(f){
         return '<span class="lke-font-pill '+f[1]+(st.titleFont===f[0]?' active':'')+'" data-font="'+f[0]+'">'+f[0]+'</span>';
       }).join('')+
     '</div>';
-  html += '<div class="lke-field-label">본문 폰트</div>'+
+  html += '<div class="lke-field-label">' + L('body_font','본문 폰트') + '</div>'+
     '<div class="lke-font-list" id="theme-body-font">'+
       [['Pretendard',''],['Noto Sans KR',''],['Nanum Myeongjo','fra'],['JetBrains Mono','mono']].map(function(f){
         return '<span class="lke-font-pill '+f[1]+(st.bodyFont===f[0]?' active':'')+'" data-font="'+f[0]+'">'+f[0]+'</span>';
       }).join('')+
     '</div>';
 
-  html += '<button class="lke-top-btn primary" style="width:100%;padding:14px;margin-top:14px" onclick="lkeApplyTheme()">적용</button>';
+  html += '<button class="lke-top-btn primary" style="width:100%;padding:14px;margin-top:14px" onclick="lkeApplyTheme()">' + L('apply','적용') + '</button>';
   body.innerHTML = html;
   body.querySelectorAll('.lke-font-list').forEach(function(list){
     list.querySelectorAll('.lke-font-pill').forEach(function(p){
@@ -11781,13 +11807,16 @@ function setImageSlot(wrap, url, meta){
   }
 
   var img = document.createElement('img');
-  img.src = url;
   img.style.cssText = preserveRatio
     ? 'position:relative;width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;border-radius:0;z-index:1'
     : 'width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;border-radius:0';
-  // 표시용 이미지는 crossOrigin 없이 로드 (어떤 소스든 표시되게).
-  // 밝기 감지는 별도 probe 가 crossOrigin='anonymous' 로 같은 URL 을 다시 받아서 측정.
-  // probe 실패 시 템플릿 기준 색으로 폴백 → 어두운 사진엔 흰 글씨, 밝은 사진엔 검정 글씨.
+  // 2026-05-07 fix: crossOrigin='anonymous' 로 로드 → html2canvas 캔버스 tainted 방지
+  //   stock 이미지(Pexels/Unsplash/picsum/Google Books/Wikipedia/Open Library) 다 CORS 지원
+  //   crossOrigin 미설정 시 브라우저가 non-CORS 캐시로 저장 → html2canvas 가 캔버스 tainted →
+  //   toBlob null → 슬라이드 업로드 누락 → 발행 시 이미지 빠짐
+  //   crossOrigin='anonymous' 면 CORS 헤더 받아서 캐시 → html2canvas 가 정상 캡처
+  img.crossOrigin = 'anonymous';
+  img.src = url;
   img.onload = function(){
     probeImageBrightness(url, function(brightness){
       if(brightness != null) wrap.dataset.brightness = String(brightness);
@@ -12934,7 +12963,18 @@ function initEditor(){
   if(badge) badge.textContent = info.label;
   canvas.querySelectorAll('.edt-slide').forEach(function(e){ e.remove(); });
   edtSlides = [];
-  var body = parseBodyIntoSlides(createData.body);  // N-1 개 body (슬라이드 2~N)
+  // 2026-05-07 fix: createData.bodySlides (구조화 배열) 직접 사용
+  //   이전엔 parseBodyIntoSlides(createData.body) 로 텍스트 재파싱 → 본문 빈 줄을
+  //   슬라이드 구분자로 오인 + role/items/list/big_number/sub 필드 다 손실됨
+  //   bodySlides 가 비어있을 때만 텍스트 fallback (수동 편집 케이스)
+  var body;
+  if(Array.isArray(createData.bodySlides) && createData.bodySlides.length){
+    body = createData.bodySlides.map(function(b){
+      return Object.assign({ kind: 'slide' }, b);  // kind 만 추가 (legacy 호환)
+    });
+  } else {
+    body = parseBodyIntoSlides(createData.body);
+  }
   var target = createData.slides || 7;              // N (총 슬라이드 수)
   var titleTxt = (createData.hook || '제목').replace(/^"|"$/g,'');
   // parsed = [cover(hook), ...body] → 총 N개가 되도록 맞춤
@@ -16445,6 +16485,14 @@ async function bootstrapUser(){
     // 내 링크 백그라운드 하이드레이션 — 로그인 즉시 서버 데이터 fetch
     //   v-link 탭 안 들어가도 미리 lkeState 업데이트해서 진입 시 즉시 표시
     try { lkeHydrateFromServer(); } catch(_){}
+
+    // 프리미엄 플래그 동기화 — profiles.plan 기반
+    //   2026-05-07 임시: PortOne 결제 플로우 미구현 단계라 모든 로그인 유저 프리미엄 허용
+    //     (베타 유저는 어차피 무료 플랜이지만 dogfooding 시 모든 테마/블록 접근 가능해야 함)
+    //   PortOne 통합 후: profiles.plan === 'premium'/'business' 일 때만 true 로 변경
+    try {
+      if(typeof lkeState !== 'undefined') lkeState._isPremium = true;
+    } catch(_){}
 
     var email = user.email || '';
     var displayName = user.user_metadata?.display_name;
