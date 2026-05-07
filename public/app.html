@@ -2835,7 +2835,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <div class="mbd"><div class="mname2" data-i18n="profile.menu.switch">다른 계정으로 로그인</div><div class="msub2" data-i18n="profile.menu.switch_sub">계정 전환</div></div>
       <div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
     </div>
-    <div class="mitem" onclick="if(confirm('로그아웃 하시겠어요?')) doLogout()" style="border:none">
+    <div class="mitem" onclick="if(confirm(t('confirm.logout','로그아웃 하시겠어요?'))) doLogout()" style="border:none">
       <div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="var(--red)" stroke-width="1.8"><path d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
       <div class="mbd"><div class="mname2" style="color:var(--red)" data-i18n="profile.menu.logout">로그아웃</div></div>
     </div>
@@ -5277,6 +5277,12 @@ var I18N = {
     'onb.feat3.sub':'24시간 댓글·DM·스토리 자동 관리',
     'onb.cta_signup':'무료로 시작하기',
     'onb.cta_login':'이미 계정이 있어요',
+    'confirm.logout':'로그아웃 하시겠어요?',
+    'confirm.delete_block':'이 블록을 삭제할까요?',
+    'confirm.replace_layout':'현재 편집 내용이 선택한 레이아웃 기본 세팅으로 교체돼요. 계속할까요?',
+    'alert.enter_handle':'핸들을 입력해주세요',
+    'alert.copied':'복사됐어요!',
+    'alert.write_bio_first':'바이오를 먼저 작성해주세요',
     'btn.share':'공유', 'btn.start':'시작하기', 'btn.delete':'삭제',
     // 홈
     'home.greeting':'안녕하세요',
@@ -6065,6 +6071,12 @@ var I18N = {
     'onb.feat3.sub':'24/7 comment·DM·story handling',
     'onb.cta_signup':'Start free',
     'onb.cta_login':'I have an account',
+    'confirm.logout':'Sign out?',
+    'confirm.delete_block':'Delete this block?',
+    'confirm.replace_layout':'Your current edits will be replaced by this layout\\\'s defaults. Continue?',
+    'alert.enter_handle':'Please enter a handle',
+    'alert.copied':'Copied!',
+    'alert.write_bio_first':'Please write your bio first',
     'btn.share':'Share', 'btn.start':'Start', 'btn.delete':'Delete',
     // home
     'home.greeting':'Hi',
@@ -8746,7 +8758,7 @@ function updateBioPreview(){
 function copyBio(){
   var v = (document.getElementById('prof-bio') || {}).value || '';
   v = v.trim();
-  if(!v){ alert('바이오를 먼저 작성해주세요'); return; }
+  if(!v){ alert(t('alert.write_bio_first','바이오를 먼저 작성해주세요')); return; }
   if(navigator.clipboard) navigator.clipboard.writeText(v);
   alert('바이오가 복사됐어요!\n인스타 프로필 편집에 붙여넣기 하세요.');
 }
@@ -9021,7 +9033,7 @@ function editHandle(){
   var v = prompt('새 숏링크 핸들 (영문/숫자/_/- 만)', linkState.handle);
   if(v==null) return;
   v = v.trim().replace(/[^a-z0-9_\-]/gi,'');
-  if(!v){ alert('핸들을 입력해주세요'); return; }
+  if(!v){ alert(t('alert.enter_handle','핸들을 입력해주세요')); return; }
   linkState.handle = v;
   var d = document.getElementById('lk-handle-disp'); if(d) d.textContent = v;
   var d2 = document.getElementById('lk-handle-disp-2'); if(d2) d2.textContent = v;
@@ -9156,7 +9168,7 @@ function moveBlock(i, dir){
   renderLinkBlocks();
 }
 function deleteBlock(i){
-  if(!confirm('이 블록을 삭제할까요?')) return;
+  if(!confirm(t('confirm.delete_block','이 블록을 삭제할까요?'))) return;
   linkState.blocks.splice(i,1);
   renderLinkBlocks();
 }
@@ -9292,7 +9304,7 @@ function copyLinkUrl(){
     : (typeof linkState !== 'undefined' ? linkState.handle : 'yourname');
   var url = 'https://ssobi.ai/u/'+handle;
   if(navigator.clipboard) navigator.clipboard.writeText(url);
-  alert('복사됐어요!\n'+url);
+  alert(t('alert.copied','복사됐어요!')+'\n'+url);
 }
 
 // 팔로워 ID 일괄 복사/공유
@@ -10264,7 +10276,7 @@ function lkeRenderSubView(){
   window.scrollTo({top:0, behavior:'instant'});
 }
 function lkeDeleteBlock(idx){
-  if(!confirm('이 블록을 삭제할까요?')) return;
+  if(!confirm(t('confirm.delete_block','이 블록을 삭제할까요?'))) return;
   lkeState.blocks.splice(idx,1); lkeRender(); lkeCloseSheet();
 }
 function lkeGridDel(idx, i){ lkeState.blocks[idx].items.splice(i,1); lkeRenderEditForm(lkeState.blocks[idx],idx); lkeRender(); }
@@ -10651,7 +10663,7 @@ function lkeTemplateBlocks(key){
   }
 }
 function lkeApplyTemplate(key){
-  if(!confirm('현재 편집 내용이 선택한 레이아웃 기본 세팅으로 교체돼요. 계속할까요?')) return;
+  if(!confirm(t('confirm.replace_layout','현재 편집 내용이 선택한 레이아웃 기본 세팅으로 교체돼요. 계속할까요?'))) return;
   var t = lkeTemplateBlocks(key); if(!t) return;
   if(t.hero) lkeState.hero = JSON.parse(JSON.stringify(t.hero));
   lkeState.blocks = JSON.parse(JSON.stringify(t.blocks));
@@ -10772,7 +10784,7 @@ function lkeApplySettings(){
   var st = document.getElementById('lke-handle-status');
   if(!hi){ lkeCloseSheet(); return; }
   var v = (hi.value||'').trim().replace(/[^a-z0-9_\-]/gi,'');
-  if(!v){ alert('핸들을 입력해주세요'); return; }
+  if(!v){ alert(t('alert.enter_handle','핸들을 입력해주세요')); return; }
   if(st && st.classList.contains('bad')){ alert('중복된 핸들이에요. 다른 핸들을 선택해주세요.'); return; }
   lkeState.handle = v;
   var d = document.getElementById('lk-handle-disp'); if(d) d.textContent = v;
@@ -15451,6 +15463,14 @@ async function loadInsights(){
 }
 
 // 승인형 AI 응대 — 대기 드래프트 불러오기
+// lang-aware translation helper for dynamic strings (alert/confirm/toast)
+//   data-i18n 못 쓰는 동적 메시지에 사용
+function t(key, fallback){
+  var lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+  var dict = (typeof I18N !== 'undefined' && I18N[lang]) || {};
+  return dict[key] || fallback;
+}
+
 async function authHeaders(){
   var h = {'Content-Type':'application/json'};
   try {
