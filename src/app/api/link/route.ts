@@ -53,13 +53,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'handle already taken' }, { status: 409 })
   }
 
+  // 2026-05-07: URL 있는 블록 (link/image/event/countdown/bigbanner/contact/magazine/quicklinks)
+  //   에 short_link code 자동 부여 → SSR 가 /s/{code} 로 라우팅 → 클릭 통계 기록 가능
+  const blocks = await ensureShortLinkCodes(sb, user.id, Array.isArray(body.blocks) ? body.blocks : [])
+
   const payload = {
     user_id: user.id,
     handle: body.handle,
     hero: body.hero ?? {},
     theme: body.theme ?? {},
     settings: body.settings ?? {},
-    blocks: body.blocks ?? [],
+    blocks: blocks,
     published: body.published ?? true,
   }
 
@@ -96,4 +100,70 @@ export async function POST(req: NextRequest) {
   await sb.from('profiles').update({ link_handle: body.handle }).eq('id', user.id)
 
   return NextResponse.json({ page: data })
+}
+
+// 6자리 영숫자 코드 생성
+function genCode(): string {
+  const alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+  let s = ''
+  for (let i = 0; i < 6; i++) s += alphabet[Math.floor(Math.random() * alphabet.length)]
+  return s
+}
+
+type AnyRecord = Record<string, unknown>
+// adminClient() 의 반환 타입과 맞추기 위해 SupabaseClient 직접 import
+import type { SupabaseClient } from '@supabase/supabase-js'
+
+// URL 있는 블록에 short_link code 부여 + short_links 테이블 upsert
+//   클릭 통계 기록을 위해 SSR 가 /s/{code} 로 라우팅하게 함
+async function ensureShortLinkCodes(sb: SupabaseClient, userId: string, blocks: AnyRecord[]): Promise<AnyRecord[]> {
+  const out: AnyRecord[] = []
+  for (const b of blocks) {
+    const block = { ...b }
+    // URL 가진 메인 블록 — code 부여
+    const url = typeof block.url === 'string' ? block.url : ''
+    const hasUrl = url && /^https?:\/\//.test(url)
+    if (hasUrl && !block.code) {
+      block.code = genCode()
+    }
+    if (block.code && hasUrl) {
+      await upsertShortLink(sb, userId, block.code as string, url, (block.title as string) || (block.label as string) || (block.text as string) || '')
+    }
+    // quicklinks/grid items 도 각자 code
+    if (Array.isArray(block.items)) {
+      block.items = await Promise.all((block.items as AnyRecord[]).map(async (it) => {
+        const item = { ...it }
+        const itemUrl = typeof item.url === 'string' ? item.url : ''
+        const itemHasUrl = itemUrl && /^https?:\/\//.test(itemUrl)
+        if (itemHasUrl && !item.code) item.code = genCode()
+        if (item.code && itemHasUrl) {
+          await upsertShortLink(sb, userId, item.code as string, itemUrl, (item.label as string) || (item.title as string) || '')
+        }
+        return item
+      }))
+    }
+    out.push(block)
+  }
+  return out
+}
+
+async function upsertShortLink(sb: SupabaseClient, userId: string, code: string, targetUrl: string, label: string) {
+  // upsert: 같은 code 있으면 target_url·label 업데이트, 없으면 insert
+  const { data: existing } = await sb
+    .from('short_links')
+    .select('code')
+    .eq('code', code)
+    .maybeSingle()
+  if (existing) {
+    await sb.from('short_links')
+      .update({ target_url: targetUrl, label: label || null })
+      .eq('code', code)
+  } else {
+    await sb.from('short_links').insert({
+      code,
+      user_id: userId,
+      target_url: targetUrl,
+      label: label || null,
+    })
+  }
 }

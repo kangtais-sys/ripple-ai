@@ -3175,6 +3175,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <button class="lke-act-btn primary" onclick="lkeOpenSheet('add-block')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg><span data-i18n="link.add_block">블록 추가</span></button>
       <div class="lke-act-sep"></div>
       <button class="lke-act-btn" onclick="lkeOpenSheet('settings')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 01-2.83 2.83l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09a1.65 1.65 0 00-1-1.51 1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06a1.65 1.65 0 00.33-1.82 1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09a1.65 1.65 0 001.51-1 1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06a1.65 1.65 0 001.82.33h.01a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06a1.65 1.65 0 00-.33 1.82v.01a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="link.settings">설정</span></button>
+      <div class="lke-act-sep"></div>
+      <button class="lke-act-btn" onclick="lkeOpenStats()" aria-label="통계"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M3 3v18h18M7 14l4-4 4 4 5-5" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="link.stats">통계</span></button>
     </div>
   </div>
 
@@ -3372,6 +3374,17 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <button class="lk-share-btn" onclick="shareTo('more')"><div style="width:28px;height:28px;border-radius:50%;background:var(--bg);display:flex;align-items:center;justify-content:center;margin:0 auto 4px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></div><div>기타</div></button>
     </div>
     <button class="btn-s" onclick="cm('m-link-share')"><span data-i18n="btn.close">닫기</span></button>
+  </div>
+</div>
+
+<!-- m-link-stats: 링크 통계 -->
+<div class="ov" id="m-link-stats" onclick="co(event,'m-link-stats')">
+  <div class="sheet" style="max-height:80vh;overflow-y:auto">
+    <div class="s-bar"></div>
+    <div class="s-title" data-i18n="link.stats.title">링크 통계</div>
+    <div class="s-sub" data-i18n="link.stats.sub">방문자 수와 링크별 클릭 수를 확인하세요</div>
+    <div id="lke-stats-body" style="padding:8px 0"></div>
+    <button class="btn-s" onclick="cm('m-link-stats')"><span data-i18n="btn.close">닫기</span></button>
   </div>
 </div>
 
@@ -5937,6 +5950,18 @@ var I18N = {
     'lke.theme.title_font':'제목 폰트',
     'lke.theme.body_font':'본문 폰트',
     'lke.theme.apply':'적용',
+    'link.stats':'통계',
+    'link.stats.title':'링크 통계',
+    'link.stats.sub':'방문자 수와 링크별 클릭 수를 확인하세요',
+    'link.stats.loading':'불러오는 중…',
+    'link.stats.error':'통계 조회 실패',
+    'link.stats.empty':'아직 게시된 링크 페이지가 없어요. 한 번 저장하면 통계가 시작돼요.',
+    'link.stats.total_views':'총 조회수',
+    'link.stats.handle':'핸들',
+    'link.stats.last_30d':'최근 30일 조회수',
+    'link.stats.no_daily':'아직 일일 통계가 없어요. 방문자가 들어오면 표시돼요.',
+    'link.stats.per_link':'링크별 클릭 수',
+    'link.stats.no_links':'아직 클릭 기록이 없어요. 블록에 URL 을 넣으면 자동 추적돼요.',
     'lke.edit.edit_suffix':'편집',
     'lke.edit.section_title':'제목',
     'lke.edit.see_all':'See all 문구 (비우면 숨김)',
@@ -6696,6 +6721,18 @@ var I18N = {
     'lke.theme.title_font':'Title font',
     'lke.theme.body_font':'Body font',
     'lke.theme.apply':'Apply',
+    'link.stats':'Stats',
+    'link.stats.title':'Link analytics',
+    'link.stats.sub':'See visitors and per-link click counts',
+    'link.stats.loading':'Loading…',
+    'link.stats.error':'Failed to load stats',
+    'link.stats.empty':'No published page yet. Save once to start tracking.',
+    'link.stats.total_views':'Total views',
+    'link.stats.handle':'Handle',
+    'link.stats.last_30d':'Last 30 days',
+    'link.stats.no_daily':'No daily data yet. Stats appear when visitors arrive.',
+    'link.stats.per_link':'Clicks per link',
+    'link.stats.no_links':'No clicks yet. Add URLs to blocks and we will auto-track.',
     'lke.edit.edit_suffix':'Edit',
     'lke.edit.section_title':'Title',
     'lke.edit.see_all':'See-all label (leave blank to hide)',
@@ -9284,6 +9321,68 @@ async function _lkeSyncNow(){
   } catch(e) { console.warn(e); }
   try{ localStorage.setItem('ssobi_lke_state', JSON.stringify(state)); }catch(e){}
 }
+// 링크 통계 모달 열기 — /api/link/stats fetch + 렌더
+async function lkeOpenStats(){
+  openModal('m-link-stats');
+  var body = document.getElementById('lke-stats-body');
+  if(!body) return;
+  var lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+  var L = (typeof I18N !== 'undefined' && I18N[lang]) || {};
+  body.innerHTML = '<div style="padding:24px;text-align:center;color:var(--t3);font-size:13px">' + (L['link.stats.loading'] || '불러오는 중…') + '</div>';
+  try {
+    var h = await authHeaders();
+    var res = await fetch('/api/link/stats', { headers: h, credentials:'include' });
+    if(!res.ok) throw new Error('http ' + res.status);
+    var j = await res.json();
+    body.innerHTML = lkeRenderStatsHtml(j, L);
+  } catch(e){
+    body.innerHTML = '<div style="padding:24px;text-align:center;color:var(--red);font-size:13px">' + (L['link.stats.error'] || '통계 조회 실패') + '</div>';
+  }
+}
+
+function lkeRenderStatsHtml(j, L){
+  var page = j.page;
+  if(!page){
+    return '<div style="padding:32px 16px;text-align:center;color:var(--t3);font-size:13px">' + (L['link.stats.empty'] || '아직 게시된 링크 페이지가 없어요. 한 번 저장하면 통계가 시작돼요.') + '</div>';
+  }
+  var html = '';
+  // 총 조회수
+  html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">' +
+    '<div style="background:var(--mint-l);border-radius:12px;padding:14px"><div style="font-size:10.5px;font-weight:700;color:var(--mint-d);letter-spacing:.05em;margin-bottom:4px">' + (L['link.stats.total_views'] || '총 조회수') + '</div><div style="font-size:24px;font-weight:900;color:var(--mint-d)">' + (page.view_count||0).toLocaleString() + '</div></div>' +
+    '<div style="background:var(--bg);border-radius:12px;padding:14px"><div style="font-size:10.5px;font-weight:700;color:var(--t2);letter-spacing:.05em;margin-bottom:4px">' + (L['link.stats.handle'] || '핸들') + '</div><div style="font-size:14px;font-weight:800;color:var(--t1);font-family:\'JetBrains Mono\',monospace">@' + page.handle + '</div></div>' +
+  '</div>';
+  // 최근 30일 일일 조회수 (간단한 라인)
+  if(Array.isArray(j.daily) && j.daily.length){
+    var maxV = Math.max.apply(null, j.daily.map(function(d){ return d.views||0; }));
+    html += '<div class="lke-field-label">' + (L['link.stats.last_30d'] || '최근 30일 조회수') + '</div>';
+    html += '<div style="display:flex;align-items:flex-end;gap:2px;height:60px;margin-bottom:14px;background:var(--bg);border-radius:8px;padding:8px">';
+    j.daily.slice(0, 30).reverse().forEach(function(d){
+      var pct = maxV > 0 ? Math.max(2, Math.round((d.views/maxV)*100)) : 2;
+      html += '<div title="' + d.date + ': ' + (d.views||0) + '" style="flex:1;background:var(--mint);height:' + pct + '%;border-radius:2px"></div>';
+    });
+    html += '</div>';
+  } else {
+    html += '<div style="background:var(--bg);border-radius:8px;padding:14px;font-size:11.5px;color:var(--t3);text-align:center;margin-bottom:14px">' + (L['link.stats.no_daily'] || '아직 일일 통계가 없어요. 방문자가 들어오면 표시돼요.') + '</div>';
+  }
+  // 링크별 클릭 (top 10)
+  html += '<div class="lke-field-label">' + (L['link.stats.per_link'] || '링크별 클릭 수') + '</div>';
+  if(Array.isArray(j.links) && j.links.length){
+    html += '<div style="display:flex;flex-direction:column;gap:6px">';
+    j.links.slice(0, 10).forEach(function(lk){
+      var domain = '';
+      try { domain = new URL(lk.target_url).hostname.replace(/^www\./, ''); } catch(_){ domain = lk.target_url||''; }
+      html += '<div style="background:#fff;border:1px solid var(--b);border-radius:10px;padding:11px 13px;display:flex;justify-content:space-between;align-items:center;gap:12px">' +
+        '<div style="flex:1;min-width:0;overflow:hidden"><div style="font-size:13px;font-weight:700;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + escapeHtml(lk.label || domain || '(no label)') + '</div><div style="font-size:10px;color:var(--t3);font-family:\'JetBrains Mono\',monospace;margin-top:2px">/s/' + lk.code + ' · ' + escapeHtml(domain) + '</div></div>' +
+        '<div style="font-size:18px;font-weight:900;color:var(--mint-d);min-width:36px;text-align:right">' + (lk.click_count||0) + '</div>' +
+      '</div>';
+    });
+    html += '</div>';
+  } else {
+    html += '<div style="background:var(--bg);border-radius:8px;padding:14px;font-size:11.5px;color:var(--t3);text-align:center">' + (L['link.stats.no_links'] || '아직 클릭 기록이 없어요. 블록에 URL 을 넣으면 자동 추적돼요.') + '</div>';
+  }
+  return html;
+}
+
 function shareTo(ch){
   var handle = (typeof lkeState !== 'undefined' && lkeState.handle)
     ? lkeState.handle

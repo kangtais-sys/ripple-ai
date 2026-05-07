@@ -19,6 +19,54 @@ function publicClient() {
   )
 }
 
+// service_role — view_count·일일 통계 증가 (RLS 우회)
+//   서버 컴포넌트 안에서만 사용, 클라이언트에 절대 노출 X
+function adminClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } }
+  )
+}
+
+// 조회수 + 일일 통계 비동기 기록 (페이지 렌더 차단 X)
+//   service_role 로 RLS 우회. atomic increment 는 SQL function 없이 read-then-write
+//   (동시성 충돌은 매우 낮은 트래픽이라 무시 가능 — 추후 RPC 로 atomic 화 가능)
+async function trackPageView(linkPageId: string) {
+  try {
+    const sb = adminClient()
+    // 1) total view_count 증가
+    const { data: cur } = await sb
+      .from('link_pages')
+      .select('view_count')
+      .eq('id', linkPageId)
+      .maybeSingle()
+    const newCount = ((cur?.view_count as number) || 0) + 1
+    await sb.from('link_pages').update({ view_count: newCount }).eq('id', linkPageId)
+    // 2) 일일 통계 upsert (KST 기준)
+    const dateKst = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10)
+    const { data: dayRow } = await sb
+      .from('link_page_daily_stats')
+      .select('views')
+      .eq('link_page_id', linkPageId)
+      .eq('date', dateKst)
+      .maybeSingle()
+    if (dayRow) {
+      await sb
+        .from('link_page_daily_stats')
+        .update({ views: ((dayRow.views as number) || 0) + 1 })
+        .eq('link_page_id', linkPageId)
+        .eq('date', dateKst)
+    } else {
+      await sb
+        .from('link_page_daily_stats')
+        .insert({ link_page_id: linkPageId, date: dateKst, views: 1, unique_visitors: 1 })
+    }
+  } catch {
+    // 통계 기록 실패해도 페이지는 정상 표시
+  }
+}
+
 type PageData = {
   id: string
   handle: string
@@ -66,8 +114,9 @@ export default async function PublicLinkPage({ params }: { params: Promise<{ han
   const page = await fetchPage(handle)
   if (!page) notFound()
 
-  // TODO: view_count 증가는 SECURITY DEFINER RPC로 별도 처리 (RLS 때문에
-  // anon 클라이언트로 update 불가). 일단 SSR 표시에만 사용.
+  // 비동기 조회수 + 일일 통계 기록 (페이지 응답 차단 X)
+  //   await 안 함 — 트래킹 실패해도 사용자는 즉시 페이지 봄
+  trackPageView(page.id).catch(() => {})
 
   return (
     <>
