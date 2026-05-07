@@ -1776,6 +1776,15 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 /* Hero banner bg 이미지 지원 */
 #v-link .lke-hero-banner.has-bg::before{background:linear-gradient(180deg,rgba(0,0,0,.2) 0%,transparent 30%,rgba(0,0,0,.45) 100%);inset:0;width:auto;height:auto;top:0;right:0}
 #v-link .lke-hero-banner.has-bg{background-size:cover;background-position:center}
+/* 미니멀 hero compact 모드 — 정사각 비율, 작은 패딩, 본문 짧게 */
+#v-link .lke-hero-banner.compact{aspect-ratio:auto;min-height:180px;padding:18px 20px;background:linear-gradient(180deg,#FAFAF9 0%,#F5F5F4 100%);color:#1A1F27}
+#v-link .lke-hero-banner.compact::before{display:none}
+#v-link .lke-hero-banner.compact .lke-hero-eyebrow{color:rgba(26,31,39,.55);margin-bottom:10px}
+#v-link .lke-hero-banner.compact .lke-hero-brand{color:rgba(26,31,39,.45);font-size:10px;letter-spacing:.15em;margin-bottom:6px}
+#v-link .lke-hero-banner.compact .lke-hero-title{font-size:24px;line-height:1.18;letter-spacing:-.02em;margin-bottom:6px}
+#v-link .lke-hero-banner.compact .lke-hero-subtitle{font-size:13px;line-height:1.5;color:rgba(26,31,39,.65);margin-bottom:0}
+#v-link .lke-hero-banner.compact .lke-hero-banner-bottom{margin-top:10px}
+#v-link .lke-hero-track > .lke-hero-banner.compact{aspect-ratio:auto}
 #v-link .lke-hero-title[contenteditable],#v-link .lke-hero-subtitle[contenteditable],#v-link .lke-hero-brand[contenteditable]{outline:none}
 #v-link .lke-hero-title[contenteditable]:focus,#v-link .lke-hero-subtitle[contenteditable]:focus,#v-link .lke-hero-brand[contenteditable]:focus{background:rgba(255,255,255,.14);border-radius:4px;padding:1px 5px;margin-left:-5px}
 
@@ -5928,6 +5937,10 @@ var I18N = {
     'lke.theme.title_font':'제목 폰트',
     'lke.theme.body_font':'본문 폰트',
     'lke.theme.apply':'적용',
+    'lke.edit.edit_suffix':'편집',
+    'lke.edit.section_title':'제목',
+    'lke.edit.see_all':'See all 문구 (비우면 숨김)',
+    'lke.edit.section_hint':'마지막 단어가 이탤릭으로 강조돼요. 예) "Today\\\'s Picks." → Picks. 가 강조됨.',
     'lke.settings.handle_hint':'유저 아이디만 수정 가능해요. 중복이면 다른 핸들을 선택하세요.',
     'lke.settings.feature':'기능 설정',
     'lke.settings.multi_lang':'다국어 자동 전환',
@@ -6683,6 +6696,10 @@ var I18N = {
     'lke.theme.title_font':'Title font',
     'lke.theme.body_font':'Body font',
     'lke.theme.apply':'Apply',
+    'lke.edit.edit_suffix':'Edit',
+    'lke.edit.section_title':'Title',
+    'lke.edit.see_all':'See-all label (leave blank to hide)',
+    'lke.edit.section_hint':'The last word gets italic emphasis. e.g. "Today\\\'s Picks." → "Picks." italicized.',
     'lke.settings.handle_hint':'Only your user ID is editable. Pick a different handle if it\'s taken.',
     'lke.settings.feature':'Features',
     'lke.settings.multi_lang':'Auto language switch',
@@ -9390,20 +9407,20 @@ async function lkeHydrateFromServer(){
 }
 
 var LKE_TYPES = {
-  hero:{name:'히어로 배너 (캐러셀)',desc:'여러 장 좌우 스와이프 · 배경 이미지 + 텍스트 편집',preview:'hero'},
-  event:{name:'이벤트 바',desc:'상단 고정 띠 · 라이브 알림',preview:'event'},
-  countdown:{name:'공구 카운트다운',desc:'마감 시간 · 잔여 수량',preview:'countdown',premium:true},
-  section:{name:'섹션 제목',desc:'큰 세리프 타이틀 + See all',preview:'section'},
-  grid:{name:'제품 그리드',desc:'2열 쇼핑 (상품/채널/컨텐츠)',preview:'grid',premium:true},
-  bigbanner:{name:'빅 배너',desc:'다크 풀 배너 · 외부 링크',preview:'bigbanner',premium:true},
-  contact:{name:'제안/문의 박스',desc:'문의 양식 → 수익제안에 수신',preview:'contact'},
-  magazine:{name:'매거진 카드',desc:'에디토리얼 이미지 타이틀',preview:'magazine',premium:true},
-  link:{name:'기본 링크',desc:'URL만 넣으면 자동 썸네일',preview:'link'},
-  image:{name:'이미지 링크',desc:'이미지 업로드 · 클릭 이동',preview:'image'},
-  quicklinks:{name:'Quick 링크',desc:'각각 다른 링크 리스트',preview:'quicklinks'},
-  socials:{name:'소셜 아이콘',desc:'IG · TK · YT · Email',preview:'socials'},
-  spacer:{name:'여백',desc:'블록 사이 공간',preview:'spacer'},
-  divider:{name:'구분선',desc:'얇은 라인',preview:'divider'}
+  hero:{name:'히어로 배너 (캐러셀)',nameEn:'Hero banner (carousel)',desc:'여러 장 좌우 스와이프 · 배경 이미지 + 텍스트 편집',descEn:'Swipeable slides · bg image + text edit',preview:'hero'},
+  event:{name:'이벤트 바',nameEn:'Event bar',desc:'상단 고정 띠 · 라이브 알림',descEn:'Pinned strip · live alerts',preview:'event'},
+  countdown:{name:'공구 카운트다운',nameEn:'Countdown',desc:'마감 시간 · 잔여 수량',descEn:'Deadline · slots remaining',preview:'countdown',premium:true},
+  section:{name:'섹션 제목',nameEn:'Section title',desc:'큰 세리프 타이틀 + See all',descEn:'Large serif title + See all',preview:'section'},
+  grid:{name:'제품 그리드',nameEn:'Product grid',desc:'2열 쇼핑 (상품/채널/컨텐츠)',descEn:'2-col shopping (product/channel/content)',preview:'grid',premium:true},
+  bigbanner:{name:'빅 배너',nameEn:'Big banner',desc:'다크 풀 배너 · 외부 링크',descEn:'Dark full banner · external link',preview:'bigbanner',premium:true},
+  contact:{name:'제안/문의 박스',nameEn:'Contact / inquiry',desc:'문의 양식 → 수익제안에 수신',descEn:'Inquiry form → routed to inbox',preview:'contact'},
+  magazine:{name:'매거진 카드',nameEn:'Magazine card',desc:'에디토리얼 이미지 타이틀',descEn:'Editorial image + title',preview:'magazine',premium:true},
+  link:{name:'기본 링크',nameEn:'Link',desc:'URL만 넣으면 자동 썸네일',descEn:'Drop a URL — thumbnail auto-fetched',preview:'link'},
+  image:{name:'이미지 링크',nameEn:'Image link',desc:'이미지 업로드 · 클릭 이동',descEn:'Upload image · click to navigate',preview:'image'},
+  quicklinks:{name:'Quick 링크',nameEn:'Quick links',desc:'각각 다른 링크 리스트',descEn:'List of distinct links',preview:'quicklinks'},
+  socials:{name:'소셜 아이콘',nameEn:'Socials',desc:'IG · TK · YT · Email',descEn:'IG · TK · YT · Email',preview:'socials'},
+  spacer:{name:'여백',nameEn:'Spacer',desc:'블록 사이 공간',descEn:'Space between blocks',preview:'spacer'},
+  divider:{name:'구분선',nameEn:'Divider',desc:'얇은 라인',descEn:'Thin line',preview:'divider'}
 };
 // 플랜 상태 (데모: 첫날 모드 = 무료체험 전체 허용 / 이후 기본 무료)
 function lkeIsPremium(){
@@ -9448,8 +9465,11 @@ function lkeRenderHero(){
   var drag=document.createElement('div'); drag.className='lke-drag'; drag.textContent='⋮⋮';
   wrap.appendChild(drag);
   var track=document.createElement('div'); track.className='lke-hero-track'; track.id='lke-hero-track';
+  // 미니멀 테마 — hero compact 모드 (sub 박스 같은 작은 카드 형태)
+  var heroCompact = !!(lkeState.hero && lkeState.hero.compact);
+  if(heroCompact) wrap.classList.add('compact');
   lkeState.hero.slides.forEach(function(s, si){
-    var slide=document.createElement('div'); slide.className='lke-hero-banner';
+    var slide=document.createElement('div'); slide.className='lke-hero-banner' + (heroCompact ? ' compact' : '');
     if(s.bg){ slide.classList.add('has-bg'); slide.style.backgroundImage='url('+s.bg+')'; }
     slide.dataset.si=si;
     function statHtml(which){
@@ -9603,7 +9623,19 @@ function lkeRenderBlock(b, idx){
     el.style.background='#fff';
     el.style.border='1px solid var(--b)';
     el.style.padding='14px 16px';
-    el.innerHTML += '<div style="font-family:\'Fraunces\',serif;font-size:15px;font-weight:500;color:var(--t1)">'+b.title+'</div><div style="font-family:\'JetBrains Mono\',monospace;font-size:10px;color:var(--t3);margin-top:2px">'+(b.url||'URL 없음')+'</div>';
+    // 링크 sub 우선 (사용자 지정 라벨), 없으면 도메인만 추출 (긴 URL 안 보이게)
+    var lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+    var noUrlLbl = lang === 'en' ? 'No URL yet' : 'URL 없음';
+    var subLine = '';
+    if(b.sub){
+      subLine = b.sub;
+    } else if(b.url){
+      try { subLine = new URL(b.url).hostname.replace(/^www\./, ''); }
+      catch(_){ subLine = b.url.slice(0, 32) + (b.url.length > 32 ? '…' : ''); }
+    } else {
+      subLine = noUrlLbl;
+    }
+    el.innerHTML += '<div style="font-family:\'Fraunces\',serif;font-size:15px;font-weight:500;color:var(--t1)">'+b.title+'</div><div style="font-family:\'JetBrains Mono\',monospace;font-size:10px;color:var(--t3);margin-top:2px">'+escapeHtml(subLine)+'</div>';
   } else if(b.type==='image'){
     el.style.margin='14px 18px';
     el.style.borderRadius='14px';
@@ -9648,8 +9680,13 @@ function lkeSelectBlock(el, idx){
 function lkeRenderEditForm(b, idx){
   var title=document.getElementById('lke-edit-title');
   var body=document.getElementById('lke-edit-body');
-  var label=(LKE_TYPES[b.type]||{}).name||b.type;
-  title.textContent=label+' 편집';
+  var lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
+  var t = (typeof I18N !== 'undefined' && I18N[lang]) || {};
+  var TL = function(k, fallback){ return t['lke.edit.'+k] || fallback; };
+  // 블록 타입 라벨 lang-aware
+  var blockType = LKE_TYPES[b.type] || {};
+  var label = (lang === 'en' && blockType.nameEn) ? blockType.nameEn : (blockType.name || b.type);
+  title.textContent = label + ' ' + TL('edit_suffix','편집');
   var html='';
   var hasAppearance = ['event','countdown','contact','bigbanner','magazine','image'].indexOf(b.type)>=0;
   if(b.type==='event'){
@@ -9664,8 +9701,11 @@ function lkeRenderEditForm(b, idx){
     html+=lkeField('잔여 수량 문구','text','f-slots',b.slots);
     html+=lkeField('이동 URL','url','f-url',b.url);
   } else if(b.type==='section'){
-    html+=lkeField('제목','text','f-title',b.title);
-    html+=lkeField('See all 문구 (비우면 숨김)','text','f-seeall',b.seeAll);
+    // em 태그는 CSS 스타일링을 위한 것 — 입력란에선 plain text 로 보여줌
+    var sectionTitleClean = (b.title || '').replace(/<\/?em>/g, '');
+    html+=lkeField(TL('section_title','제목'),'text','f-title',sectionTitleClean);
+    html+=lkeField(TL('see_all','See all 문구 (비우면 숨김)'),'text','f-seeall',b.seeAll);
+    html+='<div style="font-size:11px;color:var(--t3);line-height:1.5;margin-top:-8px;margin-bottom:8px">'+TL('section_hint','마지막 단어가 이탤릭으로 강조돼요. 예) "Today\'s Picks." → Picks. 가 강조됨.')+'</div>';
   } else if(b.type==='grid'){
     html+='<div style="font-size:12.5px;color:var(--t2);line-height:1.55;padding:12px;background:var(--bg);border-radius:8px;margin-bottom:12px">제품 카드 <b>'+b.items.length+'개</b> · 각 카드를 <b style="color:var(--mint-d)">직접 탭</b>해서 개별 편집하세요.</div>';
     html+='<button class="lke-top-btn primary" style="width:100%;padding:14px" onclick="lkeGridAdd('+idx+')">+ 카드 추가</button>';
@@ -9805,7 +9845,24 @@ function lkeSaveBlock(idx){
     b.eyebrow=v('f-eyebrow'); b.title=lkeRichVal('f-title'); b.sub=v('f-sub'); b.endsAt=v('f-ends'); b.slots=v('f-slots'); b.url=v('f-url');
     readAppearance();
   }
-  else if(b.type==='section'){ b.title=v('f-title'); b.seeAll=v('f-seeall'); }
+  else if(b.type==='section'){
+    // 섹션 제목: 마지막 단어 자동 italic 강조 — 사용자가 plain text 입력해도 디자인 유지
+    //   "Today's Picks." → "Today's <em>Picks.</em>"
+    //   기존에 <em> 태그 있으면 사용자가 직접 입력한 것이므로 그대로 보존
+    var rawTitle = (v('f-title') || '').trim();
+    if(rawTitle && !/<em>/i.test(rawTitle)){
+      var parts = rawTitle.split(/\s+/);
+      if(parts.length >= 2){
+        var last = parts.pop();
+        rawTitle = parts.join(' ') + ' <em>' + last + '</em>';
+      } else {
+        // 한 단어면 그대로 italic
+        rawTitle = '<em>' + rawTitle + '</em>';
+      }
+    }
+    b.title = rawTitle;
+    b.seeAll = v('f-seeall');
+  }
   else if(b.type==='grid'){}
   else if(b.type==='contact'){
     b.eyebrow=v('f-eyebrow'); b.title=lkeRichVal('f-title'); b.formDesc=v('f-formDesc');
@@ -10340,12 +10397,12 @@ function lkeTemplateBlocks(key){
     // 미니멀 테마 — 깔끔한 텍스트 위주, Fraunces italic 으로 살짝 personality
     //   이미지 링크 1개로 시각적 포인트, 일반 링크는 sub URL 미리보기 포함
     return {
-      hero: { slides:[{
+      hero: { compact:true, slides:[{
         bg:'',
         eyebrow:'',
         brand:'',
         title:'@yourname',
-        sub:'한 줄로 본인 소개 ✨<br><span style="font-family:Fraunces,serif;font-style:italic;font-weight:500">welcome.</span>',
+        sub:'한 줄로 본인 소개 ✨',
         stat1_hidden:true,stat2_hidden:true,cta_hidden:true
       }] },
       blocks:[
