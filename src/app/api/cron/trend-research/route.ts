@@ -3,7 +3,7 @@
 // 2026-05 업데이트: Tavily 카테고리별 검색을 메인으로, 기존 RSS 17개는 fallback 보강.
 //   1) collectAllTrends() — RSS 17개 + IG hashtag 풀 (engagement TOP 20)
 //   2) searchAllCategories() — 카테고리당 3 query × 4 결과 (= 약 200개 풀, 도메인 다양)
-//   3) Claude 에 두 풀 모두 전달 → recommended_topics 3개 + topics_by_category 18카×6개
+//   3) Claude 에 두 풀 모두 전달 → recommended_topics 3개 + topics_by_category 18카×5개
 //      각 토픽에 sources (도메인 배열 1~3개) 자동 첨부 → multi-source 카드 가능
 //   4) daily_trends upsert (date_kst 기준)
 //
@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
 
   // 카테고리별 검색 풀 — Claude 에 직접 전달 (토픽 생성 시 직접 인용 + sources 추출)
   // 형태: { beauty: [{title, snippet, domain}, ...], fashion: [...], ... }
-  // 입력 토큰 절약을 위해 카테고리당 최대 6개 (도메인 다양성은 이미 보장됨)
+  // 입력 토큰 절약을 위해 카테고리당 최대 5개 (도메인 다양성은 이미 보장됨)
   const catSearchTrim: Record<string, Array<{ title: string; snippet: string; domain: string }>> = {}
   let catSearchTotal = 0
   Object.keys(catSearchMap).forEach(cat => {
@@ -60,7 +60,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ ok: false, reason: 'no_feed_items', stats })
   }
 
-  // 2) Claude 호출 — 두 풀 모두 던지고 카테고리당 6개 토픽 (multi-source)
+  // 2) Claude 호출 — 두 풀 모두 던지고 카테고리당 5개 토픽 (multi-source)
   const userPrompt = `${TREND_RESEARCH_PROMPT}
 
 ## 입력 데이터 A (rawFeedItems · RSS·뉴스·IG hashtag pool)
@@ -71,12 +71,12 @@ ${JSON.stringify(catSearchTrim, null, 2)}
 
 ## 출력 형식 (compact JSON · 들여쓰기·줄바꿈 최소화 — 토큰 절약)
 
-{"recommended_topics":[{"topic":"...","category":"trend|beauty|fashion|food|cafe|travel|interior|fitness|money|book|baby|pet|kpop|movie|music|psych|mystery|life","why":"...","preview_hook":"...","body_preview":"...","sources":["d1","d2"]}],"topics_by_category":{"beauty":[{"topic":"...","why":"...","preview_hook":"...","body_preview":"...","hook_score":8,"sources":["d1","d2"]},...6개],"fashion":[...6개],"food":[...6개],"cafe":[...6개],"travel":[...6개],"interior":[...6개],"fitness":[...6개],"money":[...6개],"book":[...6개],"baby":[...6개],"pet":[...6개],"kpop":[...6개],"movie":[...6개],"music":[...6개],"psych":[...6개],"mystery":[...6개],"life":[...6개],"trend":[...6개]}}
+{"recommended_topics":[{"topic":"...","category":"trend|beauty|fashion|food|cafe|travel|interior|fitness|money|book|baby|pet|kpop|movie|music|psych|mystery|life","why":"...","preview_hook":"...","body_preview":"...","sources":["d1","d2"]}],"topics_by_category":{"beauty":[{"topic":"...","why":"...","preview_hook":"...","body_preview":"...","hook_score":8,"sources":["d1","d2"]},...5개],"fashion":[...5개],"food":[...5개],"cafe":[...5개],"travel":[...5개],"interior":[...5개],"fitness":[...5개],"money":[...5개],"book":[...5개],"baby":[...5개],"pet":[...5개],"kpop":[...5개],"movie":[...5개],"music":[...5개],"psych":[...5개],"mystery":[...5개],"life":[...5개],"trend":[...5개]}}
 
 룰:
 - 출력은 위 compact JSON 한 줄 (들여쓰기·불필요 공백 X). 가독성 X, 정확성·완결성 O.
 - recommended_topics 3개: 카테고리 무관 오늘 가장 핫한 주제. hook_score 9~10 만.
-- topics_by_category: 18개 카테고리 각 정확히 **6개**. 같은 카테고리 안에서도 서브토픽 다양하게 (제품 / 시술 / 트렌드 / 비교 / 후기 / 가성비 / 실패담 / 순위 골고루). 입력 데이터 B 의 카테고리별 검색 결과를 우선 활용, 부족하면 입력 데이터 A 와 모델 일반 지식으로 보강.
+- topics_by_category: 18개 카테고리 각 정확히 **5개**. 같은 카테고리 안에서도 서브토픽 다양하게 (제품 / 시술 / 트렌드 / 비교 / 후기 / 가성비 / 실패담 / 순위 골고루). 입력 데이터 B 의 카테고리별 검색 결과를 우선 활용, 부족하면 입력 데이터 A 와 모델 일반 지식으로 보강.
 - **hook_score (1~10)**: 토픽 후킹 강도 (10 = 클릭 안 할 수 없음 / 7 = 평균 / 5 이하는 만들지 말 것). 모든 토픽 7 이상.
 - **sources (배열, 1~3개)**: 그 토픽이 어디서 나온 정보인지 도메인 배열 — 입력 데이터 B 에서 활용한 도메인 우선 (예: ["vogue.com", "reddit.com"]). 입력 데이터에 해당 카테고리 정보 없으면 ["일반"] 하나.
 - topic 은 항상 한국어 자연어. 영문 제목은 한국 SNS 톤으로 의역.
@@ -85,7 +85,7 @@ ${JSON.stringify(catSearchTrim, null, 2)}
   · 주제어만 나열 금지: "뷰티 트렌드" X / "다이소 화장솜으로 만드는 에르메스급 피부결" O
 - why 한 줄 (왜 지금 뜨는지 · 50자 이내)
 - preview_hook 10자 이내, 카드뉴스 첫 슬라이드 후킹 자체로 사용 가능
-- **body_preview 60~100자, 2~3줄 본문 미리보기** — 카드 클릭 전에 어떤 내용인지 확 보여주는 부분. 구체 브랜드/이름/수치 포함. SNS 자연체. 입력 데이터 B 의 snippet 적극 인용.
+- **body_preview 정확히 60~80자, 2줄 본문 미리보기 — 100자 절대 금지** — 카드 클릭 전에 어떤 내용인지 확 보여주는 부분. 구체 브랜드/이름/수치 포함. SNS 자연체. 입력 데이터 B 의 snippet 적극 인용.
   · 좋은 예: "스타벅스 봄 한정 라이트노트, 출시 7일 만에 완판. 컴포즈·메가커피도 비슷한 라떼 출시 임박. 이번 주말이 마지막 기회."
   · 나쁜 예: "스타벅스 봄 신메뉴가 화제입니다." (정보 없음, 형식적)
 
@@ -164,10 +164,9 @@ ${JSON.stringify(catSearchTrim, null, 2)}
   }
 
   // ─── 1차 시도 ───
-  //   18 cat × 6 + recommended 3 = 111 entries
-  //   Haiku 가 system 의 compact JSON 지시 무시하고 indent 출력하는 경향 → 22000 안전선
-  //   prefill `{"recommended_topics":[{"topic":"` 으로 compact 시작 패턴 강제
-  //   142초 (16000) → 22000 ≈ 195초. 300s budget 안에서 fits
+  //   18 cat × 5 + recommended 3 = 93 entries (이전 6개에서 5개로 축소 — 22000 막힘)
+  //   compact JSON + body_preview 60~80자 강제로 토큰 추가 절약
+  //   218초 (22000, 6개 cat) → 5개 cat = ~180초 + 5000 token margin
   const attempt = await callClaude(22000)
   if (attempt.ok && attempt.text) {
     claudeResp = attempt.resp || {}
