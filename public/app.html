@@ -10823,81 +10823,74 @@ var LKE_TEMPLATES = {
   editorial: { name:'에디토리얼', nameEn:'Editorial', desc:'매거진 스타일', descEn:'Magazine style', preview:'e', premium:true }
 };
 function lkeTemplateBlocks(key){
-  var t = Date.now();
+  var ts = Date.now();
   if(key==='minimal'){
-    // 미니멀 테마 — 깔끔한 텍스트 위주, Fraunces italic 으로 살짝 personality
-    //   이미지 링크 1개로 시각적 포인트, 일반 링크는 sub URL 미리보기 포함
+    // 미니멀 — 텍스트 중심, 깔끔한 quicklinks + socials
     return {
       hero: { compact:true, slides:[{
-        bg:'',
-        eyebrow:'',
-        brand:'',
-        title:'@yourname',
-        sub:'한 줄로 본인 소개 ✨',
-        stat1_hidden:true,stat2_hidden:true,cta_hidden:true
+        bg:'', brand:'', title:'@yourname', sub:'한 줄로 본인 소개 ✨', cta:'', ctaUrl:''
       }] },
       blocks:[
-        // 추천 — Fraunces italic 으로 살짝 에디토리얼 느낌
-        {type:'section',id:'sm0'+t,title:'Today\'s <em>Picks.</em>',seeAll:''},
-        // 핵심 1개는 이미지 블록으로 시각 포인트
-        {type:'image',id:'lim1'+t,title:'오늘의 추천',sub:'대표 링크를 여기에',image:'',url:''},
-        // 일반 링크 — sub 에 URL 또는 짧은 설명
-        {type:'link',id:'lm1'+t,title:'유튜브 채널',sub:'youtube.com/your',url:''},
-        {type:'link',id:'lm2'+t,title:'블로그',sub:'blog.naver.com',url:''},
-        {type:'link',id:'lm3'+t,title:'쇼핑몰',sub:'smartstore',url:''},
-        // 연락 섹션
-        {type:'section',id:'sm1'+t,title:'<em>Contact.</em>',seeAll:''},
-        {type:'quicklinks',id:'qm'+t,items:[
-          {label:'협업·광고 문의',sub:'이메일',url:''},
-          {label:'뉴스레터 구독',sub:'free',url:''},
+        {type:'section',id:'sm0'+ts,title:'<em>Links.</em>',seeAll:''},
+        {type:'quicklinks',id:'qm0'+ts,items:[
+          {label:'유튜브 채널',sub:'youtube.com/your',url:''},
+          {label:'블로그',sub:'blog.naver.com',url:''},
+          {label:'쇼핑몰',sub:'smartstore.naver.com',url:''}
         ]},
-        {type:'socials',id:'sm'+t,items:[{ch:'ig',url:''},{ch:'tk',url:''},{ch:'yt',url:''},{ch:'email',url:''}]},
-        {type:'footer',id:'fm'+t,logo:'Ssobi<span>.</span>',text:'Powered by Ssobi Links'}
+        {type:'section',id:'sm1'+ts,title:'<em>Contact.</em>',seeAll:''},
+        {type:'quicklinks',id:'qm1'+ts,items:[
+          {label:'협업·광고 문의',sub:'이메일을 입력하세요',url:''},
+          {label:'뉴스레터 구독',sub:'free',url:''}
+        ]},
+        {type:'socials',id:'sm'+ts,items:[{ch:'ig',url:''},{ch:'tk',url:''},{ch:'yt',url:''},{ch:'email',url:''}]}
       ]
     };
   }
   if(key==='shop'){
+    // 쇼핑몰 — 제품 그리드 + 빅배너 CTA
     return {
-      hero: { slides:[{bg:'',eyebrow:'LIVE · 공동구매',brand:'YUMINHYE STUDIO',title:'Glow <em>Drop.</em><br>Spring \'26',sub:'신상만 밝히는 코덕의<br>진짜 효자템 모음.',stat1_hidden:true,stat2_hidden:true,cta:'지금 보기 →'}] },
+      hero: { slides:[{bg:'',brand:'YOUR STUDIO',title:'New <em>Drop.</em><br>이번 시즌',sub:'대표 카피를 입력하세요.',cta:'지금 보기 →',ctaUrl:''}] },
       blocks:[
-        {type:'event',id:'es'+t,text:'30% OFF',sub:'글로우 세럼 공동구매 중',url:''},
-        {type:'countdown',id:'cs'+t,title:'글로우 세럼 <em>50ml</em>',sub:'100% 페이백 · 선착순 20명',eyebrow:'공구 마감까지',slots:'7 / 20명',url:''},
-        {type:'section',id:'ss1'+t,title:'Best <em>Drop.</em>',seeAll:'See all →'},
-        {type:'grid',id:'gs'+t,items:[
-          {kind:'product',title:'시그니처 글로우 세럼',price:'₩39,800',origPrice:'₩59,800',date:'4/19 · 바로배송',tag:'HOT',tagStyle:'hot',img:'coral',url:''},
-          {kind:'product',title:'크리미 나이트 크림',price:'₩32,000',origPrice:'₩48,000',date:'4/20 · pm8',tag:'NEW',tagStyle:'',img:'cream',url:''},
-          {kind:'product',title:'프로틴 리페어 앰플',price:'₩45,000',origPrice:'₩68,000',date:'4/21 · am10',tag:'BEST',tagStyle:'dark',img:'pink',url:''},
-          {kind:'product',title:'마일드 클렌징 오일',price:'₩22,000',origPrice:'₩34,000',date:'4/22 · pm8',tag:'공구',tagStyle:'',img:'dark',url:''}
+        {type:'event',id:'es'+ts,text:'강조 텍스트',sub:'이벤트 설명을 입력하세요',url:''},
+        {type:'countdown',id:'cs'+ts,title:'카운트다운 제목',sub:'설명',eyebrow:'마감까지',endsAt:'',slots:'남은 자리 텍스트',url:''},
+        {type:'section',id:'ss1'+ts,title:'Today\'s <em>Picks.</em>',seeAll:'See all →'},
+        {type:'grid',id:'gs'+ts,items:[
+          {kind:'product',title:'상품명 1',price:'',origPrice:'',date:'',tag:'HOT',tagStyle:'hot',img:'coral',url:''},
+          {kind:'product',title:'상품명 2',price:'',origPrice:'',date:'',tag:'NEW',tagStyle:'',img:'cream',url:''},
+          {kind:'product',title:'상품명 3',price:'',origPrice:'',date:'',tag:'BEST',tagStyle:'dark',img:'pink',url:''},
+          {kind:'product',title:'상품명 4',price:'',origPrice:'',date:'',tag:'',img:'dark',url:''}
         ]},
-        {type:'contact',id:'cts'+t,eyebrow:'문의 · 제안',title:'협업·광고<br><em>문의하기.</em>',formDesc:'제품·예산·일정을 남겨주세요'},
-        {type:'footer',id:'fs'+t,logo:'Ssobi<span>.</span>',text:'Powered by Ssobi Links'}
+        {type:'bigbanner',id:'bbs'+ts,eyebrow:'문의 · 제안',title:'협업·광고<br><em>문의하기.</em>',url:''},
+        {type:'socials',id:'sos'+ts,items:[{ch:'ig',url:''},{ch:'tk',url:''},{ch:'yt',url:''},{ch:'email',url:''}]}
       ]
     };
   }
   if(key==='editorial'){
+    // 에디토리얼 — 빅배너 3장 + 추천 링크
     return {
-      hero: { slides:[{bg:'',eyebrow:'EDITORIAL',brand:'YUMINHYE',title:'Stories <em>&</em><br>Reviews.',sub:'에디토리얼 리뷰 모음',stat1_hidden:true,stat2_hidden:true,cta:'전체 보기 →'}] },
+      hero: { slides:[{bg:'',brand:'YOUR NAME',title:'Stories <em>&</em><br>Reviews.',sub:'에디토리얼 리뷰 모음',cta:'전체 보기 →',ctaUrl:''}] },
       blocks:[
-        {type:'section',id:'se1'+t,title:'Magazine',seeAll:'Read more →'},
-        {type:'magazine',id:'me1'+t,label:'Routine',title:'한국인이 <em>안 하는</em><br>스킨케어 실수 7가지',theme:'m1'},
-        {type:'magazine',id:'me2'+t,label:'Review',title:'7일 써본 <em>글로우 세럼</em><br>솔직 후기',theme:'m2'},
-        {type:'magazine',id:'me3'+t,label:'Guide',title:'<em>BEST</em> 라인<br>전부 살펴보기',theme:'m3'},
-        {type:'quicklinks',id:'qe'+t,items:[
-          {label:'올리브영에서 사기',sub:'oliveyoung.co.kr',url:''},
-          {label:'스마트스토어',sub:'smartstore.naver.com',url:''},
-          {label:'협업·광고 문의',sub:'hello@millimilli.co',url:''}
+        {type:'section',id:'se1'+ts,title:'<em>Magazine.</em>',seeAll:'Read more →'},
+        {type:'bigbanner',id:'bbe1'+ts,eyebrow:'ROUTINE',title:'아티클 제목 1',url:''},
+        {type:'bigbanner',id:'bbe2'+ts,eyebrow:'REVIEW',title:'아티클 제목 2',url:''},
+        {type:'bigbanner',id:'bbe3'+ts,eyebrow:'GUIDE',title:'아티클 제목 3',url:''},
+        {type:'section',id:'se2'+ts,title:'Quick <em>Links.</em>',seeAll:''},
+        {type:'quicklinks',id:'qe'+ts,items:[
+          {label:'대표 쇼핑몰',sub:'',url:''},
+          {label:'올리브영',sub:'oliveyoung.co.kr',url:''},
+          {label:'협업·광고 문의',sub:'이메일',url:''}
         ]},
-        {type:'socials',id:'soe'+t,items:[{ch:'ig',url:''},{ch:'tk',url:''},{ch:'yt',url:''},{ch:'email',url:''}]},
-        {type:'footer',id:'fe'+t,logo:'Ssobi<span>.</span>',text:'Powered by Ssobi Links'}
+        {type:'socials',id:'soe'+ts,items:[{ch:'ig',url:''},{ch:'tk',url:''},{ch:'yt',url:''},{ch:'email',url:''}]}
       ]
     };
   }
 }
 function lkeApplyTemplate(key){
-  if(!confirm(t('confirm.replace_layout','현재 편집 내용이 선택한 레이아웃 기본 세팅으로 교체돼요. 계속할까요?'))) return;
-  var t = lkeTemplateBlocks(key); if(!t) return;
-  if(t.hero) lkeState.hero = JSON.parse(JSON.stringify(t.hero));
-  lkeState.blocks = JSON.parse(JSON.stringify(t.blocks));
+  // i18n t() 함수와 변수명 충돌 회피 — tpl 사용
+  if(typeof confirm === 'function' && !confirm('현재 편집 내용이 선택한 레이아웃 기본 세팅으로 교체돼요. 계속할까요?')) return;
+  var tpl = lkeTemplateBlocks(key); if(!tpl) return;
+  if(tpl.hero) lkeState.hero = JSON.parse(JSON.stringify(tpl.hero));
+  lkeState.blocks = JSON.parse(JSON.stringify(tpl.blocks));
   lkeRender();
   lkeCloseSheet();
 }
