@@ -58,7 +58,14 @@ type PageData = {
 // XSS-safe HTML — em/br 만 허용
 function safeHtml(s: string | undefined): { __html: string } {
   if (!s) return { __html: '' }
-  let out = String(s)
+  // contenteditable이 만들어낸 div/p wrapper 정리 — Enter 줄바꿈 정상 처리
+  let cleaned = String(s)
+    .replace(/<\/(div|p)>\s*<(div|p)[^>]*>/gi, '<br>')
+    .replace(/<(div|p)[^>]*>/gi, '')
+    .replace(/<\/(div|p)>/gi, '')
+    .replace(/(<br\s*\/?>\s*){3,}/gi, '<br><br>')
+    .replace(/&nbsp;/g, ' ')
+  let out = cleaned
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')
