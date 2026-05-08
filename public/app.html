@@ -1572,6 +1572,8 @@ body.dev-mode .mitem.dev-only{display:flex!important}
 #v-link .lke-hero-stat .num{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:20px;font-weight:500;letter-spacing:-.02em;line-height:1}
 #v-link .lke-hero-stat .lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;opacity:.58;margin-top:3px}
 #v-link .lke-hero-cta{padding:11px 18px;background:var(--mint);color:#fff;border-radius:100px;font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;gap:6px;border:none;font-family:'Pretendard',sans-serif;cursor:pointer;letter-spacing:-.2px}
+#v-link .lke-hero-cta-add{padding:9px 16px;background:rgba(255,255,255,.12);color:rgba(255,255,255,.85);border:1px dashed rgba(255,255,255,.45);border-radius:100px;font-size:12px;font-weight:600;font-family:'Pretendard',sans-serif;cursor:pointer;letter-spacing:-.2px;backdrop-filter:blur(6px)}
+#v-link .lke-hero-cta-add:active{transform:scale(.96);background:rgba(255,255,255,.2)}
 
 /* Event Bar */
 #v-link .lke-block-event{padding:12px 18px;background:var(--dark);color:#fff;display:flex;justify-content:space-between;align-items:center;gap:14px}
@@ -1634,8 +1636,7 @@ body.dev-mode .mitem.dev-only{display:flex!important}
 #v-link .lke-bigbanner-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;color:inherit;opacity:.7;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
 #v-link .lke-bigbanner-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:26px;font-weight:400;line-height:1.05;letter-spacing:-.02em;color:inherit}
 #v-link .lke-bigbanner-title em{font-style:italic;font-weight:500}
-#v-link .lke-bigbanner-arrow{position:absolute;top:22px;right:22px;width:42px;height:42px;border:1px solid rgba(255,255,255,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;z-index:2;color:#fff;background:rgba(255,255,255,.08);backdrop-filter:blur(6px)}
-#v-link .lke-bigbanner-arrow svg{width:17px;height:17px;stroke:currentColor;fill:none}
+/* bigbanner arrow icon 제거 (2026-05-08) */
 
 /* Quick Links */
 #v-link .lke-block-quicklinks{padding:0 18px}
@@ -9749,17 +9750,15 @@ async function lkeHydrateFromServer(){
   }
 }
 
+// 블록 타입 — 통합 후 9종 (link/image/magazine/contact 제거 → bigbanner/quicklinks 로 대체)
+//   기존 데이터는 render 코드에 남아있어서 정상 표시됨 (backward compat)
 var LKE_TYPES = {
   hero:{name:'히어로 배너 (캐러셀)',nameEn:'Hero banner (carousel)',desc:'여러 장 좌우 스와이프 · 배경 이미지 + 텍스트 편집',descEn:'Swipeable slides · bg image + text edit',preview:'hero'},
   event:{name:'이벤트 바',nameEn:'Event bar',desc:'상단 고정 띠 · 라이브 알림',descEn:'Pinned strip · live alerts',preview:'event'},
   countdown:{name:'공구 카운트다운',nameEn:'Countdown',desc:'마감 시간 · 잔여 수량',descEn:'Deadline · slots remaining',preview:'countdown',premium:true},
   section:{name:'섹션 제목',nameEn:'Section title',desc:'큰 세리프 타이틀 + See all',descEn:'Large serif title + See all',preview:'section'},
   grid:{name:'제품 그리드',nameEn:'Product grid',desc:'2열 쇼핑 (상품/채널/컨텐츠)',descEn:'2-col shopping (product/channel/content)',preview:'grid',premium:true},
-  bigbanner:{name:'빅 배너',nameEn:'Big banner',desc:'다크 풀 배너 · 외부 링크',descEn:'Dark full banner · external link',preview:'bigbanner',premium:true},
-  contact:{name:'제안/문의 박스',nameEn:'Contact / inquiry',desc:'문의 양식 → 수익제안에 수신',descEn:'Inquiry form → routed to inbox',preview:'contact'},
-  magazine:{name:'매거진 카드',nameEn:'Magazine card',desc:'에디토리얼 이미지 타이틀',descEn:'Editorial image + title',preview:'magazine',premium:true},
-  link:{name:'기본 링크',nameEn:'Link',desc:'URL만 넣으면 자동 썸네일',descEn:'Drop a URL — thumbnail auto-fetched',preview:'link'},
-  image:{name:'이미지 링크',nameEn:'Image link',desc:'이미지 업로드 · 클릭 이동',descEn:'Upload image · click to navigate',preview:'image'},
+  bigbanner:{name:'빅 배너',nameEn:'Big banner',desc:'이미지/단색 배경 + 제목 + 외부 링크',descEn:'Image/solid bg + title + external link',preview:'bigbanner'},
   quicklinks:{name:'Quick 링크',nameEn:'Quick links',desc:'각각 다른 링크 리스트',descEn:'List of distinct links',preview:'quicklinks'},
   socials:{name:'소셜 아이콘',nameEn:'Socials',desc:'IG · TK · YT · Email',descEn:'IG · TK · YT · Email',preview:'socials'},
   spacer:{name:'여백',nameEn:'Spacer',desc:'블록 사이 공간',descEn:'Space between blocks',preview:'spacer'},
@@ -9840,7 +9839,11 @@ function lkeRenderHero(){
         '<h1 class="lke-hero-title lke-editable-text" data-key="title" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].title=lkeStripWrappers(this.innerHTML);lkeSyncToServer()">'+(s.title||'')+'</h1>'+
         '<div class="lke-hero-subtitle lke-editable-text" data-key="sub" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].sub=lkeStripWrappers(this.innerHTML);lkeSyncToServer()">'+(s.sub||'')+'</div>'+
       '</div>'+
-      ((s.cta_hidden || !s.cta) ? '' : '<div class="lke-hero-banner-bottom"><div class="lke-hero-cta-wrap" onclick="event.stopPropagation();lkeToggleStatMenu(this)"><button class="lke-hero-cta">'+s.cta+'</button><div class="lke-hero-stat-menu"><button onclick="event.stopPropagation();lkeEditHeroCta('+si+')">편집</button><button class="del" onclick="event.stopPropagation();lkeHeroRemoveCta('+si+')">삭제</button></div></div></div>');
+      '<div class="lke-hero-banner-bottom">'+
+        ((s.cta_hidden || !s.cta) ?
+          '<button class="lke-hero-cta-add" onclick="event.stopPropagation();lkeEditHeroCta('+si+')">+ 클릭 버튼 추가</button>' :
+          '<div class="lke-hero-cta-wrap" onclick="event.stopPropagation();lkeToggleStatMenu(this)"><button class="lke-hero-cta">'+s.cta+'</button><div class="lke-hero-stat-menu"><button onclick="event.stopPropagation();lkeEditHeroCta('+si+')">편집</button><button class="del" onclick="event.stopPropagation();lkeHeroRemoveCta('+si+')">삭제</button></div></div>')+
+      '</div>';
     track.appendChild(slide);
   });
   carousel.appendChild(track);
@@ -9937,9 +9940,12 @@ function lkeStripWrappers(html){
 }
 function lkeEditHeroCta(si){
   var s=lkeState.hero.slides[si];
-  var label=prompt('CTA 버튼 텍스트', s.cta); if(label==null) return;
-  var url=prompt('CTA 링크 URL (https://...)', s.ctaUrl||''); if(url==null) return;
-  s.cta=label; s.ctaUrl=url; lkeRender();
+  var label=prompt('버튼 텍스트 (예: 지금 보기 →)', s.cta||'지금 보기 →'); if(label==null) return;
+  var url=prompt('이동할 링크 URL (https://...)', s.ctaUrl||''); if(url==null) return;
+  s.cta = (label||'').trim();
+  s.ctaUrl = (url||'').trim();
+  s.cta_hidden = false; // 추가하면 다시 보이게
+  lkeRender();
 }
 
 // 블록 렌더
@@ -10003,13 +10009,13 @@ function lkeRenderBlock(b, idx){
     else if(b.bgSolid){ el.style.background=b.bgSolid; }
     else if(b.bg){ el.style.background=b.bg; }
     if(b.textColor) el.style.color=b.textColor;
-    el.innerHTML += '<div class="lke-bigbanner-arrow">↗</div><div class="lke-bigbanner-content"><div class="lke-bigbanner-eyebrow">'+b.eyebrow+'</div><div class="lke-bigbanner-title">'+b.title+'</div></div>';
+    el.innerHTML += '<div class="lke-bigbanner-content"><div class="lke-bigbanner-eyebrow">'+b.eyebrow+'</div><div class="lke-bigbanner-title">'+b.title+'</div></div>';
   } else if(b.type==='contact'){
     if(b.img){ el.style.background='url('+b.img+') center/cover'; }
     else if(b.bgSolid){ el.style.background=b.bgSolid; }
     else if(b.bg){ el.style.background=b.bg; }
     if(b.textColor) el.style.color=b.textColor;
-    el.innerHTML += '<div class="lke-bigbanner-arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg></div><div class="lke-bigbanner-content"><div class="lke-bigbanner-eyebrow">'+b.eyebrow+'</div><div class="lke-bigbanner-title">'+b.title+'</div></div>';
+    el.innerHTML += '<div class="lke-bigbanner-content"><div class="lke-bigbanner-eyebrow">'+b.eyebrow+'</div><div class="lke-bigbanner-title">'+b.title+'</div></div>';
   } else if(b.type==='magazine'){
     if(b.img){ el.style.background='url('+b.img+') center/cover'; }
     else if(b.bgSolid){ el.style.background=b.bgSolid; }
@@ -11115,7 +11121,8 @@ function lkeHeroRemoveStat(si, which){
   lkeRender();
 }
 function lkeHeroRemoveCta(si){
-  lkeState.hero.slides[si].cta_hidden = true;
+  var s = lkeState.hero.slides[si];
+  s.cta = ''; s.ctaUrl = ''; s.cta_hidden = false; // 완전 비우기 → "+ 추가" 버튼 보이게
   lkeRender();
 }
 function lkeToggleStatMenu(el){

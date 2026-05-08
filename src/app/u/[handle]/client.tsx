@@ -216,7 +216,7 @@ const PUBLIC_CSS = `
 .ssobi-public .lke-bigbanner-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;color:inherit;opacity:.7;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
 .ssobi-public .lke-bigbanner-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:26px;font-weight:400;line-height:1.05;letter-spacing:-.02em;color:inherit;margin:0}
 .ssobi-public .lke-bigbanner-title em{font-style:italic;font-weight:500}
-.ssobi-public .lke-bigbanner-arrow{position:absolute;top:22px;right:22px;width:42px;height:42px;border:1px solid rgba(255,255,255,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;z-index:2;color:#fff;background:rgba(255,255,255,.08)}
+/* bigbanner arrow 제거됨 (2026-05-08) */
 /* QUICKLINKS — clean editorial list */
 .ssobi-public .lke-block-quicklinks{padding:0 18px;margin-top:10px}
 .ssobi-public .lke-quicklink-item{padding:18px 4px;border-bottom:1px solid var(--b);display:flex;justify-content:space-between;align-items:center;gap:12px;text-decoration:none;color:inherit;transition:opacity .15s}
@@ -470,7 +470,6 @@ function renderBlock(b: Block, i: number) {
       return (
         <a key={key} className="lke-block lke-block-bigbanner" href={hrefOf(b)}
           style={b.thumbImg ? { background: `url(${b.thumbImg}) center/cover` } : (b.bgSolid ? { background: b.bgSolid } : (b.bg ? { background: b.bg } : {}))}>
-          <div className="lke-bigbanner-arrow">↗</div>
           <div className="lke-bigbanner-content">
             {b.eyebrow && <div className="lke-bigbanner-eyebrow" dangerouslySetInnerHTML={safeHtml(b.eyebrow)} />}
             <div className="lke-bigbanner-title" dangerouslySetInnerHTML={safeHtml(b.title)} />
