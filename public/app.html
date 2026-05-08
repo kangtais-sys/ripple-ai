@@ -9661,6 +9661,7 @@ async function lkeHydrateFromServer(){
       var hd = document.getElementById('lk-handle-disp'); if(hd) hd.textContent = lkeState.handle;
       var hd2 = document.getElementById('lk-handle-disp-2'); if(hd2) hd2.textContent = lkeState.handle;
       if(typeof lkeRender === 'function') lkeRender();
+      if(typeof lkeApplyThemeToDom === 'function') lkeApplyThemeToDom();
     }
     console.debug('[ssobi] link hydrated from server:', lkeState.handle);
   } catch(e) {
@@ -11142,6 +11143,8 @@ function initLinkView(){
   var h = document.getElementById('lk-handle-disp'); if(h) h.textContent = lkeState.handle || 'yuminhye';
   var d2=document.getElementById('lk-handle-disp-2'); if(d2) d2.textContent=lkeState.handle || 'yuminhye';
   lkeRender();
+  // 서버에서 불러온 테마 즉시 DOM 반영 — 새로고침/탭 진입 시 자동 적용
+  if(typeof lkeApplyThemeToDom === 'function') lkeApplyThemeToDom();
 }
 
 // ═══ EDITOR ═══
