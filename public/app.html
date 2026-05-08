@@ -1843,25 +1843,33 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 #v-link[data-theme-applied="1"] .lke-mag-title,
 #v-link[data-theme-applied="1"] .lke-bigbanner-title,
 #v-link[data-theme-applied="1"] .lke-cd-title,
-#v-link[data-theme-applied="1"] .lke-event-text strong{color:var(--lke-title-color, var(--t1));font-family:var(--lke-title-font, 'Fraunces','Pretendard','Noto Sans KR',sans-serif)}
+#v-link[data-theme-applied="1"] .lke-hero-title,
+#v-link[data-theme-applied="1"] .lke-price-sale,
+#v-link[data-theme-applied="1"] .lke-event-text strong{color:var(--lke-title-color, var(--t1)) !important;font-family:var(--lke-title-font, 'Fraunces','Pretendard','Noto Sans KR',sans-serif)}
 #v-link[data-theme-applied="1"] .lke-product-info-date,
 #v-link[data-theme-applied="1"] .lke-quicklink-sub,
 #v-link[data-theme-applied="1"] .lke-block-link .l-sub,
 #v-link[data-theme-applied="1"] .lke-event-text,
-#v-link[data-theme-applied="1"] .lke-cd-subtitle{color:var(--lke-text-color, var(--t2))}
+#v-link[data-theme-applied="1"] .lke-cd-subtitle,
+#v-link[data-theme-applied="1"] .lke-hero-subtitle,
+#v-link[data-theme-applied="1"] .lke-hero-brand{color:var(--lke-text-color, var(--t2)) !important}
+/* CTA pill — 테마 적용 시 title-color 와 같은 색으로, 배경은 반전 */
+#v-link[data-theme-applied="1"] .lke-hero-cta{background:var(--lke-title-color, var(--mint)) !important;color:#fff}
 
 /* 제품 카드 유형별 */
 #v-link .lke-product-card.type-channel .lke-product-info-title{color:var(--t1)}
 #v-link .lke-product-card.type-channel .lke-product-info-price{display:none}
 #v-link .lke-product-card.type-content .lke-product-info-price{display:none}
 
-/* 기본 블록 간격 (편집 모드) — add-zone 이 12px 추가로 끼어들어 적당함 */
-#v-link .lke-block-countdown,#v-link .lke-block-bigbanner,#v-link .lke-block-mag,#v-link .lke-block-image{margin-top:8px;margin-bottom:8px}
+/* 기본 블록 간격 (편집 모드) — 블록 사이 충분한 여백으로 안정감 */
+#v-link .lke-block-countdown,#v-link .lke-block-bigbanner,#v-link .lke-block-mag,#v-link .lke-block-image{margin-top:14px;margin-bottom:14px}
+#v-link .lke-block-link,#v-link .lke-block-event{margin-top:10px;margin-bottom:10px}
+#v-link .lke-block-grid,#v-link .lke-block-quicklinks{margin-top:6px;margin-bottom:14px}
 #v-link .lke-block-section-title{padding-top:32px;padding-bottom:10px}
-/* 2026-05-07 모바일 UX 폴리시 */
-/* 드래그 핸들 — 모바일 친화 (32→40px), 항상 보이는 mint 외곽선 */
-#v-link .lke-drag{width:40px;height:40px;border-radius:12px;background:#fff;border:1.5px solid var(--mint-l);color:var(--mint-d);box-shadow:0 3px 10px rgba(0,200,150,.15);font-size:16px}
-#v-link .lke-drag:active{transform:scale(.92);background:var(--mint);color:#fff;border-color:var(--mint)}
+#v-link .lke-block-socials{margin-top:10px;margin-bottom:14px}
+/* 드래그 핸들 — 28px 작게, 은은한 외곽선 */
+#v-link .lke-drag{width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.92);border:1px solid rgba(15,19,25,.1);color:var(--t3);box-shadow:0 1px 4px rgba(15,19,25,.06);font-size:12px;letter-spacing:-1.5px}
+#v-link .lke-drag:active{transform:scale(.88);background:var(--mint);color:#fff;border-color:var(--mint)}
 /* 블록 hover/select 시 우상단에 "편집" 힌트 — 첫 사용자가 탭 가능 인지 */
 #v-link .lke-block::after{content:'';display:none}
 #v-link .lke-block:not(.lke-block-divider):not(.lke-block-spacer):not(.lke-block-footer):not(.lke-block-hero):hover::after,
@@ -9442,12 +9450,57 @@ async function _lkeSyncNow(){
   if(!state || !state.handle) return;
   // 동기화 시작 — topbar 상태 indicator 'syncing'
   lkeUpdateSaveStatus('syncing');
+  // 1) 텍스트 정규화 — contenteditable wrapper div/p 제거
+  function cleanSlide(s){
+    return Object.assign({}, s, {
+      title: lkeStripWrappers(s.title),
+      sub: lkeStripWrappers(s.sub),
+      brand: lkeStripWrappers(s.brand),
+      eyebrow: lkeStripWrappers(s.eyebrow)
+    });
+  }
+  function cleanBlock(b){
+    var c = Object.assign({}, b);
+    ['title','sub','label','text','desc','caption'].forEach(function(k){
+      if(typeof c[k] === 'string') c[k] = lkeStripWrappers(c[k]);
+    });
+    if(Array.isArray(c.items)) c.items = c.items.map(cleanBlock);
+    return c;
+  }
+  var hero = state.hero || {};
+  if(Array.isArray(hero.slides)) hero = Object.assign({}, hero, { slides: hero.slides.map(cleanSlide) });
+  var blocks = Array.isArray(state.blocks) ? state.blocks.map(cleanBlock) : [];
+
+  // 2) 큰 base64 이미지 압축 — 4.5MB 한도 안 넘기게
+  if(Array.isArray(hero.slides)){
+    for(var i=0; i<hero.slides.length; i++){
+      var s = hero.slides[i];
+      if(s.bg && typeof s.bg === 'string' && s.bg.length > 500000){
+        await new Promise(function(res){ lkeCompressDataUrl(s.bg, 1080, 0.78, function(d){ s.bg = d; res(); }); });
+      }
+    }
+  }
+  for(var bi=0; bi<blocks.length; bi++){
+    var b = blocks[bi];
+    if(b.img && typeof b.img === 'string' && b.img.length > 500000){
+      await new Promise(function(res){ lkeCompressDataUrl(b.img, 1080, 0.78, function(d){ b.img = d; res(); }); });
+    }
+    if(Array.isArray(b.items)){
+      for(var ii=0; ii<b.items.length; ii++){
+        var it = b.items[ii];
+        if(it.img && typeof it.img === 'string' && it.img.length > 500000){
+          await new Promise(function(res){ lkeCompressDataUrl(it.img, 720, 0.78, function(d){ it.img = d; res(); }); });
+        }
+      }
+    }
+  }
+
   var payload = {
     handle: state.handle,
-    hero: state.hero || {},
+    hero: hero,
     theme: state.theme || {},
     settings: state.settings || {},
-    blocks: state.blocks || [],
+    blocks: blocks,
     published: state.published !== false,
   };
   try {
@@ -9744,22 +9797,6 @@ function lkeRenderHero(){
     var slide=document.createElement('div'); slide.className='lke-hero-banner' + (heroCompact ? ' compact' : '');
     if(s.bg){ slide.classList.add('has-bg'); slide.style.backgroundImage='url('+s.bg+')'; }
     slide.dataset.si=si;
-    function statHtml(which){
-      var hidden = s['stat'+which+'_hidden'];
-      if(hidden) return '';
-      var n = s['stat'+which+'n']||'';
-      var l = s['stat'+which+'l']||'';
-      return '<div class="lke-hero-stat" onclick="event.stopPropagation();lkeToggleStatMenu(this)">'+
-        '<button class="lke-hero-stat-x" onclick="event.stopPropagation();lkeHeroRemoveStat('+si+','+which+')">×</button>'+
-        '<div class="lke-hero-stat-menu">'+
-          '<button onclick="event.stopPropagation();lkeEditStat('+si+','+which+')">편집</button>'+
-          '<button class="del" onclick="event.stopPropagation();lkeHeroRemoveStat('+si+','+which+')">삭제</button>'+
-        '</div>'+
-        '<div class="num">'+n+'</div><div class="lbl">'+l+'</div>'+
-      '</div>';
-    }
-    var stat1Html = statHtml(1);
-    var stat2Html = statHtml(2);
     var canDelete = lkeState.hero.slides.length > 1;
     slide.innerHTML =
       '<div class="lke-hero-tools">'+
@@ -9768,14 +9805,11 @@ function lkeRenderHero(){
         (canDelete ? '<button class="lke-hero-tool del" aria-label="배너 삭제" onclick="event.stopPropagation();lkeDeleteHeroSlide('+si+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M6 18L18 6" stroke-linecap="round"/></svg></button>' : '')+
       '</div>'+
       '<div class="lke-hero-banner-main" style="text-align:'+(s.main_align||'left')+'">'+
-        '<div class="lke-hero-brand lke-editable-text" data-key="brand" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].brand=this.innerText">'+s.brand+'</div>'+
-        '<h1 class="lke-hero-title lke-editable-text" data-key="title" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].title=this.innerHTML">'+s.title+'</h1>'+
-        '<div class="lke-hero-subtitle lke-editable-text" data-key="sub" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].sub=this.innerHTML">'+s.sub+'</div>'+
+        '<div class="lke-hero-brand lke-editable-text" data-key="brand" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].brand=this.innerText;lkeSyncToServer()">'+(s.brand||'')+'</div>'+
+        '<h1 class="lke-hero-title lke-editable-text" data-key="title" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].title=lkeStripWrappers(this.innerHTML);lkeSyncToServer()">'+(s.title||'')+'</h1>'+
+        '<div class="lke-hero-subtitle lke-editable-text" data-key="sub" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].sub=lkeStripWrappers(this.innerHTML);lkeSyncToServer()">'+(s.sub||'')+'</div>'+
       '</div>'+
-      '<div class="lke-hero-banner-bottom">'+
-        '<div class="lke-hero-stats">'+stat1Html+stat2Html+'</div>'+
-        (s.cta_hidden ? '' : '<div class="lke-hero-cta-wrap" onclick="event.stopPropagation();lkeToggleStatMenu(this)"><button class="lke-hero-cta">'+(s.cta||'')+'</button><div class="lke-hero-stat-menu"><button onclick="event.stopPropagation();lkeEditHeroCta('+si+')">편집</button><button class="del" onclick="event.stopPropagation();lkeHeroRemoveCta('+si+')">삭제</button></div></div>')+
-      '</div>';
+      ((s.cta_hidden || !s.cta) ? '' : '<div class="lke-hero-banner-bottom"><div class="lke-hero-cta-wrap" onclick="event.stopPropagation();lkeToggleStatMenu(this)"><button class="lke-hero-cta">'+s.cta+'</button><div class="lke-hero-stat-menu"><button onclick="event.stopPropagation();lkeEditHeroCta('+si+')">편집</button><button class="del" onclick="event.stopPropagation();lkeHeroRemoveCta('+si+')">삭제</button></div></div></div>');
     track.appendChild(slide);
   });
   carousel.appendChild(track);
@@ -9824,10 +9858,51 @@ function lkeDeleteHeroSlide(si){
   window.lkeActiveSlide = Math.max(0, Math.min(si, lkeState.hero.slides.length-1));
   lkeRender();
 }
+// 이미지 압축 — 1080px JPEG q0.78. 5MB → ~200KB, payload 4.5MB 한도 초과 방지
+function lkeCompressDataUrl(dataUrl, maxWidth, quality, cb){
+  if(!dataUrl || typeof dataUrl !== 'string' || dataUrl.indexOf('data:') !== 0){ cb(dataUrl); return; }
+  if(dataUrl.length < 200000){ cb(dataUrl); return; } // 작으면 그대로
+  var img = new Image();
+  img.onload = function(){
+    var ratio = Math.min(1, maxWidth / img.width);
+    var w = Math.round(img.width * ratio);
+    var h = Math.round(img.height * ratio);
+    var canvas = document.createElement('canvas');
+    canvas.width = w; canvas.height = h;
+    canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+    try { cb(canvas.toDataURL('image/jpeg', quality)); } catch(e){ cb(dataUrl); }
+  };
+  img.onerror = function(){ cb(dataUrl); };
+  img.src = dataUrl;
+}
+function lkeCompressFile(file, maxWidth, quality, cb){
+  var r = new FileReader();
+  r.onload = function(e){ lkeCompressDataUrl(e.target.result, maxWidth, quality, cb); };
+  r.readAsDataURL(file);
+}
 function lkeHeroUploadBg(si){
   var inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
-  inp.onchange=function(){ var f=inp.files&&inp.files[0]; if(!f) return; var r=new FileReader(); r.onload=function(e){ lkeState.hero.slides[si].bg=e.target.result; window.lkeActiveSlide=si; lkeRender(); }; r.readAsDataURL(f); };
+  inp.onchange=function(){
+    var f=inp.files&&inp.files[0]; if(!f) return;
+    lkeCompressFile(f, 1080, 0.78, function(dataUrl){
+      lkeState.hero.slides[si].bg = dataUrl;
+      window.lkeActiveSlide = si;
+      lkeRender();
+    });
+  };
   inp.click();
+}
+// 텍스트 필드 정규화 — contenteditable 가 만든 <div>/<p> wrapper 제거 → <br> 로 변환
+//   safeHtml 이 escape 해서 <div>가 그대로 글자로 보이는 버그 방지
+function lkeStripWrappers(html){
+  if(typeof html !== 'string') return html;
+  return html
+    .replace(/<\/(div|p)>\s*<(div|p)[^>]*>/gi, '<br>') // 사이에 br 삽입
+    .replace(/<(div|p)[^>]*>/gi, '')                   // 시작 태그 제거
+    .replace(/<\/(div|p)>/gi, '')                       // 끝 태그 제거
+    .replace(/(<br\s*\/?>\s*){3,}/gi, '<br><br>')       // 연속 br 압축
+    .replace(/&nbsp;/g, ' ')
+    .trim();
 }
 function lkeEditHeroCta(si){
   var s=lkeState.hero.slides[si];

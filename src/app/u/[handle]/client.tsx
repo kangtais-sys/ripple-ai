@@ -83,12 +83,17 @@ const PUBLIC_CSS = `
 .ssobi-public[data-theme-applied="1"] .lke-mag-title,
 .ssobi-public[data-theme-applied="1"] .lke-bigbanner-title,
 .ssobi-public[data-theme-applied="1"] .lke-cd-title,
-.ssobi-public[data-theme-applied="1"] .lke-event-text strong{color:var(--lke-title-color, var(--t1));font-family:var(--lke-title-font, 'Fraunces','Pretendard','Noto Sans KR',sans-serif)}
+.ssobi-public[data-theme-applied="1"] .lke-hero-title,
+.ssobi-public[data-theme-applied="1"] .lke-price-sale,
+.ssobi-public[data-theme-applied="1"] .lke-event-text strong{color:var(--lke-title-color, var(--t1)) !important;font-family:var(--lke-title-font, 'Fraunces','Pretendard','Noto Sans KR',sans-serif)}
 .ssobi-public[data-theme-applied="1"] .lke-product-info-date,
 .ssobi-public[data-theme-applied="1"] .lke-quicklink-sub,
 .ssobi-public[data-theme-applied="1"] .lke-block-link .l-sub,
 .ssobi-public[data-theme-applied="1"] .lke-event-text,
-.ssobi-public[data-theme-applied="1"] .lke-cd-subtitle{color:var(--lke-text-color, var(--t2))}
+.ssobi-public[data-theme-applied="1"] .lke-cd-subtitle,
+.ssobi-public[data-theme-applied="1"] .lke-hero-subtitle,
+.ssobi-public[data-theme-applied="1"] .lke-hero-brand{color:var(--lke-text-color, var(--t2)) !important}
+.ssobi-public[data-theme-applied="1"] .lke-hero-cta{background:var(--lke-title-color, var(--mint)) !important;color:#fff}
 /* HERO — has-bg 시 강한 그라디언트 오버레이로 텍스트 가독성 확보 */
 .ssobi-public .lke-hero-carousel{position:relative}
 .ssobi-public .lke-hero-banner{aspect-ratio:4/5;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff;position:relative;overflow:hidden;padding:32px 24px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;text-decoration:none}
