@@ -82,6 +82,34 @@ const PUBLIC_CSS = `
 :root{--dark:#1A1F27;--mint:#00C896;--mint-l:#F0FDF9;--mint-d:#00A87E;--red:#FF4D4D;--bg:#F9FAFB;--b:#F0F2F5;--t1:#1A1F27;--t2:#64748B;--t3:#94A3B8}
 @keyframes lke-pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .ssobi-public{font-family:'Pretendard Variable','Pretendard',sans-serif;color:var(--t1);width:100%;max-width:480px;margin:0 auto;min-height:100vh;background:var(--bg);overflow-x:hidden;-webkit-font-smoothing:antialiased;align-self:center}
+/* lke-* 블록 폰트 — 편집기와 같은 클린 Pretendard 룩으로 통일 */
+.ssobi-public .lke-hero-title,
+.ssobi-public .lke-hero-subtitle,
+.ssobi-public .lke-hero-brand,
+.ssobi-public .lke-section-title,
+.ssobi-public .lke-section-title em,
+.ssobi-public .lke-product-info-title,
+.ssobi-public .lke-price-sale,
+.ssobi-public .lke-mag-title,
+.ssobi-public .lke-mag-title em,
+.ssobi-public .lke-bigbanner-title,
+.ssobi-public .lke-bigbanner-title em,
+.ssobi-public .lke-bigbanner-eyebrow,
+.ssobi-public .lke-cd-title,
+.ssobi-public .lke-cd-title em,
+.ssobi-public .lke-cd-num,
+.ssobi-public .lke-cd-eyebrow,
+.ssobi-public .lke-cd-lbl,
+.ssobi-public .lke-cd-slots,
+.ssobi-public .lke-event-text strong,
+.ssobi-public .lke-quicklink-label,
+.ssobi-public .lke-quicklink-sub,
+.ssobi-public .lke-block-link .l-title,
+.ssobi-public .lke-block-link .l-sub,
+.ssobi-public .lke-product-info-date,
+.ssobi-public .lke-price-orig,
+.ssobi-public .lke-product-tag,
+.ssobi-public .lke-mag-label{font-family:'Pretendard Variable','Pretendard','Noto Sans KR',sans-serif}
 /* 테마 오버라이드 — 유저가 편집기에서 색·폰트 변경 시 활성화 */
 .ssobi-public[data-theme-applied="1"] .lke-section-title,
 .ssobi-public[data-theme-applied="1"] .lke-product-info-title,
