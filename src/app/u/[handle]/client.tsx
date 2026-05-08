@@ -75,6 +75,20 @@ const PUBLIC_CSS = `
 :root{--dark:#1A1F27;--mint:#00C896;--mint-l:#F0FDF9;--mint-d:#00A87E;--red:#FF4D4D;--bg:#F9FAFB;--b:#F0F2F5;--t1:#1A1F27;--t2:#64748B;--t3:#94A3B8}
 @keyframes lke-pulse{0%,100%{opacity:1}50%{opacity:.4}}
 .ssobi-public{font-family:'Pretendard Variable','Pretendard',sans-serif;color:var(--t1);width:100%;max-width:480px;margin:0 auto;min-height:100vh;background:var(--bg);overflow-x:hidden;-webkit-font-smoothing:antialiased;align-self:center}
+/* 테마 오버라이드 — 유저가 편집기에서 색·폰트 변경 시 활성화 */
+.ssobi-public[data-theme-applied="1"] .lke-section-title,
+.ssobi-public[data-theme-applied="1"] .lke-product-info-title,
+.ssobi-public[data-theme-applied="1"] .lke-block-link .l-title,
+.ssobi-public[data-theme-applied="1"] .lke-quicklink-label,
+.ssobi-public[data-theme-applied="1"] .lke-mag-title,
+.ssobi-public[data-theme-applied="1"] .lke-bigbanner-title,
+.ssobi-public[data-theme-applied="1"] .lke-cd-title,
+.ssobi-public[data-theme-applied="1"] .lke-event-text strong{color:var(--lke-title-color, var(--t1));font-family:var(--lke-title-font, 'Fraunces','Pretendard','Noto Sans KR',sans-serif)}
+.ssobi-public[data-theme-applied="1"] .lke-product-info-date,
+.ssobi-public[data-theme-applied="1"] .lke-quicklink-sub,
+.ssobi-public[data-theme-applied="1"] .lke-block-link .l-sub,
+.ssobi-public[data-theme-applied="1"] .lke-event-text,
+.ssobi-public[data-theme-applied="1"] .lke-cd-subtitle{color:var(--lke-text-color, var(--t2))}
 /* HERO — has-bg 시 강한 그라디언트 오버레이로 텍스트 가독성 확보 */
 .ssobi-public .lke-hero-carousel{position:relative}
 .ssobi-public .lke-hero-banner{aspect-ratio:4/5;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff;position:relative;overflow:hidden;padding:32px 24px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box}
@@ -237,10 +251,20 @@ export default function LinkPageClient({ page }: { page: PageData }) {
     }
   }
 
+  // 유저 테마 — 편집기 테마 패널에서 저장한 색·폰트 그대로 공개 페이지에 적용
+  const t = (page.theme || {}) as { bgSolid?: string; textColor?: string; titleColor?: string; titleFont?: string; bodyFont?: string }
+  const themeStyle: React.CSSProperties & Record<string, string> = {}
+  if (t.bgSolid) themeStyle.background = t.bgSolid
+  if (t.bodyFont) themeStyle.fontFamily = `'${t.bodyFont}','Pretendard',sans-serif`
+  if (t.textColor) themeStyle['--lke-text-color'] = t.textColor
+  if (t.titleColor) themeStyle['--lke-title-color'] = t.titleColor
+  if (t.titleFont) themeStyle['--lke-title-font'] = `'${t.titleFont}','Pretendard',sans-serif`
+  const themeApplied = !!(t.textColor || t.titleColor || t.titleFont || t.bodyFont)
+
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: PUBLIC_CSS }} />
-      <div className="ssobi-public">
+      <div className="ssobi-public" style={themeStyle} data-theme-applied={themeApplied ? '1' : undefined}>
         <Hero slide={firstSlide} handle={page.handle} compact={isHeroCompact} />
         {page.blocks?.map((b, i) => renderBlock(b, i))}
         <a className="ssobi-cta" href="https://ssobi.ai/?ref=u" dangerouslySetInnerHTML={{ __html: '나만의 링크 페이지 <em>1초만에</em> 만들기 →' }} />

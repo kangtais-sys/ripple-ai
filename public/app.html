@@ -1839,6 +1839,21 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 .lke-bpv-prev.divider{background:#fff;border:1px solid var(--b);align-items:center;justify-content:center}
 .lke-bpv-prev.divider::before{content:'';width:60%;height:1px;background:var(--t3)}
 
+/* 테마 오버라이드 — 유저가 테마 패널에서 색·폰트 변경 시 활성화 (data-theme-applied="1") */
+#v-link[data-theme-applied="1"] .lke-section-title,
+#v-link[data-theme-applied="1"] .lke-product-info-title,
+#v-link[data-theme-applied="1"] .lke-block-link .l-title,
+#v-link[data-theme-applied="1"] .lke-quicklink-label,
+#v-link[data-theme-applied="1"] .lke-mag-title,
+#v-link[data-theme-applied="1"] .lke-bigbanner-title,
+#v-link[data-theme-applied="1"] .lke-cd-title,
+#v-link[data-theme-applied="1"] .lke-event-text strong{color:var(--lke-title-color, var(--t1));font-family:var(--lke-title-font, 'Fraunces','Pretendard','Noto Sans KR',sans-serif)}
+#v-link[data-theme-applied="1"] .lke-product-info-date,
+#v-link[data-theme-applied="1"] .lke-quicklink-sub,
+#v-link[data-theme-applied="1"] .lke-block-link .l-sub,
+#v-link[data-theme-applied="1"] .lke-event-text,
+#v-link[data-theme-applied="1"] .lke-cd-subtitle{color:var(--lke-text-color, var(--t2))}
+
 /* 제품 카드 유형별 */
 #v-link .lke-product-card.type-channel .lke-product-info-title{color:var(--t1)}
 #v-link .lke-product-card.type-channel .lke-product-info-price{display:none}
@@ -10837,15 +10852,6 @@ function lkeRenderThemeSheet(){
 
   // 페이지 배경 (블록 꾸미기와 동일한 패턴)
   html += '<div class="lke-appearance"><div class="lke-app-head">' + L('appearance','페이지 꾸미기') + '</div>';
-  html += '<div class="lke-pick-row"><label>' + L('bg_grad','배경 그라디') + '</label><div class="lke-pick-col" id="theme-bg-grad">'+
-    '<input type="color" class="lke-color-dot lke-grad-c1" value="'+g.c1+'">'+
-    '<select class="lke-grad-sel">'+
-      [['135','↘'],['180','↓'],['90','→'],['45','↗'],['radial','⊙']].map(function(d){
-        return '<option value="'+d[0]+'"'+(g.dir===d[0]?' selected':'')+'>'+d[1]+'</option>';
-      }).join('')+
-    '</select>'+
-    '<input type="color" class="lke-color-dot lke-grad-c2" value="'+g.c2+'">'+
-  '</div></div>';
   html += '<div class="lke-pick-row"><label>' + L('bg_solid','배경 단색') + '</label><div class="lke-pick-col"><span class="lke-pick-hex" id="theme-bg-solid-hex">'+((st.bgSolid||'#F9FAFB').toUpperCase())+'</span><input type="color" class="lke-color-dot" id="theme-bg-solid" value="'+(st.bgSolid||'#F9FAFB')+'" oninput="document.getElementById(\'theme-bg-solid-hex\').textContent=this.value.toUpperCase()"></div></div>';
   html += '<div class="lke-pick-row"><label>' + L('text_color','기본 글자색') + '</label><div class="lke-pick-col"><span class="lke-pick-hex" id="theme-text-hex">'+((st.textColor||'#1A1F27').toUpperCase())+'</span><input type="color" class="lke-color-dot" id="theme-text" value="'+(st.textColor||'#1A1F27')+'" oninput="document.getElementById(\'theme-text-hex\').textContent=this.value.toUpperCase()"></div></div>';
   html += '<div class="lke-pick-row"><label>' + L('title_color','제목 글자색') + '</label><div class="lke-pick-col"><span class="lke-pick-hex" id="theme-title-hex">'+((st.titleColor||'#1A1F27').toUpperCase())+'</span><input type="color" class="lke-color-dot" id="theme-title-c" value="'+(st.titleColor||'#1A1F27')+'" oninput="document.getElementById(\'theme-title-hex\').textContent=this.value.toUpperCase()"></div></div>';
@@ -10876,16 +10882,8 @@ function lkeRenderThemeSheet(){
 
 function lkeApplyTheme(){
   var st = lkeState.theme || (lkeState.theme = {});
-  var gradBody = document.getElementById('theme-bg-grad');
-  if(gradBody){
-    var sel = gradBody.querySelector('.lke-grad-sel');
-    var dir = sel ? sel.value : '135';
-    var c1 = gradBody.querySelector('.lke-grad-c1').value;
-    var c2 = gradBody.querySelector('.lke-grad-c2').value;
-    if(c1 && c2){
-      st.bg = (dir==='radial'?'radial-gradient(circle,':'linear-gradient('+dir+'deg,')+c1+','+c2+')';
-    }
-  }
+  // 그라디언트 옵션 제거 — 단색만 사용
+  st.bg = null;
   var solid = document.getElementById('theme-bg-solid');
   if(solid) st.bgSolid = solid.value;
   st.textColor = document.getElementById('theme-text').value;
@@ -10899,14 +10897,17 @@ function lkeApplyTheme(){
 function lkeApplyThemeToDom(){
   var st = lkeState.theme; if(!st) return;
   var v = document.getElementById('v-link'); if(!v) return;
-  // 배경 우선: grad(있으면) > solid
-  if(st.bg) v.style.background = st.bg;
-  else if(st.bgSolid) v.style.background = st.bgSolid;
+  // 배경 — 단색만 (그라디언트 옵션 제거됨)
+  if(st.bgSolid) v.style.background = st.bgSolid;
+  else v.style.background = '';
   if(st.bodyFont) v.style.fontFamily = "'"+st.bodyFont+"','Pretendard',sans-serif";
-  // CSS vars for 블록 디폴트
-  if(st.textColor) v.style.setProperty('--lke-default-text', st.textColor);
-  if(st.titleColor) v.style.setProperty('--lke-default-title', st.titleColor);
-  if(st.titleFont) v.style.setProperty('--lke-default-title-font', "'"+st.titleFont+"','Pretendard',sans-serif");
+  else v.style.fontFamily = '';
+  // 테마 변수 — 아래 CSS 오버라이드 규칙이 이 변수를 사용해서 텍스트/제목 색·폰트 적용
+  v.style.setProperty('--lke-text-color', st.textColor || '');
+  v.style.setProperty('--lke-title-color', st.titleColor || '');
+  v.style.setProperty('--lke-title-font', st.titleFont ? ("'"+st.titleFont+"','Pretendard',sans-serif") : '');
+  // 테마 적용 플래그 — CSS 셀렉터가 이걸로 활성화
+  v.dataset.themeApplied = (st.textColor || st.titleColor || st.titleFont || st.bodyFont) ? '1' : '';
 }
 // lkeApplyLayout 제거됨 (레이아웃 기능 삭제)
 function lkeApplySettings(){
