@@ -112,9 +112,9 @@ const PUBLIC_CSS = `
 /* eyebrow 제거됨 (2026-05-08) */
 .ssobi-public .lke-hero-banner-main{position:relative;z-index:2}
 .ssobi-public .lke-hero-brand{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;opacity:.65;margin-bottom:14px}
-.ssobi-public .lke-hero-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:48px;font-weight:300;line-height:1.02;letter-spacing:-.035em;margin:0 0 14px;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.25)}
+.ssobi-public .lke-hero-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:48px;font-weight:300;line-height:1.02;letter-spacing:-.035em;margin:0 0 14px;color:inherit;text-shadow:0 2px 12px rgba(0,0,0,.25)}
 .ssobi-public .lke-hero-title em{font-style:italic;font-weight:500}
-.ssobi-public .lke-hero-subtitle{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:14.5px;font-style:italic;opacity:.92;margin-bottom:16px;max-width:280px;line-height:1.5;color:#fff;text-shadow:0 2px 8px rgba(0,0,0,.3)}
+.ssobi-public .lke-hero-subtitle{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:14.5px;font-style:italic;opacity:.92;margin-bottom:16px;max-width:280px;line-height:1.5;color:inherit;text-shadow:0 2px 8px rgba(0,0,0,.3)}
 .ssobi-public .lke-hero-banner-bottom{position:relative;z-index:2;display:flex;justify-content:flex-end;align-items:flex-end}
 .ssobi-public .lke-hero-stats{display:flex;gap:18px}
 .ssobi-public .lke-hero-stat{position:relative;padding:4px 8px}
@@ -178,15 +178,15 @@ const PUBLIC_CSS = `
 .ssobi-public .lke-block-mag.m3{background:linear-gradient(135deg,#C4B5FD 0%,#8B5CF6 100%)}
 .ssobi-public .lke-block-mag::before{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(15,19,25,.45) 0%,transparent 60%)}
 .ssobi-public .lke-mag-label{position:absolute;top:18px;left:18px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#fff;background:rgba(15,19,25,.35);padding:4px 11px;border-radius:100px;letter-spacing:.15em;text-transform:uppercase}
-.ssobi-public .lke-mag-title{position:relative;z-index:2;font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:24px;font-weight:500;color:#fff;line-height:1.1;letter-spacing:-.02em;max-width:82%}
+.ssobi-public .lke-mag-title{position:relative;z-index:2;font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:24px;font-weight:500;color:inherit;line-height:1.1;letter-spacing:-.02em;max-width:82%}
 .ssobi-public .lke-mag-title em{font-style:italic}
 /* BIGBANNER / CONTACT */
 .ssobi-public .lke-block-bigbanner{margin:14px 18px;border-radius:18px;overflow:hidden;aspect-ratio:2/1;position:relative;display:flex;align-items:flex-end;padding:24px;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff;text-decoration:none;box-shadow:0 8px 24px rgba(15,19,25,.12);transition:transform .15s ease}
 .ssobi-public .lke-block-bigbanner:active{transform:scale(.99)}
 .ssobi-public .lke-block-bigbanner::before{content:'';position:absolute;top:-100px;right:-100px;width:280px;height:280px;background:radial-gradient(circle,rgba(0,200,150,.3),transparent 70%)}
 .ssobi-public .lke-bigbanner-content{position:relative;z-index:2}
-.ssobi-public .lke-bigbanner-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--mint);letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
-.ssobi-public .lke-bigbanner-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:26px;font-weight:400;line-height:1.05;letter-spacing:-.02em;color:#fff;margin:0}
+.ssobi-public .lke-bigbanner-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;color:inherit;opacity:.7;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
+.ssobi-public .lke-bigbanner-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:26px;font-weight:400;line-height:1.05;letter-spacing:-.02em;color:inherit;margin:0}
 .ssobi-public .lke-bigbanner-title em{font-style:italic;font-weight:500}
 .ssobi-public .lke-bigbanner-arrow{position:absolute;top:22px;right:22px;width:42px;height:42px;border:1px solid rgba(255,255,255,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;z-index:2;color:#fff;background:rgba(255,255,255,.08)}
 /* QUICKLINKS — clean editorial list */
