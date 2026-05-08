@@ -9662,37 +9662,15 @@ function openPreview(){
 // ═══════════════════════════════════════════════════
 //  내 링크 · 상태 기반 에디터 (DnD · 히어로 캐러셀 · 블록별 편집)
 // ═══════════════════════════════════════════════════
+// 첫 진입 — 깔끔한 placeholder. hydrate 가 서버 데이터로 덮어쓰면 placeholder 사라짐.
 var lkeState = {
-  handle:'yuminhye',
+  handle:'',
   hero:{
     slides:[
-      {bg:'',eyebrow:'LIVE · 공동구매',brand:'YUMINHYE STUDIO',title:'Glow <em>Drop.</em><br>Spring \'26',sub:'신상만 밝히는 코덕의<br>진짜 효자템 모음.',stat1_hidden:true,stat2_hidden:true,cta:'지금 보기 →',ctaUrl:''}
+      {bg:'',brand:'',title:'제목을 입력하세요',sub:'부제를 입력하세요',cta:'',ctaUrl:''}
     ]
   },
-  blocks:[
-    {type:'event',id:'e'+Date.now(),text:'30% OFF',sub:'글로우 세럼 공동구매 중',url:''},
-    {type:'countdown',id:'c'+Date.now(),title:'글로우 세럼 <em>50ml</em>',sub:'100% 페이백 · 선착순 20명',eyebrow:'공구 마감까지',endsAt:'',slots:'7 / 20명',url:''},
-    {type:'section',id:'s'+Date.now(),title:'Best <em>Drop.</em>',seeAll:'See all →'},
-    {type:'grid',id:'g'+Date.now(),items:[
-      {kind:'product',title:'시그니처 글로우 세럼',price:'₩39,800',origPrice:'₩59,800',date:'4/19 · 바로배송',tag:'HOT',tagStyle:'hot',img:'coral',url:''},
-      {kind:'product',title:'크리미 나이트 크림',price:'₩32,000',origPrice:'₩48,000',date:'4/20 · pm8',tag:'NEW',tagStyle:'',img:'cream',url:''},
-      {kind:'product',title:'프로틴 리페어 앰플',price:'₩45,000',origPrice:'₩68,000',date:'4/21 · am10',tag:'BEST',tagStyle:'dark',img:'pink',url:''},
-      {kind:'product',title:'마일드 클렌징 오일',price:'₩22,000',origPrice:'₩34,000',date:'4/22 · pm8',tag:'공구',tagStyle:'',img:'dark',url:''}
-    ]},
-    {type:'contact',id:'ct'+Date.now(),eyebrow:'문의 · 제안',title:'협업·광고<br><em>문의하기.</em>',arrow:'→',formDesc:'제품·예산·일정을 남겨주세요',fields:['이름 / 브랜드','이메일','내용']},
-    {type:'section',id:'s2'+Date.now(),title:'Magazine',seeAll:'Read more →'},
-    {type:'magazine',id:'m1'+Date.now(),label:'Routine',title:'한국인이 <em>안 하는</em><br>스킨케어 실수 7가지',theme:'m1',url:''},
-    {type:'magazine',id:'m2'+Date.now(),label:'Review',title:'7일 써본 <em>글로우 세럼</em><br>솔직 후기',theme:'m2',url:''},
-    {type:'section',id:'s3'+Date.now(),title:'Quick <em>Links.</em>',seeAll:''},
-    {type:'quicklinks',id:'q'+Date.now(),items:[
-      {label:'올리브영에서 사기',sub:'oliveyoung.co.kr',url:''},
-      {label:'스마트스토어',sub:'smartstore.naver.com',url:''},
-      {label:'협업·광고 문의',sub:'hello@millimilli.co',url:''},
-      {label:'알림받기 (카카오)',sub:'pf.kakao.com',url:''}
-    ]},
-    {type:'socials',id:'so'+Date.now(),items:[{ch:'ig',url:''},{ch:'tk',url:''},{ch:'yt',url:''},{ch:'email',url:''}]},
-    {type:'footer',id:'f'+Date.now(),logo:'Ssobi<span>.</span>',text:'Powered by Ssobi Links'}
-  ],
+  blocks:[],
   proposals:[]
 };
 
@@ -9881,7 +9859,7 @@ function lkeRenderHero(){
 window.lkeActiveSlide = window.lkeActiveSlide || 0;
 function lkeAddHeroSlide(){
   var idx=lkeState.hero.slides.length;
-  lkeState.hero.slides.push({bg:'',eyebrow:'',brand:'',title:'New <em>Drop.</em>',sub:'텍스트를 바꿔주세요',cta:'',ctaUrl:''});
+  lkeState.hero.slides.push({bg:'',brand:'',title:'제목을 입력하세요',sub:'부제를 입력하세요',cta:'',ctaUrl:''});
   window.lkeActiveSlide = idx; // 새 슬라이드로 자동 점프
   lkeRender();
 }
@@ -10531,11 +10509,11 @@ function lkeDeleteBlock(idx){
   lkeState.blocks.splice(idx,1); lkeRender(); lkeCloseSheet();
 }
 function lkeGridDel(idx, i){ lkeState.blocks[idx].items.splice(i,1); lkeRenderEditForm(lkeState.blocks[idx],idx); lkeRender(); }
-function lkeGridAdd(idx){ lkeState.blocks[idx].items.push({kind:'product',title:'새 제품',price:'₩0',date:'',tag:'',img:'cream',url:''}); lkeRenderEditForm(lkeState.blocks[idx],idx); lkeRender(); }
+function lkeGridAdd(idx){ lkeState.blocks[idx].items.push({kind:'product',title:'상품명',price:'',origPrice:'',date:'',tag:'',img:'cream',url:''}); lkeRenderEditForm(lkeState.blocks[idx],idx); lkeRender(); }
 function lkeGridKind(idx, i, kind){ lkeState.blocks[idx].items[i].kind=kind; lkeRenderEditForm(lkeState.blocks[idx],idx); lkeRender(); }
 function lkeGridTag(idx, i, t){ lkeState.blocks[idx].items[i].tag=t; lkeState.blocks[idx].items[i].tagStyle = t==='HOT'?'hot':(t==='BEST'||t==='공구'?'dark':''); lkeRenderEditForm(lkeState.blocks[idx],idx); lkeRender(); }
 function lkeQlDel(idx, i){ lkeState.blocks[idx].items.splice(i,1); lkeRenderEditForm(lkeState.blocks[idx],idx); lkeRender(); }
-function lkeQlAdd(idx){ lkeState.blocks[idx].items.push({label:'새 링크',sub:'',url:''}); lkeRenderEditForm(lkeState.blocks[idx],idx); lkeRender(); }
+function lkeQlAdd(idx){ lkeState.blocks[idx].items.push({label:'링크 이름',sub:'설명',url:''}); lkeRenderEditForm(lkeState.blocks[idx],idx); lkeRender(); }
 function lkeImageUpload(idx, inp){
   var f=inp.files&&inp.files[0]; if(!f) return;
   // 재렌더 전 현재 폼 입력값 commit (제목/URL 등 타이핑 보존)
@@ -10607,20 +10585,22 @@ function lkeRenderPicker(){
 }
 function lkeAddBlock(kind){
   var id=kind+Date.now();
+  // placeholder text — 클릭해서 내용을 바꿔주세요 형식. 실제 데이터처럼 보이지 않게.
   var defaults = {
-    event:{type:'event',id:id,text:'30% OFF',sub:'새 이벤트',url:''},
-    countdown:{type:'countdown',id:id,title:'새 카운트다운',sub:'설명',eyebrow:'마감까지',endsAt:'',slots:'0/0',url:''},
-    section:{type:'section',id:id,title:'Section <em>Title.</em>',seeAll:'See all →'},
-    grid:{type:'grid',id:id,items:[{kind:'product',title:'새 상품',price:'₩0',date:'',tag:'',img:'cream',url:''}]},
-    bigbanner:{type:'bigbanner',id:id,eyebrow:'LABEL',title:'Banner <em>Title.</em>',arrow:'↗',url:''},
-    contact:{type:'contact',id:id,eyebrow:'문의 · 제안',title:'협업·광고<br><em>문의하기.</em>',arrow:'💌',formDesc:'제품·예산·일정을 남겨주세요',fields:['이름 / 브랜드','이메일','내용']},
-    magazine:{type:'magazine',id:id,label:'Label',title:'매거진 타이틀',theme:'m1',url:''},
-    link:{type:'link',id:id,title:'새 링크',url:''},
-    image:{type:'image',id:id,img:'',title:'이미지 링크',url:''},
-    quicklinks:{type:'quicklinks',id:id,items:[{label:'새 링크',sub:'',url:''}]},
-    socials:{type:'socials',id:id,items:[{ch:'ig',url:''},{ch:'tk',url:''},{ch:'yt',url:''}]},
+    event:{type:'event',id:id,text:'강조 텍스트',sub:'설명을 입력하세요',url:''},
+    countdown:{type:'countdown',id:id,title:'새 카운트다운',sub:'설명',eyebrow:'마감까지',endsAt:'',slots:'남은자리 텍스트를 바꿔주세요',url:''},
+    section:{type:'section',id:id,title:'섹션 제목',seeAll:''},
+    grid:{type:'grid',id:id,items:[{kind:'product',title:'상품명',price:'',origPrice:'',date:'',tag:'',img:'cream',url:''}]},
+    bigbanner:{type:'bigbanner',id:id,eyebrow:'라벨',title:'배너 제목을 입력하세요',url:''},
+    quicklinks:{type:'quicklinks',id:id,items:[{label:'링크 이름',sub:'설명',url:''}]},
+    socials:{type:'socials',id:id,items:[{ch:'ig',url:''}]},
     spacer:{type:'spacer',id:id},
-    divider:{type:'divider',id:id}
+    divider:{type:'divider',id:id},
+    // legacy types — 이미 추가된 블록 backward compat (picker 에선 안 보임)
+    contact:{type:'contact',id:id,eyebrow:'문의',title:'문의 제목',formDesc:'설명을 입력하세요'},
+    magazine:{type:'magazine',id:id,label:'라벨',title:'매거진 제목',theme:'m1',url:''},
+    link:{type:'link',id:id,title:'링크 제목',url:''},
+    image:{type:'image',id:id,img:'',title:'제목',url:''}
   };
   var b=defaults[kind]; if(!b) return;
   var at = typeof window._lkeInsertAt === 'number' ? window._lkeInsertAt : lkeState.blocks.length;
