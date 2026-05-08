@@ -1559,10 +1559,7 @@ body.dev-mode .mitem.dev-only{display:flex!important}
 #v-link .lke-hero-banner{aspect-ratio:4/5;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff;position:relative;overflow:hidden;padding:28px 22px;display:flex;flex-direction:column;justify-content:space-between}
 #v-link .lke-hero-banner::before{content:'';position:absolute;top:-100px;right:-100px;width:380px;height:380px;background:radial-gradient(circle,rgba(0,200,150,.35),transparent 70%)}
 #v-link .lke-hero-banner-top{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:flex-start}
-#v-link .lke-hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--mint);display:inline-flex;align-items:center;gap:10px;min-height:14px}
-#v-link .lke-hero-eyebrow:not(.is-empty)::before{content:'';width:24px;height:1px;background:var(--mint);animation:lke-pulse 2s infinite}
-#v-link .lke-hero-eyebrow.is-empty{opacity:.55;font-style:italic}
-#v-link .lke-hero-eyebrow.is-empty::after{content:'태그 추가';opacity:.7}
+/* eyebrow 제거됨 (2026-05-08) — hero 상단 태그 라인 비활성 */
 @keyframes lke-pulse{0%,100%{opacity:1}50%{opacity:.4}}
 #v-link .lke-hero-avatar-mini{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#A7F3D0,#00A87E);display:flex;align-items:center;justify-content:center;font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-style:italic;font-weight:500;font-size:17px;color:#fff}
 #v-link .lke-hero-banner-main{position:relative;z-index:2}
@@ -9770,9 +9767,6 @@ function lkeRenderHero(){
         '<button class="lke-hero-tool" aria-label="배너 추가" onclick="event.stopPropagation();lkeAddHeroSlide()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></button>'+
         '<button class="lke-hero-tool" aria-label="배경 변경" onclick="event.stopPropagation();lkeHeroUploadBg('+si+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button>'+
         (canDelete ? '<button class="lke-hero-tool del" aria-label="배너 삭제" onclick="event.stopPropagation();lkeDeleteHeroSlide('+si+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M6 18L18 6" stroke-linecap="round"/></svg></button>' : '')+
-      '</div>'+
-      '<div class="lke-hero-banner-top" style="text-align:'+(s.eyebrow_align||'left')+'">'+
-        '<div class="lke-hero-eyebrow lke-editable-text'+(s.eyebrow ? '' : ' is-empty')+'" data-key="eyebrow" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this);this.classList.remove(\'is-empty\')" onblur="lkeHideAlignBar();this.classList.toggle(\'is-empty\',!this.innerText.trim())" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].eyebrow=this.innerText.trim()">'+(s.eyebrow||'')+'</div>'+
       '</div>'+
       '<div class="lke-hero-banner-main" style="text-align:'+(s.main_align||'left')+'">'+
         '<div class="lke-hero-brand lke-editable-text" data-key="brand" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].brand=this.innerText">'+s.brand+'</div>'+

@@ -91,13 +91,13 @@ const PUBLIC_CSS = `
 .ssobi-public[data-theme-applied="1"] .lke-cd-subtitle{color:var(--lke-text-color, var(--t2))}
 /* HERO — has-bg 시 강한 그라디언트 오버레이로 텍스트 가독성 확보 */
 .ssobi-public .lke-hero-carousel{position:relative}
-.ssobi-public .lke-hero-banner{aspect-ratio:4/5;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff;position:relative;overflow:hidden;padding:32px 24px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box}
+.ssobi-public .lke-hero-banner{aspect-ratio:4/5;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff;position:relative;overflow:hidden;padding:32px 24px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;text-decoration:none}
+.ssobi-public a.lke-hero-banner{color:#fff;cursor:pointer;transition:filter .2s}
+.ssobi-public a.lke-hero-banner:active{filter:brightness(.9)}
 .ssobi-public .lke-hero-banner::before{content:'';position:absolute;top:-100px;right:-100px;width:380px;height:380px;background:radial-gradient(circle,rgba(0,200,150,.35),transparent 70%)}
 .ssobi-public .lke-hero-banner.has-bg{background-size:cover;background-position:center}
 .ssobi-public .lke-hero-banner.has-bg::before{background:linear-gradient(180deg,rgba(0,0,0,.45) 0%,rgba(0,0,0,.15) 35%,rgba(0,0,0,.2) 60%,rgba(0,0,0,.7) 100%);inset:0;width:auto;height:auto;top:0;right:0}
-.ssobi-public .lke-hero-banner-top{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:flex-start}
-.ssobi-public .lke-hero-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--mint);display:inline-flex;align-items:center;gap:10px}
-.ssobi-public .lke-hero-eyebrow::before{content:'';width:24px;height:1px;background:var(--mint);animation:lke-pulse 2s infinite}
+/* eyebrow 제거됨 (2026-05-08) */
 .ssobi-public .lke-hero-banner-main{position:relative;z-index:2}
 .ssobi-public .lke-hero-brand{font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.15em;text-transform:uppercase;opacity:.65;margin-bottom:14px}
 .ssobi-public .lke-hero-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:48px;font-weight:300;line-height:1.02;letter-spacing:-.035em;margin:0 0 14px;color:#fff;text-shadow:0 2px 12px rgba(0,0,0,.25)}
@@ -111,8 +111,7 @@ const PUBLIC_CSS = `
 .ssobi-public .lke-hero-cta{padding:11px 18px;background:var(--mint);color:#fff;border-radius:100px;font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;gap:6px;border:none;font-family:'Pretendard',sans-serif;letter-spacing:-.2px;text-decoration:none}
 .ssobi-public .lke-hero-banner.compact{aspect-ratio:auto;min-height:180px;padding:18px 20px;background:linear-gradient(180deg,#FAFAF9 0%,#F5F5F4 100%);color:#1A1F27}
 .ssobi-public .lke-hero-banner.compact::before{display:none}
-.ssobi-public .lke-hero-banner.compact .lke-hero-eyebrow{color:rgba(26,31,39,.55);margin-bottom:10px}
-.ssobi-public .lke-hero-banner.compact .lke-hero-eyebrow::before{display:none}
+/* compact eyebrow 제거됨 (2026-05-08) */
 .ssobi-public .lke-hero-banner.compact .lke-hero-brand{color:rgba(26,31,39,.45);font-size:10px;letter-spacing:.15em;margin-bottom:6px}
 .ssobi-public .lke-hero-banner.compact .lke-hero-title{font-size:24px;line-height:1.18;letter-spacing:-.02em;margin-bottom:6px;color:var(--t1)}
 .ssobi-public .lke-hero-banner.compact .lke-hero-title em{font-style:italic}
@@ -303,29 +302,32 @@ function Hero({ slide, handle, compact }: { slide: HeroSlide; handle: string; co
   const hasBg = !!slide.bg
   const cls = ['lke-hero-banner', compact ? 'compact' : '', hasBg ? 'has-bg' : ''].filter(Boolean).join(' ')
   const style: React.CSSProperties = hasBg ? { backgroundImage: `url(${slide.bg})` } : {}
-  return (
-    <div className="lke-hero-carousel">
-      <div className={cls} style={style}>
-        <div className="lke-hero-banner-top" style={{ textAlign: slide.eyebrow_align || 'left' }}>
-          {slide.eyebrow && (
-            <div className="lke-hero-eyebrow" dangerouslySetInnerHTML={safeHtml(slide.eyebrow)} />
-          )}
-        </div>
-        <div className="lke-hero-banner-main" style={{ textAlign: slide.main_align || 'left' }}>
-          {slide.brand && (
-            <div className="lke-hero-brand" dangerouslySetInnerHTML={safeHtml(slide.brand)} />
-          )}
-          <h1 className="lke-hero-title" dangerouslySetInnerHTML={safeHtml(slide.title || `@${handle}`)} />
-          {slide.sub && (
-            <div className="lke-hero-subtitle" dangerouslySetInnerHTML={safeHtml(slide.sub)} />
-          )}
-        </div>
-        {slide.cta && !slide.cta_hidden && (
-          <div className="lke-hero-banner-bottom">
-            <a className="lke-hero-cta" href={slide.ctaUrl || '#'} dangerouslySetInnerHTML={safeHtml(slide.cta)} />
-          </div>
+  const linkUrl = slide.ctaUrl || ''
+  const inner = (
+    <>
+      <div className="lke-hero-banner-main" style={{ textAlign: slide.main_align || 'left' }}>
+        {slide.brand && (
+          <div className="lke-hero-brand" dangerouslySetInnerHTML={safeHtml(slide.brand)} />
+        )}
+        <h1 className="lke-hero-title" dangerouslySetInnerHTML={safeHtml(slide.title || `@${handle}`)} />
+        {slide.sub && (
+          <div className="lke-hero-subtitle" dangerouslySetInnerHTML={safeHtml(slide.sub)} />
         )}
       </div>
+      {slide.cta && !slide.cta_hidden && (
+        <div className="lke-hero-banner-bottom">
+          <span className="lke-hero-cta" dangerouslySetInnerHTML={safeHtml(slide.cta)} />
+        </div>
+      )}
+    </>
+  )
+  return (
+    <div className="lke-hero-carousel">
+      {linkUrl ? (
+        <a className={cls} style={style} href={linkUrl}>{inner}</a>
+      ) : (
+        <div className={cls} style={style}>{inner}</div>
+      )}
     </div>
   )
 }
