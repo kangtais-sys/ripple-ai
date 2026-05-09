@@ -147,7 +147,7 @@ const PUBLIC_CSS = `
 .ssobi-public .lke-hero-stat .num{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:20px;font-weight:500;letter-spacing:-.02em;line-height:1}
 .ssobi-public .lke-hero-stat .lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;opacity:.58;margin-top:3px}
 .ssobi-public .lke-hero-cta{padding:11px 18px;background:var(--mint);color:#fff;border-radius:100px;font-size:12.5px;font-weight:700;display:inline-flex;align-items:center;gap:6px;border:none;font-family:'Pretendard',sans-serif;letter-spacing:-.2px;text-decoration:none}
-.ssobi-public .lke-hero-banner.compact{aspect-ratio:auto;min-height:180px;padding:18px 20px;background:linear-gradient(180deg,#FAFAF9 0%,#F5F5F4 100%);color:#1A1F27}
+.ssobi-public .lke-hero-banner.compact{aspect-ratio:auto;min-height:180px;padding:18px 20px;background:#FAFAF9;color:#1A1F27}
 .ssobi-public .lke-hero-banner.compact::before{display:none}
 /* compact eyebrow 제거됨 (2026-05-08) */
 .ssobi-public .lke-hero-banner.compact .lke-hero-brand{color:rgba(26,31,39,.45);font-size:10px;letter-spacing:.15em;margin-bottom:6px}
