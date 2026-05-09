@@ -209,6 +209,7 @@ const PUBLIC_CSS = `
 .ssobi-public .lke-block-bigbanner{margin:14px 18px;border-radius:18px;overflow:hidden;aspect-ratio:2/1;position:relative;display:flex;align-items:flex-end;padding:24px;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff;text-decoration:none;box-shadow:0 8px 24px rgba(15,19,25,.12);transition:transform .15s ease}
 .ssobi-public .lke-block-bigbanner:active{transform:scale(.99)}
 .ssobi-public .lke-block-bigbanner::before{content:'';position:absolute;top:-100px;right:-100px;width:280px;height:280px;background:radial-gradient(circle,rgba(0,200,150,.3),transparent 70%)}
+.ssobi-public .lke-block-bigbanner.has-bg::before{display:none}
 .ssobi-public .lke-bigbanner-content{position:relative;z-index:2}
 .ssobi-public .lke-bigbanner-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;color:inherit;opacity:.7;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
 .ssobi-public .lke-bigbanner-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:26px;font-weight:400;line-height:1.05;letter-spacing:-.02em;color:inherit;margin:0}
@@ -526,7 +527,7 @@ function renderBlock(b: Block, i: number) {
     case 'contact':
     case 'bigbanner':
       return (
-        <a key={key} className="lke-block lke-block-bigbanner" href={hrefOf(b)}
+        <a key={key} className={`lke-block lke-block-bigbanner${b.img || b.thumbImg ? ' has-bg' : ''}`} href={hrefOf(b)}
           style={{
             background: b.img ? `url(${b.img}) center/cover` : (b.thumbImg ? `url(${b.thumbImg}) center/cover` : (b.bgSolid as string || b.bg as string || undefined)),
             color: b.textColor as string | undefined

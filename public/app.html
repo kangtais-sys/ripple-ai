@@ -1632,6 +1632,8 @@ body.dev-mode .mitem.dev-only{display:flex!important}
 /* Big Banner */
 #v-link .lke-block-bigbanner{margin:14px 18px;border-radius:18px;overflow:hidden;aspect-ratio:2/1;position:relative;cursor:pointer;display:flex;align-items:flex-end;padding:22px;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff}
 #v-link .lke-block-bigbanner::before{content:'';position:absolute;top:-100px;right:-100px;width:280px;height:280px;background:radial-gradient(circle,rgba(0,200,150,.3),transparent 70%)}
+/* 이미지 배경일 때 mint glow 오버레이 제거 — 이미지 위에 그라디언트 같이 깔리는 거 방지 */
+#v-link .lke-block-bigbanner.has-bg::before{display:none}
 #v-link .lke-bigbanner-content{position:relative;z-index:2}
 #v-link .lke-bigbanner-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;color:inherit;opacity:.7;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
 #v-link .lke-bigbanner-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:26px;font-weight:400;line-height:1.05;letter-spacing:-.02em;color:inherit}
@@ -10153,7 +10155,7 @@ function lkeRenderBlock(b, idx){
       el.appendChild(card);
     });
   } else if(b.type==='bigbanner'){
-    if(b.img){ el.style.background='url('+b.img+') center/cover'; }
+    if(b.img){ el.style.background='url('+b.img+') center/cover'; el.classList.add('has-bg'); }
     else if(b.bgSolid){ el.style.background=b.bgSolid; }
     else if(b.bg){ el.style.background=b.bg; }
     if(b.textColor) el.style.color=b.textColor;
@@ -11084,7 +11086,7 @@ function lkeTemplateBlocks(key){
           {kind:'product',title:'상품명 3',price:'',origPrice:'',date:'',tag:'BEST',tagStyle:'dark',img:'pink',url:''},
           {kind:'product',title:'상품명 4',price:'',origPrice:'',date:'',tag:'',img:'dark',url:''}
         ]},
-        {type:'bigbanner',id:'bbs'+ts,eyebrow:'문의 · 제안',title:'협업·광고<br><em>문의하기.</em>',url:''},
+        {type:'bigbanner',id:'bbs'+ts,eyebrow:'라벨',title:'배너 제목을<br><em>입력하세요</em>',url:''},
         {type:'socials',id:'sos'+ts,items:[{ch:'ig',url:''},{ch:'tk',url:''},{ch:'yt',url:''},{ch:'email',url:''}]}
       ]
     };
