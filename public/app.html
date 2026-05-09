@@ -1753,7 +1753,9 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 #v-link .lke-drag{position:absolute;z-index:11;display:flex;align-items:center;justify-content:center;font-weight:900;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
 #v-link .lke-drag:active{cursor:grabbing;background:var(--mint);color:#fff;border-color:var(--mint);transform:scale(.95)}
 #v-link.lke-preview .lke-drag,#v-link .lke-block-hero .lke-drag{display:none}
-#v-link .lke-block.dragging{opacity:.4;transform:scale(.98);transition:transform .15s}
+#v-link .lke-block.dragging{opacity:.4;transform:scale(.98);transition:transform .15s;pointer-events:none}
+/* 드롭 타겟 — 블록 위쪽 가장자리에 mint 가이드라인 */
+#v-link .lke-block.lke-drop-target{box-shadow:inset 0 4px 0 var(--mint),0 4px 12px rgba(0,200,150,.25)}
 #v-link .lke-block.lke-ready{outline:2px solid var(--mint);outline-offset:3px;transform:scale(1.01);transition:transform .15s,outline .15s;box-shadow:0 8px 22px rgba(0,200,150,.22)}
 #v-link .lke-drop-target{border-top:3px solid var(--mint)}
 
@@ -11046,8 +11048,11 @@ function lkeAttachDnD(el){
   el.addEventListener('drop',function(e){
     e.preventDefault(); this.classList.remove('lke-drop-target');
     var to=+this.dataset.idx; if(lkeDragIdx==null||lkeDragIdx===to||lkeDragIdx===-1||to===-1) return;
-    var moved=lkeState.blocks.splice(lkeDragIdx,1)[0];
-    lkeState.blocks.splice(to,0,moved);
+    var from = lkeDragIdx;
+    var moved=lkeState.blocks.splice(from,1)[0];
+    // splice 이후 from 보다 큰 index 는 1 감소 → to 도 보정
+    var insertAt = from < to ? to - 1 : to;
+    lkeState.blocks.splice(insertAt,0,moved);
     lkeRender();
   });
   el.addEventListener('dragend',function(){
@@ -11149,8 +11154,12 @@ function lkeTouchDragEnd(){
   document.querySelectorAll('.lke-block.lke-drop-target').forEach(function(x){ x.classList.remove('lke-drop-target'); });
   document.querySelectorAll('.lke-block.dragging').forEach(function(x){ x.classList.remove('dragging'); });
   if(_lkTouchOverIdx != null && lkeDragIdx != null && _lkTouchOverIdx !== lkeDragIdx){
-    var moved=lkeState.blocks.splice(lkeDragIdx,1)[0];
-    lkeState.blocks.splice(_lkTouchOverIdx,0,moved);
+    var from = lkeDragIdx;
+    var to = _lkTouchOverIdx;
+    var moved = lkeState.blocks.splice(from, 1)[0];
+    // splice 보정: from < to 면 to 가 1 줄어듦
+    var insertAt = from < to ? to - 1 : to;
+    lkeState.blocks.splice(insertAt, 0, moved);
     lkeRender();
   }
   lkeDragIdx=null; _lkTouchOverIdx=null;
