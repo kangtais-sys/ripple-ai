@@ -9803,7 +9803,9 @@ function lkeRender(){
 function lkeAddZone(idx){
   var z=document.createElement('div');
   z.className='lke-add-zone';
-  z.onclick=function(e){ e.stopPropagation(); window._lkeInsertAt = idx+1; lkeOpenSheet('add-block'); };
+  // addZone(N) = "blocks[N] 위쪽 + 자리". 클릭 시 그 자리에 새 블록 삽입 (blocks 가
+  // 한 칸씩 밀려남). idx=-1 (hero 위) 은 hero 다음 첫 자리(0) 로 처리.
+  z.onclick=function(e){ e.stopPropagation(); window._lkeInsertAt = Math.max(0, idx); lkeOpenSheet('add-block'); };
   return z;
 }
 
