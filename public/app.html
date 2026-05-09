@@ -10248,7 +10248,9 @@ function lkeRenderBlock(b, idx){
     else if(b.bg) el.style.background=b.bg;
     else if(b.bgColor) el.style.background=b.bgColor;
     if(b.textColor) el.style.color=b.textColor;
-    el.innerHTML += '<div class="lke-cd-eyebrow">'+b.eyebrow+'</div><div class="lke-cd-title">'+b.title+'</div><div class="lke-cd-subtitle">'+b.sub+'</div><div class="lke-cd-timer"><div class="lke-cd-unit"><div class="lke-cd-num">03</div><div class="lke-cd-lbl">Hours</div></div><div class="lke-cd-unit"><div class="lke-cd-num">42</div><div class="lke-cd-lbl">Min</div></div><div class="lke-cd-unit"><div class="lke-cd-num">18</div><div class="lke-cd-lbl">Sec</div></div></div><div class="lke-cd-slots">남은 자리 '+b.slots+'</div>';
+    // data-endsat 으로 ticker 가 매초 갱신
+    el.dataset.endsat = b.endsAt || '';
+    el.innerHTML += '<div class="lke-cd-eyebrow">'+(b.eyebrow||'')+'</div><div class="lke-cd-title">'+(b.title||'')+'</div><div class="lke-cd-subtitle">'+(b.sub||'')+'</div><div class="lke-cd-timer"><div class="lke-cd-unit"><div class="lke-cd-num cd-h">03</div><div class="lke-cd-lbl">Hours</div></div><div class="lke-cd-unit"><div class="lke-cd-num cd-m">42</div><div class="lke-cd-lbl">Min</div></div><div class="lke-cd-unit"><div class="lke-cd-num cd-s">18</div><div class="lke-cd-lbl">Sec</div></div></div><div class="lke-cd-slots">남은 자리 '+(b.slots||'')+'</div>';
   } else if(b.type==='section'){
     var isMag = /more|매거진|mag/i.test(b.seeAll||'');
     var kind = isMag ? 'mag' : 'grid';
@@ -10358,6 +10360,38 @@ function lkeRenderBlock(b, idx){
   lkeAttachDnD(el);
   return el;
 }
+// 카운트다운 ticker — 1초마다 모든 countdown 블록의 시간 갱신 (편집기·전역 한 번 시작)
+window.lkeCountdownTickerStarted = window.lkeCountdownTickerStarted || (function(){
+  function tick(){
+    var now = Date.now();
+    document.querySelectorAll('#v-link .lke-block-countdown').forEach(function(el){
+      var endsAt = el.dataset.endsat;
+      var target;
+      if(endsAt){ target = new Date(endsAt).getTime(); }
+      else {
+        // fallback: 오늘 자정 KST (사용자가 endsAt 설정 안 해도 ticker 보이게)
+        var d = new Date(); d.setHours(23,59,59,999); target = d.getTime();
+      }
+      var diff = Math.max(0, target - now);
+      var totalSec = Math.floor(diff/1000);
+      var h = Math.floor(totalSec/3600), m = Math.floor((totalSec%3600)/60), s = totalSec%60;
+      var pad = function(n){ return String(n).padStart(2,'0'); };
+      var hEl = el.querySelector('.cd-h'), mEl = el.querySelector('.cd-m'), sEl = el.querySelector('.cd-s');
+      if(hEl) hEl.textContent = pad(h>=24?Math.floor(h/24):h);
+      if(mEl) mEl.textContent = h>=24 ? pad(h%24) : pad(m);
+      if(sEl) sEl.textContent = h>=24 ? pad(m) : pad(s);
+      // 24h 초과면 라벨도 변경
+      var lbls = el.querySelectorAll('.lke-cd-lbl');
+      if(lbls.length === 3){
+        if(h >= 24){ lbls[0].textContent='Days'; lbls[1].textContent='Hours'; lbls[2].textContent='Min'; }
+        else { lbls[0].textContent='Hours'; lbls[1].textContent='Min'; lbls[2].textContent='Sec'; }
+      }
+    });
+  }
+  setInterval(tick, 1000);
+  setTimeout(tick, 100); // 즉시 한 번
+  return true;
+})();
 
 // 블록 선택 → 편집 시트 렌더
 var lkeSelected = null;
@@ -10917,7 +10951,7 @@ function lkeAddBlock(kind){
   // placeholder text — 클릭해서 내용을 바꿔주세요 형식. 실제 데이터처럼 보이지 않게.
   var defaults = {
     event:{type:'event',id:id,text:'강조 텍스트',sub:'설명을 입력하세요',url:''},
-    countdown:{type:'countdown',id:id,title:'새 카운트다운',sub:'설명',eyebrow:'마감까지',endsAt:'',slots:'남은자리 텍스트를 바꿔주세요',url:''},
+    countdown:{type:'countdown',id:id,title:'새 카운트다운',sub:'설명',eyebrow:'마감까지',endsAt:new Date(Date.now()+24*3600*1000).toISOString().slice(0,16),slots:'남은자리 텍스트를 바꿔주세요',url:''},
     section:{type:'section',id:id,title:'섹션 제목',seeAll:''},
     grid:{type:'grid',id:id,items:[{kind:'product',title:'상품명',price:'',origPrice:'',date:'',tag:'',img:'cream',url:''}]},
     bigbanner:{type:'bigbanner',id:id,eyebrow:'라벨',title:'배너 제목을 입력하세요',url:''},

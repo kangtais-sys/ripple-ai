@@ -64,40 +64,41 @@ type PageData = {
 }
 
 // XSS-safe HTML — em/br 만 허용
-// 카운트다운 타이머 — endsAt (ISO datetime) 까지 남은 시간을 1초마다 갱신
+// 카운트다운 타이머 — endsAt (ISO datetime) 까지 남은 시간을 1초마다 갱신.
+//   endsAt 미설정 시 오늘 자정으로 fallback → 항상 ticker 보임.
 function CountdownTimer({ endsAt }: { endsAt?: string }) {
   const [now, setNow] = useState(() => Date.now())
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 1000)
     return () => clearInterval(t)
   }, [])
-  // endsAt 미설정 시 hardcoded 03:42:18 (placeholder)
-  let h = 3, m = 42, s = 18
+  let target: number
   if (endsAt) {
-    const target = new Date(endsAt).getTime()
-    const diff = Math.max(0, target - now)
-    const totalSec = Math.floor(diff / 1000)
-    h = Math.floor(totalSec / 3600)
-    m = Math.floor((totalSec % 3600) / 60)
-    s = totalSec % 60
-    // 24시간 넘어가면 일/시/분으로 표시
-    if (h >= 24) {
-      const d = Math.floor(h / 24)
-      const remH = h % 24
-      return (
-        <div className="lke-cd-timer">
-          <div className="lke-cd-unit"><div className="lke-cd-num">{String(d).padStart(2, '0')}</div><div className="lke-cd-lbl">Days</div></div>
-          <div className="lke-cd-unit"><div className="lke-cd-num">{String(remH).padStart(2, '0')}</div><div className="lke-cd-lbl">Hours</div></div>
-          <div className="lke-cd-unit"><div className="lke-cd-num">{String(m).padStart(2, '0')}</div><div className="lke-cd-lbl">Min</div></div>
-        </div>
-      )
-    }
+    target = new Date(endsAt).getTime()
+  } else {
+    const d = new Date(); d.setHours(23, 59, 59, 999)
+    target = d.getTime()
+  }
+  const diff = Math.max(0, target - now)
+  const totalSec = Math.floor(diff / 1000)
+  const h = Math.floor(totalSec / 3600)
+  const m = Math.floor((totalSec % 3600) / 60)
+  const s = totalSec % 60
+  const pad = (n: number) => String(n).padStart(2, '0')
+  if (h >= 24) {
+    return (
+      <div className="lke-cd-timer">
+        <div className="lke-cd-unit"><div className="lke-cd-num">{pad(Math.floor(h / 24))}</div><div className="lke-cd-lbl">Days</div></div>
+        <div className="lke-cd-unit"><div className="lke-cd-num">{pad(h % 24)}</div><div className="lke-cd-lbl">Hours</div></div>
+        <div className="lke-cd-unit"><div className="lke-cd-num">{pad(m)}</div><div className="lke-cd-lbl">Min</div></div>
+      </div>
+    )
   }
   return (
     <div className="lke-cd-timer">
-      <div className="lke-cd-unit"><div className="lke-cd-num">{String(h).padStart(2, '0')}</div><div className="lke-cd-lbl">Hours</div></div>
-      <div className="lke-cd-unit"><div className="lke-cd-num">{String(m).padStart(2, '0')}</div><div className="lke-cd-lbl">Min</div></div>
-      <div className="lke-cd-unit"><div className="lke-cd-num">{String(s).padStart(2, '0')}</div><div className="lke-cd-lbl">Sec</div></div>
+      <div className="lke-cd-unit"><div className="lke-cd-num">{pad(h)}</div><div className="lke-cd-lbl">Hours</div></div>
+      <div className="lke-cd-unit"><div className="lke-cd-num">{pad(m)}</div><div className="lke-cd-lbl">Min</div></div>
+      <div className="lke-cd-unit"><div className="lke-cd-num">{pad(s)}</div><div className="lke-cd-lbl">Sec</div></div>
     </div>
   )
 }
