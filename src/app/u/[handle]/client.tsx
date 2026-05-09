@@ -256,10 +256,11 @@ const PUBLIC_CSS = `
 .ssobi-public .ssobi-credit{text-align:center;font-size:10px;opacity:.5;font-weight:600;margin:16px 0 90px;letter-spacing:.4px}
 .ssobi-public .ssobi-credit a{color:inherit;text-decoration:none}
 .ssobi-public .ssobi-credit em{color:var(--mint);font-style:normal}
-.ssobi-public .ssobi-fab{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));right:20px;min-width:52px;height:52px;padding:0 18px;border-radius:26px;background:#1A1F27;color:#fff;border:none;cursor:pointer;box-shadow:0 8px 20px rgba(15,19,25,.28);display:inline-flex;align-items:center;gap:8px;font-family:'Pretendard',sans-serif;font-size:13px;font-weight:700;text-decoration:none;letter-spacing:-.2px}
-.ssobi-public .ssobi-fab > span:first-child{font-size:22px;line-height:1}
-.ssobi-public .ssobi-fab-label{font-size:13px;font-weight:700}
+.ssobi-public .ssobi-fab{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));right:20px;min-width:52px;height:52px;padding:0 18px;border-radius:26px;background:#1A1F27;color:#fff;border:none;cursor:pointer;box-shadow:0 8px 20px rgba(15,19,25,.28);display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:'Pretendard',sans-serif;font-size:13px;font-weight:700;text-decoration:none;letter-spacing:-.2px}
+.ssobi-public .ssobi-fab svg{stroke:currentColor;fill:none;flex-shrink:0}
+.ssobi-public .ssobi-fab-label{font-size:13px;font-weight:700;line-height:1}
 .ssobi-public a.ssobi-fab:hover{filter:brightness(1.1)}
+.ssobi-public .ssobi-fab:active{transform:scale(.96)}
 `
 
 export default function LinkPageClient({ page }: { page: PageData }) {
@@ -323,20 +324,30 @@ export default function LinkPageClient({ page }: { page: PageData }) {
 
         {(() => {
           const fab = (page.settings as { fab?: { enabled?: boolean; icon?: string; mode?: string; url?: string; label?: string } })?.fab
-          // 명시적으로 비활성화 됐으면 숨김. 미설정(undefined)은 기본 활성 (메시지 + 제안)
           if (fab && fab.enabled === false) return null
-          const icon = fab?.icon === 'kakao' ? '💬' : (fab?.icon === 'mail' ? '📧' : '💌')
+          const iconKey = (fab?.icon || 'message') as 'message' | 'chat' | 'kakao' | 'mail'
+          const Icon = () => {
+            if (iconKey === 'mail') return (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" /><polyline points="22,6 12,13 2,6" /></svg>
+            )
+            if (iconKey === 'chat' || iconKey === 'kakao') return (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" /></svg>
+            )
+            return (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" /></svg>
+            )
+          }
           const label = fab?.label || ''
           if (fab?.mode === 'link' && fab.url) {
             return (
               <a className="ssobi-fab" href={fab.url} target="_blank" rel="noopener noreferrer" aria-label={label || '제안하기'}>
-                <span>{icon}</span>{label && <span className="ssobi-fab-label">{label}</span>}
+                <Icon />{label && <span className="ssobi-fab-label">{label}</span>}
               </a>
             )
           }
           return (
             <button className="ssobi-fab" onClick={() => setProposing(true)} aria-label={label || '제안하기'}>
-              <span>{icon}</span>{label && <span className="ssobi-fab-label">{label}</span>}
+              <Icon />{label && <span className="ssobi-fab-label">{label}</span>}
             </button>
           )
         })()}
