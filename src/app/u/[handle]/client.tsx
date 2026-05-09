@@ -127,7 +127,7 @@ const PUBLIC_CSS = `
 .ssobi-public[data-theme-applied="1"] .lke-block-link .l-sub{color:var(--lke-text-color, var(--t2)) !important}
 /* HERO — has-bg 시 강한 그라디언트 오버레이로 텍스트 가독성 확보 */
 .ssobi-public .lke-hero-carousel{position:relative}
-.ssobi-public .lke-hero-banner{aspect-ratio:4/5;background:#1A1F27;color:#fff;position:relative;overflow:hidden;padding:32px 24px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;text-decoration:none}
+.ssobi-public .lke-hero-banner{aspect-ratio:4/5;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff;position:relative;overflow:hidden;padding:32px 24px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;text-decoration:none}
 .ssobi-public .lke-hero-banner[data-valign='middle']{justify-content:center;gap:14px}
 .ssobi-public .lke-hero-banner[data-valign='bottom']{justify-content:flex-end;gap:14px}
 .ssobi-public a.lke-hero-banner{color:#fff;cursor:pointer;transition:filter .2s}

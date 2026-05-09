@@ -1556,7 +1556,7 @@ body.dev-mode .mitem.dev-only{display:flex!important}
 #v-link .lke-add-zone:hover::after{transform:translate(-50%,-50%) scale(1)}
 
 /* Hero Banner — 다크 + 민트 */
-#v-link .lke-hero-banner{aspect-ratio:4/5;background:#1A1F27;color:#fff;position:relative;overflow:hidden;padding:28px 22px;display:flex;flex-direction:column;justify-content:space-between}
+#v-link .lke-hero-banner{aspect-ratio:4/5;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff;position:relative;overflow:hidden;padding:28px 22px;display:flex;flex-direction:column;justify-content:space-between}
 /* 그라디 글로우 제거 — has-bg (이미지 있을 때) 만 dim 오버레이 유지 */
 #v-link .lke-hero-banner::before{content:none}
 #v-link .lke-hero-banner-top{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:flex-start}
@@ -1801,11 +1801,15 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 #v-link .lke-hero-banner[data-valign='top']{justify-content:space-between}
 #v-link .lke-hero-banner[data-valign='middle']{justify-content:center;gap:14px}
 #v-link .lke-hero-banner[data-valign='bottom']{justify-content:flex-end;gap:14px}
-/* 자유 위치 (main_pos 있을 때) — 절대 위치 + 드래그 */
-#v-link .lke-hero-banner-main[data-positioned="1"]{position:absolute;margin:0;max-width:calc(100% - 36px);cursor:move;touch-action:none}
+/* 메인 텍스트 영역 — 항상 드래그 가능. 우측상단에 손잡이 표시 (pos 여부 무관) */
+#v-link .lke-hero-banner-main{cursor:move;touch-action:none}
+#v-link .lke-hero-banner-main::after{content:'⇲ 옮기기';position:absolute;top:-8px;right:-8px;background:rgba(255,255,255,.92);color:var(--mint-d);font-family:'Pretendard',sans-serif;font-size:9.5px;font-weight:800;padding:4px 8px;border-radius:100px;letter-spacing:-.1px;white-space:nowrap;box-shadow:0 2px 6px rgba(15,19,25,.18);pointer-events:none;opacity:0;transition:opacity .15s}
+#v-link .lke-hero-banner-main:hover::after,#v-link .lke-hero-banner-main.dragging::after{opacity:1}
+#v-link.lke-preview .lke-hero-banner-main::after{display:none}
+#v-link .lke-hero-banner-main[data-positioned="1"]{position:absolute;margin:0;max-width:calc(100% - 36px)}
 #v-link .lke-hero-banner-main[data-positioned="1"]::before{content:'';position:absolute;inset:-8px;border:1.5px dashed transparent;border-radius:8px;pointer-events:none;transition:border-color .15s}
 #v-link .lke-hero-banner-main[data-positioned="1"]:hover::before,#v-link .lke-hero-banner-main[data-positioned="1"].dragging::before{border-color:rgba(0,200,150,.55)}
-#v-link .lke-hero-banner-main[data-positioned="1"].dragging{opacity:.85}
+#v-link .lke-hero-banner-main.dragging{opacity:.85}
 #v-link .lke-hero-stat.menu-on .lke-hero-stat-menu{display:flex}
 #v-link .lke-hero-stat-menu button{border:none;background:none;padding:7px 10px;font-size:11.5px;font-weight:700;text-align:left;color:var(--t1);cursor:pointer;border-radius:4px;font-family:'Pretendard',sans-serif}
 #v-link .lke-hero-stat-menu button:hover{background:var(--bg)}
@@ -3336,6 +3340,9 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
   <!-- 히어로 텍스트 정렬 미니 툴바 -->
   <div class="lke-align-bar" id="lke-align-bar" onmousedown="event.preventDefault()">
+    <button type="button" onmousedown="event.preventDefault()" onclick="lkeRichExec('bold')" title="굵게" style="font-weight:900"><b>B</b></button>
+    <button type="button" onmousedown="event.preventDefault()" onclick="lkeRichExec('italic')" title="기울임"><i>I</i></button>
+    <span class="sep"></span>
     <button type="button" onmousedown="event.preventDefault()" onclick="lkeSetAlign('left')" title="왼쪽 정렬"><span data-i18n="lke.align.left">왼쪽</span></button>
     <button type="button" onmousedown="event.preventDefault()" onclick="lkeSetAlign('center')" title="가운데 정렬"><span data-i18n="lke.align.center">가운데</span></button>
     <button type="button" onmousedown="event.preventDefault()" onclick="lkeSetAlign('right')" title="오른쪽 정렬"><span data-i18n="lke.align.right">오른쪽</span></button>
@@ -3403,6 +3410,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         <input type="text" class="lke-field-input" id="lke-fab-url" data-i18n-ph="lke.settings.fab.url_ph" placeholder="https://... 또는 mailto:hello@email.com" style="display:none">
         <div style="font-size:11.5px;font-weight:700;color:var(--t2);margin:10px 0 6px" data-i18n="lke.settings.fab.label">버튼 옆 안내 문구 (선택)</div>
         <input type="text" class="lke-field-input" id="lke-fab-label" data-i18n-ph="lke.settings.fab.label_ph" placeholder="예: 협업 문의 / DM 으로 받기">
+        <button type="button" onclick="lkeFabDelete()" style="margin-top:14px;padding:10px;width:100%;background:none;border:1px solid var(--red);color:var(--red);border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif" data-i18n="lke.settings.fab.delete">제안 버튼 삭제 (페이지에서 안 보임)</button>
       </div>
     </div>
 
@@ -6171,6 +6179,7 @@ var I18N = {
     'lke.settings.fab.url_ph':'https://... 또는 mailto:hello@email.com',
     'lke.settings.fab.label':'버튼 옆 안내 문구 (선택)',
     'lke.settings.fab.label_ph':'예: 협업 문의 / DM 으로 받기',
+    'lke.settings.fab.delete':'제안 버튼 삭제 (페이지에서 안 보임)',
     'link.stats':'통계',
     'link.stats.title':'링크 통계',
     'link.stats.sub':'방문자 수와 링크별 클릭 수를 확인하세요',
@@ -6985,6 +6994,7 @@ var I18N = {
     'lke.settings.fab.url_ph':'https://... or mailto:hello@email.com',
     'lke.settings.fab.label':'Label next to button (optional)',
     'lke.settings.fab.label_ph':'e.g. Collab inquiry / DM me',
+    'lke.settings.fab.delete':'Delete floating button (hide from page)',
     'link.stats':'Stats',
     'link.stats.title':'Link analytics',
     'link.stats.sub':'See visitors and per-link click counts',
@@ -11075,6 +11085,14 @@ function lkeFabPickIcon(icon){
     b.classList.toggle('on', b.dataset.icon === icon);
   });
 }
+function lkeFabDelete(){
+  if(!confirm('제안 버튼을 삭제할까요? 페이지에서 안 보이게 됩니다.')) return;
+  if(!lkeState.settings) lkeState.settings = {};
+  lkeState.settings.fab = { enabled: false };
+  if(typeof lkeUpdateFabPreview === 'function') lkeUpdateFabPreview();
+  if(typeof lkeSyncToServer === 'function') lkeSyncToServer();
+  lkeCloseSheet();
+}
 function lkeFabToggleUrlInput(){
   var mode = (document.querySelector('input[name="fab_mode"]:checked')||{}).value || 'proposal';
   document.getElementById('lke-fab-url').style.display = (mode === 'link') ? 'block' : 'none';
@@ -11376,6 +11394,20 @@ function lkeSetAlign(align){
     var newEl = document.querySelector('.lke-editable-text[data-si="'+si+'"][data-key="'+key+'"]');
     if(newEl) newEl.focus();
   }, 50);
+}
+// 히어로 텍스트 B/I — 현재 편집 중 element 의 selection 에 적용 + state 동기화
+function lkeRichExec(cmd){
+  if(!_lkeAlignEl) return;
+  _lkeAlignEl.focus();
+  try { document.execCommand(cmd); } catch(e){}
+  // oninput 핸들러가 자동으로 state 갱신하지만, focus 회복을 위해 명시적 sync
+  var si = +_lkeAlignEl.dataset.si;
+  var key = _lkeAlignEl.dataset.key;
+  var s = lkeState.hero.slides[si];
+  if(key === 'title') s.title = lkeStripWrappers(_lkeAlignEl.innerHTML);
+  else if(key === 'sub') s.sub = lkeStripWrappers(_lkeAlignEl.innerHTML);
+  else if(key === 'brand') s.brand = _lkeAlignEl.innerText;
+  if(typeof lkeSyncToServer === 'function') lkeSyncToServer();
 }
 
 // 정렬 바의 삭제 — 현재 편집 중인 hero 텍스트 비우기 (eyebrow/brand/title/sub)
