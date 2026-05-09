@@ -8,6 +8,8 @@ type Block = {
   title?: string
   sub?: string
   sub2?: string
+  imgPos?: string
+  thumbPos?: string
   text?: string
   url?: string
   code?: string
@@ -386,7 +388,8 @@ export default function LinkPageClient({ page }: { page: PageData }) {
 function Hero({ slide, handle, compact }: { slide: HeroSlide; handle: string; compact: boolean }) {
   const hasBg = !!slide.bg
   const cls = ['lke-hero-banner', compact ? 'compact' : '', hasBg ? 'has-bg' : ''].filter(Boolean).join(' ')
-  const style: React.CSSProperties = hasBg ? { backgroundImage: `url(${slide.bg})` } : {}
+  const heroBgPos = (slide as { bgPos?: string }).bgPos || 'center'
+  const style: React.CSSProperties = hasBg ? { backgroundImage: `url(${slide.bg})`, backgroundPosition: heroBgPos, backgroundSize: 'cover' } : {}
   const linkUrl = slide.ctaUrl || ''
   const ctaJustify = ({ left: 'flex-start', center: 'center', right: 'flex-end' } as const)[(slide.cta_align as 'left'|'center'|'right') || 'right']
   const inner = (
@@ -446,7 +449,7 @@ function renderBlock(b: Block, i: number) {
     case 'event':
       return (
         <a key={key} className="lke-block lke-block-event" href={hrefOf(b)}
-          style={{ background: b.img ? `url(${b.img}) center/cover` : (b.bgColor || b.bgSolid || b.bg), color: b.textColor }}>
+          style={{ background: b.img ? `url(${b.img}) ${b.imgPos || 'center'}/cover` : (b.bgColor || b.bgSolid || b.bg), color: b.textColor }}>
           <div className="lke-event-left">
             <div className="lke-event-dot" />
             <div className="lke-event-text">
@@ -461,7 +464,7 @@ function renderBlock(b: Block, i: number) {
     case 'countdown':
       return (
         <a key={key} className="lke-block lke-block-countdown" href={hrefOf(b)}
-          style={{ background: b.img ? `url(${b.img}) center/cover` : (b.bgColor || b.bgSolid || b.bg), color: b.textColor }}>
+          style={{ background: b.img ? `url(${b.img}) ${b.imgPos || 'center'}/cover` : (b.bgColor || b.bgSolid || b.bg), color: b.textColor }}>
           {b.eyebrow && <div className="lke-cd-eyebrow" dangerouslySetInnerHTML={safeHtml(b.eyebrow)} />}
           <div className="lke-cd-title" dangerouslySetInnerHTML={safeHtml(b.title)} />
           {b.sub && <div className="lke-cd-subtitle" dangerouslySetInnerHTML={safeHtml(b.sub)} />}
@@ -491,7 +494,7 @@ function renderBlock(b: Block, i: number) {
             const isProduct = it.kind === 'product' || !it.kind
             const imgClass = `lke-product-img ${it.img || 'cream'}`
             const thumbStyle: React.CSSProperties = it.thumbImg
-              ? { background: `url(${it.thumbImg}) center/cover` }
+              ? { background: `url(${it.thumbImg}) ${(it as { thumbPos?: string }).thumbPos || 'center'}/cover` }
               : {}
             return (
               <a key={ci} className="lke-product-card" href={cardHref}>
@@ -519,7 +522,7 @@ function renderBlock(b: Block, i: number) {
       return (
         <a key={key} className={`lke-block lke-block-mag ${b.theme || 'm1'}`} href={hrefOf(b)}
           style={{
-            background: b.img ? `url(${b.img}) center/cover` : (b.thumbImg ? `url(${b.thumbImg}) center/cover` : (b.bgSolid as string || b.bg as string || undefined)),
+            background: b.img ? `url(${b.img}) ${b.imgPos || 'center'}/cover` : (b.thumbImg ? `url(${b.thumbImg}) center/cover` : (b.bgSolid as string || b.bg as string || undefined)),
             color: b.textColor as string | undefined
           }}>
           {b.label && <span className="lke-mag-label">{b.label}</span>}
@@ -531,7 +534,7 @@ function renderBlock(b: Block, i: number) {
     case 'bigbanner': {
       const hasBg = !!(b.img || b.thumbImg)
       const cardStyle: React.CSSProperties = {
-        background: b.img ? `url(${b.img}) center/cover` : (b.thumbImg ? `url(${b.thumbImg}) center/cover` : (b.bgSolid as string || b.bg as string || undefined)),
+        background: b.img ? `url(${b.img}) ${b.imgPos || 'center'}/cover` : (b.thumbImg ? `url(${b.thumbImg}) center/cover` : (b.bgSolid as string || b.bg as string || undefined)),
         color: b.textColor as string | undefined
       }
       const sub2 = (b as { sub2?: string }).sub2

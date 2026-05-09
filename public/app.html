@@ -10048,7 +10048,11 @@ function lkeRenderHero(){
   if(heroCompact) wrap.classList.add('compact');
   lkeState.hero.slides.forEach(function(s, si){
     var slide=document.createElement('div'); slide.className='lke-hero-banner' + (heroCompact ? ' compact' : '');
-    if(s.bg){ slide.classList.add('has-bg'); slide.style.backgroundImage='url('+s.bg+')'; }
+    if(s.bg){
+      slide.classList.add('has-bg');
+      slide.style.backgroundImage='url('+s.bg+')';
+      slide.style.backgroundPosition = (s.bgPos || 'center');
+    }
     slide.dataset.si=si;
     slide.dataset.valign = s.main_valign || 'top';
     var canDelete = lkeState.hero.slides.length > 1;
@@ -10056,6 +10060,7 @@ function lkeRenderHero(){
       '<div class="lke-hero-tools">'+
         '<button class="lke-hero-tool" aria-label="배너 추가" onclick="event.stopPropagation();lkeAddHeroSlide()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></button>'+
         '<button class="lke-hero-tool" aria-label="배경 변경" onclick="event.stopPropagation();lkeHeroUploadBg('+si+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button>'+
+        (s.bg ? '<button class="lke-hero-tool" aria-label="이미지 위치 조정" onclick="event.stopPropagation();lkeOpenImgPosPicker(\'hero\','+si+')" title="이미지 위치"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke-linecap="round"/></svg></button>' : '')+
         '<button class="lke-hero-tool" aria-label="텍스트 위치" onclick="event.stopPropagation();lkeCycleHeroValign('+si+')" title="위/중/아래"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h12M3 18h18" stroke-linecap="round"/></svg></button>'+
         (canDelete ? '<button class="lke-hero-tool del" aria-label="배너 삭제" onclick="event.stopPropagation();lkeDeleteHeroSlide('+si+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M6 18L18 6" stroke-linecap="round"/></svg></button>' : '')+
       '</div>'+
@@ -10257,7 +10262,7 @@ function lkeRenderBlock(b, idx){
       card.addEventListener('dragend', function(){ this.style.opacity=''; window._lkeCardDrag=null; });
       var imgClass = it.img||'cream';
       var thumbStyle = '';
-      if(it.thumbImg) thumbStyle = 'background:url('+it.thumbImg+') center/cover';
+      if(it.thumbImg) thumbStyle = 'background:url('+it.thumbImg+') '+(it.thumbPos||'center')+'/cover';
       else if(it.thumbBg) thumbStyle = 'background:'+it.thumbBg;
       var priceHtml = (it.kind==='product' || !it.kind) ? '<div class="lke-product-info-price"><span class="lke-price-sale">'+(it.price||'')+'</span>'+(it.origPrice?'<span class="lke-price-orig">'+it.origPrice+'</span>':'')+'</div>' : '';
       card.innerHTML =
@@ -10272,7 +10277,7 @@ function lkeRenderBlock(b, idx){
     // 시각 카드 (배너) + 본문2 (배너 밖 아래) 분리
     var cardCls = 'lke-bigbanner-card' + (b.img ? ' has-bg' : '');
     var cardStyle = '';
-    if(b.img) cardStyle = 'background:url('+b.img+') center/cover';
+    if(b.img) cardStyle = 'background:url('+b.img+') '+(b.imgPos||'center')+'/cover';
     else if(b.bgSolid) cardStyle = 'background:'+b.bgSolid;
     else if(b.bg) cardStyle = 'background:'+b.bg;
     if(b.textColor) cardStyle += ';color:'+b.textColor;
@@ -10673,7 +10678,8 @@ function lkeColorPickerHtml(id, current, palette, label, opts){
   return lkeSpectrumHtml(id, current, label);
 }
 function lkeImageUploadHtml(idx, currentImg, label){
-  return '<div class="lke-field-label">'+label+'</div><label style="display:block;margin-bottom:12px"><input type="file" accept="image/*" onchange="lkeImageUpload('+idx+',this)" style="display:none"><div style="padding:12px;border:1.5px dashed #D6D3D1;text-align:center;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;background:#fff;border-radius:8px">'+(currentImg?'이미지 변경 ✓':'사진 선택')+'</div></label>';
+  return '<div class="lke-field-label">'+label+'</div><label style="display:block;margin-bottom:8px"><input type="file" accept="image/*" onchange="lkeImageUpload('+idx+',this)" style="display:none"><div style="padding:12px;border:1.5px dashed #D6D3D1;text-align:center;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;background:#fff;border-radius:8px">'+(currentImg?'이미지 변경 ✓':'사진 선택')+'</div></label>'+
+    (currentImg ? '<button type="button" onclick="lkeOpenImgPosPicker(\'block\','+idx+')" style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:var(--bg);border:1px solid var(--b);border-radius:8px;font-size:12px;font-weight:700;color:var(--t1);cursor:pointer;font-family:\'Pretendard\',sans-serif;margin-bottom:12px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke-linecap="round"/></svg>이미지 위치 조정</button>' : '');
 }
 function lkeTextStyleHtml(b){
   window._lkeStyleEdit = {bold: b.bold!==false, italic: !!b.italic, textColor: b.textColor||'#FFFFFF'};
@@ -11514,6 +11520,63 @@ function lkeHeroRemoveCta(si){
   lkeRender();
   if(typeof lkeSyncToServer === 'function') lkeSyncToServer();
 }
+// 이미지 위치 조정 — 9-grid 모달 (메인배너 hero / 빅배너 / 그리드 카드)
+//   target: 'hero' (slide.bgPos) | 'block' (block.imgPos) | 'griditem' (item.thumbPos)
+//   id: target 별 idx (hero=si, block=blockIdx, griditem='blockIdx_cardIdx')
+function lkeOpenImgPosPicker(target, id){
+  // 현재 위치 읽기
+  var current = 'center';
+  if(target === 'hero') current = lkeState.hero.slides[id]?.bgPos || 'center';
+  else if(target === 'block') current = lkeState.blocks[id]?.imgPos || 'center';
+  else if(target === 'griditem'){
+    var parts = (''+id).split('_'); var bi = +parts[0], ci = +parts[1];
+    current = lkeState.blocks[bi]?.items[ci]?.thumbPos || 'center';
+  }
+  var positions = [
+    ['top left','left top','↖'],['top','center top','↑'],['top right','right top','↗'],
+    ['left','left center','←'],['center','center','◎'],['right','right center','→'],
+    ['bottom left','left bottom','↙'],['bottom','center bottom','↓'],['bottom right','right bottom','↘']
+  ];
+  var existing = document.getElementById('m-img-pos'); if(existing) existing.remove();
+  var ov = document.createElement('div');
+  ov.id = 'm-img-pos';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:300;background:rgba(15,19,25,.55);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px';
+  ov.innerHTML =
+    '<div style="background:#fff;border-radius:18px;padding:22px;max-width:340px;width:100%;font-family:\'Pretendard\',sans-serif">'+
+      '<div style="font-size:16px;font-weight:800;color:var(--t1);letter-spacing:-.3px;margin-bottom:6px">이미지 위치 조정</div>'+
+      '<div style="font-size:12px;color:var(--t3);line-height:1.5;margin-bottom:14px">이미지가 잘리는 위치를 9개 중 골라요. 가운데가 기본.</div>'+
+      '<div id="img-pos-grid" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:16px"></div>'+
+      '<button id="img-pos-close" style="width:100%;padding:12px;background:var(--mint);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:\'Pretendard\',sans-serif">완료</button>'+
+    '</div>';
+  document.body.appendChild(ov);
+  var grid = ov.querySelector('#img-pos-grid');
+  positions.forEach(function(p){
+    var b = document.createElement('button');
+    var isOn = (current === p[0] || current === p[1]);
+    b.style.cssText = 'aspect-ratio:1;font-size:18px;background:'+(isOn?'var(--mint-l)':'#fff')+';border:1.5px solid '+(isOn?'var(--mint)':'var(--b)')+';border-radius:8px;cursor:pointer;color:'+(isOn?'var(--mint-d)':'var(--t2)')+';font-weight:700;font-family:\'Pretendard\',sans-serif';
+    b.textContent = p[2];
+    b.onclick = function(){
+      var newPos = p[1]; // 'left top', 'center top', etc. — CSS background-position 형식
+      if(target === 'hero'){
+        lkeState.hero.slides[id].bgPos = newPos;
+      } else if(target === 'block'){
+        lkeState.blocks[id].imgPos = newPos;
+      } else if(target === 'griditem'){
+        var parts = (''+id).split('_'); var bi = +parts[0], ci = +parts[1];
+        lkeState.blocks[bi].items[ci].thumbPos = newPos;
+      }
+      // 즉시 미리보기 업데이트 (해당 element 직접 수정 — 전체 re-render 안 해서 모달 안 닫힘)
+      grid.querySelectorAll('button').forEach(function(x){ x.style.background='#fff'; x.style.borderColor='var(--b)'; x.style.color='var(--t2)'; });
+      b.style.background='var(--mint-l)'; b.style.borderColor='var(--mint)'; b.style.color='var(--mint-d)';
+      // 실시간 lkeRender
+      lkeRender();
+      if(typeof lkeSyncToServer === 'function') lkeSyncToServer();
+    };
+    grid.appendChild(b);
+  });
+  ov.querySelector('#img-pos-close').onclick = function(){ ov.remove(); };
+  ov.onclick = function(e){ if(e.target === ov) ov.remove(); };
+}
 function lkeSetHeroCtaAlign(si, align){
   lkeState.hero.slides[si].cta_align = align;
   lkeRender();
@@ -11650,6 +11713,7 @@ function lkeEditGridCard(blockIdx, cardIdx){
     '</div>'+
     lkeField('URL','url','ci-url',it.url)+
     '<div class="lke-field-label">썸네일 이미지</div><label style="display:block;margin-bottom:10px"><input type="file" accept="image/*" onchange="lkeCardImageUpload('+blockIdx+','+cardIdx+',this)" style="display:none"><div style="padding:10px;border:1.5px dashed #D6D3D1;text-align:center;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;border-radius:6px">'+(it.thumbImg?'이미지 변경 ✓':'사진 선택')+'</div></label>'+
+    (it.thumbImg ? '<button type="button" onclick="lkeOpenImgPosPicker(\'griditem\',\''+blockIdx+'_'+cardIdx+'\')" style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:var(--bg);border:1px solid var(--b);border-radius:8px;font-size:12px;font-weight:700;color:var(--t1);cursor:pointer;font-family:\'Pretendard\',sans-serif;margin-bottom:10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke-linecap="round"/></svg>이미지 위치 조정</button>' : '')+
     '<div class="lke-field-label">썸네일 배경 (이미지 없을 때)</div>'+
     '<div style="display:flex;gap:6px;margin-bottom:14px">'+
       [['cream','#F5EDD8→#D4B896'],['coral','#A7F3D0→#00C896'],['pink','#FFE8DC→#FFB098'],['dark','#374151→#1A1F27']].map(function(p){ return '<button onclick="lkeCardImg('+blockIdx+','+cardIdx+',\''+p[0]+'\')" style="flex:1;height:36px;border-radius:6px;border:2px solid '+((it.img||'cream')===p[0]?'var(--mint)':'transparent')+';background:'+({cream:'linear-gradient(135deg,#F5EDD8,#D4B896)',coral:'linear-gradient(135deg,#A7F3D0,#00C896)',pink:'linear-gradient(135deg,#FFE8DC,#FFB098)',dark:'linear-gradient(135deg,#374151,#1A1F27)'}[p[0]])+';cursor:pointer"></button>'; }).join('')+
