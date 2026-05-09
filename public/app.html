@@ -10068,9 +10068,9 @@ function lkeRenderHero(){
         (canDelete ? '<button class="lke-hero-tool del" aria-label="배너 삭제" onclick="event.stopPropagation();lkeDeleteHeroSlide('+si+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M6 18L18 6" stroke-linecap="round"/></svg></button>' : '')+
       '</div>'+
       '<div class="lke-hero-banner-main"'+(s.main_pos ? ' data-positioned="1" style="text-align:'+(s.main_align||'left')+';left:'+s.main_pos.x+'%;top:'+s.main_pos.y+'%"' : ' style="text-align:'+(s.main_align||'left')+'"')+'>'+
-        '<div class="lke-hero-brand lke-editable-text" data-key="brand" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" onkeydown="lkeHeroEnterFix(event)" oninput="lkeState.hero.slides['+si+'].brand=this.innerText;lkeSyncToServer()">'+(s.brand||'')+'</div>'+
-        '<h1 class="lke-hero-title lke-editable-text" data-key="title" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" onkeydown="lkeHeroEnterFix(event)" oninput="lkeState.hero.slides['+si+'].title=lkeStripWrappers(this.innerHTML);lkeSyncToServer()">'+(s.title||'')+'</h1>'+
-        '<div class="lke-hero-subtitle lke-editable-text" data-key="sub" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" onkeydown="lkeHeroEnterFix(event)" oninput="lkeState.hero.slides['+si+'].sub=lkeStripWrappers(this.innerHTML);lkeSyncToServer()">'+(s.sub||'')+'</div>'+
+        '<div class="lke-hero-brand lke-editable-text" data-key="brand" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" onkeydown="lkeHeroEnterFix(event)" onkeyup="lkeSaveSel()" onmouseup="lkeSaveSel()" ontouchend="lkeSaveSel()" oninput="lkeState.hero.slides['+si+'].brand=this.innerText;lkeSyncToServer()">'+(s.brand||'')+'</div>'+
+        '<h1 class="lke-hero-title lke-editable-text" data-key="title" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" onkeydown="lkeHeroEnterFix(event)" onkeyup="lkeSaveSel()" onmouseup="lkeSaveSel()" ontouchend="lkeSaveSel()" oninput="lkeState.hero.slides['+si+'].title=lkeStripWrappers(this.innerHTML);lkeSyncToServer()">'+(s.title||'')+'</h1>'+
+        '<div class="lke-hero-subtitle lke-editable-text" data-key="sub" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" onkeydown="lkeHeroEnterFix(event)" onkeyup="lkeSaveSel()" onmouseup="lkeSaveSel()" ontouchend="lkeSaveSel()" oninput="lkeState.hero.slides['+si+'].sub=lkeStripWrappers(this.innerHTML);lkeSyncToServer()">'+(s.sub||'')+'</div>'+
       '</div>'+
       '<div class="lke-hero-banner-bottom" style="justify-content:'+({left:'flex-start',center:'center',right:'flex-end'}[s.cta_align||'right'])+'">'+
         ((s.cta_hidden || !s.cta) ?
@@ -10194,6 +10194,8 @@ function lkeHeroUploadBg(si){
       window.lkeActiveSlide = si;
       lkeRender();
       if(typeof lkeShowToast === 'function') lkeShowToast('✓ 업로드 완료');
+      // 업로드 직후 위치 조정 모달 자동 오픈
+      setTimeout(function(){ lkeOpenImgPosPicker('hero', si); }, 200);
     });
   };
   inp.click();
@@ -10719,6 +10721,8 @@ function lkeCardImageUpload(bIdx, cIdx, inp){
     lkeRender();
     lkeEditGridCard(bIdx,cIdx);
     if(typeof lkeShowToast === 'function') lkeShowToast('✓ 업로드 완료');
+    // 업로드 직후 위치 조정 모달 자동 오픈
+    setTimeout(function(){ lkeOpenImgPosPicker('griditem', bIdx + '_' + cIdx); }, 200);
   });
 }
 function lkeCardImg(bIdx, cIdx, key){
@@ -10843,6 +10847,8 @@ function lkeImageUpload(idx, inp){
     lkeRender();
     lkeRenderEditForm(lkeState.blocks[idx],idx);
     if(typeof lkeShowToast === 'function') lkeShowToast('✓ 업로드 완료');
+    // 업로드 직후 위치 조정 모달 자동 오픈
+    setTimeout(function(){ lkeOpenImgPosPicker('block', idx); }, 200);
   });
 }
 
@@ -11486,24 +11492,37 @@ function lkeSetAlign(align){
     if(newEl) newEl.focus();
   }, 50);
 }
-// 히어로 텍스트 B/I — 현재 편집 중 element 의 selection 에 토글 + state 동기화.
-//   document.execCommand('bold') 는 toggle 작동하지만 모바일에서 selection 잃으면 다시 누를
-//   때 해제 안 됨. selection 보존 + queryCommandState 로 강제 토글.
+// 마지막 selection 추적 — B/I 클릭 시 선택영역이 사라져도 복원할 수 있게
+var _lkeLastRange = null;
+function lkeSaveSel(){
+  try {
+    var sel = window.getSelection();
+    if(sel && sel.rangeCount > 0 && _lkeAlignEl && _lkeAlignEl.contains(sel.anchorNode)){
+      _lkeLastRange = sel.getRangeAt(0).cloneRange();
+    }
+  } catch(_){}
+}
+// 히어로 텍스트 B/I — selection 복원 후 execCommand 토글
 function lkeRichExec(cmd){
   if(!_lkeAlignEl) return;
-  // selection 이 lke-editable-text 안에 있는지 확인
-  var sel = window.getSelection();
-  var inEl = sel && sel.rangeCount > 0 && _lkeAlignEl.contains(sel.anchorNode);
-  if(!inEl){
-    // selection 없으면 element 전체 선택 (전체 적용)
-    _lkeAlignEl.focus();
-    var range = document.createRange();
-    range.selectNodeContents(_lkeAlignEl);
-    sel.removeAllRanges();
-    sel.addRange(range);
+  _lkeAlignEl.focus();
+  // 직전 selection 복원 (B/I 버튼 누르며 selection 잃었을 때 대비)
+  if(_lkeLastRange){
+    try {
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(_lkeLastRange);
+    } catch(_){}
   }
-  try { document.execCommand(cmd); } catch(e){}
-  // 강제 sync
+  // styleWithCSS=false → <strong>/<em> 같은 시맨틱 태그 사용 (퍼블릭 페이지 safeHtml 호환)
+  try { document.execCommand('styleWithCSS', false, false); } catch(_){}
+  try { document.execCommand(cmd === 'bold' ? 'bold' : 'italic'); } catch(e){}
+  // 새 selection 저장 (toggle 후 selection 그대로)
+  try {
+    var sel2 = window.getSelection();
+    if(sel2 && sel2.rangeCount > 0) _lkeLastRange = sel2.getRangeAt(0).cloneRange();
+  } catch(_){}
+  // 강제 state sync
   var si = +_lkeAlignEl.dataset.si;
   var key = _lkeAlignEl.dataset.key;
   var s = lkeState.hero.slides[si];

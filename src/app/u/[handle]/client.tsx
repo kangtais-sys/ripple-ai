@@ -118,6 +118,12 @@ function safeHtml(s: string | undefined): { __html: string } {
   out = out
     .replace(/&lt;em&gt;/gi, '<em>')
     .replace(/&lt;\/em&gt;/gi, '</em>')
+    .replace(/&lt;i&gt;/gi, '<em>')
+    .replace(/&lt;\/i&gt;/gi, '</em>')
+    .replace(/&lt;strong&gt;/gi, '<strong>')
+    .replace(/&lt;\/strong&gt;/gi, '</strong>')
+    .replace(/&lt;b&gt;/gi, '<strong>')
+    .replace(/&lt;\/b&gt;/gi, '</strong>')
     .replace(/&lt;br\s*\/?&gt;/gi, '<br/>')
   return { __html: out }
 }
