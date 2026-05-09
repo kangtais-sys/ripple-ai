@@ -9659,7 +9659,11 @@ async function _lkeSyncNow(){
       lkeUpdateSaveStatus('error');
     });
   } catch(e) { console.warn(e); lkeUpdateSaveStatus('error'); }
-  try{ localStorage.setItem('ssobi_lke_state', JSON.stringify(state)); }catch(e){}
+  try{
+    localStorage.setItem('ssobi_lke_state', JSON.stringify(state));
+    var _u = (await sb.auth.getUser())?.data?.user;
+    if(_u?.email) localStorage.setItem('ssobi_lke_state_email', _u.email);
+  }catch(e){}
 }
 // 링크 통계 모달 열기 — /api/link/stats fetch + 렌더
 async function lkeOpenStats(){
@@ -9777,6 +9781,20 @@ var lkeState = {
   blocks:[],
   proposals:[]
 };
+// 캐시 복원 — 같은 유저 마지막 상태 즉시 렌더 (default 플래시 1-2초 제거)
+//   서버 hydrate 가 도착하면 더 최신 데이터로 자동 갱신.
+//   다른 유저 로그인 시 doLogout / 새 가입 시 캐시 자동 무효화 (sb_user_email 비교).
+try {
+  var _cached = localStorage.getItem('ssobi_lke_state');
+  var _cachedEmail = localStorage.getItem('ssobi_lke_state_email');
+  if(_cached){
+    var _parsed = JSON.parse(_cached);
+    if(_parsed && typeof _parsed === 'object' && _parsed.handle){
+      lkeState = Object.assign(lkeState, _parsed);
+      lkeState.proposals = []; // server-only
+    }
+  }
+} catch(_){}
 
 // 서버 → lkeState 하이드레이션 — 로그인 직후 호출
 //   1) GET /api/link 으로 link_pages 행 조회
@@ -9787,6 +9805,23 @@ window._lkeHydrated = false;
 async function lkeHydrateFromServer(){
   if(window._lkeHydrated) return;
   try {
+    // 캐시 유저 일치 검증 — 다른 유저 로그인 후 첫 hydrate 면 캐시 무효화
+    try {
+      var _curU = (await sb.auth.getUser())?.data?.user;
+      var _cachedEmail = localStorage.getItem('ssobi_lke_state_email');
+      if(_curU?.email && _cachedEmail && _curU.email !== _cachedEmail){
+        // 다른 유저 → 캐시 폐기 + lkeState 기본값으로 리셋
+        localStorage.removeItem('ssobi_lke_state');
+        localStorage.removeItem('ssobi_lke_state_email');
+        if(typeof lkeState !== 'undefined'){
+          lkeState.handle = '';
+          lkeState.hero = { slides:[{bg:'',brand:'',title:'제목을 입력하세요',sub:'부제를 입력하세요',cta:'',ctaUrl:''}] };
+          lkeState.blocks = [];
+          lkeState.theme = undefined;
+          lkeState.settings = {};
+        }
+      }
+    } catch(_){}
     var h = await authHeaders();
     var res = await fetch('/api/link', { headers: h, credentials:'include' });
     if(!res.ok) return;
