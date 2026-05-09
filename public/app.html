@@ -1556,8 +1556,9 @@ body.dev-mode .mitem.dev-only{display:flex!important}
 #v-link .lke-add-zone:hover::after{transform:translate(-50%,-50%) scale(1)}
 
 /* Hero Banner — 다크 + 민트 */
-#v-link .lke-hero-banner{aspect-ratio:4/5;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff;position:relative;overflow:hidden;padding:28px 22px;display:flex;flex-direction:column;justify-content:space-between}
-#v-link .lke-hero-banner::before{content:'';position:absolute;top:-100px;right:-100px;width:380px;height:380px;background:radial-gradient(circle,rgba(0,200,150,.35),transparent 70%)}
+#v-link .lke-hero-banner{aspect-ratio:4/5;background:#1A1F27;color:#fff;position:relative;overflow:hidden;padding:28px 22px;display:flex;flex-direction:column;justify-content:space-between}
+/* 그라디 글로우 제거 — has-bg (이미지 있을 때) 만 dim 오버레이 유지 */
+#v-link .lke-hero-banner::before{content:none}
 #v-link .lke-hero-banner-top{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:flex-start}
 /* eyebrow 제거됨 (2026-05-08) — hero 상단 태그 라인 비활성 */
 @keyframes lke-pulse{0%,100%{opacity:1}50%{opacity:.4}}
@@ -1585,7 +1586,7 @@ body.dev-mode .mitem.dev-only{display:flex!important}
 
 /* Countdown */
 #v-link .lke-block-countdown{margin:14px 18px;padding:24px 22px;background:var(--mint);color:#fff;border-radius:18px;text-align:center;position:relative;overflow:hidden}
-#v-link .lke-block-countdown::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;background:radial-gradient(circle,rgba(255,255,255,.18),transparent 70%)}
+#v-link .lke-block-countdown::before{content:none}
 #v-link .lke-cd-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;opacity:.9;margin-bottom:8px;position:relative}
 #v-link .lke-cd-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:26px;font-weight:500;margin-bottom:5px;letter-spacing:-.02em;position:relative}
 #v-link .lke-cd-title em{font-style:italic}
@@ -1606,10 +1607,10 @@ body.dev-mode .mitem.dev-only{display:flex!important}
 #v-link .lke-block-grid{padding:0 18px;display:grid;grid-template-columns:1fr 1fr;gap:14px 10px}
 #v-link .lke-product-card{cursor:pointer}
 #v-link .lke-product-img{aspect-ratio:1/1;border-radius:12px;margin-bottom:9px;position:relative;overflow:hidden;display:flex;align-items:flex-start;padding:10px}
-#v-link .lke-product-img.cream{background:linear-gradient(135deg,#FEF3C7 0%,#D4B896 100%)}
-#v-link .lke-product-img.coral{background:linear-gradient(135deg,#A7F3D0 0%,#00C896 100%)}
-#v-link .lke-product-img.pink{background:linear-gradient(135deg,#FFE8DC 0%,#FFB098 100%)}
-#v-link .lke-product-img.dark{background:linear-gradient(135deg,#374151 0%,#1A1F27 100%);color:#fff}
+#v-link .lke-product-img.cream{background:#F5E9C8}
+#v-link .lke-product-img.coral{background:#A7F3D0}
+#v-link .lke-product-img.pink{background:#FFD9C7}
+#v-link .lke-product-img.dark{background:#1F2937;color:#fff}
 #v-link .lke-product-tag{font-family:'JetBrains Mono',monospace;font-size:9px;background:rgba(255,255,255,.92);color:var(--t1);padding:3px 8px;border-radius:100px;letter-spacing:.05em;font-weight:500;text-transform:uppercase}
 #v-link .lke-product-tag.hot{background:var(--mint);color:#fff}
 #v-link .lke-product-tag.dark{background:var(--dark);color:#fff}
@@ -1621,20 +1622,22 @@ body.dev-mode .mitem.dev-only{display:flex!important}
 
 /* Magazine */
 #v-link .lke-block-mag{margin:14px 18px;border-radius:18px;overflow:hidden;aspect-ratio:4/3;position:relative;cursor:pointer;display:flex;align-items:flex-end;padding:22px;color:#fff}
-#v-link .lke-block-mag.m1{background:linear-gradient(135deg,#A7F3D0 0%,#00A87E 100%)}
-#v-link .lke-block-mag.m2{background:linear-gradient(135deg,#67E8F9 0%,#06B6D4 100%)}
-#v-link .lke-block-mag.m3{background:linear-gradient(135deg,#C4B5FD 0%,#8B5CF6 100%)}
-#v-link .lke-block-mag::before{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(15,19,25,.45) 0%,transparent 60%)}
+#v-link .lke-block-mag.m1{background:#00A87E}
+#v-link .lke-block-mag.m2{background:#06B6D4}
+#v-link .lke-block-mag.m3{background:#8B5CF6}
+#v-link .lke-block-mag::before{content:none}
 #v-link .lke-mag-label{position:absolute;top:18px;left:18px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#fff;background:rgba(15,19,25,.35);padding:4px 11px;border-radius:100px;letter-spacing:.15em;text-transform:uppercase;backdrop-filter:blur(10px)}
 #v-link .lke-mag-title{position:relative;z-index:2;font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:24px;font-weight:500;color:inherit;line-height:1.1;letter-spacing:-.02em;max-width:82%}
 #v-link .lke-mag-title em{font-style:italic}
 
-/* Big Banner */
-#v-link .lke-block-bigbanner{margin:14px 18px;border-radius:18px;overflow:hidden;aspect-ratio:2/1;position:relative;cursor:pointer;display:flex;align-items:flex-end;padding:22px;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff}
-#v-link .lke-block-bigbanner::before{content:'';position:absolute;top:-100px;right:-100px;width:280px;height:280px;background:radial-gradient(circle,rgba(0,200,150,.3),transparent 70%)}
-/* 이미지 배경일 때 mint glow 오버레이 제거 — 이미지 위에 그라디언트 같이 깔리는 거 방지 */
-#v-link .lke-block-bigbanner.has-bg::before{display:none}
+/* Big Banner — wrapper(.lke-block-bigbanner) 는 빈 컨테이너. 시각 카드는 .lke-bigbanner-card */
+#v-link .lke-block-bigbanner{margin:14px 18px;cursor:pointer;background:none}
+#v-link .lke-bigbanner-card{border-radius:18px;overflow:hidden;aspect-ratio:2/1;position:relative;display:flex;align-items:flex-end;padding:22px;background:#1A1F27;color:#fff;box-sizing:border-box}
+/* 그라디 글로우 제거됨 (2026-05-09) — 이미지 모드 has-bg 에선 dim 오버레이만 */
+#v-link .lke-bigbanner-card.has-bg::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.15) 0%,transparent 30%,rgba(0,0,0,.4) 100%);pointer-events:none}
 #v-link .lke-bigbanner-content{position:relative;z-index:2}
+/* 본문2 — 배너 카드 밖, 아래에 깔리는 텍스트 (블록 wrapper 안) */
+#v-link .lke-bigbanner-sub2{padding:10px 4px 2px;font-size:13px;line-height:1.55;color:var(--t2)}
 #v-link .lke-bigbanner-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;color:inherit;opacity:.7;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
 #v-link .lke-bigbanner-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:26px;font-weight:400;line-height:1.05;letter-spacing:-.02em;color:inherit}
 #v-link .lke-bigbanner-sub{font-size:13px;font-weight:500;color:inherit;opacity:.78;margin-top:8px;line-height:1.4}
@@ -1808,7 +1811,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 #v-link .lke-hero-cta-wrap.menu-on .lke-hero-stat-menu{display:flex}
 
 /* Hero banner bg 이미지 지원 */
-#v-link .lke-hero-banner.has-bg::before{background:linear-gradient(180deg,rgba(0,0,0,.2) 0%,transparent 30%,rgba(0,0,0,.45) 100%);inset:0;width:auto;height:auto;top:0;right:0}
+#v-link .lke-hero-banner.has-bg::before{content:'';background:linear-gradient(180deg,rgba(0,0,0,.2) 0%,transparent 30%,rgba(0,0,0,.45) 100%);position:absolute;inset:0;pointer-events:none}
 #v-link .lke-hero-banner.has-bg{background-size:cover;background-position:center}
 /* 미니멀 hero compact 모드 — 정사각 비율, 작은 패딩, 본문 짧게 */
 #v-link .lke-hero-banner.compact{aspect-ratio:auto;min-height:180px;padding:18px 20px;background:linear-gradient(180deg,#FAFAF9 0%,#F5F5F4 100%);color:#1A1F27}
@@ -10155,17 +10158,29 @@ function lkeRenderBlock(b, idx){
       el.appendChild(card);
     });
   } else if(b.type==='bigbanner'){
-    if(b.img){ el.style.background='url('+b.img+') center/cover'; el.classList.add('has-bg'); }
-    else if(b.bgSolid){ el.style.background=b.bgSolid; }
-    else if(b.bg){ el.style.background=b.bg; }
-    if(b.textColor) el.style.color=b.textColor;
-    el.innerHTML += '<div class="lke-bigbanner-content"><div class="lke-bigbanner-eyebrow">'+(b.eyebrow||'')+'</div><div class="lke-bigbanner-title">'+(b.title||'')+'</div>'+(b.sub?'<div class="lke-bigbanner-sub">'+b.sub+'</div>':'')+'</div>';
+    // 시각 카드 (배너) + 본문2 (배너 밖 아래) 분리
+    var cardCls = 'lke-bigbanner-card' + (b.img ? ' has-bg' : '');
+    var cardStyle = '';
+    if(b.img) cardStyle = 'background:url('+b.img+') center/cover';
+    else if(b.bgSolid) cardStyle = 'background:'+b.bgSolid;
+    else if(b.bg) cardStyle = 'background:'+b.bg;
+    if(b.textColor) cardStyle += ';color:'+b.textColor;
+    el.innerHTML += '<div class="'+cardCls+'" style="'+cardStyle+'">'+
+        '<div class="lke-bigbanner-content">'+
+          '<div class="lke-bigbanner-eyebrow">'+(b.eyebrow||'')+'</div>'+
+          '<div class="lke-bigbanner-title">'+(b.title||'')+'</div>'+
+          (b.sub?'<div class="lke-bigbanner-sub">'+b.sub+'</div>':'')+
+        '</div>'+
+      '</div>'+
+      (b.sub2?'<div class="lke-bigbanner-sub2">'+b.sub2+'</div>':'');
   } else if(b.type==='contact'){
-    if(b.img){ el.style.background='url('+b.img+') center/cover'; }
-    else if(b.bgSolid){ el.style.background=b.bgSolid; }
-    else if(b.bg){ el.style.background=b.bg; }
-    if(b.textColor) el.style.color=b.textColor;
-    el.innerHTML += '<div class="lke-bigbanner-content"><div class="lke-bigbanner-eyebrow">'+b.eyebrow+'</div><div class="lke-bigbanner-title">'+b.title+'</div></div>';
+    var cardCls2 = 'lke-bigbanner-card' + (b.img ? ' has-bg' : '');
+    var cardStyle2 = '';
+    if(b.img) cardStyle2 = 'background:url('+b.img+') center/cover';
+    else if(b.bgSolid) cardStyle2 = 'background:'+b.bgSolid;
+    else if(b.bg) cardStyle2 = 'background:'+b.bg;
+    if(b.textColor) cardStyle2 += ';color:'+b.textColor;
+    el.innerHTML += '<div class="'+cardCls2+'" style="'+cardStyle2+'"><div class="lke-bigbanner-content"><div class="lke-bigbanner-eyebrow">'+(b.eyebrow||'')+'</div><div class="lke-bigbanner-title">'+(b.title||'')+'</div></div></div>';
   } else if(b.type==='magazine'){
     if(b.img){ el.style.background='url('+b.img+') center/cover'; }
     else if(b.bgSolid){ el.style.background=b.bgSolid; }
@@ -10269,9 +10284,10 @@ function lkeRenderEditForm(b, idx){
     html+=lkeField('문의 양식 안내','text','f-formDesc',b.formDesc||'');
     html+='<div style="font-size:12px;color:var(--t2);line-height:1.55;padding:12px;background:var(--mint-l);border-radius:8px;margin-top:6px">이 블록에 작성된 문의는 <b>키우기 → 실시간 관리 → 수익제안 탭</b>에 자동 수신돼요.<br>현재 데모: '+lkeState.proposals.length+'건 저장됨</div>';
   } else if(b.type==='bigbanner'){
-    html+=lkeField('상단 라벨','text','f-eyebrow',b.eyebrow);
+    html+=lkeField('배너 (상단 라벨)','text','f-eyebrow',b.eyebrow);
     html+=lkeRich('제목','f-title',b.title);
-    html+=lkeField('하단 텍스트 (선택 — 비우면 숨김)','text','f-sub',b.sub);
+    html+=lkeField('본문1 (배너 안 — 비우면 숨김)','text','f-sub',b.sub);
+    html+=lkeField('본문2 (배너 아래 — 비우면 숨김)','text','f-sub2',b.sub2);
     html+=lkeField('이동 URL','url','f-url',b.url);
     html+=lkeImageUploadHtml(idx, b.img, '배경 이미지 (선택)');
   } else if(b.type==='magazine'){
@@ -10429,7 +10445,7 @@ function lkeSaveBlock(idx){
     readAppearance();
   }
   else if(b.type==='bigbanner'){
-    b.eyebrow=v('f-eyebrow'); b.title=lkeRichVal('f-title'); b.sub=v('f-sub'); b.url=v('f-url');
+    b.eyebrow=v('f-eyebrow'); b.title=lkeRichVal('f-title'); b.sub=v('f-sub'); b.sub2=v('f-sub2'); b.url=v('f-url');
     readAppearance();
   }
   else if(b.type==='magazine'){

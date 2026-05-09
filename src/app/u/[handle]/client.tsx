@@ -7,6 +7,7 @@ type Block = {
   id?: string
   title?: string
   sub?: string
+  sub2?: string
   text?: string
   url?: string
   code?: string
@@ -126,12 +127,12 @@ const PUBLIC_CSS = `
 .ssobi-public[data-theme-applied="1"] .lke-block-link .l-sub{color:var(--lke-text-color, var(--t2)) !important}
 /* HERO — has-bg 시 강한 그라디언트 오버레이로 텍스트 가독성 확보 */
 .ssobi-public .lke-hero-carousel{position:relative}
-.ssobi-public .lke-hero-banner{aspect-ratio:4/5;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff;position:relative;overflow:hidden;padding:32px 24px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;text-decoration:none}
+.ssobi-public .lke-hero-banner{aspect-ratio:4/5;background:#1A1F27;color:#fff;position:relative;overflow:hidden;padding:32px 24px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;text-decoration:none}
 .ssobi-public .lke-hero-banner[data-valign='middle']{justify-content:center;gap:14px}
 .ssobi-public .lke-hero-banner[data-valign='bottom']{justify-content:flex-end;gap:14px}
 .ssobi-public a.lke-hero-banner{color:#fff;cursor:pointer;transition:filter .2s}
 .ssobi-public a.lke-hero-banner:active{filter:brightness(.9)}
-.ssobi-public .lke-hero-banner::before{content:'';position:absolute;top:-100px;right:-100px;width:380px;height:380px;background:radial-gradient(circle,rgba(0,200,150,.35),transparent 70%)}
+.ssobi-public .lke-hero-banner::before{content:none}
 .ssobi-public .lke-hero-banner.has-bg{background-size:cover;background-position:center}
 .ssobi-public .lke-hero-banner.has-bg::before{background:linear-gradient(180deg,rgba(0,0,0,.45) 0%,rgba(0,0,0,.15) 35%,rgba(0,0,0,.2) 60%,rgba(0,0,0,.7) 100%);inset:0;width:auto;height:auto;top:0;right:0}
 /* eyebrow 제거됨 (2026-05-08) */
@@ -163,7 +164,7 @@ const PUBLIC_CSS = `
 .ssobi-public .lke-event-arrow{color:var(--mint);font-size:15px;flex-shrink:0}
 /* COUNTDOWN */
 .ssobi-public .lke-block-countdown{margin:14px 18px;padding:24px 22px;background:var(--mint);color:#fff;border-radius:18px;text-align:center;position:relative;overflow:hidden;text-decoration:none;display:block}
-.ssobi-public .lke-block-countdown::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;background:radial-gradient(circle,rgba(255,255,255,.18),transparent 70%)}
+.ssobi-public .lke-block-countdown::before{content:none}
 .ssobi-public .lke-cd-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.2em;text-transform:uppercase;opacity:.9;margin-bottom:8px;position:relative}
 .ssobi-public .lke-cd-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:26px;font-weight:500;margin-bottom:5px;letter-spacing:-.02em;position:relative}
 .ssobi-public .lke-cd-title em{font-style:italic}
@@ -183,10 +184,10 @@ const PUBLIC_CSS = `
 .ssobi-public .lke-product-card{text-decoration:none;color:inherit;transition:transform .15s ease}
 .ssobi-public .lke-product-card:active{transform:scale(.98)}
 .ssobi-public .lke-product-img{aspect-ratio:1/1;border-radius:14px;margin-bottom:11px;position:relative;overflow:hidden;display:flex;align-items:flex-start;padding:10px;box-shadow:0 4px 14px rgba(15,19,25,.06)}
-.ssobi-public .lke-product-img.cream{background:linear-gradient(135deg,#FEF3C7 0%,#D4B896 100%)}
-.ssobi-public .lke-product-img.coral{background:linear-gradient(135deg,#A7F3D0 0%,#00C896 100%)}
-.ssobi-public .lke-product-img.pink{background:linear-gradient(135deg,#FFE8DC 0%,#FFB098 100%)}
-.ssobi-public .lke-product-img.dark{background:linear-gradient(135deg,#374151 0%,#1A1F27 100%);color:#fff}
+.ssobi-public .lke-product-img.cream{background:#F5E9C8}
+.ssobi-public .lke-product-img.coral{background:#A7F3D0}
+.ssobi-public .lke-product-img.pink{background:#FFD9C7}
+.ssobi-public .lke-product-img.dark{background:#1F2937;color:#fff}
 .ssobi-public .lke-product-tag{font-family:'JetBrains Mono',monospace;font-size:9px;background:rgba(255,255,255,.92);color:var(--t1);padding:3px 8px;border-radius:100px;letter-spacing:.05em;font-weight:500;text-transform:uppercase}
 .ssobi-public .lke-product-tag.hot{background:var(--mint);color:#fff}
 .ssobi-public .lke-product-tag.dark{background:var(--dark);color:#fff}
@@ -198,18 +199,20 @@ const PUBLIC_CSS = `
 /* MAGAZINE — soft shadow */
 .ssobi-public .lke-block-mag{margin:14px 18px;border-radius:18px;overflow:hidden;aspect-ratio:4/3;position:relative;display:flex;align-items:flex-end;padding:22px;text-decoration:none;color:#fff;box-shadow:0 8px 24px rgba(15,19,25,.08);transition:transform .15s ease}
 .ssobi-public .lke-block-mag:active{transform:scale(.99)}
-.ssobi-public .lke-block-mag.m1{background:linear-gradient(135deg,#A7F3D0 0%,#00A87E 100%)}
-.ssobi-public .lke-block-mag.m2{background:linear-gradient(135deg,#67E8F9 0%,#06B6D4 100%)}
-.ssobi-public .lke-block-mag.m3{background:linear-gradient(135deg,#C4B5FD 0%,#8B5CF6 100%)}
-.ssobi-public .lke-block-mag::before{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(15,19,25,.45) 0%,transparent 60%)}
+.ssobi-public .lke-block-mag.m1{background:#00A87E}
+.ssobi-public .lke-block-mag.m2{background:#06B6D4}
+.ssobi-public .lke-block-mag.m3{background:#8B5CF6}
+.ssobi-public .lke-block-mag::before{content:none}
 .ssobi-public .lke-mag-label{position:absolute;top:18px;left:18px;font-family:'JetBrains Mono',monospace;font-size:10px;color:#fff;background:rgba(15,19,25,.35);padding:4px 11px;border-radius:100px;letter-spacing:.15em;text-transform:uppercase}
 .ssobi-public .lke-mag-title{position:relative;z-index:2;font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:24px;font-weight:500;color:inherit;line-height:1.1;letter-spacing:-.02em;max-width:82%}
 .ssobi-public .lke-mag-title em{font-style:italic}
 /* BIGBANNER / CONTACT */
-.ssobi-public .lke-block-bigbanner{margin:14px 18px;border-radius:18px;overflow:hidden;aspect-ratio:2/1;position:relative;display:flex;align-items:flex-end;padding:24px;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff;text-decoration:none;box-shadow:0 8px 24px rgba(15,19,25,.12);transition:transform .15s ease}
-.ssobi-public .lke-block-bigbanner:active{transform:scale(.99)}
-.ssobi-public .lke-block-bigbanner::before{content:'';position:absolute;top:-100px;right:-100px;width:280px;height:280px;background:radial-gradient(circle,rgba(0,200,150,.3),transparent 70%)}
-.ssobi-public .lke-block-bigbanner.has-bg::before{display:none}
+/* bigbanner: wrapper(.lke-block-bigbanner) — 빈 컨테이너. 시각 카드 = .lke-bigbanner-card */
+.ssobi-public .lke-block-bigbanner{margin:14px 18px;text-decoration:none;display:block;color:inherit}
+.ssobi-public .lke-bigbanner-card{border-radius:18px;overflow:hidden;aspect-ratio:2/1;position:relative;display:flex;align-items:flex-end;padding:24px;background:#1A1F27;color:#fff;box-shadow:0 8px 24px rgba(15,19,25,.12);transition:transform .15s ease;box-sizing:border-box}
+.ssobi-public .lke-block-bigbanner:active .lke-bigbanner-card{transform:scale(.99)}
+.ssobi-public .lke-bigbanner-card.has-bg::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.15) 0%,transparent 30%,rgba(0,0,0,.4) 100%);pointer-events:none}
+.ssobi-public .lke-bigbanner-sub2{padding:10px 4px 2px;font-size:13px;line-height:1.55;color:var(--t2)}
 .ssobi-public .lke-bigbanner-content{position:relative;z-index:2}
 .ssobi-public .lke-bigbanner-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;color:inherit;opacity:.7;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
 .ssobi-public .lke-bigbanner-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:26px;font-weight:400;line-height:1.05;letter-spacing:-.02em;color:inherit;margin:0}
@@ -525,20 +528,26 @@ function renderBlock(b: Block, i: number) {
       )
 
     case 'contact':
-    case 'bigbanner':
+    case 'bigbanner': {
+      const hasBg = !!(b.img || b.thumbImg)
+      const cardStyle: React.CSSProperties = {
+        background: b.img ? `url(${b.img}) center/cover` : (b.thumbImg ? `url(${b.thumbImg}) center/cover` : (b.bgSolid as string || b.bg as string || undefined)),
+        color: b.textColor as string | undefined
+      }
+      const sub2 = (b as { sub2?: string }).sub2
       return (
-        <a key={key} className={`lke-block lke-block-bigbanner${b.img || b.thumbImg ? ' has-bg' : ''}`} href={hrefOf(b)}
-          style={{
-            background: b.img ? `url(${b.img}) center/cover` : (b.thumbImg ? `url(${b.thumbImg}) center/cover` : (b.bgSolid as string || b.bg as string || undefined)),
-            color: b.textColor as string | undefined
-          }}>
-          <div className="lke-bigbanner-content">
-            {b.eyebrow && <div className="lke-bigbanner-eyebrow" dangerouslySetInnerHTML={safeHtml(b.eyebrow)} />}
-            <div className="lke-bigbanner-title" dangerouslySetInnerHTML={safeHtml(b.title)} />
-            {b.sub && <div className="lke-bigbanner-sub" dangerouslySetInnerHTML={safeHtml(b.sub)} />}
+        <a key={key} className="lke-block lke-block-bigbanner" href={hrefOf(b)}>
+          <div className={`lke-bigbanner-card${hasBg ? ' has-bg' : ''}`} style={cardStyle}>
+            <div className="lke-bigbanner-content">
+              {b.eyebrow && <div className="lke-bigbanner-eyebrow" dangerouslySetInnerHTML={safeHtml(b.eyebrow)} />}
+              <div className="lke-bigbanner-title" dangerouslySetInnerHTML={safeHtml(b.title)} />
+              {b.sub && <div className="lke-bigbanner-sub" dangerouslySetInnerHTML={safeHtml(b.sub)} />}
+            </div>
           </div>
+          {sub2 && <div className="lke-bigbanner-sub2" dangerouslySetInnerHTML={safeHtml(sub2)} />}
         </a>
       )
+    }
 
     case 'quicklinks': {
       const items = (b.items as Array<{ label?: string; sub?: string; url?: string; code?: string }>) || []
