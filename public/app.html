@@ -1943,6 +1943,12 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 #v-link .lke-fab-add svg{width:18px;height:18px;stroke:currentColor;fill:none}
 #v-link .lke-fab-add:active{transform:scale(.94);box-shadow:0 4px 14px rgba(0,200,150,.5)}
 #v-link.lke-preview .lke-fab-add{display:none}
+/* 제안 FAB 미리보기 — 편집기 안에서 항상 표시 (preview 모드든 편집 모드든) */
+#v-link .lke-fab-proposal{position:fixed;bottom:84px;right:14px;min-width:46px;height:46px;padding:0 16px;border-radius:23px;background:#1A1F27;color:#fff;border:none;cursor:pointer;box-shadow:0 6px 18px rgba(15,19,25,.28);display:inline-flex;align-items:center;justify-content:center;gap:7px;font-family:'Pretendard',sans-serif;font-size:12px;font-weight:700;letter-spacing:-.2px;z-index:50}
+#v-link .lke-fab-proposal svg{width:19px;height:19px;stroke:currentColor;fill:none;flex-shrink:0}
+#v-link .lke-fab-proposal:active{transform:scale(.94)}
+#v-link .lke-fab-proposal::after{content:'설정';position:absolute;top:-22px;right:-2px;font-size:9.5px;font-weight:800;color:var(--mint-d);background:var(--mint-l);padding:3px 7px;border-radius:100px;letter-spacing:.05em;white-space:nowrap;pointer-events:none}
+#v-link.lke-preview .lke-fab-proposal::after{display:none}
 /* 빈 상태 — 블록 0개 시 가운데 큰 CTA */
 #v-link .lke-empty{
   text-align:center;padding:60px 20px 80px;
@@ -3310,6 +3316,12 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <button class="lke-fab-add" onclick="lkeOpenSheet('add-block')" aria-label="블록 추가">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
     <span data-i18n="link.add_block_short">추가</span>
+  </button>
+
+  <!-- 제안 FAB 미리보기 — 공개 페이지의 우측 하단 floating button. 클릭 시 설정 시트 열림 -->
+  <button class="lke-fab-proposal" id="lke-fab-proposal" onclick="lkeOpenSheet('settings')" aria-label="제안 버튼 설정" style="display:none">
+    <svg id="lke-fab-proposal-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
+    <span class="lke-fab-proposal-label" id="lke-fab-proposal-label" style="display:none"></span>
   </button>
 
   <button class="lke-preview-exit" onclick="lkeTogglePreview()" data-i18n="link.exit_preview">✕ 편집으로</button>
@@ -9833,6 +9845,34 @@ function lkeRender(){
   }
   // 상태 변경 후 서버 동기화 (디바운스)
   if(typeof lkeSyncToServer === 'function') lkeSyncToServer();
+  // 제안 FAB 미리보기 갱신
+  if(typeof lkeUpdateFabPreview === 'function') lkeUpdateFabPreview();
+}
+// 제안 FAB 미리보기 — settings.fab 상태에 맞춰 편집기 우측 하단 버튼 토글·아이콘·라벨 갱신
+function lkeUpdateFabPreview(){
+  var btn = document.getElementById('lke-fab-proposal');
+  if(!btn) return;
+  var fab = (lkeState.settings && lkeState.settings.fab) || {};
+  // enabled === false 일 때만 숨김 (미설정 = 기본 활성)
+  if(fab.enabled === false){ btn.style.display = 'none'; return; }
+  btn.style.display = 'inline-flex';
+  // 아이콘
+  var svgEl = document.getElementById('lke-fab-proposal-svg');
+  if(svgEl){
+    var paths = {
+      mail: '<path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>',
+      chat: '<path d="M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>',
+      kakao: '<path d="M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>',
+      message: '<path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/>'
+    };
+    svgEl.innerHTML = paths[fab.icon] || paths.message;
+  }
+  // 라벨
+  var lblEl = document.getElementById('lke-fab-proposal-label');
+  if(lblEl){
+    if(fab.label){ lblEl.textContent = fab.label; lblEl.style.display = 'inline'; }
+    else { lblEl.style.display = 'none'; lblEl.textContent = ''; }
+  }
 }
 
 function lkeAddZone(idx){
@@ -11173,6 +11213,8 @@ function lkeApplySettings(){
     url: fabUrl,
     label: fabLabel
   };
+  // FAB 미리보기 즉시 갱신
+  if(typeof lkeUpdateFabPreview === 'function') lkeUpdateFabPreview();
   // 즉시 서버에 sync
   if(typeof lkeSyncToServer === 'function') lkeSyncToServer();
   lkeCloseSheet();
