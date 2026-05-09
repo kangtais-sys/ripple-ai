@@ -3378,23 +3378,23 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
     <!-- 떠있는 제안하기 버튼 (FAB) — 페이지 우측 하단 고정. 비활성·아이콘·동작 선택 -->
     <div class="lke-field-group" id="lke-settings-fab-group">
-      <div class="lke-field-label">제안 버튼 (페이지 우측 하단)</div>
-      <div class="lke-toggle-row"><div class="lke-toggle-info"><strong>버튼 표시</strong><span>방문자가 협업·DM 보낼 수 있는 떠있는 버튼</span></div><div class="lke-toggle" id="lke-fab-enabled" onclick="this.classList.toggle('on')"></div></div>
+      <div class="lke-field-label" data-i18n="lke.settings.fab.section">제안 버튼 (페이지 우측 하단)</div>
+      <div class="lke-toggle-row"><div class="lke-toggle-info"><strong data-i18n="lke.settings.fab.toggle">버튼 표시</strong><span data-i18n="lke.settings.fab.toggle_sub">방문자가 협업·DM 보낼 수 있는 떠있는 버튼</span></div><div class="lke-toggle" id="lke-fab-enabled" onclick="this.classList.toggle('on')"></div></div>
       <div id="lke-fab-config" style="display:none;margin-top:10px">
-        <div style="font-size:11.5px;font-weight:700;color:var(--t2);margin-bottom:6px">아이콘</div>
+        <div style="font-size:11.5px;font-weight:700;color:var(--t2);margin-bottom:6px" data-i18n="lke.settings.fab.icon">아이콘</div>
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:14px" id="lke-fab-icons">
-          <button class="lke-fab-icon-pick" data-icon="message" type="button" onclick="lkeFabPickIcon(\'message\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg><span>메시지</span></button>
-          <button class="lke-fab-icon-pick" data-icon="chat" type="button" onclick="lkeFabPickIcon(\'chat\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><span>채팅</span></button>
-          <button class="lke-fab-icon-pick" data-icon="mail" type="button" onclick="lkeFabPickIcon(\'mail\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span>메일</span></button>
+          <button class="lke-fab-icon-pick" data-icon="message" type="button" onclick="lkeFabPickIcon(\'message\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg><span data-i18n="lke.settings.fab.icon_message">메시지</span></button>
+          <button class="lke-fab-icon-pick" data-icon="chat" type="button" onclick="lkeFabPickIcon(\'chat\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.86 9.86 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/></svg><span data-i18n="lke.settings.fab.icon_chat">채팅</span></button>
+          <button class="lke-fab-icon-pick" data-icon="mail" type="button" onclick="lkeFabPickIcon(\'mail\')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg><span data-i18n="lke.settings.fab.icon_mail">메일</span></button>
         </div>
-        <div style="font-size:11.5px;font-weight:700;color:var(--t2);margin-bottom:6px">동작</div>
+        <div style="font-size:11.5px;font-weight:700;color:var(--t2);margin-bottom:6px" data-i18n="lke.settings.fab.mode">동작</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
-          <label class="lke-fab-mode-pick" id="lke-fab-mode-proposal"><input type="radio" name="fab_mode" value="proposal" checked><span><strong>쏘비에서 받기</strong>방문자가 양식 작성 → 통계에 자동 수신</span></label>
-          <label class="lke-fab-mode-pick" id="lke-fab-mode-link"><input type="radio" name="fab_mode" value="link"><span><strong>외부 링크</strong>카톡 채널·인스타 DM·이메일 등으로 바로 이동</span></label>
+          <label class="lke-fab-mode-pick" id="lke-fab-mode-proposal"><input type="radio" name="fab_mode" value="proposal" checked><span><strong data-i18n="lke.settings.fab.mode_prop">쏘비에서 받기</strong><span data-i18n="lke.settings.fab.mode_prop_sub">방문자가 양식 작성 → 협업/제안 탭에 자동 수신</span></span></label>
+          <label class="lke-fab-mode-pick" id="lke-fab-mode-link"><input type="radio" name="fab_mode" value="link"><span><strong data-i18n="lke.settings.fab.mode_link">외부 링크</strong><span data-i18n="lke.settings.fab.mode_link_sub">카톡 채널·인스타 DM·이메일 등 바로 이동</span></span></label>
         </div>
-        <input type="text" class="lke-field-input" id="lke-fab-url" placeholder="https://... 또는 mailto:hello@email.com (외부 링크 모드일 때만)" style="display:none">
-        <div style="font-size:11.5px;font-weight:700;color:var(--t2);margin:10px 0 6px">버튼 옆 안내 문구 (선택)</div>
-        <input type="text" class="lke-field-input" id="lke-fab-label" placeholder="예: 협업 문의 / DM 으로 받기">
+        <input type="text" class="lke-field-input" id="lke-fab-url" data-i18n-ph="lke.settings.fab.url_ph" placeholder="https://... 또는 mailto:hello@email.com" style="display:none">
+        <div style="font-size:11.5px;font-weight:700;color:var(--t2);margin:10px 0 6px" data-i18n="lke.settings.fab.label">버튼 옆 안내 문구 (선택)</div>
+        <input type="text" class="lke-field-input" id="lke-fab-label" data-i18n-ph="lke.settings.fab.label_ph" placeholder="예: 협업 문의 / DM 으로 받기">
       </div>
     </div>
 
@@ -6147,6 +6147,22 @@ var I18N = {
     'lke.theme.title_font':'제목 폰트',
     'lke.theme.body_font':'본문 폰트',
     'lke.theme.apply':'적용',
+    // FAB (제안 버튼) 설정
+    'lke.settings.fab.section':'제안 버튼 (페이지 우측 하단)',
+    'lke.settings.fab.toggle':'버튼 표시',
+    'lke.settings.fab.toggle_sub':'방문자가 협업·DM 보낼 수 있는 떠있는 버튼',
+    'lke.settings.fab.icon':'아이콘',
+    'lke.settings.fab.icon_message':'메시지',
+    'lke.settings.fab.icon_chat':'채팅',
+    'lke.settings.fab.icon_mail':'메일',
+    'lke.settings.fab.mode':'동작',
+    'lke.settings.fab.mode_prop':'쏘비에서 받기',
+    'lke.settings.fab.mode_prop_sub':'방문자가 양식 작성 → 협업/제안 탭에 자동 수신',
+    'lke.settings.fab.mode_link':'외부 링크',
+    'lke.settings.fab.mode_link_sub':'카톡 채널·인스타 DM·이메일 등 바로 이동',
+    'lke.settings.fab.url_ph':'https://... 또는 mailto:hello@email.com',
+    'lke.settings.fab.label':'버튼 옆 안내 문구 (선택)',
+    'lke.settings.fab.label_ph':'예: 협업 문의 / DM 으로 받기',
     'link.stats':'통계',
     'link.stats.title':'링크 통계',
     'link.stats.sub':'방문자 수와 링크별 클릭 수를 확인하세요',
@@ -6945,6 +6961,22 @@ var I18N = {
     'lke.theme.title_font':'Title font',
     'lke.theme.body_font':'Body font',
     'lke.theme.apply':'Apply',
+    // FAB (proposal button) settings
+    'lke.settings.fab.section':'Floating button (bottom right)',
+    'lke.settings.fab.toggle':'Show button',
+    'lke.settings.fab.toggle_sub':'Visitors can send collab requests / DMs',
+    'lke.settings.fab.icon':'Icon',
+    'lke.settings.fab.icon_message':'Message',
+    'lke.settings.fab.icon_chat':'Chat',
+    'lke.settings.fab.icon_mail':'Email',
+    'lke.settings.fab.mode':'Action',
+    'lke.settings.fab.mode_prop':'Receive in Ssobi',
+    'lke.settings.fab.mode_prop_sub':'Visitor fills form → routed to Collab/Offer tab',
+    'lke.settings.fab.mode_link':'External link',
+    'lke.settings.fab.mode_link_sub':'Send straight to KakaoTalk channel / IG DM / email',
+    'lke.settings.fab.url_ph':'https://... or mailto:hello@email.com',
+    'lke.settings.fab.label':'Label next to button (optional)',
+    'lke.settings.fab.label_ph':'e.g. Collab inquiry / DM me',
     'link.stats':'Stats',
     'link.stats.title':'Link analytics',
     'link.stats.sub':'See visitors and per-link click counts',
