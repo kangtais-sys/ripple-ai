@@ -110,25 +110,15 @@ const PUBLIC_CSS = `
 .ssobi-public .lke-price-orig,
 .ssobi-public .lke-product-tag,
 .ssobi-public .lke-mag-label{font-family:'Pretendard Variable','Pretendard','Noto Sans KR',sans-serif}
-/* 테마 오버라이드 — 유저가 편집기에서 색·폰트 변경 시 활성화 */
+/* 테마 오버라이드 — 라이트 배경 블록만 (다크 배경 블록은 #fff inherit 유지) */
 .ssobi-public[data-theme-applied="1"] .lke-section-title,
 .ssobi-public[data-theme-applied="1"] .lke-product-info-title,
 .ssobi-public[data-theme-applied="1"] .lke-block-link .l-title,
 .ssobi-public[data-theme-applied="1"] .lke-quicklink-label,
-.ssobi-public[data-theme-applied="1"] .lke-mag-title,
-.ssobi-public[data-theme-applied="1"] .lke-bigbanner-title,
-.ssobi-public[data-theme-applied="1"] .lke-cd-title,
-.ssobi-public[data-theme-applied="1"] .lke-hero-title,
-.ssobi-public[data-theme-applied="1"] .lke-price-sale,
-.ssobi-public[data-theme-applied="1"] .lke-event-text strong{color:var(--lke-title-color, var(--t1)) !important;font-family:var(--lke-title-font, 'Fraunces','Pretendard','Noto Sans KR',sans-serif)}
+.ssobi-public[data-theme-applied="1"] .lke-price-sale{color:var(--lke-title-color, var(--t1)) !important;font-family:var(--lke-title-font, 'Pretendard','Noto Sans KR',sans-serif)}
 .ssobi-public[data-theme-applied="1"] .lke-product-info-date,
 .ssobi-public[data-theme-applied="1"] .lke-quicklink-sub,
-.ssobi-public[data-theme-applied="1"] .lke-block-link .l-sub,
-.ssobi-public[data-theme-applied="1"] .lke-event-text,
-.ssobi-public[data-theme-applied="1"] .lke-cd-subtitle,
-.ssobi-public[data-theme-applied="1"] .lke-hero-subtitle,
-.ssobi-public[data-theme-applied="1"] .lke-hero-brand{color:var(--lke-text-color, var(--t2)) !important}
-.ssobi-public[data-theme-applied="1"] .lke-hero-cta{background:var(--lke-title-color, var(--mint)) !important;color:#fff}
+.ssobi-public[data-theme-applied="1"] .lke-block-link .l-sub{color:var(--lke-text-color, var(--t2)) !important}
 /* HERO — has-bg 시 강한 그라디언트 오버레이로 텍스트 가독성 확보 */
 .ssobi-public .lke-hero-carousel{position:relative}
 .ssobi-public .lke-hero-banner{aspect-ratio:4/5;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff;position:relative;overflow:hidden;padding:32px 24px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;text-decoration:none}

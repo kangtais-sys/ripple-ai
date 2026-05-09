@@ -1620,7 +1620,7 @@ body.dev-mode .mitem.dev-only{display:flex!important}
 #v-link .lke-price-orig{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--t3);text-decoration:line-through}
 
 /* Magazine */
-#v-link .lke-block-mag{margin:14px 18px;border-radius:18px;overflow:hidden;aspect-ratio:4/3;position:relative;cursor:pointer;display:flex;align-items:flex-end;padding:22px}
+#v-link .lke-block-mag{margin:14px 18px;border-radius:18px;overflow:hidden;aspect-ratio:4/3;position:relative;cursor:pointer;display:flex;align-items:flex-end;padding:22px;color:#fff}
 #v-link .lke-block-mag.m1{background:linear-gradient(135deg,#A7F3D0 0%,#00A87E 100%)}
 #v-link .lke-block-mag.m2{background:linear-gradient(135deg,#67E8F9 0%,#06B6D4 100%)}
 #v-link .lke-block-mag.m3{background:linear-gradient(135deg,#C4B5FD 0%,#8B5CF6 100%)}
@@ -1867,26 +1867,16 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 #v-link .lke-price-orig,
 #v-link .lke-product-tag,
 #v-link .lke-mag-label{font-family:'Pretendard','Pretendard Variable','Noto Sans KR',sans-serif}
-/* 테마 오버라이드 — 유저가 테마 패널에서 색·폰트 변경 시 활성화 (data-theme-applied="1") */
+/* 테마 오버라이드 — 라이트 배경 블록만 유저 색 적용.
+   다크 배경 블록 (hero/event/bigbanner/countdown/magazine) 은 각자 #fff inherit 유지 */
 #v-link[data-theme-applied="1"] .lke-section-title,
 #v-link[data-theme-applied="1"] .lke-product-info-title,
 #v-link[data-theme-applied="1"] .lke-block-link .l-title,
 #v-link[data-theme-applied="1"] .lke-quicklink-label,
-#v-link[data-theme-applied="1"] .lke-mag-title,
-#v-link[data-theme-applied="1"] .lke-bigbanner-title,
-#v-link[data-theme-applied="1"] .lke-cd-title,
-#v-link[data-theme-applied="1"] .lke-hero-title,
-#v-link[data-theme-applied="1"] .lke-price-sale,
-#v-link[data-theme-applied="1"] .lke-event-text strong{color:var(--lke-title-color, var(--t1)) !important;font-family:var(--lke-title-font, 'Fraunces','Pretendard','Noto Sans KR',sans-serif)}
+#v-link[data-theme-applied="1"] .lke-price-sale{color:var(--lke-title-color, var(--t1)) !important;font-family:var(--lke-title-font, 'Pretendard','Noto Sans KR',sans-serif)}
 #v-link[data-theme-applied="1"] .lke-product-info-date,
 #v-link[data-theme-applied="1"] .lke-quicklink-sub,
-#v-link[data-theme-applied="1"] .lke-block-link .l-sub,
-#v-link[data-theme-applied="1"] .lke-event-text,
-#v-link[data-theme-applied="1"] .lke-cd-subtitle,
-#v-link[data-theme-applied="1"] .lke-hero-subtitle,
-#v-link[data-theme-applied="1"] .lke-hero-brand{color:var(--lke-text-color, var(--t2)) !important}
-/* CTA pill — 테마 적용 시 title-color 와 같은 색으로, 배경은 반전 */
-#v-link[data-theme-applied="1"] .lke-hero-cta{background:var(--lke-title-color, var(--mint)) !important;color:#fff}
+#v-link[data-theme-applied="1"] .lke-block-link .l-sub{color:var(--lke-text-color, var(--t2)) !important}
 
 /* 제품 카드 유형별 */
 #v-link .lke-product-card.type-channel .lke-product-info-title{color:var(--t1)}
@@ -10897,8 +10887,16 @@ function lkeApplyTemplate(key){
 
 function lkeRenderThemeSheet(){
   var body = document.getElementById('lke-theme-body'); if(!body) return;
-  var st = lkeState.theme || (lkeState.theme = {bg:null, bgSolid:null, textColor:'#1A1F27', titleColor:'#1A1F27', titleFont:'Pretendard', bodyFont:'Pretendard'});
-  var g = lkeParseGrad(st.bg);
+  // 시트 열기만 해서는 lkeState.theme 안 건드림 — display 용 default 만
+  var st = lkeState.theme || {};
+  // display defaults (안 건드리고 표시만)
+  st = {
+    bgSolid: st.bgSolid || '#F9FAFB',
+    textColor: st.textColor || '#1A1F27',
+    titleColor: st.titleColor || '#1A1F27',
+    titleFont: st.titleFont || 'Pretendard',
+    bodyFont: st.bodyFont || 'Pretendard'
+  };
   var _lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
   var _d = (typeof I18N !== 'undefined' && I18N[_lang]) || {};
   var L = function(k, fallback){ return _d['lke.theme.'+k] || fallback; };
