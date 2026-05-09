@@ -1670,9 +1670,9 @@ body.dev-mode .mitem.dev-only{display:flex!important}
 
 /* Edit Sheet */
 .lke-edit-sheet{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;z-index:310;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);max-height:82vh;overflow:hidden;padding-bottom:env(safe-area-inset-bottom);max-width:430px;margin:0 auto;left:0;right:0;display:flex;flex-direction:column}
-/* 시트 본문은 스크롤 — header (handle bar + title) 와 action bar 는 고정 */
-#lke-sheet-edit .lke-sheet-body{flex:1;overflow-y:auto;padding-bottom:80px}
-.lke-edit-action-bar{display:flex;gap:8px;padding:12px 22px calc(12px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--b);box-shadow:0 -4px 14px rgba(15,19,25,.06);position:relative;z-index:5}
+/* 시트 본문은 스크롤 — header / action bar 는 flex 고정 */
+#lke-sheet-edit .lke-sheet-body{flex:1 1 auto;min-height:0;overflow-y:auto;padding-bottom:18px}
+.lke-edit-action-bar{display:flex;gap:8px;padding:12px 22px calc(12px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--b);box-shadow:0 -4px 14px rgba(15,19,25,.06);flex:0 0 auto;z-index:5}
 .lke-edit-sheet.open{transform:translateY(0);box-shadow:0 -18px 50px rgba(15,19,25,.14)}
 .lke-sheet-handle{width:36px;height:4px;background:var(--b);border-radius:100px;margin:12px auto}
 .lke-sheet-header{padding:4px 22px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--b)}
@@ -10445,7 +10445,11 @@ function lkeRenderEditForm(b, idx){
     html += lkeAppearanceHtml(b, idx);
   }
   body.innerHTML=html;
-  // 공통 액션 바 — 시트 하단 sticky (스크롤 따라다니지 않게 fixed footer)
+  // 방어: 혹시 폼 안에 인라인 액션 버튼이 들어갔으면 제거 (legacy 흔적 차단)
+  body.querySelectorAll('button[onclick*="lkeDeleteBlock"],button[onclick*="lkeSaveBlock"]').forEach(function(b){
+    var parent = b.closest('div'); if(parent && parent !== body) parent.remove(); else b.remove();
+  });
+  // 공통 액션 바 — 시트 하단 sticky
   var actionBar = document.getElementById('lke-edit-action-bar');
   if(!actionBar){
     actionBar = document.createElement('div');
