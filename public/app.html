@@ -1773,6 +1773,10 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 #v-link .lke-cta-align-btn{flex:1;padding:6px 0;background:none;border:none;border-radius:6px;color:var(--t2);font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif}
 #v-link .lke-cta-align-btn:hover{background:var(--bg)}
 #v-link .lke-cta-align-btn.on{background:var(--mint-l);color:var(--mint-d)}
+/* CTA 색 row */
+#v-link .lke-cta-color-row{display:flex;gap:6px;padding:4px 6px 8px;border-bottom:1px solid var(--b);margin-bottom:4px}
+#v-link .lke-cta-color-row label{flex:1;display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:11px;font-weight:600;color:var(--t2);cursor:pointer;padding:4px 6px;border-radius:6px;background:var(--bg)}
+#v-link .lke-cta-color-row input[type="color"]{width:24px;height:20px;border:none;border-radius:4px;background:none;padding:0;cursor:pointer}
 /* 히어로 valign — 메인 텍스트 영역 세로 위치 (main_pos 없을 때만) */
 #v-link .lke-hero-banner[data-valign='top']{justify-content:space-between}
 #v-link .lke-hero-banner[data-valign='middle']{justify-content:center;gap:14px}
@@ -9838,9 +9842,13 @@ function lkeRenderHero(){
       '<div class="lke-hero-banner-bottom" style="justify-content:'+({left:'flex-start',center:'center',right:'flex-end'}[s.cta_align||'right'])+'">'+
         ((s.cta_hidden || !s.cta) ?
           '<button class="lke-hero-cta-add" onclick="event.stopPropagation();lkeEditHeroCta('+si+')">+ 클릭 버튼 추가</button>' :
-          '<div class="lke-hero-cta-wrap" onclick="event.stopPropagation();lkeToggleStatMenu(this)"><button class="lke-hero-cta">'+s.cta+'</button>'+
+          '<div class="lke-hero-cta-wrap" onclick="event.stopPropagation();lkeToggleStatMenu(this)"><button class="lke-hero-cta" style="background:'+(s.cta_bg||'#00C896')+';color:'+(s.cta_color||'#fff')+'">'+s.cta+'</button>'+
             '<div class="lke-hero-stat-menu">'+
               '<div class="lke-cta-align-row"><button class="lke-cta-align-btn'+((s.cta_align||'right')==='left'?' on':'')+'" onclick="event.stopPropagation();lkeSetHeroCtaAlign('+si+',\'left\')" aria-label="왼쪽">⇤</button><button class="lke-cta-align-btn'+((s.cta_align||'right')==='center'?' on':'')+'" onclick="event.stopPropagation();lkeSetHeroCtaAlign('+si+',\'center\')" aria-label="가운데">⇔</button><button class="lke-cta-align-btn'+((s.cta_align||'right')==='right'?' on':'')+'" onclick="event.stopPropagation();lkeSetHeroCtaAlign('+si+',\'right\')" aria-label="오른쪽">⇥</button></div>'+
+              '<div class="lke-cta-color-row" onclick="event.stopPropagation()">'+
+                '<label>배경<input type="color" value="'+(s.cta_bg||'#00C896')+'" onchange="lkeSetHeroCtaColor('+si+',\'cta_bg\',this.value)"></label>'+
+                '<label>글자<input type="color" value="'+(s.cta_color||'#FFFFFF')+'" onchange="lkeSetHeroCtaColor('+si+',\'cta_color\',this.value)"></label>'+
+              '</div>'+
               '<button onclick="event.stopPropagation();lkeEditHeroCta('+si+')">편집</button>'+
               '<button class="del" onclick="event.stopPropagation();lkeHeroRemoveCta('+si+')">삭제</button>'+
             '</div>'+
@@ -11140,6 +11148,18 @@ function lkeHeroRemoveCta(si){
 function lkeSetHeroCtaAlign(si, align){
   lkeState.hero.slides[si].cta_align = align;
   lkeRender();
+  if(typeof lkeSyncToServer === 'function') lkeSyncToServer();
+}
+function lkeSetHeroCtaColor(si, key, val){
+  // key: 'cta_bg' | 'cta_color'
+  lkeState.hero.slides[si][key] = val;
+  // CTA 버튼만 inline style 업데이트 — 전체 lkeRender 안 해서 menu 닫힘 방지
+  var slide = document.querySelector('.lke-hero-banner[data-si="'+si+'"]');
+  var btn = slide && slide.querySelector('.lke-hero-cta');
+  if(btn){
+    btn.style.background = lkeState.hero.slides[si].cta_bg || '#00C896';
+    btn.style.color = lkeState.hero.slides[si].cta_color || '#fff';
+  }
   if(typeof lkeSyncToServer === 'function') lkeSyncToServer();
 }
 // 메인 텍스트 박스 자유 드래그 — banner-main 의 빈 공간(텍스트 외)에서 pointer down 시 이동

@@ -47,6 +47,8 @@ type HeroSlide = {
   main_valign?: 'top' | 'middle' | 'bottom'
   cta_align?: 'left' | 'center' | 'right'
   main_pos?: { x: number; y: number }
+  cta_bg?: string
+  cta_color?: string
 }
 
 type PageData = {
@@ -361,7 +363,10 @@ function Hero({ slide, handle, compact }: { slide: HeroSlide; handle: string; co
       </div>
       {slide.cta && !slide.cta_hidden && (
         <div className="lke-hero-banner-bottom" style={{ justifyContent: ctaJustify }}>
-          <span className="lke-hero-cta" dangerouslySetInnerHTML={safeHtml(slide.cta)} />
+          <span className="lke-hero-cta" style={{
+            background: slide.cta_bg || undefined,
+            color: slide.cta_color || undefined
+          }} dangerouslySetInnerHTML={safeHtml(slide.cta)} />
         </div>
       )}
     </>
@@ -393,7 +398,7 @@ function renderBlock(b: Block, i: number) {
     case 'event':
       return (
         <a key={key} className="lke-block lke-block-event" href={hrefOf(b)}
-          style={{ background: b.bgColor || b.bgSolid || b.bg, color: b.textColor }}>
+          style={{ background: b.img ? `url(${b.img}) center/cover` : (b.bgColor || b.bgSolid || b.bg), color: b.textColor }}>
           <div className="lke-event-left">
             <div className="lke-event-dot" />
             <div className="lke-event-text">
@@ -408,7 +413,7 @@ function renderBlock(b: Block, i: number) {
     case 'countdown':
       return (
         <a key={key} className="lke-block lke-block-countdown" href={hrefOf(b)}
-          style={{ background: b.bgColor || b.bgSolid || b.bg, color: b.textColor }}>
+          style={{ background: b.img ? `url(${b.img}) center/cover` : (b.bgColor || b.bgSolid || b.bg), color: b.textColor }}>
           {b.eyebrow && <div className="lke-cd-eyebrow" dangerouslySetInnerHTML={safeHtml(b.eyebrow)} />}
           <div className="lke-cd-title" dangerouslySetInnerHTML={safeHtml(b.title)} />
           {b.sub && <div className="lke-cd-subtitle" dangerouslySetInnerHTML={safeHtml(b.sub)} />}
@@ -465,7 +470,10 @@ function renderBlock(b: Block, i: number) {
     case 'magazine':
       return (
         <a key={key} className={`lke-block lke-block-mag ${b.theme || 'm1'}`} href={hrefOf(b)}
-          style={b.thumbImg ? { background: `url(${b.thumbImg}) center/cover` } : (b.img ? { background: `url(${b.img}) center/cover` } : {})}>
+          style={{
+            background: b.img ? `url(${b.img}) center/cover` : (b.thumbImg ? `url(${b.thumbImg}) center/cover` : (b.bgSolid as string || b.bg as string || undefined)),
+            color: b.textColor as string | undefined
+          }}>
           {b.label && <span className="lke-mag-label">{b.label}</span>}
           <div className="lke-mag-title" dangerouslySetInnerHTML={safeHtml(b.title)} />
         </a>
@@ -475,7 +483,10 @@ function renderBlock(b: Block, i: number) {
     case 'bigbanner':
       return (
         <a key={key} className="lke-block lke-block-bigbanner" href={hrefOf(b)}
-          style={b.thumbImg ? { background: `url(${b.thumbImg}) center/cover` } : (b.bgSolid ? { background: b.bgSolid } : (b.bg ? { background: b.bg } : {}))}>
+          style={{
+            background: b.img ? `url(${b.img}) center/cover` : (b.thumbImg ? `url(${b.thumbImg}) center/cover` : (b.bgSolid as string || b.bg as string || undefined)),
+            color: b.textColor as string | undefined
+          }}>
           <div className="lke-bigbanner-content">
             {b.eyebrow && <div className="lke-bigbanner-eyebrow" dangerouslySetInnerHTML={safeHtml(b.eyebrow)} />}
             <div className="lke-bigbanner-title" dangerouslySetInnerHTML={safeHtml(b.title)} />
