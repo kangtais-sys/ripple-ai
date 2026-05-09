@@ -1779,6 +1779,9 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 #v-link .lke-cta-align-btn{flex:1;padding:6px 0;background:none;border:none;border-radius:6px;color:var(--t2);font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif}
 #v-link .lke-cta-align-btn:hover{background:var(--bg)}
 #v-link .lke-cta-align-btn.on{background:var(--mint-l);color:var(--mint-d)}
+/* settings 시트가 FAB 전용 모드일 때 — 핸들·기능 토글 그룹 숨김, FAB 그룹만 노출 */
+#lke-sheet-settings.fab-only .lke-field-group:not(#lke-settings-fab-group){display:none}
+#lke-sheet-settings.fab-only .lke-sheet-title::after{content:' · 제안 버튼';font-weight:500;opacity:.7}
 /* FAB icon picker (settings sheet) */
 .lke-fab-icon-pick{padding:14px 8px;background:#fff;border:1.5px solid var(--b);border-radius:12px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:6px;font-family:'Pretendard',sans-serif;transition:all .15s;color:var(--t2)}
 .lke-fab-icon-pick svg{width:22px;height:22px;stroke:currentColor;fill:none}
@@ -3323,8 +3326,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <span data-i18n="link.add_block_short">추가</span>
   </button>
 
-  <!-- 제안 FAB 미리보기 — 공개 페이지의 우측 하단 floating button. 클릭 시 설정 시트 열림 -->
-  <button class="lke-fab-proposal" id="lke-fab-proposal" onclick="lkeOpenSheet('settings')" aria-label="제안 버튼 설정" style="display:none">
+  <!-- 제안 FAB 미리보기 — 공개 페이지의 우측 하단 floating button. 클릭 시 FAB 전용 편집 시트 -->
+  <button class="lke-fab-proposal" id="lke-fab-proposal" onclick="lkeOpenFabOnly()" aria-label="제안 버튼 설정" style="display:none">
     <svg id="lke-fab-proposal-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z"/></svg>
     <span class="lke-fab-proposal-label" id="lke-fab-proposal-label" style="display:none"></span>
   </button>
@@ -11022,7 +11025,18 @@ function lkeOpenSheet(name){
   if(s) s.classList.add('open');
   if(name==='add-block') lkeRenderPicker();
   if(name==='theme') lkeRenderThemeSheet();
-  if(name==='settings') lkeRenderSettingsSheet();
+  if(name==='settings') {
+    document.getElementById('lke-sheet-settings').classList.remove('fab-only');
+    lkeRenderSettingsSheet();
+  }
+  document.getElementById('lke-backdrop').classList.add('show');
+}
+// FAB 미리보기 클릭 시 — 설정 시트 열되 핸들/기능 토글 섹션 숨기고 FAB 만 노출
+function lkeOpenFabOnly(){
+  document.querySelectorAll('.lke-edit-sheet').forEach(function(s){ s.classList.remove('open'); });
+  var sheet = document.getElementById('lke-sheet-settings');
+  sheet.classList.add('open', 'fab-only');
+  lkeRenderSettingsSheet();
   document.getElementById('lke-backdrop').classList.add('show');
 }
 // 설정 시트 — 현재 lkeState.settings.fab 상태로 폼 동기화
@@ -11261,15 +11275,20 @@ function lkeApplyThemeToDom(){
 }
 // lkeApplyLayout 제거됨 (레이아웃 기능 삭제)
 function lkeApplySettings(){
-  var hi = document.getElementById('lke-settings-handle');
-  var st = document.getElementById('lke-handle-status');
-  if(!hi){ lkeCloseSheet(); return; }
-  var v = (hi.value||'').trim().replace(/[^a-z0-9_\-]/gi,'');
-  if(!v){ alert('핸들을 입력해주세요'); return; }
-  if(st && st.classList.contains('bad')){ alert('중복된 핸들이에요. 다른 핸들을 선택해주세요.'); return; }
-  lkeState.handle = v;
-  var d = document.getElementById('lk-handle-disp'); if(d) d.textContent = v;
-  var d2 = document.getElementById('lk-handle-disp-2'); if(d2) d2.textContent = v;
+  var sheet = document.getElementById('lke-sheet-settings');
+  var fabOnly = sheet && sheet.classList.contains('fab-only');
+  if(!fabOnly){
+    // 일반 모드 — 핸들 검증·저장
+    var hi = document.getElementById('lke-settings-handle');
+    var st = document.getElementById('lke-handle-status');
+    if(!hi){ lkeCloseSheet(); return; }
+    var v = (hi.value||'').trim().replace(/[^a-z0-9_\-]/gi,'');
+    if(!v){ alert('핸들을 입력해주세요'); return; }
+    if(st && st.classList.contains('bad')){ alert('중복된 핸들이에요. 다른 핸들을 선택해주세요.'); return; }
+    lkeState.handle = v;
+    var d = document.getElementById('lk-handle-disp'); if(d) d.textContent = v;
+    var d2 = document.getElementById('lk-handle-disp-2'); if(d2) d2.textContent = v;
+  }
   // FAB 설정 저장
   if(!lkeState.settings) lkeState.settings = {};
   var fabEnabled = document.getElementById('lke-fab-enabled').classList.contains('on');
