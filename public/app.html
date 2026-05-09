@@ -1669,7 +1669,10 @@ body.dev-mode .mitem.dev-only{display:flex!important}
 /* Floating Toolbar — Ssobi nav 위로 */
 
 /* Edit Sheet */
-.lke-edit-sheet{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;z-index:310;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);max-height:82vh;overflow-y:auto;padding-bottom:env(safe-area-inset-bottom);max-width:430px;margin:0 auto;left:0;right:0}
+.lke-edit-sheet{position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:24px 24px 0 0;z-index:310;transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);max-height:82vh;overflow:hidden;padding-bottom:env(safe-area-inset-bottom);max-width:430px;margin:0 auto;left:0;right:0;display:flex;flex-direction:column}
+/* 시트 본문은 스크롤 — header (handle bar + title) 와 action bar 는 고정 */
+#lke-sheet-edit .lke-sheet-body{flex:1;overflow-y:auto;padding-bottom:80px}
+.lke-edit-action-bar{display:flex;gap:8px;padding:12px 22px calc(12px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid var(--b);box-shadow:0 -4px 14px rgba(15,19,25,.06);position:relative;z-index:5}
 .lke-edit-sheet.open{transform:translateY(0);box-shadow:0 -18px 50px rgba(15,19,25,.14)}
 .lke-sheet-handle{width:36px;height:4px;background:var(--b);border-radius:100px;margin:12px auto}
 .lke-sheet-header{padding:4px 22px 16px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--b)}
@@ -1925,6 +1928,30 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 #v-link .lke-product-card.type-channel .lke-product-info-price{display:none}
 #v-link .lke-product-card.type-content .lke-product-info-price{display:none}
 
+/* spacer 블록 — 편집 모드에서 잡기 쉽게 visible 영역 + 큰 핸들 영역 */
+#v-link .lke-block-spacer{
+  min-height:36px;
+  margin:6px 18px;
+  border-radius:8px;
+  background:rgba(15,19,25,.04);
+  border:1px dashed rgba(15,19,25,.14);
+  position:relative;
+  display:flex;align-items:center;justify-content:center;
+}
+#v-link .lke-block-spacer::after{
+  content:'여백';
+  font-family:'Pretendard',sans-serif;
+  font-size:10px;font-weight:700;color:var(--t3);
+  letter-spacing:.1em;
+}
+#v-link .lke-block-spacer:hover{background:rgba(0,200,150,.08);border-color:rgba(0,200,150,.3)}
+#v-link.lke-preview .lke-block-spacer{min-height:18px;margin:0;background:none;border:none}
+#v-link.lke-preview .lke-block-spacer::after{display:none}
+/* spacer 의 핸들 — 블록 안 가운데, 살짝 더 크게 */
+#v-link .lke-block-spacer .lke-drag{position:absolute;top:50%;left:8px;transform:translateY(-50%)}
+/* divider 도 spacer 와 비슷하게 */
+#v-link .lke-block-divider{margin:6px 18px;border:none;height:1px;background:rgba(15,19,25,.18);position:relative;padding:8px 0;background-clip:content-box;background-color:rgba(15,19,25,.18)}
+#v-link.lke-preview .lke-block-divider{padding:0;background:rgba(15,19,25,.18)}
 /* 기본 블록 간격 (편집 모드) — 블록 사이 충분한 여백으로 안정감 */
 #v-link .lke-block-countdown,#v-link .lke-block-bigbanner,#v-link .lke-block-mag,#v-link .lke-block-image{margin-top:14px;margin-bottom:14px}
 #v-link .lke-block-link,#v-link .lke-block-event{margin-top:10px;margin-bottom:10px}
@@ -10417,13 +10444,20 @@ function lkeRenderEditForm(b, idx){
   if(hasAppearance){
     html += lkeAppearanceHtml(b, idx);
   }
-  // 공통: 저장/삭제/이동
-  html+='<div style="display:flex;gap:8px;margin-top:16px">'+
+  body.innerHTML=html;
+  // 공통 액션 바 — 시트 하단 sticky (스크롤 따라다니지 않게 fixed footer)
+  var actionBar = document.getElementById('lke-edit-action-bar');
+  if(!actionBar){
+    actionBar = document.createElement('div');
+    actionBar.id = 'lke-edit-action-bar';
+    actionBar.className = 'lke-edit-action-bar';
+    document.getElementById('lke-sheet-edit').appendChild(actionBar);
+  }
+  actionBar.innerHTML =
     '<button class="lke-top-btn danger" onclick="lkeDeleteBlock('+idx+')">삭제</button>'+
     '<button class="lke-top-btn" style="flex:1" onclick="lkeCloseSheet()"><span data-i18n="btn.cancel">취소</span></button>'+
-    '<button class="lke-top-btn primary" style="flex:2" onclick="lkeSaveBlock('+idx+')"><span data-i18n="btn.save">저장</span></button>'+
-  '</div>';
-  body.innerHTML=html;
+    '<button class="lke-top-btn primary" style="flex:2" onclick="lkeSaveBlock('+idx+')"><span data-i18n="btn.save">저장</span></button>';
+  if(typeof applyI18n === 'function' && typeof ssobiCurrentLang !== 'undefined') applyI18n(ssobiCurrentLang);
 }
 // 리치 텍스트 필드 (B/I + 줄바꿈 Enter 자동 <br>, 글자색은 꾸미기 패널에서 통일)
 function lkeRich(label, id, val, opts){
