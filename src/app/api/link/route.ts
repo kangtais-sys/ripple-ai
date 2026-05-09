@@ -6,6 +6,7 @@
 //   getUserFromRequest 가 Bearer 우선 + cookie fallback 둘 다 처리
 
 import { NextRequest, NextResponse } from 'next/server'
+import { revalidatePath } from 'next/cache'
 import { getUserFromRequest, adminClient } from '@/lib/auth-helper'
 
 const HANDLE_RE = /^[a-z0-9_-]{3,30}$/
@@ -98,6 +99,9 @@ export async function POST(req: NextRequest) {
 
   // 프로필에 핸들 동기화
   await sb.from('profiles').update({ link_handle: body.handle }).eq('id', user.id)
+
+  // ISR 캐시 무효화 — 저장 직후 /u/[handle] 페이지 캐시 비움 → 다음 방문은 새 데이터
+  try { revalidatePath('/u/' + body.handle) } catch (_) {}
 
   return NextResponse.json({ page: data })
 }

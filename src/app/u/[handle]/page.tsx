@@ -1,15 +1,16 @@
 // 공개 링크 페이지 /u/[handle] — Supabase에서 link_pages 조회 후 SSR 렌더
 //
-// 2026-05-07: dynamic='force-dynamic' 추가 — 유저 편집 즉시 반영
-//   기본 Next.js 동작은 정적 캐싱 → 새 편집이 페이지에 안 보이는 버그 발생
+// 2026-05-09: ISR 캐싱 (revalidate=60) — Edge 에서 60초간 HTML 캐시.
+//   사용자가 편집·저장하면 /api/link POST 가 revalidatePath('/u/{handle}') 호출 →
+//   캐시 즉시 무효화 → 다음 방문은 새 데이터.
+//   조회수 증가는 별도 /api/link/track 엔드포인트가 클라이언트에서 호출 (page 캐싱과 무관).
 import { createClient } from '@supabase/supabase-js'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Script from 'next/script'
 import LinkPageClient from './client'
 
-export const dynamic = 'force-dynamic'
-export const revalidate = 0
+export const revalidate = 60
 
 // anon 키 사용 — RLS의 "Public reads published link_pages" 정책으로 접근
 function publicClient() {
@@ -19,50 +20,8 @@ function publicClient() {
   )
 }
 
-// service_role — view_count·일일 통계 증가 (RLS 우회)
-//   서버 컴포넌트 안에서만 사용, 클라이언트에 절대 노출 X
-function adminClient() {
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { persistSession: false } }
-  )
-}
-
-// 조회수 + 일일 통계 비동기 기록 (페이지 렌더 차단 X)
-//   migration 015 의 atomic RPC 우선 사용. RPC 없으면 read-then-write fallback.
-async function trackPageView(linkPageId: string) {
-  try {
-    const sb = adminClient()
-    const dateKst = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10)
-    // 1) atomic RPC 시도
-    const r1 = await sb.rpc('increment_link_view', { p_id: linkPageId })
-    const r2 = await sb.rpc('increment_link_day_view', { p_id: linkPageId, p_date: dateKst })
-    if (!r1.error && !r2.error) return
-    // 2) RPC 없거나 실패 시 fallback (read-then-write, race-prone but functional)
-    const { data: cur } = await sb.from('link_pages').select('view_count').eq('id', linkPageId).maybeSingle()
-    await sb.from('link_pages').update({ view_count: ((cur?.view_count as number) || 0) + 1 }).eq('id', linkPageId)
-    const { data: dayRow } = await sb
-      .from('link_page_daily_stats')
-      .select('views')
-      .eq('link_page_id', linkPageId)
-      .eq('date', dateKst)
-      .maybeSingle()
-    if (dayRow) {
-      await sb
-        .from('link_page_daily_stats')
-        .update({ views: ((dayRow.views as number) || 0) + 1 })
-        .eq('link_page_id', linkPageId)
-        .eq('date', dateKst)
-    } else {
-      await sb
-        .from('link_page_daily_stats')
-        .insert({ link_page_id: linkPageId, date: dateKst, views: 1, unique_visitors: 1 })
-    }
-  } catch {
-    // 통계 기록 실패해도 페이지는 정상 표시
-  }
-}
+// 조회수 트래킹은 ISR 캐싱과 충돌 (캐시 hit 시 SSR 안 돌아서 카운트 누락) →
+// /api/link/track 으로 분리. client.tsx 에서 마운트 시 호출.
 
 type PageData = {
   id: string
@@ -110,10 +69,7 @@ export default async function PublicLinkPage({ params }: { params: Promise<{ han
   const { handle } = await params
   const page = await fetchPage(handle)
   if (!page) notFound()
-
-  // 비동기 조회수 + 일일 통계 기록 (페이지 응답 차단 X)
-  //   await 안 함 — 트래킹 실패해도 사용자는 즉시 페이지 봄
-  trackPageView(page.id).catch(() => {})
+  // 조회수: client.tsx 가 useEffect 에서 /api/link/track 호출
 
   return (
     <>

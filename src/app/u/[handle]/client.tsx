@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 type Block = {
   type: string
@@ -264,6 +264,17 @@ export default function LinkPageClient({ page }: { page: PageData }) {
   const slides = page.hero?.slides || []
   const firstSlide = slides[0] || ({ title: `@${page.handle}`, sub: 'Ssobi에서 만든 링크 페이지' } as HeroSlide)
   const isHeroCompact = !!page.hero?.compact
+
+  // 조회수 트래킹 — page.tsx 가 ISR 캐싱이라 SSR 단계에서 카운트하면 누락됨.
+  //   마운트 시 한 번만 호출. 봇은 fetch 안 하니 어차피 카운트 안 됨.
+  useEffect(() => {
+    fetch('/api/link/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ handle: page.handle }),
+      keepalive: true,
+    }).catch(() => {})
+  }, [page.handle])
 
   async function submitProposal(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
