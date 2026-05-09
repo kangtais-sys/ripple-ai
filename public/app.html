@@ -1744,7 +1744,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
 /* Drag handle & DnD */
 #v-link .lke-block{position:relative}
-#v-link .lke-drag{position:absolute;top:8px;left:8px;z-index:11;width:32px;height:32px;border-radius:10px;background:#fff;backdrop-filter:blur(8px);border:1px solid rgba(15,19,25,.08);display:flex;align-items:center;justify-content:center;cursor:grab;color:var(--t2);font-size:14px;font-weight:900;letter-spacing:-2px;box-shadow:0 2px 8px rgba(15,19,25,.08);touch-action:none;user-select:none;-webkit-user-select:none}
+#v-link .lke-drag{position:absolute;z-index:11;display:flex;align-items:center;justify-content:center;font-weight:900;cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
 #v-link .lke-drag:active{cursor:grabbing;background:var(--mint);color:#fff;border-color:var(--mint);transform:scale(.95)}
 #v-link.lke-preview .lke-drag,#v-link .lke-block-hero .lke-drag{display:none}
 #v-link .lke-block.dragging{opacity:.4;transform:scale(.98);transition:transform .15s}
@@ -1931,9 +1931,45 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 #v-link .lke-block-grid,#v-link .lke-block-quicklinks{margin-top:6px;margin-bottom:14px}
 #v-link .lke-block-section-title{padding-top:32px;padding-bottom:10px}
 #v-link .lke-block-socials{margin-top:10px;margin-bottom:14px}
-/* 드래그 핸들 — 28px 작게, 은은한 외곽선 */
-#v-link .lke-drag{width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.92);border:1px solid rgba(15,19,25,.1);color:var(--t3);box-shadow:0 1px 4px rgba(15,19,25,.06);font-size:12px;letter-spacing:-1.5px}
-#v-link .lke-drag:active{transform:scale(.88);background:var(--mint);color:#fff;border-color:var(--mint)}
+/* 드래그 핸들 — 기본은 작고 흐릿 (16×20 세로 pill), hover/선택 시 mint 강조 */
+#v-link .lke-drag{
+  width:14px; height:24px;
+  border-radius:6px;
+  background:rgba(15,19,25,.08);
+  border:none;
+  color:rgba(15,19,25,.35);
+  box-shadow:none;
+  font-size:9px;
+  letter-spacing:-1.2px;
+  line-height:1;
+  top:50%; left:4px;
+  transform:translateY(-50%);
+  transition:all .15s ease;
+}
+/* hover/선택 시 — 손잡이 커지고 mint, 툴팁 노출 */
+#v-link .lke-block:not(.lke-block-hero):hover .lke-drag,
+#v-link .lke-block.selected:not(.lke-block-hero) .lke-drag{
+  width:28px; height:28px; left:-2px;
+  background:var(--mint);
+  color:#fff;
+  font-size:13px;
+  letter-spacing:-1.5px;
+  box-shadow:0 4px 12px rgba(0,200,150,.32);
+}
+#v-link .lke-drag::before{
+  content:'끌어 옮기기';
+  position:absolute; top:50%; left:calc(100% + 8px);
+  transform:translateY(-50%);
+  background:#1A1F27; color:#fff;
+  font-family:'Pretendard',sans-serif;
+  font-size:10.5px; font-weight:700; letter-spacing:-.1px;
+  padding:5px 9px; border-radius:6px; white-space:nowrap;
+  opacity:0; pointer-events:none;
+  transition:opacity .12s ease;
+}
+#v-link .lke-block:not(.lke-block-hero):hover .lke-drag::before,
+#v-link .lke-block.selected:not(.lke-block-hero) .lke-drag::before{opacity:1}
+#v-link .lke-drag:active{transform:translateY(-50%) scale(.92);background:var(--mint-d) !important}
 /* 블록 hover/select 시 우상단에 "편집" 힌트 — 첫 사용자가 탭 가능 인지 */
 #v-link .lke-block::after{content:'';display:none}
 #v-link .lke-block:not(.lke-block-divider):not(.lke-block-spacer):not(.lke-block-footer):not(.lke-block-hero):hover::after,
