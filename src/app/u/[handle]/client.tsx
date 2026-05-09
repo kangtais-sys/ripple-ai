@@ -213,6 +213,7 @@ const PUBLIC_CSS = `
 .ssobi-public .lke-bigbanner-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;color:inherit;opacity:.7;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
 .ssobi-public .lke-bigbanner-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:26px;font-weight:400;line-height:1.05;letter-spacing:-.02em;color:inherit;margin:0}
 .ssobi-public .lke-bigbanner-title em{font-style:italic;font-weight:500}
+.ssobi-public .lke-bigbanner-sub{font-size:13px;font-weight:500;color:inherit;opacity:.78;margin-top:8px;line-height:1.4}
 /* bigbanner arrow 제거됨 (2026-05-08) */
 /* QUICKLINKS — clean editorial list */
 .ssobi-public .lke-block-quicklinks{padding:0 18px;margin-top:10px}
@@ -255,7 +256,10 @@ const PUBLIC_CSS = `
 .ssobi-public .ssobi-credit{text-align:center;font-size:10px;opacity:.5;font-weight:600;margin:16px 0 90px;letter-spacing:.4px}
 .ssobi-public .ssobi-credit a{color:inherit;text-decoration:none}
 .ssobi-public .ssobi-credit em{color:var(--mint);font-style:normal}
-.ssobi-public .ssobi-fab{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));right:20px;width:52px;height:52px;border-radius:26px;background:#E85D75;color:#fff;border:none;cursor:pointer;box-shadow:0 8px 20px rgba(232,93,117,.36);font-size:22px}
+.ssobi-public .ssobi-fab{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));right:20px;min-width:52px;height:52px;padding:0 18px;border-radius:26px;background:#1A1F27;color:#fff;border:none;cursor:pointer;box-shadow:0 8px 20px rgba(15,19,25,.28);display:inline-flex;align-items:center;gap:8px;font-family:'Pretendard',sans-serif;font-size:13px;font-weight:700;text-decoration:none;letter-spacing:-.2px}
+.ssobi-public .ssobi-fab > span:first-child{font-size:22px;line-height:1}
+.ssobi-public .ssobi-fab-label{font-size:13px;font-weight:700}
+.ssobi-public a.ssobi-fab:hover{filter:brightness(1.1)}
 `
 
 export default function LinkPageClient({ page }: { page: PageData }) {
@@ -317,7 +321,25 @@ export default function LinkPageClient({ page }: { page: PageData }) {
         <a className="ssobi-cta" href="https://ssobi.ai/?ref=u" dangerouslySetInnerHTML={{ __html: '나만의 링크 페이지 <em>1초만에</em> 만들기 →' }} />
         <div className="ssobi-credit">Powered by <a href="https://ssobi.ai">Ssobi<em>.</em></a></div>
 
-        <button className="ssobi-fab" onClick={() => setProposing(true)} aria-label="제안하기">💌</button>
+        {(() => {
+          const fab = (page.settings as { fab?: { enabled?: boolean; icon?: string; mode?: string; url?: string; label?: string } })?.fab
+          // 명시적으로 비활성화 됐으면 숨김. 미설정(undefined)은 기본 활성 (메시지 + 제안)
+          if (fab && fab.enabled === false) return null
+          const icon = fab?.icon === 'kakao' ? '💬' : (fab?.icon === 'mail' ? '📧' : '💌')
+          const label = fab?.label || ''
+          if (fab?.mode === 'link' && fab.url) {
+            return (
+              <a className="ssobi-fab" href={fab.url} target="_blank" rel="noopener noreferrer" aria-label={label || '제안하기'}>
+                <span>{icon}</span>{label && <span className="ssobi-fab-label">{label}</span>}
+              </a>
+            )
+          }
+          return (
+            <button className="ssobi-fab" onClick={() => setProposing(true)} aria-label={label || '제안하기'}>
+              <span>{icon}</span>{label && <span className="ssobi-fab-label">{label}</span>}
+            </button>
+          )
+        })()}
 
         {proposing && (
           <div onClick={(e) => { if (e.target === e.currentTarget) setProposing(false) }}
@@ -501,6 +523,7 @@ function renderBlock(b: Block, i: number) {
           <div className="lke-bigbanner-content">
             {b.eyebrow && <div className="lke-bigbanner-eyebrow" dangerouslySetInnerHTML={safeHtml(b.eyebrow)} />}
             <div className="lke-bigbanner-title" dangerouslySetInnerHTML={safeHtml(b.title)} />
+            {b.sub && <div className="lke-bigbanner-sub" dangerouslySetInnerHTML={safeHtml(b.sub)} />}
           </div>
         </a>
       )
