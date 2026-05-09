@@ -10504,7 +10504,6 @@ function lkeSaveBlock(idx){
 function lkeAppearanceHtml(b, idx){
   var text = (b.textColor && b.textColor[0]==='#') ? b.textColor.slice(0,7) : '#FFFFFF';
   var solid = (b.bgSolid && b.bgSolid[0]==='#') ? b.bgSolid.slice(0,7) : '#FFFFFF';
-  var g = lkeParseGrad(b.bg);
   return '<div class="lke-appearance">'+
     '<div class="lke-app-head">꾸미기</div>'+
     // 글자색
@@ -10521,19 +10520,6 @@ function lkeAppearanceHtml(b, idx){
       '<div class="lke-pick-col">'+
         '<span class="lke-pick-hex" id="f-bgSolid-hex">'+solid.toUpperCase()+'</span>'+
         '<input type="color" class="lke-color-dot" id="f-bgSolid" value="'+solid+'" oninput="document.getElementById(\'f-bgSolid-hex\').textContent=this.value.toUpperCase()">'+
-      '</div>'+
-    '</div>'+
-    // 배경 그라디언트 (c1 + dir + c2)
-    '<div class="lke-pick-row">'+
-      '<label>배경 그라디</label>'+
-      '<div class="lke-pick-col" id="f-bg">'+
-        '<input type="color" class="lke-color-dot lke-grad-c1" value="'+g.c1+'">'+
-        '<select class="lke-grad-sel">'+
-          [['135','↘'],['180','↓'],['90','→'],['45','↗'],['radial','⊙']].map(function(d){
-            return '<option value="'+d[0]+'"'+(g.dir===d[0]?' selected':'')+'>'+d[1]+'</option>';
-          }).join('')+
-        '</select>'+
-        '<input type="color" class="lke-color-dot lke-grad-c2" value="'+g.c2+'">'+
       '</div>'+
     '</div>'+
     // 배경 이미지
