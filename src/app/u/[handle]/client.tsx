@@ -44,6 +44,8 @@ type HeroSlide = {
   cta_hidden?: boolean
   main_align?: 'left' | 'center' | 'right'
   eyebrow_align?: 'left' | 'center' | 'right'
+  main_valign?: 'top' | 'middle' | 'bottom'
+  cta_align?: 'left' | 'center' | 'right'
 }
 
 type PageData = {
@@ -122,6 +124,8 @@ const PUBLIC_CSS = `
 /* HERO — has-bg 시 강한 그라디언트 오버레이로 텍스트 가독성 확보 */
 .ssobi-public .lke-hero-carousel{position:relative}
 .ssobi-public .lke-hero-banner{aspect-ratio:4/5;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff;position:relative;overflow:hidden;padding:32px 24px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;text-decoration:none}
+.ssobi-public .lke-hero-banner[data-valign='middle']{justify-content:center;gap:14px}
+.ssobi-public .lke-hero-banner[data-valign='bottom']{justify-content:flex-end;gap:14px}
 .ssobi-public a.lke-hero-banner{color:#fff;cursor:pointer;transition:filter .2s}
 .ssobi-public a.lke-hero-banner:active{filter:brightness(.9)}
 .ssobi-public .lke-hero-banner::before{content:'';position:absolute;top:-100px;right:-100px;width:380px;height:380px;background:radial-gradient(circle,rgba(0,200,150,.35),transparent 70%)}
@@ -333,6 +337,7 @@ function Hero({ slide, handle, compact }: { slide: HeroSlide; handle: string; co
   const cls = ['lke-hero-banner', compact ? 'compact' : '', hasBg ? 'has-bg' : ''].filter(Boolean).join(' ')
   const style: React.CSSProperties = hasBg ? { backgroundImage: `url(${slide.bg})` } : {}
   const linkUrl = slide.ctaUrl || ''
+  const ctaJustify = ({ left: 'flex-start', center: 'center', right: 'flex-end' } as const)[(slide.cta_align as 'left'|'center'|'right') || 'right']
   const inner = (
     <>
       <div className="lke-hero-banner-main" style={{ textAlign: slide.main_align || 'left' }}>
@@ -345,18 +350,19 @@ function Hero({ slide, handle, compact }: { slide: HeroSlide; handle: string; co
         )}
       </div>
       {slide.cta && !slide.cta_hidden && (
-        <div className="lke-hero-banner-bottom">
+        <div className="lke-hero-banner-bottom" style={{ justifyContent: ctaJustify }}>
           <span className="lke-hero-cta" dangerouslySetInnerHTML={safeHtml(slide.cta)} />
         </div>
       )}
     </>
   )
+  const valign = (slide.main_valign as 'top'|'middle'|'bottom') || 'top'
   return (
     <div className="lke-hero-carousel">
       {linkUrl ? (
-        <a className={cls} style={style} href={linkUrl}>{inner}</a>
+        <a className={cls} style={style} href={linkUrl} data-valign={valign}>{inner}</a>
       ) : (
-        <div className={cls} style={style}>{inner}</div>
+        <div className={cls} style={style} data-valign={valign}>{inner}</div>
       )}
     </div>
   )

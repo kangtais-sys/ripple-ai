@@ -1767,7 +1767,16 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 /* X 버튼은 메뉴의 [삭제] 와 중복이라 제거 — 완전 숨김 */
 #v-link .lke-hero-stat-x{display:none !important}
 #v-link .lke-hero-stat.menu-on .lke-hero-stat-x{display:flex}
-#v-link .lke-hero-stat-menu{position:absolute;top:calc(100% + 6px);left:0;z-index:5;background:#fff;border:1px solid var(--b);border-radius:8px;box-shadow:0 8px 22px rgba(15,19,25,.18);padding:4px;display:none;flex-direction:column;gap:2px;min-width:80px}
+#v-link .lke-hero-stat-menu{position:absolute;bottom:calc(100% + 6px);left:0;z-index:5;background:#fff;border:1px solid var(--b);border-radius:10px;box-shadow:0 8px 22px rgba(15,19,25,.22);padding:6px;display:none;flex-direction:column;gap:2px;min-width:140px}
+/* CTA 정렬 row (편집/삭제 메뉴 안) */
+#v-link .lke-cta-align-row{display:flex;gap:2px;padding:2px 0 6px;border-bottom:1px solid var(--b);margin-bottom:4px}
+#v-link .lke-cta-align-btn{flex:1;padding:6px 0;background:none;border:none;border-radius:6px;color:var(--t2);font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif}
+#v-link .lke-cta-align-btn:hover{background:var(--bg)}
+#v-link .lke-cta-align-btn.on{background:var(--mint-l);color:var(--mint-d)}
+/* 히어로 valign — 메인 텍스트 영역 세로 위치 */
+#v-link .lke-hero-banner[data-valign='top']{justify-content:space-between}
+#v-link .lke-hero-banner[data-valign='middle']{justify-content:center;gap:14px}
+#v-link .lke-hero-banner[data-valign='bottom']{justify-content:flex-end;gap:14px}
 #v-link .lke-hero-stat.menu-on .lke-hero-stat-menu{display:flex}
 #v-link .lke-hero-stat-menu button{border:none;background:none;padding:7px 10px;font-size:11.5px;font-weight:700;text-align:left;color:var(--t1);cursor:pointer;border-radius:4px;font-family:'Pretendard',sans-serif}
 #v-link .lke-hero-stat-menu button:hover{background:var(--bg)}
@@ -9807,11 +9816,13 @@ function lkeRenderHero(){
     var slide=document.createElement('div'); slide.className='lke-hero-banner' + (heroCompact ? ' compact' : '');
     if(s.bg){ slide.classList.add('has-bg'); slide.style.backgroundImage='url('+s.bg+')'; }
     slide.dataset.si=si;
+    slide.dataset.valign = s.main_valign || 'top';
     var canDelete = lkeState.hero.slides.length > 1;
     slide.innerHTML =
       '<div class="lke-hero-tools">'+
         '<button class="lke-hero-tool" aria-label="배너 추가" onclick="event.stopPropagation();lkeAddHeroSlide()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg></button>'+
         '<button class="lke-hero-tool" aria-label="배경 변경" onclick="event.stopPropagation();lkeHeroUploadBg('+si+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg></button>'+
+        '<button class="lke-hero-tool" aria-label="텍스트 위치" onclick="event.stopPropagation();lkeCycleHeroValign('+si+')" title="위/중/아래"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h12M3 18h18" stroke-linecap="round"/></svg></button>'+
         (canDelete ? '<button class="lke-hero-tool del" aria-label="배너 삭제" onclick="event.stopPropagation();lkeDeleteHeroSlide('+si+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M6 18L18 6" stroke-linecap="round"/></svg></button>' : '')+
       '</div>'+
       '<div class="lke-hero-banner-main" style="text-align:'+(s.main_align||'left')+'">'+
@@ -9819,10 +9830,16 @@ function lkeRenderHero(){
         '<h1 class="lke-hero-title lke-editable-text" data-key="title" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].title=lkeStripWrappers(this.innerHTML);lkeSyncToServer()">'+(s.title||'')+'</h1>'+
         '<div class="lke-hero-subtitle lke-editable-text" data-key="sub" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].sub=lkeStripWrappers(this.innerHTML);lkeSyncToServer()">'+(s.sub||'')+'</div>'+
       '</div>'+
-      '<div class="lke-hero-banner-bottom">'+
+      '<div class="lke-hero-banner-bottom" style="justify-content:'+({left:'flex-start',center:'center',right:'flex-end'}[s.cta_align||'right'])+'">'+
         ((s.cta_hidden || !s.cta) ?
           '<button class="lke-hero-cta-add" onclick="event.stopPropagation();lkeEditHeroCta('+si+')">+ 클릭 버튼 추가</button>' :
-          '<div class="lke-hero-cta-wrap" onclick="event.stopPropagation();lkeToggleStatMenu(this)"><button class="lke-hero-cta">'+s.cta+'</button><div class="lke-hero-stat-menu"><button onclick="event.stopPropagation();lkeEditHeroCta('+si+')">편집</button><button class="del" onclick="event.stopPropagation();lkeHeroRemoveCta('+si+')">삭제</button></div></div>')+
+          '<div class="lke-hero-cta-wrap" onclick="event.stopPropagation();lkeToggleStatMenu(this)"><button class="lke-hero-cta">'+s.cta+'</button>'+
+            '<div class="lke-hero-stat-menu">'+
+              '<div class="lke-cta-align-row"><button class="lke-cta-align-btn'+((s.cta_align||'right')==='left'?' on':'')+'" onclick="event.stopPropagation();lkeSetHeroCtaAlign('+si+',\'left\')" aria-label="왼쪽">⇤</button><button class="lke-cta-align-btn'+((s.cta_align||'right')==='center'?' on':'')+'" onclick="event.stopPropagation();lkeSetHeroCtaAlign('+si+',\'center\')" aria-label="가운데">⇔</button><button class="lke-cta-align-btn'+((s.cta_align||'right')==='right'?' on':'')+'" onclick="event.stopPropagation();lkeSetHeroCtaAlign('+si+',\'right\')" aria-label="오른쪽">⇥</button></div>'+
+              '<button onclick="event.stopPropagation();lkeEditHeroCta('+si+')">편집</button>'+
+              '<button class="del" onclick="event.stopPropagation();lkeHeroRemoveCta('+si+')">삭제</button>'+
+            '</div>'+
+          '</div>')+
       '</div>';
     track.appendChild(slide);
   });
@@ -11110,6 +11127,22 @@ function lkeHeroRemoveCta(si){
   var s = lkeState.hero.slides[si];
   s.cta = ''; s.ctaUrl = ''; s.cta_hidden = false; // 완전 비우기 → "+ 추가" 버튼 보이게
   lkeRender();
+  if(typeof lkeSyncToServer === 'function') lkeSyncToServer();
+}
+function lkeSetHeroCtaAlign(si, align){
+  lkeState.hero.slides[si].cta_align = align;
+  lkeRender();
+  if(typeof lkeSyncToServer === 'function') lkeSyncToServer();
+}
+// 메인 텍스트 영역 세로 위치 토글 — top → middle → bottom 순환
+function lkeCycleHeroValign(si){
+  var s = lkeState.hero.slides[si];
+  var cur = s.main_valign || 'top';
+  var next = { top:'middle', middle:'bottom', bottom:'top' }[cur];
+  s.main_valign = next;
+  if(typeof lkeShowToast === 'function') lkeShowToast('텍스트 위치: '+ {top:'위',middle:'가운데',bottom:'아래'}[next]);
+  lkeRender();
+  if(typeof lkeSyncToServer === 'function') lkeSyncToServer();
 }
 function lkeToggleStatMenu(el){
   var wasOn = el.classList.contains('menu-on');
