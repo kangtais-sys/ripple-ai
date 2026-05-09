@@ -3007,6 +3007,19 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         </div>
       </div>
       <div id="signup-error" style="color:var(--red);font-size:12px;margin-top:6px;display:none"></div>
+
+      <!-- 약관·마케팅 동의 (한국 PIPA 준수) -->
+      <div class="signup-consents" style="margin-top:14px;padding:12px 14px;background:var(--bg);border-radius:10px;font-family:'Pretendard',sans-serif">
+        <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:12.5px;line-height:1.5;color:var(--t1);font-weight:500">
+          <input type="checkbox" id="signup-tos" style="margin-top:3px;flex-shrink:0;width:16px;height:16px;accent-color:var(--mint)">
+          <span><span style="color:var(--red);font-weight:700">[필수]</span> <a href="/legal/terms.html" target="_blank" style="color:var(--mint-d);text-decoration:underline">이용약관</a> · <a href="/legal/privacy.html" target="_blank" style="color:var(--mint-d);text-decoration:underline">개인정보처리방침</a> 에 동의합니다</span>
+        </label>
+        <label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:12.5px;line-height:1.5;color:var(--t2);font-weight:500;margin-top:8px">
+          <input type="checkbox" id="signup-marketing" style="margin-top:3px;flex-shrink:0;width:16px;height:16px;accent-color:var(--mint)">
+          <span>[선택] 이벤트·신기능·할인 등 마케팅 알림 수신에 동의합니다</span>
+        </label>
+      </div>
+
       <button class="btn-dark" style="margin-top:12px" onclick="doSignup()" data-i18n="auth.signup.btn_start">7일 무료로 시작하기</button>
       <div class="divider" data-i18n="auth.divider">또는</div>
       <button class="social-btn social-kakao" onclick="doKakaoLogin()">
@@ -3026,7 +3039,6 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     </div>
 
     <div class="auth-switch"><span data-i18n="auth.have_account">이미 계정이 있나요?</span> <a onclick="go('login')" data-i18n="auth.signin">로그인</a></div>
-    <div class="auth-legal" data-i18n="auth.signup.legal">가입하면 이용약관과 개인정보처리방침에 동의하는 것으로 간주돼요</div>
   </div>
 </div>
 
@@ -10992,10 +11004,13 @@ function lkeApplySettings(){
   var st = document.getElementById('lke-handle-status');
   if(!hi){ lkeCloseSheet(); return; }
   var v = (hi.value||'').trim().replace(/[^a-z0-9_\-]/gi,'');
-  if(!v){ alert(t('alert.enter_handle','핸들을 입력해주세요')); return; }
+  if(!v){ alert('핸들을 입력해주세요'); return; }
   if(st && st.classList.contains('bad')){ alert('중복된 핸들이에요. 다른 핸들을 선택해주세요.'); return; }
   lkeState.handle = v;
   var d = document.getElementById('lk-handle-disp'); if(d) d.textContent = v;
+  var d2 = document.getElementById('lk-handle-disp-2'); if(d2) d2.textContent = v;
+  // 즉시 서버에 sync — 설정 변경이 자동으로 적용되게
+  if(typeof lkeSyncToServer === 'function') lkeSyncToServer();
   lkeCloseSheet();
 }
 
@@ -16665,12 +16680,27 @@ async function doSignup() {
   var emailEl = document.querySelector('#v-signup .inp[type="email"]');
   var pwEl = document.getElementById('signup-pw');
   var errEl = document.getElementById('signup-error');
+  var tosEl = document.getElementById('signup-tos');
+  var mktEl = document.getElementById('signup-marketing');
   errEl.style.display = 'none';
+
+  // 약관 동의 검증 (한국 PIPA 필수)
+  if(tosEl && !tosEl.checked){
+    errEl.textContent = '이용약관·개인정보처리방침 동의가 필요해요.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  var marketingConsent = !!(mktEl && mktEl.checked);
 
   var res = await sb.auth.signUp({
     email: emailEl.value,
     password: pwEl.value,
-    options: { data: { display_name: nameEl.value } }
+    options: { data: {
+      display_name: nameEl.value,
+      tos_accepted: true,
+      marketing_consent: marketingConsent
+    } }
   });
 
   if (res.error) {
@@ -16679,15 +16709,129 @@ async function doSignup() {
     return;
   }
 
+  // profiles 에 동의 시각·마케팅 동의 기록 (트리거가 행 만든 후 update)
+  //   세션이 즉시 발급되면 sb 클라이언트가 RLS 통과해서 본인 행 update 가능
+  if(res.data.session){
+    try {
+      await sb.from('profiles').update({
+        tos_accepted_at: new Date().toISOString(),
+        marketing_consent: marketingConsent
+      }).eq('id', res.data.session.user.id);
+    } catch(_){}
+  }
+
   if (typeof lkeShowToast === 'function') lkeShowToast('✓ '+(nameEl.value||'환영합니다')+'님, 가입 완료!');
 
-  // 신규 가입자는 항상 온보딩(SNS 연동)부터
+  // 신규 가입자: 카테고리 선택 → SNS 연동
   if (res.data.session) {
-    go('connect-account-onb');
+    openCategoryPicker(true); // skippable
   } else {
     // 이메일 인증 필요 시
     go('signup/confirm');
   }
+}
+
+// OAuth 신규 유저용 약관 동의 — 닫기 불가 (백드롭 클릭·ESC 막음)
+//   동의 → tos_accepted_at·marketing_consent 저장 → 카테고리 모달
+function openOAuthConsentModal(userId){
+  var existing = document.getElementById('m-oauth-consent');
+  if(existing) existing.remove();
+  var ov = document.createElement('div');
+  ov.id = 'm-oauth-consent';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:300;background:rgba(15,19,25,.7);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;padding:20px';
+  ov.innerHTML =
+    '<div style="background:#fff;border-radius:18px;padding:24px;max-width:380px;width:100%;font-family:\'Pretendard\',sans-serif">'+
+      '<div style="font-size:20px;font-weight:800;color:var(--t1);letter-spacing:-.4px;margin-bottom:6px">Ssobi 이용에 앞서</div>'+
+      '<div style="font-size:12.5px;color:var(--t3);line-height:1.5;margin-bottom:16px">서비스 시작 전에 약관 동의가 필요해요.</div>'+
+      '<label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:13px;line-height:1.5;color:var(--t1);font-weight:600;margin-bottom:10px">'+
+        '<input type="checkbox" id="oauth-tos" style="margin-top:3px;flex-shrink:0;width:16px;height:16px;accent-color:var(--mint)">'+
+        '<span><span style="color:var(--red);font-weight:700">[필수]</span> <a href="/legal/terms.html" target="_blank" style="color:var(--mint-d);text-decoration:underline">이용약관</a> · <a href="/legal/privacy.html" target="_blank" style="color:var(--mint-d);text-decoration:underline">개인정보처리방침</a> 동의</span>'+
+      '</label>'+
+      '<label style="display:flex;align-items:flex-start;gap:8px;cursor:pointer;font-size:13px;line-height:1.5;color:var(--t2);font-weight:600">'+
+        '<input type="checkbox" id="oauth-marketing" style="margin-top:3px;flex-shrink:0;width:16px;height:16px;accent-color:var(--mint)">'+
+        '<span>[선택] 마케팅 알림 수신 동의</span>'+
+      '</label>'+
+      '<button id="oauth-consent-btn" style="width:100%;margin-top:18px;padding:14px;background:var(--mint);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:800;cursor:pointer;font-family:\'Pretendard\',sans-serif">동의하고 시작하기</button>'+
+    '</div>';
+  document.body.appendChild(ov);
+  // 백드롭 클릭·ESC 차단 — 약관 동의는 mandatory
+  ov.addEventListener('click', function(e){ e.stopPropagation(); });
+  ov.querySelector('#oauth-consent-btn').onclick = async function(){
+    var tos = document.getElementById('oauth-tos').checked;
+    var mkt = document.getElementById('oauth-marketing').checked;
+    if(!tos){ alert('이용약관·개인정보처리방침 동의가 필요해요.'); return; }
+    try {
+      await sb.from('profiles').update({
+        tos_accepted_at: new Date().toISOString(),
+        marketing_consent: mkt
+      }).eq('id', userId);
+    } catch(_){}
+    ov.remove();
+    // 이어서 카테고리 권유
+    if(typeof openCategoryPicker === 'function') openCategoryPicker(false);
+  };
+}
+
+// 카테고리 선택 모달 — 신규 가입 직후 또는 기존 유저 (categories 비어있을 때) 자동 표시
+//   다중 선택 (최대 3), 스킵 가능. 스킵하면 SNS 연동으로 바로 진행.
+function openCategoryPicker(isSignup){
+  var existing = document.getElementById('m-category-pick');
+  if(existing) existing.remove();
+  var cats = [
+    {key:'beauty',label:'뷰티',emoji:'💄'},
+    {key:'fashion',label:'패션',emoji:'👗'},
+    {key:'food',label:'푸드',emoji:'🍽️'},
+    {key:'fitness',label:'운동',emoji:'💪'},
+    {key:'tech',label:'IT·테크',emoji:'💻'},
+    {key:'life',label:'라이프',emoji:'🏠'},
+    {key:'travel',label:'여행',emoji:'✈️'},
+    {key:'parenting',label:'육아',emoji:'👶'},
+    {key:'pet',label:'펫',emoji:'🐾'},
+    {key:'other',label:'기타',emoji:'✨'}
+  ];
+  var ov = document.createElement('div');
+  ov.id = 'm-category-pick';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:200;background:rgba(15,19,25,.55);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:20px';
+  ov.innerHTML =
+    '<div style="background:#fff;border-radius:18px;padding:24px;max-width:380px;width:100%;max-height:90vh;overflow-y:auto;font-family:\'Pretendard\',sans-serif">'+
+      '<div style="font-size:20px;font-weight:800;color:var(--t1);letter-spacing:-.4px;margin-bottom:6px">관심 카테고리를 골라주세요</div>'+
+      '<div style="font-size:12.5px;color:var(--t3);line-height:1.5;margin-bottom:16px">맞춤 트렌드·콘텐츠 추천에 사용해요. 최대 3개 선택. <b>나중에 바꿀 수 있어요.</b></div>'+
+      '<div id="cat-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:8px"></div>'+
+      '<div style="display:flex;gap:8px;margin-top:18px">'+
+        '<button id="cat-skip" style="flex:1;padding:12px;background:none;border:1px solid var(--b);border-radius:10px;font-size:13px;font-weight:700;color:var(--t2);cursor:pointer;font-family:\'Pretendard\',sans-serif">건너뛰기</button>'+
+        '<button id="cat-save" style="flex:2;padding:12px;background:var(--mint);color:#fff;border:none;border-radius:10px;font-size:13px;font-weight:800;cursor:pointer;font-family:\'Pretendard\',sans-serif">완료</button>'+
+      '</div>'+
+    '</div>';
+  document.body.appendChild(ov);
+  var grid = ov.querySelector('#cat-grid');
+  var picked = [];
+  cats.forEach(function(c){
+    var b = document.createElement('button');
+    b.style.cssText = 'padding:14px 10px;background:#fff;border:1.5px solid var(--b);border-radius:12px;font-size:13px;font-weight:700;color:var(--t1);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;transition:all .15s;font-family:\'Pretendard\',sans-serif';
+    b.innerHTML = '<span style="font-size:22px">'+c.emoji+'</span>'+c.label;
+    b.onclick = function(){
+      var i = picked.indexOf(c.key);
+      if(i >= 0){ picked.splice(i,1); b.style.borderColor='var(--b)'; b.style.background='#fff'; }
+      else if(picked.length >= 3){ alert('최대 3개까지 선택 가능해요.'); }
+      else { picked.push(c.key); b.style.borderColor='var(--mint)'; b.style.background='var(--mint-l)'; }
+    };
+    grid.appendChild(b);
+  });
+  ov.querySelector('#cat-skip').onclick = function(){
+    try { localStorage.setItem('ssobi_cat_skipped', '1'); } catch(_){}
+    ov.remove();
+    if(isSignup) go('connect-account-onb');
+  };
+  ov.querySelector('#cat-save').onclick = async function(){
+    if(picked.length === 0){ alert('하나 이상 선택하거나 건너뛰기를 눌러주세요.'); return; }
+    try {
+      var u = (await sb.auth.getUser())?.data?.user;
+      if(u) await sb.from('profiles').update({ categories: picked }).eq('id', u.id);
+      localStorage.removeItem('ssobi_cat_skipped');
+    } catch(_){}
+    ov.remove();
+    if(isSignup) go('connect-account-onb');
+  };
 }
 
 async function doLogin() {
@@ -17015,6 +17159,20 @@ async function bootstrapUser(){
     var userRes = await sb.auth.getUser();
     var user = userRes?.data?.user;
     if(!user) return;
+
+    // OAuth (Google/Kakao) 신규 유저 — 약관 동의·카테고리 받기
+    //   profiles.tos_accepted_at NULL 이면 동의 미완 → 모달 띄움
+    //   이메일 가입자는 이미 폼에서 받았음 (tos_accepted_at 세팅됨)
+    try {
+      var pr = await sb.from('profiles').select('tos_accepted_at, categories').eq('id', user.id).maybeSingle();
+      if(pr?.data && !pr.data.tos_accepted_at){
+        // OAuth 신규 — 약관 동의 모달 (mandatory)
+        openOAuthConsentModal(user.id);
+      } else if(pr?.data && (!pr.data.categories || pr.data.categories.length === 0) && !localStorage.getItem('ssobi_cat_skipped')){
+        // 카테고리 미선택 → 권유 (skippable, 1회만)
+        if(typeof openCategoryPicker === 'function') openCategoryPicker(false);
+      }
+    } catch(_){}
 
     // 내 링크 백그라운드 하이드레이션 — 로그인 즉시 서버 데이터 fetch
     //   v-link 탭 안 들어가도 미리 lkeState 업데이트해서 진입 시 즉시 표시
