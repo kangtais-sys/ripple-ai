@@ -2180,7 +2180,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div class="eff-strip" id="eff-repeat-strip" style="display:none">
     <div><span data-i18n="home.eff.replied">응대한</span> <b id="eff-total-users">0</b> <span data-i18n="home.eff.midfix">명 중</span> <b id="eff-repeat-users" style="color:var(--mint-d)">0</b> <span data-i18n="home.eff.returned">명 재방문 · 관계 전환</span> <span id="eff-repeat-rate">0</span>%</div>
   </div>
-  <div id="home-alert-urgent" class="alert" onclick="go('manage');setTab('urgent')">
+  <div id="home-alert-urgent" class="alert" onclick="goHomeAlertTarget()">
     <div><div class="alert-t"><span data-i18n="home.urgent_pending">긴급 응대 대기</span> <span id="home-alert-count">0</span></div><div class="alert-s" id="home-alert-sub" data-i18n="home.urgent_sub">긴급 · 비즈니스 제안</div></div>
     <div class="alert-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
   </div>
@@ -15861,6 +15861,109 @@ function setTab(t){
   if(t==='comments') loadPendingDrafts();
   if(t==='urgent') loadPendingDrafts();
   if(t==='insight') loadInsights();
+  if(t==='revenue') loadProposalList();
+}
+
+// 협업/제안 탭 — link_proposals 목록 + 미확인 마크 처리
+async function loadProposalList(){
+  var listEl = document.getElementById('revenue-list');
+  var emptyEl = document.getElementById('revenue-empty');
+  var countEl = document.getElementById('rev-linkcount');
+  if(!listEl) return;
+  try {
+    var h = await authHeaders();
+    var r = await fetch('/api/link/proposals', { headers: h, credentials:'include' });
+    if(!r.ok) return;
+    var j = await r.json();
+    var arr = j.proposals || [];
+    if(countEl) countEl.textContent = arr.length;
+    if(arr.length === 0){
+      listEl.innerHTML = '';
+      if(emptyEl) emptyEl.style.display = 'block';
+      return;
+    }
+    if(emptyEl) emptyEl.style.display = 'none';
+    var kindLabels = { collab:'협찬·광고', ad:'공동구매', question:'수출·유통', other:'기타' };
+    listEl.innerHTML = arr.map(function(p){
+      var t = new Date(p.created_at);
+      var ago = _formatRelativeTime(t);
+      var unread = !p.read;
+      return '<div class="msg-row" style="padding:14px 16px;background:#fff;border:1px solid var(--b);border-radius:14px;margin-bottom:8px;'+(unread?'box-shadow:0 0 0 2px var(--mint-l)':'')+'">'+
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'+
+          '<div style="display:flex;align-items:center;gap:8px;font-size:11px;font-weight:800;color:var(--mint-d)">'+(unread?'<span style="width:7px;height:7px;border-radius:50%;background:var(--mint);display:inline-block"></span>':'')+(kindLabels[p.kind]||p.kind||'기타')+'</div>'+
+          '<div style="font-size:10.5px;color:var(--t3)">'+ago+'</div>'+
+        '</div>'+
+        '<div style="font-size:13.5px;font-weight:700;color:var(--t1);margin-bottom:4px">'+escapeHtml(p.from_name||'(이름 없음)')+(p.from_handle?' · @'+escapeHtml(p.from_handle):'')+'</div>'+
+        (p.from_email?'<div style="font-family:\'JetBrains Mono\',monospace;font-size:11px;color:var(--t3);margin-bottom:8px">'+escapeHtml(p.from_email)+'</div>':'')+
+        '<div style="font-size:13px;line-height:1.55;color:var(--t1);white-space:pre-wrap">'+escapeHtml(p.message||'')+'</div>'+
+      '</div>';
+    }).join('');
+    // 미확인 모두 read 처리 (배지 카운트 갱신)
+    if(j.unread_count > 0){
+      try {
+        await fetch('/api/link/proposals', { method:'PATCH', headers: h, credentials:'include' });
+        // home alert 갱신
+        if(typeof updateHomeAlertCount === 'function') updateHomeAlertCount();
+      } catch(_){}
+    }
+  } catch(e){ console.warn('loadProposalList', e); }
+}
+
+function _formatRelativeTime(t){
+  var diff = (Date.now() - t.getTime()) / 1000;
+  if(diff < 60) return '방금';
+  if(diff < 3600) return Math.floor(diff/60)+'분 전';
+  if(diff < 86400) return Math.floor(diff/3600)+'시간 전';
+  if(diff < 86400*7) return Math.floor(diff/86400)+'일 전';
+  return t.toISOString().slice(0,10);
+}
+
+// 홈 알림 클릭 시 — 미확인 제안 있으면 revenue 탭(협업/제안), 없으면 urgent 탭
+async function goHomeAlertTarget(){
+  go('manage');
+  // 미확인 제안 있는지 빠른 확인
+  try {
+    var u = (await sb.auth.getUser())?.data?.user;
+    if(u){
+      var pq = await sb.from('link_pages').select('id').eq('user_id', u.id);
+      var ids = (pq.data||[]).map(p=>p.id);
+      if(ids.length){
+        var unread = await sb.from('link_proposals').select('id',{count:'exact',head:true}).in('link_page_id',ids).eq('read',false);
+        if(unread.count > 0){ setTab('revenue'); return; }
+      }
+    }
+  } catch(_){}
+  setTab('urgent');
+}
+
+// 홈 탭의 '긴급 응대 대기' 알림 카운트 — 미확인 link_proposals + pending reply_logs
+async function updateHomeAlertCount(){
+  var countEl = document.getElementById('home-alert-count');
+  var subEl = document.getElementById('home-alert-sub');
+  if(!countEl) return;
+  try {
+    var u = (await sb.auth.getUser())?.data?.user;
+    if(!u) return;
+    // 1) 미확인 제안 (link_proposals.read=false)
+    var pageQ = await sb.from('link_pages').select('id').eq('user_id', u.id);
+    var pageIds = (pageQ.data||[]).map(p=>p.id);
+    var propUnread = 0;
+    if(pageIds.length){
+      var pq = await sb.from('link_proposals').select('id', {count:'exact', head:true}).in('link_page_id', pageIds).eq('read', false);
+      propUnread = pq.count || 0;
+    }
+    // 2) pending reply_logs (긴급 응대)
+    var rq = await sb.from('reply_logs').select('id', {count:'exact', head:true}).eq('user_id', u.id).eq('send_status','pending');
+    var pendCount = rq.count || 0;
+    var total = propUnread + pendCount;
+    countEl.textContent = total;
+    if(subEl){
+      var bits = [];
+      if(propUnread) bits.push('내 링크 제안 '+propUnread+'건');
+      if(pendCount) bits.push('긴급 응대 '+pendCount+'건');
+      subEl.textContent = bits.length ? bits.join(' · ') : '긴급 · 비즈니스 제안';
+    }
+  } catch(_){}
 }
 
 function _renderInsights(j){
@@ -17500,6 +17603,9 @@ async function bootstrapUser(){
       if(pendRes?.count){ b.textContent = pendRes.count; b.style.display='inline'; }
       else { b.style.display='none'; }
     });
+
+    // 8. 홈 알림 카운트 — 미확인 link_proposals + pending reply_logs 합산
+    if(typeof updateHomeAlertCount === 'function') updateHomeAlertCount();
   } catch(e){ console.warn('[bootstrap] failed', e); }
 }
 
