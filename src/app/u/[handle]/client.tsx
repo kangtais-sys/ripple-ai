@@ -138,7 +138,7 @@ const PUBLIC_CSS = `
 .ssobi-public .lke-hero-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:48px;font-weight:300;line-height:1.02;letter-spacing:-.035em;margin:0 0 14px;color:inherit;text-shadow:0 2px 12px rgba(0,0,0,.25)}
 .ssobi-public .lke-hero-title em{font-style:italic;font-weight:500}
 .ssobi-public .lke-hero-subtitle{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:14.5px;font-style:italic;opacity:.92;margin-bottom:16px;max-width:280px;line-height:1.5;color:inherit;text-shadow:0 2px 8px rgba(0,0,0,.3)}
-.ssobi-public .lke-hero-banner-bottom{position:relative;z-index:2;display:flex;justify-content:flex-end;align-items:flex-end}
+.ssobi-public .lke-hero-banner-bottom{position:absolute;bottom:24px;left:24px;right:24px;z-index:3;display:flex;justify-content:flex-end;align-items:flex-end}
 .ssobi-public .lke-hero-stats{display:flex;gap:18px}
 .ssobi-public .lke-hero-stat{position:relative;padding:4px 8px}
 .ssobi-public .lke-hero-stat .num{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:20px;font-weight:500;letter-spacing:-.02em;line-height:1}
