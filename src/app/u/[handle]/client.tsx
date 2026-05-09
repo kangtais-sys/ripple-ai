@@ -46,6 +46,7 @@ type HeroSlide = {
   eyebrow_align?: 'left' | 'center' | 'right'
   main_valign?: 'top' | 'middle' | 'bottom'
   cta_align?: 'left' | 'center' | 'right'
+  main_pos?: { x: number; y: number }
 }
 
 type PageData = {
@@ -340,7 +341,16 @@ function Hero({ slide, handle, compact }: { slide: HeroSlide; handle: string; co
   const ctaJustify = ({ left: 'flex-start', center: 'center', right: 'flex-end' } as const)[(slide.cta_align as 'left'|'center'|'right') || 'right']
   const inner = (
     <>
-      <div className="lke-hero-banner-main" style={{ textAlign: slide.main_align || 'left' }}>
+      <div className="lke-hero-banner-main" style={{
+        textAlign: slide.main_align || 'left',
+        ...(slide.main_pos ? {
+          position: 'absolute' as const,
+          left: `${slide.main_pos.x}%`,
+          top: `${slide.main_pos.y}%`,
+          margin: 0,
+          maxWidth: 'calc(100% - 36px)'
+        } : {})
+      }}>
         {slide.brand && (
           <div className="lke-hero-brand" dangerouslySetInnerHTML={safeHtml(slide.brand)} />
         )}

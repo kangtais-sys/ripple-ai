@@ -1773,10 +1773,15 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 #v-link .lke-cta-align-btn{flex:1;padding:6px 0;background:none;border:none;border-radius:6px;color:var(--t2);font-size:14px;font-weight:700;cursor:pointer;font-family:'Pretendard',sans-serif}
 #v-link .lke-cta-align-btn:hover{background:var(--bg)}
 #v-link .lke-cta-align-btn.on{background:var(--mint-l);color:var(--mint-d)}
-/* 히어로 valign — 메인 텍스트 영역 세로 위치 */
+/* 히어로 valign — 메인 텍스트 영역 세로 위치 (main_pos 없을 때만) */
 #v-link .lke-hero-banner[data-valign='top']{justify-content:space-between}
 #v-link .lke-hero-banner[data-valign='middle']{justify-content:center;gap:14px}
 #v-link .lke-hero-banner[data-valign='bottom']{justify-content:flex-end;gap:14px}
+/* 자유 위치 (main_pos 있을 때) — 절대 위치 + 드래그 */
+#v-link .lke-hero-banner-main[data-positioned="1"]{position:absolute;margin:0;max-width:calc(100% - 36px);cursor:move;touch-action:none}
+#v-link .lke-hero-banner-main[data-positioned="1"]::before{content:'';position:absolute;inset:-8px;border:1.5px dashed transparent;border-radius:8px;pointer-events:none;transition:border-color .15s}
+#v-link .lke-hero-banner-main[data-positioned="1"]:hover::before,#v-link .lke-hero-banner-main[data-positioned="1"].dragging::before{border-color:rgba(0,200,150,.55)}
+#v-link .lke-hero-banner-main[data-positioned="1"].dragging{opacity:.85}
 #v-link .lke-hero-stat.menu-on .lke-hero-stat-menu{display:flex}
 #v-link .lke-hero-stat-menu button{border:none;background:none;padding:7px 10px;font-size:11.5px;font-weight:700;text-align:left;color:var(--t1);cursor:pointer;border-radius:4px;font-family:'Pretendard',sans-serif}
 #v-link .lke-hero-stat-menu button:hover{background:var(--bg)}
@@ -9825,7 +9830,7 @@ function lkeRenderHero(){
         '<button class="lke-hero-tool" aria-label="텍스트 위치" onclick="event.stopPropagation();lkeCycleHeroValign('+si+')" title="위/중/아래"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M3 12h12M3 18h18" stroke-linecap="round"/></svg></button>'+
         (canDelete ? '<button class="lke-hero-tool del" aria-label="배너 삭제" onclick="event.stopPropagation();lkeDeleteHeroSlide('+si+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M6 18L18 6" stroke-linecap="round"/></svg></button>' : '')+
       '</div>'+
-      '<div class="lke-hero-banner-main" style="text-align:'+(s.main_align||'left')+'">'+
+      '<div class="lke-hero-banner-main"'+(s.main_pos ? ' data-positioned="1" style="text-align:'+(s.main_align||'left')+';left:'+s.main_pos.x+'%;top:'+s.main_pos.y+'%"' : ' style="text-align:'+(s.main_align||'left')+'"')+'>'+
         '<div class="lke-hero-brand lke-editable-text" data-key="brand" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].brand=this.innerText;lkeSyncToServer()">'+(s.brand||'')+'</div>'+
         '<h1 class="lke-hero-title lke-editable-text" data-key="title" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].title=lkeStripWrappers(this.innerHTML);lkeSyncToServer()">'+(s.title||'')+'</h1>'+
         '<div class="lke-hero-subtitle lke-editable-text" data-key="sub" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].sub=lkeStripWrappers(this.innerHTML);lkeSyncToServer()">'+(s.sub||'')+'</div>'+
@@ -9842,6 +9847,9 @@ function lkeRenderHero(){
           '</div>')+
       '</div>';
     track.appendChild(slide);
+    // 메인 텍스트 박스 자유 드래그 — banner-main 영역의 빈 공간을 잡고 끌면 이동
+    //   contenteditable 텍스트 직접 탭하면 편집 모드 (드래그 X)
+    lkeAttachHeroMainDrag(slide, si);
   });
   carousel.appendChild(track);
   // dots
@@ -11134,12 +11142,72 @@ function lkeSetHeroCtaAlign(si, align){
   lkeRender();
   if(typeof lkeSyncToServer === 'function') lkeSyncToServer();
 }
+// 메인 텍스트 박스 자유 드래그 — banner-main 의 빈 공간(텍스트 외)에서 pointer down 시 이동
+//   첫 드래그 시 main_pos 생기고 absolute 모드 진입. 이후 자유 이동.
+//   이동 중 텍스트 편집 모드 진입 차단. mouseup 후 sync.
+function lkeAttachHeroMainDrag(slide, si){
+  var main = slide.querySelector('.lke-hero-banner-main');
+  if(!main) return;
+  var dragging = false, moved = false, startX, startY, startLeft, startTop;
+  main.addEventListener('pointerdown', function(e){
+    // 텍스트(편집 가능) 직접 탭 시 드래그 X — 편집 모드 그대로
+    if(e.target && (e.target.isContentEditable || e.target.closest('[contenteditable]'))) return;
+    // 툴/CTA 버튼 영역 클릭 시 드래그 X
+    if(e.target.closest('.lke-hero-tools, .lke-hero-banner-bottom')) return;
+    var br = slide.getBoundingClientRect();
+    var mr = main.getBoundingClientRect();
+    startLeft = mr.left - br.left;
+    startTop = mr.top - br.top;
+    startX = e.clientX; startY = e.clientY;
+    dragging = true; moved = false;
+    if(!main.dataset.positioned){
+      // 첫 드래그 — 현재 위치를 % 로 고정 후 absolute 진입
+      main.dataset.positioned = '1';
+      main.style.position = 'absolute';
+      main.style.margin = '0';
+      main.style.left = (startLeft / br.width * 100) + '%';
+      main.style.top = (startTop / br.height * 100) + '%';
+    }
+    main.classList.add('dragging');
+    try { main.setPointerCapture && main.setPointerCapture(e.pointerId); } catch(_){}
+    e.preventDefault();
+  });
+  main.addEventListener('pointermove', function(e){
+    if(!dragging) return;
+    var dx = e.clientX - startX;
+    var dy = e.clientY - startY;
+    if(Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
+    if(!moved) return;
+    var br = slide.getBoundingClientRect();
+    var newLeft = Math.max(0, Math.min(br.width - 40, startLeft + dx));
+    var newTop = Math.max(0, Math.min(br.height - 40, startTop + dy));
+    main.style.left = (newLeft / br.width * 100).toFixed(2) + '%';
+    main.style.top = (newTop / br.height * 100).toFixed(2) + '%';
+  });
+  function endDrag(e){
+    if(!dragging) return;
+    dragging = false;
+    main.classList.remove('dragging');
+    try { main.releasePointerCapture && main.releasePointerCapture(e.pointerId); } catch(_){}
+    if(!moved) return; // 클릭만 한 거면 저장 X
+    var s = lkeState.hero.slides[si];
+    s.main_pos = {
+      x: parseFloat(main.style.left),
+      y: parseFloat(main.style.top)
+    };
+    if(typeof lkeSyncToServer === 'function') lkeSyncToServer();
+  }
+  main.addEventListener('pointerup', endDrag);
+  main.addEventListener('pointercancel', endDrag);
+}
 // 메인 텍스트 영역 세로 위치 토글 — top → middle → bottom 순환
+//   자유 드래그(main_pos)와 상충해서 main_pos 초기화 (valign 모드 우선)
 function lkeCycleHeroValign(si){
   var s = lkeState.hero.slides[si];
   var cur = s.main_valign || 'top';
   var next = { top:'middle', middle:'bottom', bottom:'top' }[cur];
   s.main_valign = next;
+  delete s.main_pos; // 자유 위치 리셋
   if(typeof lkeShowToast === 'function') lkeShowToast('텍스트 위치: '+ {top:'위',middle:'가운데',bottom:'아래'}[next]);
   lkeRender();
   if(typeof lkeSyncToServer === 'function') lkeSyncToServer();
