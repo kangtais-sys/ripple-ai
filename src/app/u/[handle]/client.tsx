@@ -212,7 +212,7 @@ const PUBLIC_CSS = `
 .ssobi-public .lke-bigbanner-card{border-radius:18px;overflow:hidden;aspect-ratio:2/1;position:relative;display:flex;align-items:flex-end;padding:24px;background:#1A1F27;color:#fff;box-shadow:0 8px 24px rgba(15,19,25,.12);transition:transform .15s ease;box-sizing:border-box}
 .ssobi-public .lke-block-bigbanner:active .lke-bigbanner-card{transform:scale(.99)}
 .ssobi-public .lke-bigbanner-card.has-bg::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.15) 0%,transparent 30%,rgba(0,0,0,.4) 100%);pointer-events:none}
-.ssobi-public .lke-bigbanner-sub2{padding:10px 4px 2px;font-size:13px;line-height:1.55;color:var(--t2)}
+.ssobi-public .lke-bigbanner-sub2{padding:10px 4px 2px;font-size:14px;font-weight:500;line-height:1.3;letter-spacing:-.01em;color:var(--t1)}
 .ssobi-public .lke-bigbanner-content{position:relative;z-index:2}
 .ssobi-public .lke-bigbanner-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;color:inherit;opacity:.7;letter-spacing:.2em;text-transform:uppercase;margin-bottom:8px}
 .ssobi-public .lke-bigbanner-title{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-size:26px;font-weight:400;line-height:1.05;letter-spacing:-.02em;color:inherit;margin:0}
