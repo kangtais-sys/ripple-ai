@@ -10068,9 +10068,9 @@ function lkeRenderHero(){
         (canDelete ? '<button class="lke-hero-tool del" aria-label="배너 삭제" onclick="event.stopPropagation();lkeDeleteHeroSlide('+si+')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M6 6l12 12M6 18L18 6" stroke-linecap="round"/></svg></button>' : '')+
       '</div>'+
       '<div class="lke-hero-banner-main"'+(s.main_pos ? ' data-positioned="1" style="text-align:'+(s.main_align||'left')+';left:'+s.main_pos.x+'%;top:'+s.main_pos.y+'%"' : ' style="text-align:'+(s.main_align||'left')+'"')+'>'+
-        '<div class="lke-hero-brand lke-editable-text" data-key="brand" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].brand=this.innerText;lkeSyncToServer()">'+(s.brand||'')+'</div>'+
-        '<h1 class="lke-hero-title lke-editable-text" data-key="title" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].title=lkeStripWrappers(this.innerHTML);lkeSyncToServer()">'+(s.title||'')+'</h1>'+
-        '<div class="lke-hero-subtitle lke-editable-text" data-key="sub" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" oninput="lkeState.hero.slides['+si+'].sub=lkeStripWrappers(this.innerHTML);lkeSyncToServer()">'+(s.sub||'')+'</div>'+
+        '<div class="lke-hero-brand lke-editable-text" data-key="brand" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" onkeydown="lkeHeroEnterFix(event)" oninput="lkeState.hero.slides['+si+'].brand=this.innerText;lkeSyncToServer()">'+(s.brand||'')+'</div>'+
+        '<h1 class="lke-hero-title lke-editable-text" data-key="title" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" onkeydown="lkeHeroEnterFix(event)" oninput="lkeState.hero.slides['+si+'].title=lkeStripWrappers(this.innerHTML);lkeSyncToServer()">'+(s.title||'')+'</h1>'+
+        '<div class="lke-hero-subtitle lke-editable-text" data-key="sub" data-si="'+si+'" contenteditable onfocus="lkeShowAlignBar(this)" onblur="lkeHideAlignBar()" onclick="event.stopPropagation()" onkeydown="lkeHeroEnterFix(event)" oninput="lkeState.hero.slides['+si+'].sub=lkeStripWrappers(this.innerHTML);lkeSyncToServer()">'+(s.sub||'')+'</div>'+
       '</div>'+
       '<div class="lke-hero-banner-bottom" style="justify-content:'+({left:'flex-start',center:'center',right:'flex-end'}[s.cta_align||'right'])+'">'+
         ((s.cta_hidden || !s.cta) ?
@@ -10268,8 +10268,13 @@ function lkeRenderBlock(b, idx){
       if(it.thumbImg) thumbStyle = 'background:url('+it.thumbImg+') '+(it.thumbPos||'center')+'/cover';
       else if(it.thumbBg) thumbStyle = 'background:'+it.thumbBg;
       var priceHtml = (it.kind==='product' || !it.kind) ? '<div class="lke-product-info-price"><span class="lke-price-sale">'+(it.price||'')+'</span>'+(it.origPrice?'<span class="lke-price-orig">'+it.origPrice+'</span>':'')+'</div>' : '';
+      var tagStyleAttr = '';
+      if(it.tag){
+        if(it.tagBg) tagStyleAttr += 'background:'+it.tagBg+';';
+        if(it.tagColor) tagStyleAttr += 'color:'+it.tagColor+';';
+      }
       card.innerHTML =
-        '<div class="lke-product-img '+imgClass+'" style="'+thumbStyle+'">'+(it.tag?'<span class="lke-product-tag '+(it.tagStyle||'')+'">'+it.tag+'</span>':'')+'</div>'+
+        '<div class="lke-product-img '+imgClass+'" style="'+thumbStyle+'">'+(it.tag?'<span class="lke-product-tag '+(it.tagStyle||'')+'" style="'+tagStyleAttr+'">'+it.tag+'</span>':'')+'</div>'+
         '<div class="lke-product-info-date">'+(it.date||'')+'</div>'+
         '<div class="lke-product-info-title">'+(it.title||'')+'</div>'+
         priceHtml;
@@ -11481,12 +11486,24 @@ function lkeSetAlign(align){
     if(newEl) newEl.focus();
   }, 50);
 }
-// 히어로 텍스트 B/I — 현재 편집 중 element 의 selection 에 적용 + state 동기화
+// 히어로 텍스트 B/I — 현재 편집 중 element 의 selection 에 토글 + state 동기화.
+//   document.execCommand('bold') 는 toggle 작동하지만 모바일에서 selection 잃으면 다시 누를
+//   때 해제 안 됨. selection 보존 + queryCommandState 로 강제 토글.
 function lkeRichExec(cmd){
   if(!_lkeAlignEl) return;
-  _lkeAlignEl.focus();
+  // selection 이 lke-editable-text 안에 있는지 확인
+  var sel = window.getSelection();
+  var inEl = sel && sel.rangeCount > 0 && _lkeAlignEl.contains(sel.anchorNode);
+  if(!inEl){
+    // selection 없으면 element 전체 선택 (전체 적용)
+    _lkeAlignEl.focus();
+    var range = document.createRange();
+    range.selectNodeContents(_lkeAlignEl);
+    sel.removeAllRanges();
+    sel.addRange(range);
+  }
   try { document.execCommand(cmd); } catch(e){}
-  // oninput 핸들러가 자동으로 state 갱신하지만, focus 회복을 위해 명시적 sync
+  // 강제 sync
   var si = +_lkeAlignEl.dataset.si;
   var key = _lkeAlignEl.dataset.key;
   var s = lkeState.hero.slides[si];
@@ -11494,6 +11511,14 @@ function lkeRichExec(cmd){
   else if(key === 'sub') s.sub = lkeStripWrappers(_lkeAlignEl.innerHTML);
   else if(key === 'brand') s.brand = _lkeAlignEl.innerText;
   if(typeof lkeSyncToServer === 'function') lkeSyncToServer();
+}
+// Enter 키 → <div> wrapper 대신 <br> 직접 삽입 (줄바꿈 사라지는 버그 방지)
+function lkeHeroEnterFix(e){
+  if(e.key === 'Enter' && !e.isComposing){
+    e.preventDefault();
+    document.execCommand('insertLineBreak');
+    return false;
+  }
 }
 
 // 정렬 바의 삭제 — 현재 편집 중인 hero 텍스트 비우기 (eyebrow/brand/title/sub)
@@ -11750,12 +11775,17 @@ function lkeEditGridCard(blockIdx, cardIdx){
     html += lkeField('판매가','text','ci-price',it.price)+lkeField('원가 (취소선)','text','ci-orig',it.origPrice);
   }
   html += '<div class="lke-field-label">태그</div>'+
-    '<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">'+
+    '<div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">'+
       ['','HOT','NEW','BEST','공구'].map(function(t){
         var active = (it.tag||'')===t;
         return '<button onclick="lkeGridTagOnly('+blockIdx+','+cardIdx+',\''+t+'\')" style="padding:7px 12px;border-radius:100px;font-size:11px;font-weight:700;border:1px solid var(--b);background:'+(active?'var(--dark)':'#fff')+';color:'+(active?'#fff':'var(--t2)')+';cursor:pointer">'+(t||'없음')+'</button>';
       }).join('')+
     '</div>'+
+    (it.tag ? '<div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;padding:8px 10px;background:var(--bg);border-radius:8px">'+
+      '<span style="font-size:11px;font-weight:700;color:var(--t2);flex:1">태그 색</span>'+
+      '<label style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t3);font-weight:600">배경<input type="color" id="ci-tagBg" value="'+(it.tagBg||'#1A1F27')+'" oninput="lkeState.blocks['+blockIdx+'].items['+cardIdx+'].tagBg=this.value;lkeRender()" style="width:24px;height:20px;border:none;background:none;cursor:pointer;padding:0"></label>'+
+      '<label style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t3);font-weight:600">글자<input type="color" id="ci-tagColor" value="'+(it.tagColor||'#FFFFFF')+'" oninput="lkeState.blocks['+blockIdx+'].items['+cardIdx+'].tagColor=this.value;lkeRender()" style="width:24px;height:20px;border:none;background:none;cursor:pointer;padding:0"></label>'+
+    '</div>' : '')+
     lkeField('URL','url','ci-url',it.url)+
     '<div class="lke-field-label">썸네일 이미지</div><label style="display:block;margin-bottom:10px"><input type="file" accept="image/*" onchange="lkeCardImageUpload('+blockIdx+','+cardIdx+',this)" style="display:none"><div style="padding:10px;border:1.5px dashed #D6D3D1;text-align:center;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;border-radius:6px">'+(it.thumbImg?'이미지 변경 ✓':'사진 선택')+'</div></label>'+
     (it.thumbImg ? '<button type="button" onclick="lkeOpenImgPosPicker(\'griditem\',\''+blockIdx+'_'+cardIdx+'\')" style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:var(--bg);border:1px solid var(--b);border-radius:8px;font-size:12px;font-weight:700;color:var(--t1);cursor:pointer;font-family:\'Pretendard\',sans-serif;margin-bottom:10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke-linecap="round"/></svg>이미지 위치 조정</button>' : '')+

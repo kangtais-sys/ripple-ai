@@ -64,6 +64,44 @@ type PageData = {
 }
 
 // XSS-safe HTML — em/br 만 허용
+// 카운트다운 타이머 — endsAt (ISO datetime) 까지 남은 시간을 1초마다 갱신
+function CountdownTimer({ endsAt }: { endsAt?: string }) {
+  const [now, setNow] = useState(() => Date.now())
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 1000)
+    return () => clearInterval(t)
+  }, [])
+  // endsAt 미설정 시 hardcoded 03:42:18 (placeholder)
+  let h = 3, m = 42, s = 18
+  if (endsAt) {
+    const target = new Date(endsAt).getTime()
+    const diff = Math.max(0, target - now)
+    const totalSec = Math.floor(diff / 1000)
+    h = Math.floor(totalSec / 3600)
+    m = Math.floor((totalSec % 3600) / 60)
+    s = totalSec % 60
+    // 24시간 넘어가면 일/시/분으로 표시
+    if (h >= 24) {
+      const d = Math.floor(h / 24)
+      const remH = h % 24
+      return (
+        <div className="lke-cd-timer">
+          <div className="lke-cd-unit"><div className="lke-cd-num">{String(d).padStart(2, '0')}</div><div className="lke-cd-lbl">Days</div></div>
+          <div className="lke-cd-unit"><div className="lke-cd-num">{String(remH).padStart(2, '0')}</div><div className="lke-cd-lbl">Hours</div></div>
+          <div className="lke-cd-unit"><div className="lke-cd-num">{String(m).padStart(2, '0')}</div><div className="lke-cd-lbl">Min</div></div>
+        </div>
+      )
+    }
+  }
+  return (
+    <div className="lke-cd-timer">
+      <div className="lke-cd-unit"><div className="lke-cd-num">{String(h).padStart(2, '0')}</div><div className="lke-cd-lbl">Hours</div></div>
+      <div className="lke-cd-unit"><div className="lke-cd-num">{String(m).padStart(2, '0')}</div><div className="lke-cd-lbl">Min</div></div>
+      <div className="lke-cd-unit"><div className="lke-cd-num">{String(s).padStart(2, '0')}</div><div className="lke-cd-lbl">Sec</div></div>
+    </div>
+  )
+}
+
 function safeHtml(s: string | undefined): { __html: string } {
   if (!s) return { __html: '' }
   // contenteditable이 만들어낸 div/p wrapper 정리 — Enter 줄바꿈 정상 처리
@@ -468,11 +506,7 @@ function renderBlock(b: Block, i: number) {
           {b.eyebrow && <div className="lke-cd-eyebrow" dangerouslySetInnerHTML={safeHtml(b.eyebrow)} />}
           <div className="lke-cd-title" dangerouslySetInnerHTML={safeHtml(b.title)} />
           {b.sub && <div className="lke-cd-subtitle" dangerouslySetInnerHTML={safeHtml(b.sub)} />}
-          <div className="lke-cd-timer">
-            <div className="lke-cd-unit"><div className="lke-cd-num">03</div><div className="lke-cd-lbl">Hours</div></div>
-            <div className="lke-cd-unit"><div className="lke-cd-num">42</div><div className="lke-cd-lbl">Min</div></div>
-            <div className="lke-cd-unit"><div className="lke-cd-num">18</div><div className="lke-cd-lbl">Sec</div></div>
-          </div>
+          <CountdownTimer endsAt={b.endsAt} />
           {b.slots && <div className="lke-cd-slots">남은 자리 {b.slots}</div>}
         </a>
       )
@@ -486,7 +520,7 @@ function renderBlock(b: Block, i: number) {
       )
 
     case 'grid': {
-      const items = (b.items as Array<{ kind?: string; title?: string; sub?: string; price?: string; origPrice?: string; date?: string; img?: string; thumbImg?: string; tag?: string; tagStyle?: string; url?: string; code?: string }>) || []
+      const items = (b.items as Array<{ kind?: string; title?: string; sub?: string; price?: string; origPrice?: string; date?: string; img?: string; thumbImg?: string; thumbPos?: string; tag?: string; tagStyle?: string; tagBg?: string; tagColor?: string; url?: string; code?: string }>) || []
       return (
         <div key={key} className="lke-block lke-block-grid">
           {items.map((it, ci) => {
@@ -500,7 +534,11 @@ function renderBlock(b: Block, i: number) {
               <a key={ci} className="lke-product-card" href={cardHref}>
                 <div className={imgClass} style={thumbStyle}>
                   {it.tag && (
-                    <span className={`lke-product-tag ${it.tagStyle || ''}`}>{it.tag}</span>
+                    <span className={`lke-product-tag ${it.tagStyle || ''}`}
+                      style={{
+                        background: it.tagBg || undefined,
+                        color: it.tagColor || undefined
+                      }}>{it.tag}</span>
                   )}
                 </div>
                 {it.date && <div className="lke-product-info-date">{it.date}</div>}
