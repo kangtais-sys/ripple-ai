@@ -9927,14 +9927,40 @@ function lkeCompressFile(file, maxWidth, quality, cb){
   r.onload = function(e){ lkeCompressDataUrl(e.target.result, maxWidth, quality, cb); };
   r.readAsDataURL(file);
 }
+// 이미지를 Supabase Storage 에 업로드 → public URL 반환.
+//   base64 dataUrl → Blob → /api/link/upload-image (FormData)
+//   업로드 실패 시 base64 dataUrl 그대로 fallback (페이지는 무거워지지만 동작은 함)
+async function lkeUploadDataUrl(dataUrl, kind){
+  try {
+    if(!dataUrl || typeof dataUrl !== 'string' || dataUrl.indexOf('data:') !== 0) return dataUrl;
+    var m = dataUrl.match(/^data:([^;]+);base64,(.+)$/);
+    if(!m) return dataUrl;
+    var bin = atob(m[2]);
+    var arr = new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++) arr[i] = bin.charCodeAt(i);
+    var blob = new Blob([arr], { type: m[1] });
+    var fd = new FormData();
+    fd.append('file', blob, 'upload.jpg');
+    fd.append('kind', kind || 'img');
+    var headers = await authHeaders();
+    delete headers['Content-Type']; // FormData → 브라우저가 자동 설정
+    var r = await fetch('/api/link/upload-image', { method:'POST', headers: headers, body: fd, credentials:'include' });
+    if(!r.ok){ console.warn('[lkeUploadDataUrl] failed', r.status); return dataUrl; }
+    var j = await r.json();
+    return j.url || dataUrl;
+  } catch(e){ console.warn(e); return dataUrl; }
+}
 function lkeHeroUploadBg(si){
   var inp=document.createElement('input'); inp.type='file'; inp.accept='image/*';
   inp.onchange=function(){
     var f=inp.files&&inp.files[0]; if(!f) return;
-    lkeCompressFile(f, 1080, 0.78, function(dataUrl){
-      lkeState.hero.slides[si].bg = dataUrl;
+    if(typeof lkeShowToast === 'function') lkeShowToast('이미지 업로드 중…');
+    lkeCompressFile(f, 1080, 0.78, async function(dataUrl){
+      var url = await lkeUploadDataUrl(dataUrl, 'hero');
+      lkeState.hero.slides[si].bg = url;
       window.lkeActiveSlide = si;
       lkeRender();
+      if(typeof lkeShowToast === 'function') lkeShowToast('✓ 업로드 완료');
     });
   };
   inp.click();
@@ -10432,11 +10458,15 @@ function lkeSocialDel(idx, i){
 }
 function lkeCardImageUpload(bIdx, cIdx, inp){
   var f=inp.files&&inp.files[0]; if(!f) return;
-  // 재렌더 전 입력값 commit (제목/시간/판매가 등 타이핑 보존)
   if(typeof lkeCommitGridCardInputs === 'function') lkeCommitGridCardInputs(bIdx, cIdx);
-  var r=new FileReader();
-  r.onload=function(e){ lkeState.blocks[bIdx].items[cIdx].thumbImg=e.target.result; lkeRender(); lkeEditGridCard(bIdx,cIdx); };
-  r.readAsDataURL(f);
+  if(typeof lkeShowToast === 'function') lkeShowToast('이미지 업로드 중…');
+  lkeCompressFile(f, 720, 0.78, async function(dataUrl){
+    var url = await lkeUploadDataUrl(dataUrl, 'grid');
+    lkeState.blocks[bIdx].items[cIdx].thumbImg = url;
+    lkeRender();
+    lkeEditGridCard(bIdx,cIdx);
+    if(typeof lkeShowToast === 'function') lkeShowToast('✓ 업로드 완료');
+  });
 }
 function lkeCardImg(bIdx, cIdx, key){
   if(typeof lkeCommitGridCardInputs === 'function') lkeCommitGridCardInputs(bIdx, cIdx);
@@ -10551,11 +10581,16 @@ function lkeQlDel(idx, i){ lkeState.blocks[idx].items.splice(i,1); lkeRenderEdit
 function lkeQlAdd(idx){ lkeState.blocks[idx].items.push({label:'링크 이름',sub:'설명',url:''}); lkeRenderEditForm(lkeState.blocks[idx],idx); lkeRender(); }
 function lkeImageUpload(idx, inp){
   var f=inp.files&&inp.files[0]; if(!f) return;
-  // 재렌더 전 현재 폼 입력값 commit (제목/URL 등 타이핑 보존)
   if(typeof lkeCommitEditFormInputs === 'function') lkeCommitEditFormInputs(idx);
-  var r=new FileReader();
-  r.onload=function(e){ lkeState.blocks[idx].img=e.target.result; lkeRender(); lkeRenderEditForm(lkeState.blocks[idx],idx); };
-  r.readAsDataURL(f);
+  if(typeof lkeShowToast === 'function') lkeShowToast('이미지 업로드 중…');
+  var blockType = (lkeState.blocks[idx] && lkeState.blocks[idx].type) || 'block';
+  lkeCompressFile(f, 1080, 0.78, async function(dataUrl){
+    var url = await lkeUploadDataUrl(dataUrl, blockType);
+    lkeState.blocks[idx].img = url;
+    lkeRender();
+    lkeRenderEditForm(lkeState.blocks[idx],idx);
+    if(typeof lkeShowToast === 'function') lkeShowToast('✓ 업로드 완료');
+  });
 }
 
 // 일반 블록 edit form 의 입력값을 state 로 commit (재렌더 전 호출)
