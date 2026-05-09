@@ -13,6 +13,10 @@ import LinkPageClient from './client'
 
 export const revalidate = 60
 export const dynamicParams = true
+export const dynamic = 'force-static'
+
+// 빌드 타임에 prerender 안 함 (handle 무한). 처음 방문 시 lazy 생성 + 60초 ISR 캐시.
+export async function generateStaticParams() { return [] }
 
 // anon 키 사용 — RLS의 "Public reads published link_pages" 정책으로 접근
 function publicClient() {
