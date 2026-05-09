@@ -11579,7 +11579,7 @@ function lkeOpenImgPosPicker(target, id){
   var existing = document.getElementById('m-img-pos'); if(existing) existing.remove();
   var ov = document.createElement('div');
   ov.id = 'm-img-pos';
-  ov.style.cssText = 'position:fixed;inset:0;z-index:300;background:rgba(15,19,25,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;user-select:none';
+  ov.style.cssText = 'position:fixed;inset:0;z-index:1000;background:rgba(15,19,25,.92);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;user-select:none';
   ov.innerHTML =
     '<div style="font-size:13px;color:rgba(255,255,255,.85);font-weight:600;margin-bottom:14px;font-family:\'Pretendard\',sans-serif;text-align:center;letter-spacing:-.2px">사진을 손가락으로 끌어 위치 맞춰요</div>'+
     '<div id="img-pos-frame" style="aspect-ratio:'+aspect+';width:min(340px,86vw);background:url(\''+imgUrl+'\') '+startBgX+'% '+startBgY+'%/cover;border-radius:14px;cursor:move;touch-action:none;box-shadow:0 12px 48px rgba(0,0,0,.4);position:relative"></div>'+
