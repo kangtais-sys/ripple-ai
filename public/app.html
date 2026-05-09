@@ -1963,45 +1963,33 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 #v-link .lke-block-grid,#v-link .lke-block-quicklinks{margin-top:6px;margin-bottom:14px}
 #v-link .lke-block-section-title{padding-top:32px;padding-bottom:10px}
 #v-link .lke-block-socials{margin-top:10px;margin-bottom:14px}
-/* 드래그 핸들 — 기본은 작고 흐릿 (16×20 세로 pill), hover/선택 시 mint 강조 */
+/* 드래그 핸들 — 항상 또렷하게 보임 (모바일 hover 없어도 발견 쉽게) */
 #v-link .lke-drag{
-  width:14px; height:24px;
-  border-radius:6px;
-  background:rgba(15,19,25,.08);
-  border:none;
-  color:rgba(15,19,25,.35);
-  box-shadow:none;
-  font-size:9px;
-  letter-spacing:-1.2px;
+  width:24px; height:34px;
+  border-radius:8px;
+  background:#fff;
+  border:1.5px solid var(--mint-l);
+  color:var(--mint-d);
+  box-shadow:0 2px 8px rgba(0,200,150,.18);
+  font-size:12px;
+  letter-spacing:-1.5px;
   line-height:1;
-  top:50%; left:4px;
+  top:50%; left:-6px;
   transform:translateY(-50%);
-  transition:all .15s ease;
+  transition:all .12s ease;
 }
-/* hover/선택 시 — 손잡이 커지고 mint, 툴팁 노출 */
 #v-link .lke-block:not(.lke-block-hero):hover .lke-drag,
-#v-link .lke-block.selected:not(.lke-block-hero) .lke-drag{
-  width:28px; height:28px; left:-2px;
+#v-link .lke-block.selected:not(.lke-block-hero) .lke-drag,
+#v-link .lke-block.lke-ready .lke-drag,
+#v-link .lke-block.dragging .lke-drag{
+  width:32px; height:40px; left:-10px;
   background:var(--mint);
   color:#fff;
-  font-size:13px;
-  letter-spacing:-1.5px;
-  box-shadow:0 4px 12px rgba(0,200,150,.32);
+  border-color:var(--mint);
+  font-size:14px;
+  box-shadow:0 6px 16px rgba(0,200,150,.4);
 }
-#v-link .lke-drag::before{
-  content:'끌어 옮기기';
-  position:absolute; top:50%; left:calc(100% + 8px);
-  transform:translateY(-50%);
-  background:#1A1F27; color:#fff;
-  font-family:'Pretendard',sans-serif;
-  font-size:10.5px; font-weight:700; letter-spacing:-.1px;
-  padding:5px 9px; border-radius:6px; white-space:nowrap;
-  opacity:0; pointer-events:none;
-  transition:opacity .12s ease;
-}
-#v-link .lke-block:not(.lke-block-hero):hover .lke-drag::before,
-#v-link .lke-block.selected:not(.lke-block-hero) .lke-drag::before{opacity:1}
-#v-link .lke-drag:active{transform:translateY(-50%) scale(.92);background:var(--mint-d) !important}
+#v-link .lke-drag:active{transform:translateY(-50%) scale(.92)}
 /* 블록 hover/select 시 우상단에 "편집" 힌트 — 첫 사용자가 탭 가능 인지 */
 #v-link .lke-block::after{content:'';display:none}
 #v-link .lke-block:not(.lke-block-divider):not(.lke-block-spacer):not(.lke-block-footer):not(.lke-block-hero):hover::after,
@@ -3407,13 +3395,13 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <button class="lke-preview-exit" onclick="lkeTogglePreview()" data-i18n="link.exit_preview">✕ 편집으로</button>
 
   <!-- 히어로 텍스트 정렬 미니 툴바 -->
-  <div class="lke-align-bar" id="lke-align-bar" onmousedown="event.preventDefault()">
-    <button type="button" onmousedown="event.preventDefault()" onclick="lkeRichExec('bold')" title="굵게" style="font-weight:900"><b>B</b></button>
-    <button type="button" onmousedown="event.preventDefault()" onclick="lkeRichExec('italic')" title="기울임"><i>I</i></button>
+  <div class="lke-align-bar" id="lke-align-bar" onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()">
+    <button type="button" onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="lkeRichExec('bold')" title="굵게" style="font-weight:900"><b>B</b></button>
+    <button type="button" onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="lkeRichExec('italic')" title="기울임"><i>I</i></button>
     <span class="sep"></span>
-    <button type="button" onmousedown="event.preventDefault()" onclick="lkeSetAlign('left')" title="왼쪽 정렬"><span data-i18n="lke.align.left">왼쪽</span></button>
-    <button type="button" onmousedown="event.preventDefault()" onclick="lkeSetAlign('center')" title="가운데 정렬"><span data-i18n="lke.align.center">가운데</span></button>
-    <button type="button" onmousedown="event.preventDefault()" onclick="lkeSetAlign('right')" title="오른쪽 정렬"><span data-i18n="lke.align.right">오른쪽</span></button>
+    <button type="button" onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="lkeSetAlign('left')" title="왼쪽 정렬"><span data-i18n="lke.align.left">왼쪽</span></button>
+    <button type="button" onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="lkeSetAlign('center')" title="가운데 정렬"><span data-i18n="lke.align.center">가운데</span></button>
+    <button type="button" onmousedown="event.preventDefault()" ontouchstart="event.preventDefault()" onclick="lkeSetAlign('right')" title="오른쪽 정렬"><span data-i18n="lke.align.right">오른쪽</span></button>
     <span class="sep"></span>
     <button type="button" class="del" onmousedown="event.preventDefault()" onclick="lkeDeleteEditingText()" title="텍스트 삭제">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="width:12px;height:12px"><path d="M3 6h18M8 6V4a2 2 0 012-2h4a2 2 0 012 2v2m-1 0v14a2 2 0 01-2 2H9a2 2 0 01-2-2V6h10z" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -11535,37 +11523,85 @@ function lkeSetAlign(align){
     if(newEl) newEl.focus();
   }, 50);
 }
-// 마지막 selection 추적 — B/I 클릭 시 선택영역이 사라져도 복원할 수 있게
+// 마지막 selection 추적 — Range 와 offsets 둘 다 보관 (DOM mutation 후에도 복원 가능)
 var _lkeLastRange = null;
+var _lkeLastSelOffsets = null; // {start:N, end:N} character offsets within element
 function lkeSaveSel(){
   try {
     var sel = window.getSelection();
     if(sel && sel.rangeCount > 0 && _lkeAlignEl && _lkeAlignEl.contains(sel.anchorNode)){
       _lkeLastRange = sel.getRangeAt(0).cloneRange();
+      _lkeLastSelOffsets = lkeGetSelOffsets(_lkeAlignEl, _lkeLastRange);
     }
   } catch(_){}
 }
-// 히어로 텍스트 B/I — selection 복원 후 execCommand 토글
+// element 내 Range 의 시작/끝 character offset 계산 (text only)
+function lkeGetSelOffsets(root, range){
+  function offset(node, off){
+    var n = 0;
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    var t;
+    while((t = walker.nextNode())){
+      if(t === node) return n + off;
+      n += t.nodeValue.length;
+    }
+    // node 가 element면 그 안의 첫 텍스트까지의 offset
+    return n;
+  }
+  return { start: offset(range.startContainer, range.startOffset), end: offset(range.endContainer, range.endOffset) };
+}
+// offset 으로 Range 복원 (DOM mutation 후에도 OK)
+function lkeRestoreSelByOffsets(root, offsets){
+  if(!offsets) return null;
+  var s = offsets.start, e = offsets.end;
+  var n = 0, startNode=null, startOff=0, endNode=null, endOff=0;
+  var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  var t;
+  while((t = walker.nextNode())){
+    var len = t.nodeValue.length;
+    if(!startNode && n + len >= s){ startNode = t; startOff = s - n; }
+    if(!endNode && n + len >= e){ endNode = t; endOff = e - n; break; }
+    n += len;
+  }
+  if(!startNode) return null;
+  if(!endNode){ endNode = startNode; endOff = startOff; }
+  var range = document.createRange();
+  range.setStart(startNode, startOff);
+  range.setEnd(endNode, endOff);
+  return range;
+}
+// 히어로 텍스트 B/I — offset 기반 복원 + execCommand 토글
 function lkeRichExec(cmd){
   if(!_lkeAlignEl) return;
   _lkeAlignEl.focus();
-  // 직전 selection 복원 (B/I 버튼 누르며 selection 잃었을 때 대비)
-  if(_lkeLastRange){
-    try {
-      var sel = window.getSelection();
+  var sel = window.getSelection();
+  // 1) 현재 selection 이 element 안에 있고 collapsed 아니면 그대로 사용
+  var hasValidSel = sel && sel.rangeCount > 0 && _lkeAlignEl.contains(sel.anchorNode) && !sel.getRangeAt(0).collapsed;
+  if(!hasValidSel){
+    // 2) 저장된 offset 으로 Range 복원 시도
+    var restored = _lkeLastSelOffsets ? lkeRestoreSelByOffsets(_lkeAlignEl, _lkeLastSelOffsets) : null;
+    if(restored && !restored.collapsed){
       sel.removeAllRanges();
-      sel.addRange(_lkeLastRange);
-    } catch(_){}
+      sel.addRange(restored);
+    } else {
+      // 3) 복원 실패 → element 전체 선택
+      var range = document.createRange();
+      range.selectNodeContents(_lkeAlignEl);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
   }
-  // styleWithCSS=false → <strong>/<em> 같은 시맨틱 태그 사용 (퍼블릭 페이지 safeHtml 호환)
   try { document.execCommand('styleWithCSS', false, false); } catch(_){}
   try { document.execCommand(cmd === 'bold' ? 'bold' : 'italic'); } catch(e){}
-  // 새 selection 저장 (toggle 후 selection 그대로)
+  // execCommand 후 selection 갱신 (DOM 변경됐을 수 있음)
   try {
     var sel2 = window.getSelection();
-    if(sel2 && sel2.rangeCount > 0) _lkeLastRange = sel2.getRangeAt(0).cloneRange();
+    if(sel2 && sel2.rangeCount > 0){
+      _lkeLastRange = sel2.getRangeAt(0).cloneRange();
+      _lkeLastSelOffsets = lkeGetSelOffsets(_lkeAlignEl, _lkeLastRange);
+    }
   } catch(_){}
-  // 강제 state sync
+  // state sync
   var si = +_lkeAlignEl.dataset.si;
   var key = _lkeAlignEl.dataset.key;
   var s = lkeState.hero.slides[si];
