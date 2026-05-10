@@ -34,14 +34,36 @@ export async function POST(req: NextRequest) {
     if (!page) return NextResponse.json({ ok: false, reason: 'not found' }, { status: 404 })
 
     const dateKst = new Date(Date.now() + 9 * 3600 * 1000).toISOString().slice(0, 10)
-    // atomic RPC (migration 015)
+    // atomic RPC (migration 015) — 둘 다 성공한 경우만 빠른 path
     const r1 = await sb.rpc('increment_link_view', { p_id: page.id })
     const r2 = await sb.rpc('increment_link_day_view', { p_id: page.id, p_date: dateKst })
     if (!r1.error && !r2.error) return NextResponse.json({ ok: true })
 
-    // Fallback (race-prone) — RPC 미존재 환경 대비
-    const { data: cur } = await sb.from('link_pages').select('view_count').eq('id', page.id).maybeSingle()
-    await sb.from('link_pages').update({ view_count: ((cur?.view_count as number) || 0) + 1 }).eq('id', page.id)
+    // Fallback (race-prone) — RPC 미존재 시 page.view_count + daily_stats 둘 다 갱신
+    if (r1.error) {
+      const { data: cur } = await sb.from('link_pages').select('view_count').eq('id', page.id).maybeSingle()
+      await sb.from('link_pages').update({ view_count: ((cur?.view_count as number) || 0) + 1 }).eq('id', page.id)
+    }
+    if (r2.error) {
+      // daily upsert manual: 기존 행 있으면 +1, 없으면 insert(views=1)
+      const { data: cur } = await sb
+        .from('link_page_daily_stats')
+        .select('views')
+        .eq('link_page_id', page.id)
+        .eq('date', dateKst)
+        .maybeSingle()
+      if (cur) {
+        await sb
+          .from('link_page_daily_stats')
+          .update({ views: ((cur.views as number) || 0) + 1 })
+          .eq('link_page_id', page.id)
+          .eq('date', dateKst)
+      } else {
+        await sb
+          .from('link_page_daily_stats')
+          .insert({ link_page_id: page.id, date: dateKst, views: 1, unique_visitors: 1 })
+      }
+    }
     return NextResponse.json({ ok: true, fallback: true })
   } catch (e) {
     return NextResponse.json({ ok: false, error: String(e) }, { status: 500 })
