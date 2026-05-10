@@ -2031,10 +2031,10 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 #v-link.lke-preview .lke-block-section-title{padding-top:40px;padding-bottom:12px}
 
 /* 숏링크 핸들 입력 (prefix 고정) */
-.lke-handle-wrap{display:flex;align-items:stretch;border:1px solid var(--b);border-radius:10px;overflow:hidden;background:#fff}
-.lke-handle-prefix{padding:12px 14px;background:var(--bg);color:var(--t3);font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:600;display:flex;align-items:center}
-.lke-handle-input{flex:1;padding:12px 14px;border:none;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;color:var(--t1);font-weight:600}
-.lke-handle-status{padding:0 12px;display:flex;align-items:center;font-size:11px;font-weight:700;flex-shrink:0}
+.lke-handle-wrap{display:flex;align-items:stretch;border:1px solid var(--b);border-radius:10px;background:#fff;min-width:0}
+.lke-handle-prefix{padding:12px 10px 12px 12px;background:var(--bg);color:var(--t3);font-family:'JetBrains Mono',monospace;font-size:11.5px;font-weight:600;display:flex;align-items:center;border-radius:10px 0 0 10px;flex-shrink:0;white-space:nowrap}
+.lke-handle-input{flex:1;min-width:0;padding:12px 10px;border:none;font-family:'JetBrains Mono',monospace;font-size:13px;outline:none;color:var(--t1);font-weight:600;background:transparent}
+.lke-handle-status{padding:0 12px 0 6px;display:flex;align-items:center;font-size:11px;font-weight:700;flex-shrink:0;border-radius:0 10px 10px 0;white-space:nowrap}
 .lke-handle-status.ok{color:var(--mint-d)}
 .lke-handle-status.bad{color:var(--red)}
 .lke-handle-status.checking{color:var(--t3)}
@@ -3435,7 +3435,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <div class="lke-field-label" data-i18n="lke.settings.handle">숏링크 핸들</div>
       <div class="lke-handle-wrap">
         <span class="lke-handle-prefix">ssobi.ai/u/</span>
-        <input type="text" class="lke-handle-input" id="lke-settings-handle" value="yuminhye" oninput="lkeHandleCheck(this)" placeholder="영문/숫자/_/-">
+        <input type="text" class="lke-handle-input" id="lke-settings-handle" value="yuminhye" oninput="lkeHandleCheck(this)" placeholder="영문/숫자/_/-" autocapitalize="off" autocomplete="off" autocorrect="off" spellcheck="false" inputmode="latin">
         <span class="lke-handle-status ok" id="lke-handle-status" data-i18n="lke.settings.handle_ok">사용 가능</span>
       </div>
       <div style="font-size:11px;color:var(--t3);margin-top:6px" data-i18n="lke.settings.handle_hint">유저 아이디만 수정 가능해요. 중복이면 다른 핸들을 선택하세요.</div>
@@ -11469,14 +11469,17 @@ function lkeApplyThemeToDom(){
 function lkeApplySettings(){
   var sheet = document.getElementById('lke-sheet-settings');
   var fabOnly = sheet && sheet.classList.contains('fab-only');
+  var handleChanged = false;
   if(!fabOnly){
     // 일반 모드 — 핸들 검증·저장
     var hi = document.getElementById('lke-settings-handle');
     var st = document.getElementById('lke-handle-status');
     if(!hi){ lkeCloseSheet(); return; }
-    var v = (hi.value||'').trim().replace(/[^a-z0-9_\-]/gi,'');
+    var v = (hi.value||'').trim().toLowerCase().replace(/[^a-z0-9_\-]/g,'');
     if(!v){ alert('핸들을 입력해주세요'); return; }
+    if(v.length < 3){ alert('핸들은 3자 이상이어야 해요.'); return; }
     if(st && st.classList.contains('bad')){ alert('중복된 핸들이에요. 다른 핸들을 선택해주세요.'); return; }
+    handleChanged = (lkeState.handle !== v);
     lkeState.handle = v;
     var d = document.getElementById('lk-handle-disp'); if(d) d.textContent = v;
     var d2 = document.getElementById('lk-handle-disp-2'); if(d2) d2.textContent = v;
@@ -11497,8 +11500,14 @@ function lkeApplySettings(){
   };
   // FAB 미리보기 즉시 갱신
   if(typeof lkeUpdateFabPreview === 'function') lkeUpdateFabPreview();
-  // 즉시 서버에 sync
-  if(typeof lkeSyncToServer === 'function') lkeSyncToServer();
+  // 즉시 서버에 sync — 핸들 변경 시엔 디바운스 우회 (즉시 저장)
+  if(handleChanged && typeof _lkeSyncNow === 'function'){
+    if(_lkeSyncTimer){ clearTimeout(_lkeSyncTimer); _lkeSyncTimer = null; }
+    _lkeSyncNow();
+    if(typeof lkeShowToast === 'function') lkeShowToast('핸들 저장됨 · ssobi.ai/u/' + lkeState.handle);
+  } else if(typeof lkeSyncToServer === 'function'){
+    lkeSyncToServer();
+  }
   lkeCloseSheet();
 }
 
@@ -11507,7 +11516,8 @@ var _lkeHandleDebounce = null;
 function lkeHandleCheck(inp){
   clearTimeout(_lkeHandleDebounce);
   var st = document.getElementById('lke-handle-status');
-  var v = (inp.value||'').trim().replace(/[^a-z0-9_\-]/gi,'');
+  // 소문자만 + 영문/숫자/-_ 만 허용 (대문자·한글·공백 자동 제거)
+  var v = (inp.value||'').trim().toLowerCase().replace(/[^a-z0-9_\-]/g,'');
   if(v!==inp.value) inp.value=v;
   var _lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
   var msg = _lang === 'en'
