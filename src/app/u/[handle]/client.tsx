@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 type Block = {
   type: string
@@ -174,6 +174,12 @@ const PUBLIC_CSS = `
 .ssobi-public[data-theme-applied="1"] .lke-block-link .l-sub{color:var(--lke-text-color, var(--t2)) !important}
 /* HERO — has-bg 시 강한 그라디언트 오버레이로 텍스트 가독성 확보 */
 .ssobi-public .lke-hero-carousel{position:relative}
+.ssobi-public .lke-hero-track{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.ssobi-public .lke-hero-track::-webkit-scrollbar{display:none}
+.ssobi-public .lke-hero-slide-wrap{flex:0 0 100%;scroll-snap-align:start;min-width:0}
+.ssobi-public .lke-hero-dots{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:3}
+.ssobi-public .lke-hero-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,255,255,.4);border:none;padding:0;cursor:pointer;transition:all .2s}
+.ssobi-public .lke-hero-dot.on{background:#fff;width:20px;border-radius:3px}
 .ssobi-public .lke-hero-banner{aspect-ratio:4/5;background:linear-gradient(135deg,#1A1F27 0%,#374151 100%);color:#fff;position:relative;overflow:hidden;padding:32px 24px;display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;text-decoration:none}
 .ssobi-public .lke-hero-banner[data-valign='middle']{justify-content:center;gap:14px}
 .ssobi-public .lke-hero-banner[data-valign='bottom']{justify-content:flex-end;gap:14px}
@@ -318,7 +324,7 @@ export default function LinkPageClient({ page }: { page: PageData }) {
   const [proposing, setProposing] = useState(false)
 
   const slides = page.hero?.slides || []
-  const firstSlide = slides[0] || ({ title: `@${page.handle}`, sub: 'Ssobi에서 만든 링크 페이지' } as HeroSlide)
+  const heroSlides = slides.length > 0 ? slides : [{ title: `@${page.handle}`, sub: 'Ssobi에서 만든 링크 페이지' } as HeroSlide]
   const isHeroCompact = !!page.hero?.compact
 
   // 조회수 트래킹 — page.tsx 가 ISR 캐싱이라 SSR 단계에서 카운트하면 누락됨.
@@ -368,7 +374,7 @@ export default function LinkPageClient({ page }: { page: PageData }) {
     <>
       <style dangerouslySetInnerHTML={{ __html: PUBLIC_CSS }} />
       <div className="ssobi-public" style={themeStyle} data-theme-applied={themeApplied ? '1' : undefined}>
-        <Hero slide={firstSlide} handle={page.handle} compact={isHeroCompact} />
+        <HeroCarousel slides={heroSlides} handle={page.handle} compact={isHeroCompact} />
         {page.blocks?.map((b, i) => renderBlock(b, i))}
         <a className="ssobi-cta" href="https://ssobi.ai/?ref=u" dangerouslySetInnerHTML={{ __html: '나만의 링크 페이지 <em>1초만에</em> 만들기 →' }} />
         <div className="ssobi-credit">Powered by <a href="https://ssobi.ai">Ssobi<em>.</em></a></div>
@@ -430,7 +436,8 @@ export default function LinkPageClient({ page }: { page: PageData }) {
   )
 }
 
-function Hero({ slide, handle, compact }: { slide: HeroSlide; handle: string; compact: boolean }) {
+// 단일 hero 배너 (캐러셀 안의 한 슬라이드)
+function HeroSlideEl({ slide, handle, compact }: { slide: HeroSlide; handle: string; compact: boolean }) {
   const hasBg = !!slide.bg
   const cls = ['lke-hero-banner', compact ? 'compact' : '', hasBg ? 'has-bg' : ''].filter(Boolean).join(' ')
   const heroBgPos = (slide as { bgPos?: string }).bgPos || 'center'
@@ -468,12 +475,41 @@ function Hero({ slide, handle, compact }: { slide: HeroSlide; handle: string; co
     </>
   )
   const valign = (slide.main_valign as 'top'|'middle'|'bottom') || 'top'
+  return linkUrl
+    ? <a className={cls} style={style} href={linkUrl} data-valign={valign}>{inner}</a>
+    : <div className={cls} style={style} data-valign={valign}>{inner}</div>
+}
+
+// 히어로 캐러셀 — 여러 슬라이드 좌우 스와이프 + 도트 indicator
+function HeroCarousel({ slides, handle, compact }: { slides: HeroSlide[]; handle: string; compact: boolean }) {
+  const [activeIdx, setActiveIdx] = useState(0)
+  const trackRef = useRef<HTMLDivElement>(null)
+  const onScroll = () => {
+    const el = trackRef.current; if (!el) return
+    const i = Math.round(el.scrollLeft / el.clientWidth)
+    if (i !== activeIdx) setActiveIdx(i)
+  }
+  const goTo = (i: number) => {
+    const el = trackRef.current; if (!el) return
+    el.scrollTo({ left: i * el.clientWidth, behavior: 'smooth' })
+  }
   return (
     <div className="lke-hero-carousel">
-      {linkUrl ? (
-        <a className={cls} style={style} href={linkUrl} data-valign={valign}>{inner}</a>
-      ) : (
-        <div className={cls} style={style} data-valign={valign}>{inner}</div>
+      <div className="lke-hero-track" ref={trackRef} onScroll={onScroll}>
+        {slides.map((s, i) => (
+          <div key={i} className="lke-hero-slide-wrap">
+            <HeroSlideEl slide={s} handle={handle} compact={compact} />
+          </div>
+        ))}
+      </div>
+      {slides.length > 1 && (
+        <>
+          <div className="lke-hero-dots">
+            {slides.map((_, i) => (
+              <button key={i} className={'lke-hero-dot' + (i === activeIdx ? ' on' : '')} onClick={() => goTo(i)} aria-label={`슬라이드 ${i+1}`} />
+            ))}
+          </div>
+        </>
       )}
     </div>
   )
