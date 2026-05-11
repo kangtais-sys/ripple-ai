@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Allow: /u/
+Allow: /s/
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /app
+Disallow: /signup
+Disallow: /login
+
+Sitemap: https://ssobi.ai/sitemap.xml
