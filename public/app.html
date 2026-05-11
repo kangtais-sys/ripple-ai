@@ -447,6 +447,11 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .plan-feat::before{content:'✓';color:var(--mint);font-weight:800;font-size:11px}
 .plan-footer{padding:0 24px calc(20px + env(safe-area-inset-bottom))}
 .pay-note{text-align:center;font-size:12px;color:var(--t3);margin-top:12px;line-height:1.6}
+.plan-curr-toggle{display:inline-flex;gap:0;background:var(--bg);padding:4px;border-radius:99px;margin:0 auto 16px;align-self:center}
+#m-plan .plan-hero{text-align:center}
+#m-plan .plan-curr-toggle{display:flex;width:fit-content;margin:6px auto 14px}
+.plan-curr-pill{padding:7px 18px;border-radius:99px;border:none;background:transparent;font-size:12px;font-weight:700;color:var(--t3);cursor:pointer;transition:all .2s;font-family:inherit}
+.plan-curr-pill.on{background:#fff;color:var(--t1);box-shadow:0 1px 3px rgba(0,0,0,.08)}
 
 /* ── EMPTY STATE ── */
 .empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 32px;text-align:center;min-height:240px}
@@ -3885,58 +3890,71 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   </div>
 </div>
 
-<!-- ════ 이용권 / 결제 ════ -->
+<!-- ════ 이용권 / 결제 (4단계 · 통화 분기) ════ -->
 <div class="ov" id="m-plan" onclick="co(event,'m-plan')">
-  <div class="sheet" style="padding:14px 20px 28px">
+  <div class="sheet" style="padding:14px 20px 28px;max-height:90vh;overflow-y:auto">
     <div class="s-bar"></div>
-    <div class="plan-hero" style="padding:4px 0 16px">
-      <div class="plan-badge" data-i18n="mod.plan.hero_badge">무료체험 D-4 · 지금 바로 구독하기</div>
+    <div class="plan-hero" style="padding:4px 0 12px">
       <div class="plan-title" data-i18n="mod.plan.hero_title">플랜을 선택하세요</div>
       <div class="plan-sub" data-i18n="mod.plan.hero_sub">언제든지 취소할 수 있어요. 약정 없음.</div>
     </div>
+    <div class="plan-curr-toggle" role="tablist" aria-label="통화">
+      <button class="plan-curr-pill" data-cur="KRW" onclick="planApplyCurrency('KRW')" type="button">₩ KRW</button>
+      <button class="plan-curr-pill" data-cur="USD" onclick="planApplyCurrency('USD')" type="button">$ USD</button>
+    </div>
     <div class="plan-cards" style="padding:0">
+      <div class="plan-card" id="plan-free" onclick="selectPlan('free')">
+        <div class="plan-name">FREE</div>
+        <div class="plan-price" data-krw="0" data-usd="0"><span class="px-amount">₩0</span><span class="px-suffix"> / 월</span></div>
+        <div class="plan-desc">일단 무료로.</div>
+        <div class="plan-features">
+          <div class="plan-feat">월 300건 자동 응대</div>
+          <div class="plan-feat">연동 계정 1개</div>
+          <div class="plan-feat">AI 톤 학습 월 1회</div>
+          <div class="plan-feat">카드뉴스 월 5개 (워터마크)</div>
+        </div>
+      </div>
       <div class="plan-card" id="plan-basic" onclick="selectPlan('basic')">
-        <div class="plan-name" data-i18n="mod.plan.basic_name">베이직</div>
-        <div class="plan-price">₩0 <span data-i18n="mod.plan.basic_price_unit">/ 월</span></div>
-        <div class="plan-desc" data-i18n="mod.plan.basic_desc">그냥 쓰세요. 평생 무료.</div>
+        <div class="plan-name">STARTER</div>
+        <div class="plan-price" data-krw="9900" data-usd="7.99"><span class="px-amount">₩9,900</span><span class="px-suffix"> / 월</span></div>
+        <div class="plan-desc">크리에이터 입문자용.</div>
         <div class="plan-features">
-          <div class="plan-feat" data-i18n="mod.plan.basic_f1">월 300건 자동 응대</div>
-          <div class="plan-feat" data-i18n="mod.plan.basic_f2">계정 1개</div>
-          <div class="plan-feat" data-i18n="mod.plan.basic_f3">AI 말투 학습 (기본)</div>
-          <div class="plan-feat" data-i18n="mod.plan.basic_f4">1초 카드뉴스 월 3회</div>
-          <div class="plan-feat" data-i18n="mod.plan.basic_f5">카카오톡 알림 (기본)</div>
+          <div class="plan-feat">월 3,000건 자동 응대</div>
+          <div class="plan-feat">AI 톤 학습 월 4회</div>
+          <div class="plan-feat">카드뉴스 월 50개 · 워터마크 없음</div>
+          <div class="plan-feat">내 링크 프리미엄 블록·템플릿</div>
+          <div class="plan-feat">예약 발행</div>
         </div>
       </div>
-      <div class="plan-card selected recommended" id="plan-pro" onclick="selectPlan('pro')">
-        <div class="plan-rec-badge" data-i18n="mod.plan.rec_badge">추천</div>
-        <div class="plan-name" data-i18n="mod.plan.prem_name">프리미엄</div>
-        <div class="plan-price">₩29,800 <span data-i18n="mod.plan.basic_price_unit">/ 월</span></div>
-        <div class="plan-desc" data-i18n="mod.plan.prem_desc">키우기·만들기·돈벌기 전부</div>
+      <div class="plan-card selected recommended" id="plan-premium" onclick="selectPlan('premium')">
+        <div class="plan-rec-badge">추천</div>
+        <div class="plan-name">PRO</div>
+        <div class="plan-price" data-krw="29900" data-usd="22.99"><span class="px-amount">₩29,900</span><span class="px-suffix"> / 월</span></div>
+        <div class="plan-desc">본격 인플루언서용.</div>
         <div class="plan-features">
-          <div class="plan-feat" data-i18n="mod.plan.prem_f1">월 6,600건 자동 응대 · 계정 3개</div>
-          <div class="plan-feat" data-i18n="mod.plan.prem_f2">1초 카드뉴스 무제한</div>
-          <div class="plan-feat" data-i18n="mod.plan.prem_f3">대화형 루프 + 업로드 자동 실행</div>
-          <div class="plan-feat" data-i18n="mod.plan.prem_f4">Ssobi 협업 제안 전체 참여</div>
-          <div class="plan-feat" data-i18n="mod.plan.prem_f5">수익 제안 분류 + 팔로워 CRM</div>
-          <div class="plan-feat" data-i18n="mod.plan.prem_f6">카카오톡 알림 전체</div>
+          <div class="plan-feat">월 30,000건 자동 응대</div>
+          <div class="plan-feat">AI 톤 학습 무제한</div>
+          <div class="plan-feat">카드뉴스 월 200개</div>
+          <div class="plan-feat">이미지 업로드 무제한</div>
+          <div class="plan-feat">우선 지원</div>
         </div>
       </div>
-      <div class="plan-card" id="plan-biz" onclick="selectPlan('biz')">
-        <div class="plan-name" data-i18n="mod.plan.pro_name">프로페셔널</div>
-        <div class="plan-price">₩69,800 <span data-i18n="mod.plan.basic_price_unit">/ 월</span></div>
-        <div class="plan-desc" data-i18n="mod.plan.pro_desc">브랜드·에이전시 운영에 최적</div>
+      <div class="plan-card" id="plan-business" onclick="selectPlan('business')">
+        <div class="plan-name">TEAM</div>
+        <div class="plan-price" data-krw="79000" data-usd="59.99"><span class="px-amount">₩79,000</span><span class="px-suffix"> / 월</span></div>
+        <div class="plan-desc">브랜드·에이전시.</div>
         <div class="plan-features">
-          <div class="plan-feat" data-i18n="mod.plan.pro_f1">월 무제한 자동 응대</div>
-          <div class="plan-feat" data-i18n="mod.plan.pro_f2">계정 10개</div>
-          <div class="plan-feat" data-i18n="mod.plan.pro_f3">전용 AI 말투 세분화</div>
-          <div class="plan-feat" data-i18n="mod.plan.pro_f4">수출·B2B 자동 분류</div>
-          <div class="plan-feat" data-i18n="mod.plan.pro_f5">전담 매니저 지원</div>
+          <div class="plan-feat">자동 응대 Meta 한도까지</div>
+          <div class="plan-feat">연동 계정 3개</div>
+          <div class="plan-feat">팀 멤버 3명 (출시 예정)</div>
+          <div class="plan-feat">카드뉴스 무제한</div>
+          <div class="plan-feat">전담 매니저</div>
         </div>
       </div>
     </div>
     <div class="plan-footer" style="padding:16px 0 0">
-      <button class="btn-mint-full" onclick="cm('m-plan');openModal('m-plan-checkout')" data-i18n="mod.plan.cta">프리미엄 구독 시작하기</button>
-      <div class="pay-note" data-i18n="mod.plan.note">첫 결제는 무료체험 종료 후 진행돼요. 언제든 취소·변경 가능해요.</div>
+      <button class="btn-mint-full" id="plan-cta-btn" onclick="planSubscribe()">PRO 구독 시작하기</button>
+      <div class="pay-note">언제든 취소·변경 가능해요. 첫 결제 후 영수증을 이메일로 보내드려요.</div>
     </div>
   </div>
 </div>
@@ -4779,9 +4797,6 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
 <!-- 카카오 알림 -->
 <div class="ov" id="m-kakao" onclick="co(event,'m-kakao')"><div class="sheet"><div class="s-bar"></div><div class="s-title">카카오 알림 설정</div><div class="s-sub">중요 이벤트 발생 시 카카오톡으로 즉시 알려드려요</div><div class="setting-row"><div class="s-body"><div class="s-name">요주의 댓글 즉시 알림</div><div class="s-desc">부정 이슈, 결제 문제 감지 시 즉시 발송</div></div><label class="tog"><input type="checkbox" checked><span class="tsl"></span></label></div><div class="setting-row"><div class="s-body"><div class="s-name">일일 리포트</div><div class="s-desc">매일 오전 9시 전일 응대 요약 발송</div></div><label class="tog"><input type="checkbox" checked><span class="tsl"></span></label></div><div class="setting-row"><div class="s-body"><div class="s-name">수익 제안 알림</div><div class="s-desc">광고·협업·수출 문의 도착 시 즉시 발송</div></div><label class="tog"><input type="checkbox" checked><span class="tsl"></span></label></div><div style="font-size:13px;font-weight:700;color:var(--t1);margin-top:16px;margin-bottom:8px">카카오톡 연동</div><input class="sheet-in" type="text" placeholder="카카오톡 ID 입력" style="margin-bottom:10px"><button class="btn-p" style="background:#FEE500;color:#3A1D1D;margin-top:0" onclick="cm('m-kakao')">카카오 알림톡 연동하기</button><button class="btn-s" style="margin-top:6px" onclick="cm('m-kakao')"><span data-i18n="btn.close">닫기</span></button></div></div>
-
-<!-- 이용권 -->
-<div class="ov" id="m-plan" onclick="co(event,'m-plan')"><div class="sheet"><div class="s-bar"></div><div class="s-title">이용권</div><div style="background:var(--mint-l);border-radius:16px;padding:20px;margin-bottom:16px;border:1px solid #A7F3D0"><div style="font-size:11px;font-weight:700;color:var(--mint-d);margin-bottom:4px">현재 플랜</div><div style="font-size:22px;font-weight:900;color:var(--t1)">프리미엄</div><div style="font-size:13px;color:var(--t2);margin-top:4px">무료체험 D-4 남음</div><div style="margin-top:12px;font-size:12px;color:var(--mint-d);font-weight:600">월 6,600건 응대 · 3개 채널 · AI 말투 학습 포함</div></div><div class="setting-row"><div class="s-body"><div class="s-name">월 응대 한도</div><div class="s-desc">6,600건 / 이번 달 1,842건 사용 (28%)</div></div></div><div class="setting-row"><div class="s-body"><div class="s-name">연결 채널</div><div class="s-desc">Instagram · TikTok · YouTube</div></div></div><div class="setting-row"><div class="s-body"><div class="s-name">갱신일</div><div class="s-desc">2025년 2월 15일</div></div></div><button class="btn-p" onclick="cm('m-plan')">구독 관리</button><button class="btn-s" onclick="cm('m-plan')"><span data-i18n="btn.close">닫기</span></button></div></div>
 
 <!-- 계정 연동 -->
 <div class="ov" id="m-account" onclick="co(event,'m-account')">
@@ -16796,7 +16811,7 @@ function devSimulate(kind, level){
 
 function toggleAcc(id){ document.getElementById(id).classList.toggle('open'); }
 function openAcc(id){ document.getElementById(id).classList.add('open'); }
-function openModal(id){ var el = document.getElementById(id); if(el) el.classList.add('on'); if(id==='m-ai-style') loadToneState(); }
+function openModal(id){ var el = document.getElementById(id); if(el) el.classList.add('on'); if(id==='m-ai-style') loadToneState(); if(id==='m-plan' && typeof planInitOnOpen==='function') planInitOnOpen(); }
 
 function toneFmt(v){
   if(v === null || v === undefined || v === '') return '';
@@ -17226,12 +17241,74 @@ function doLearnFromManual(){
   });
 }
 
+// ═══ m-plan 모달 — 4단계 + 통화 분기 ═══
+// plan key 는 DB enum 그대로 (free/basic/premium/business)
+// 마케팅명 매핑: free=FREE, basic=STARTER, premium=PRO, business=TEAM
+var PLAN_TIER_NAME = { free:'FREE', basic:'STARTER', premium:'PRO', business:'TEAM' };
+var _selectedPlan = 'premium'; // 모달 열릴 때 기본 선택
+
 function selectPlan(plan){
+  if(!PLAN_TIER_NAME[plan]) return;
+  _selectedPlan = plan;
   document.querySelectorAll('#m-plan .plan-card').forEach(function(c){ c.classList.remove('selected'); });
-  document.getElementById('plan-'+plan).classList.add('selected');
-  var names={basic:'베이직', pro:'프리미엄', biz:'프로페셔널'};
-  var btn=document.querySelector('#m-plan .plan-footer .btn-mint-full');
-  if(btn) btn.textContent=names[plan]+' 구독 시작하기';
+  var card = document.getElementById('plan-'+plan);
+  if(card) card.classList.add('selected');
+  // CTA 텍스트 갱신
+  var btn = document.getElementById('plan-cta-btn');
+  if(btn){
+    if(plan === 'free') btn.textContent = '현재 플랜';
+    else btn.textContent = PLAN_TIER_NAME[plan] + ' 구독 시작하기';
+  }
+}
+
+// 통화 토글 — landing 의 ssobi_currency localStorage 공유
+function planGetCurrency(){
+  try {
+    var stored = localStorage.getItem('ssobi_currency');
+    if(stored === 'KRW' || stored === 'USD') return stored;
+  } catch(_){}
+  return (navigator.language || '').toLowerCase().indexOf('ko') === 0 ? 'KRW' : 'USD';
+}
+function planApplyCurrency(cur){
+  if(cur !== 'KRW' && cur !== 'USD') cur = 'KRW';
+  document.querySelectorAll('#m-plan .plan-price[data-krw]').forEach(function(el){
+    var krw = parseInt(el.getAttribute('data-krw'), 10) || 0;
+    var usd = parseFloat(el.getAttribute('data-usd')) || 0;
+    var amount = el.querySelector('.px-amount');
+    var suffix = el.querySelector('.px-suffix');
+    if(!amount || !suffix) return;
+    if(cur === 'USD'){
+      amount.textContent = usd === 0 ? 'Free' : '$' + usd.toFixed(2);
+      suffix.textContent = usd === 0 ? '' : ' / mo';
+    } else {
+      amount.textContent = krw === 0 ? '무료' : '₩' + krw.toLocaleString();
+      suffix.textContent = krw === 0 ? '' : ' / 월';
+    }
+  });
+  document.querySelectorAll('#m-plan .plan-curr-pill').forEach(function(p){
+    p.classList.toggle('on', p.getAttribute('data-cur') === cur);
+  });
+  try { localStorage.setItem('ssobi_currency', cur); } catch(_){}
+}
+
+// 구독 시작 — 통화에 따라 NicePay (KRW) / Stripe (USD) 분기
+// (실제 SDK 호출은 NicePay/Stripe 키 받은 후 Task 3·6 에서 wire)
+function planSubscribe(){
+  if(_selectedPlan === 'free'){ cm('m-plan'); return; }
+  var cur = planGetCurrency();
+  // TODO Task 3·6: 실제 결제 호출
+  //   if(cur === 'KRW') startNicePayBilling(_selectedPlan)
+  //   else              startStripeCheckout(_selectedPlan)
+  alert(PLAN_TIER_NAME[_selectedPlan] + ' 구독 (' + cur + ') — 결제 시스템 준비 중입니다.');
+}
+
+// m-plan 모달 열릴 때 초기 통화 적용 + URL ?plan= 으로 들어오면 자동 선택
+function planInitOnOpen(){
+  planApplyCurrency(planGetCurrency());
+  try {
+    var p = new URLSearchParams(location.search).get('plan');
+    if(p && PLAN_TIER_NAME[p]) selectPlan(p);
+  } catch(_){}
 }
 
 function addTarget(){
@@ -18008,6 +18085,19 @@ async function checkAuth() {
     var errors = { no_code:'인증 코드 없음', token_failed:'토큰 발급 실패', profile_failed:'프로필 조회 실패', not_logged_in:'로그인 필요', db_failed:'저장 실패', unknown:'알 수 없는 오류' };
     alert('Instagram 연동 실패: ' + (errors[params.get('ig_error')] || params.get('ig_error')));
     window.history.replaceState({}, '', '/app.html');
+  }
+
+  // landing 의 startStarter/startPremium/startTeam → /app?plan=basic|premium|business
+  // 로그인 완료 후 m-plan 모달 자동 오픈 + 해당 플랜 사전 선택
+  var planFromQuery = params.get('plan');
+  if (planFromQuery && ['basic','premium','business'].indexOf(planFromQuery) >= 0) {
+    setTimeout(function(){
+      if (typeof selectPlan === 'function') selectPlan(planFromQuery);
+      openModal('m-plan');
+    }, 600);
+    // 쿼리 정리해서 새로고침 시 안 뜨게
+    var clean = location.pathname + (hash ? '#' + hash : '');
+    window.history.replaceState({}, '', clean);
   }
 
   if (res.data.session) {
