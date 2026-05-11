@@ -33,13 +33,8 @@ export default function PlanPage() {
   const planInfo = PLANS[currentPlan]
 
   async function handleSubscribe(plan: PlanKey) {
-    if (!process.env.NEXT_PUBLIC_PORTONE_STORE_ID) {
-      alert('결제 시스템 준비 중입니다. 곧 오픈됩니다!')
-      return
-    }
-    // 포트원 SDK 빌링키 발급 → /api/payment/subscribe 호출
-    // 실제 구현은 포트원 가입 후 진행
-    alert(`${PLANS[plan].name} 플랜 결제 페이지로 이동합니다`)
+    // TODO Task 8: 통화 분기 → KRW: NicePay JS SDK / USD: Stripe Checkout 리다이렉트
+    alert(`${PLANS[plan].name} 플랜 결제 (준비 중)`)
   }
 
   if (loading) return <div className="p-8 text-center text-gray-400">로딩 중...</div>
@@ -92,7 +87,7 @@ export default function PlanPage() {
               <p className="text-sm font-bold text-[#1A1F27]">{p.name}</p>
               <div className="mt-2 mb-3">
                 <span className="text-2xl font-bold text-[#1A1F27]">
-                  {p.price.toLocaleString()}
+                  {p.priceKrw.toLocaleString()}
                 </span>
                 <span className="text-sm text-gray-400">원/월</span>
               </div>

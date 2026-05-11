@@ -406,7 +406,11 @@ body{top:0!important}
 .comp-table-wrap{max-width:720px;margin:0 auto}
 
 /* ── PRICING ── */
-.pricing-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:880px;margin:0 auto;align-items:stretch}
+.pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;max-width:1120px;margin:0 auto;align-items:stretch}
+@media (max-width:1024px){.pricing-grid{grid-template-columns:repeat(2,1fr)}}
+.curr-toggle{display:inline-flex;gap:0;background:#F3F4F6;padding:4px;border-radius:99px;margin:0 auto 28px;align-self:center}
+.curr-pill{padding:7px 18px;border-radius:99px;border:none;background:transparent;font-size:12.5px;font-weight:700;color:var(--ink3);cursor:pointer;transition:all .2s;font-family:inherit}
+.curr-pill.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px rgba(0,0,0,.08)}
 .plan-card{background:var(--bg);border-radius:20px;border:1px solid rgba(15,19,25,.06);padding:24px;position:relative;transition:all .3s cubic-bezier(.32,1,.32,1);box-shadow:0 2px 8px rgba(15,19,25,.03);display:flex;flex-direction:column}
 .plan-card:hover{border-color:rgba(0,200,150,.3);transform:translateY(-3px);box-shadow:0 20px 44px rgba(15,19,25,.08),0 4px 10px rgba(0,200,150,.06)}
 .plan-card.featured{background:linear-gradient(160deg,#1A1F27,#0F1319);border-color:rgba(0,200,150,.25);box-shadow:0 16px 40px rgba(0,200,150,.15),0 2px 8px rgba(15,19,25,.15),inset 0 1px 0 rgba(255,255,255,.06)}
@@ -1144,51 +1148,69 @@ function googleTranslateElementInit(){
 
 <!-- PRICING -->
 <section class="sec fade-in" id="pricing">
-  <div class="wrap">
+  <div class="wrap" style="display:flex;flex-direction:column;align-items:center">
     <span class="sec-eye">PRICING</span>
-    <h2 class="sec-title" style="margin-bottom:8px">먼저, <em>그냥 쓰세요.</em></h2>
-    <p class="sec-sub">베이직 평생 무료 · 프리미엄 7일 무료 체험 · 언제든 취소 가능</p>
-    <div class="pricing-grid">
+    <h2 class="sec-title" style="margin-bottom:8px;text-align:center">먼저, <em>그냥 쓰세요.</em></h2>
+    <p class="sec-sub" style="text-align:center">FREE 평생 무료 · PRO 7일 무료 체험 · 언제든 취소 가능</p>
+    <div class="curr-toggle" role="tablist" aria-label="통화 선택">
+      <button class="curr-pill" data-cur="KRW" onclick="applyCurrency('KRW')" type="button">₩ KRW</button>
+      <button class="curr-pill" data-cur="USD" onclick="applyCurrency('USD')" type="button">$ USD</button>
+    </div>
+    <div class="pricing-grid" style="width:100%">
       <div class="plan-card">
-        <div class="plan-name">베이직</div>
-        <div class="plan-price">₩0<span> / 월</span></div>
-        <div class="plan-desc">그냥 쓰세요. 평생 무료.</div>
+        <div class="plan-name">FREE</div>
+        <div class="plan-price" data-krw="0" data-usd="0"><span class="px-amount">₩0</span><span class="px-suffix"> / 월</span></div>
+        <div class="plan-desc">일단 무료로 써보세요.</div>
         <div class="plan-feats">
           <div class="plan-feat">월 300건 자동 응대</div>
-          <div class="plan-feat">계정 1개</div>
-          <div class="plan-feat">AI 말투 학습 (기본)</div>
-          <div class="plan-feat">1초 카드뉴스 월 3회</div>
-          <div class="plan-feat">카카오톡 알림 (기본)</div>
+          <div class="plan-feat">연동 계정 1개</div>
+          <div class="plan-feat">AI 톤 학습 월 1회</div>
+          <div class="plan-feat">카드뉴스 월 5개 (워터마크)</div>
+          <div class="plan-feat">내 링크 기본 블록</div>
         </div>
         <button class="plan-btn dark" onclick="start()">지금 시작</button>
       </div>
+      <div class="plan-card">
+        <div class="plan-name">STARTER</div>
+        <div class="plan-price" data-krw="9900" data-usd="7.99"><span class="px-amount">₩9,900</span><span class="px-suffix"> / 월</span></div>
+        <div class="plan-desc">크리에이터 입문자용.</div>
+        <div class="plan-feats">
+          <div class="plan-feat">월 3,000건 자동 응대</div>
+          <div class="plan-feat">연동 계정 1개</div>
+          <div class="plan-feat">AI 톤 학습 월 4회</div>
+          <div class="plan-feat">카드뉴스 월 50개 · 워터마크 없음</div>
+          <div class="plan-feat">내 링크 프리미엄 블록·템플릿</div>
+          <div class="plan-feat">예약 발행</div>
+        </div>
+        <button class="plan-btn dark" onclick="startStarter()">지금 시작</button>
+      </div>
       <div class="plan-card featured">
         <div class="plan-badge">추천</div>
-        <div class="plan-name">프리미엄</div>
-        <div class="plan-price">₩29,800<span> / 월</span></div>
-        <div class="plan-desc">키우기·만들기·돈벌기 전부</div>
+        <div class="plan-name">PRO</div>
+        <div class="plan-price" data-krw="29900" data-usd="22.99"><span class="px-amount">₩29,900</span><span class="px-suffix"> / 월</span></div>
+        <div class="plan-desc">본격 인플루언서를 위한.</div>
         <div class="plan-feats">
-          <div class="plan-feat">월 6,600건 자동 응대 · 계정 3개</div>
-          <div class="plan-feat">1초 카드뉴스 무제한</div>
-          <div class="plan-feat">대화형 루프 + 업로드 자동 실행</div>
-          <div class="plan-feat">Ssobi 협업 제안 전체 참여</div>
-          <div class="plan-feat">수익 제안 분류 + 팔로워 CRM</div>
-          <div class="plan-feat">카카오톡 알림 전체</div>
+          <div class="plan-feat">월 30,000건 자동 응대</div>
+          <div class="plan-feat">연동 계정 1개</div>
+          <div class="plan-feat">AI 톤 학습 무제한</div>
+          <div class="plan-feat">카드뉴스 월 200개</div>
+          <div class="plan-feat">이미지 업로드 무제한</div>
+          <div class="plan-feat">우선 지원</div>
         </div>
         <button class="plan-btn green" onclick="startPremium()">7일 무료로 시작</button>
       </div>
       <div class="plan-card">
-        <div class="plan-name">프로페셔널</div>
-        <div class="plan-price">₩69,800<span> / 월</span></div>
-        <div class="plan-desc">브랜드·에이전시 운영에 최적</div>
+        <div class="plan-name">TEAM</div>
+        <div class="plan-price" data-krw="79000" data-usd="59.99"><span class="px-amount">₩79,000</span><span class="px-suffix"> / 월</span></div>
+        <div class="plan-desc">브랜드·에이전시 운영용.</div>
         <div class="plan-feats">
-          <div class="plan-feat">월 무제한 자동 응대</div>
-          <div class="plan-feat">계정 10개</div>
-          <div class="plan-feat">전용 AI 말투 세분화</div>
-          <div class="plan-feat">수출·B2B 자동 분류</div>
+          <div class="plan-feat">자동 응대 Meta 한도까지</div>
+          <div class="plan-feat">연동 계정 3개</div>
+          <div class="plan-feat">팀 멤버 3명 (출시 예정)</div>
+          <div class="plan-feat">카드뉴스 무제한</div>
           <div class="plan-feat">전담 매니저 지원</div>
         </div>
-        <button class="plan-btn dark" onclick="start()">지금 시작</button>
+        <button class="plan-btn dark" onclick="startTeam()">지금 시작</button>
       </div>
     </div>
   </div>
@@ -1294,7 +1316,40 @@ function toggleFaq(el) {
   arrow.style.transform = isOpen ? '' : 'rotate(180deg)';
 }
 function start() { window.location.href = '/app'; }
+function startStarter() { window.location.href = '/app?plan=basic'; }
 function startPremium() { window.location.href = '/app?plan=premium'; }
+function startTeam() { window.location.href = '/app?plan=business'; }
+
+// 가격표 통화 분기 — KRW/USD 토글
+//   ko-* 브라우저는 기본 KRW, 그 외는 USD. 사용자 선택은 localStorage 에 영속화.
+function ssobiGetCurrency(){
+  try {
+    var stored = localStorage.getItem('ssobi_currency');
+    if(stored === 'KRW' || stored === 'USD') return stored;
+  } catch(_){}
+  return (navigator.language || '').toLowerCase().indexOf('ko') === 0 ? 'KRW' : 'USD';
+}
+function applyCurrency(cur){
+  if(cur !== 'KRW' && cur !== 'USD') cur = 'KRW';
+  document.querySelectorAll('.plan-price[data-krw]').forEach(function(el){
+    var krw = parseInt(el.getAttribute('data-krw'), 10) || 0;
+    var usd = parseFloat(el.getAttribute('data-usd')) || 0;
+    var amount = el.querySelector('.px-amount');
+    var suffix = el.querySelector('.px-suffix');
+    if(cur === 'USD'){
+      amount.textContent = usd === 0 ? 'Free' : '$' + usd.toFixed(2);
+      suffix.textContent = usd === 0 ? '' : ' / mo';
+    } else {
+      amount.textContent = krw === 0 ? '무료' : '₩' + krw.toLocaleString();
+      suffix.textContent = krw === 0 ? '' : ' / 월';
+    }
+  });
+  document.querySelectorAll('.curr-pill').forEach(function(p){
+    p.classList.toggle('on', p.getAttribute('data-cur') === cur);
+  });
+  try { localStorage.setItem('ssobi_currency', cur); } catch(_){}
+}
+document.addEventListener('DOMContentLoaded', function(){ applyCurrency(ssobiGetCurrency()); });
 
 // 언어 선택
 function toggleLangMenu(){
