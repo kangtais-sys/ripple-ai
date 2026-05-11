@@ -3358,7 +3358,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div class="lke-topbar">
     <div class="lke-topbar-row1">
       <button class="lke-back-btn" onclick="go('create')" aria-label="뒤로"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <div class="lke-mini-url" onclick="editHandle()" style="position:relative">
+      <div class="lke-mini-url" onclick="lkeEditHandle()" style="position:relative">
         ssobi.ai/u/<strong id="lk-handle-disp">yuminhye</strong>
         <span id="lke-save-status" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);display:flex;align-items:center;opacity:0;transition:opacity .2s"></span>
       </div>
@@ -9308,19 +9308,13 @@ var linkState = {
 var editingBlockIdx = -1;
 
 function saveHero(key, el){ linkState[key] = el.innerText.trim() || (key==='title'?'@이름':''); }
-function saveHandle(inp){
-  linkState.handle = (inp.value||'').trim().replace(/[^a-z0-9_\-]/gi,'') || 'yuminhye';
-  var d = document.getElementById('lk-handle-disp'); if(d) d.textContent = linkState.handle;
-  var d2 = document.getElementById('lk-handle-disp-2'); if(d2) d2.textContent = linkState.handle;
-}
-function editHandle(){
-  var v = prompt('새 숏링크 핸들 (영문/숫자/_/- 만)', linkState.handle);
-  if(v==null) return;
-  v = v.trim().replace(/[^a-z0-9_\-]/gi,'');
-  if(!v){ alert(t('alert.enter_handle','핸들을 입력해주세요')); return; }
-  linkState.handle = v;
-  var d = document.getElementById('lk-handle-disp'); if(d) d.textContent = v;
-  var d2 = document.getElementById('lk-handle-disp-2'); if(d2) d2.textContent = v;
+// topbar URL 클릭 → 설정 시트의 핸들 input 으로 진입 (중복확인·즉시 저장 모두 시트가 처리)
+function lkeEditHandle(){
+  lkeOpenSheet('settings');
+  setTimeout(function(){
+    var hi = document.getElementById('lke-settings-handle');
+    if(hi){ hi.focus(); try{ hi.select(); }catch(_){} }
+  }, 250);
 }
 function saveEventText(el){ linkState.event.text = el.innerText.trim(); }
 function toggleEventBar(cb){
