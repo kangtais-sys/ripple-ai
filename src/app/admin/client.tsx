@@ -12,19 +12,86 @@ const sb = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-function HiggsfieldTestButton() {
+function GenerateNowButton() {
   const [state, setState] = useState<
     | { kind: 'idle' }
     | { kind: 'running' }
-    | { kind: 'success'; imageUrl: string; elapsedMs: number }
+    | { kind: 'success'; summary: string; details: unknown }
     | { kind: 'error'; message: string }
   >({ kind: 'idle' })
 
-  async function test() {
+  async function generate() {
     setState({ kind: 'running' })
     try {
       const { data } = await sb.auth.getSession()
       const token = data.session?.access_token
+      if (!token) { setState({ kind: 'error', message: '세션 만료' }); return }
+
+      const res = await fetch('/api/admin/marketing/generate-now', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({}),
+      })
+      const j = await res.json()
+      if (!res.ok || !j.ok) {
+        setState({ kind: 'error', message: j.error || '실패' })
+        return
+      }
+      const results = (j.results || []) as Array<{ generated?: Array<{ language: string; text_post_ids: string[]; asset_id: string | null }> }>
+      let textCount = 0
+      let visualCount = 0
+      for (const r of results) {
+        for (const g of r.generated || []) {
+          textCount += g.text_post_ids?.length || 0
+          if (g.asset_id) visualCount++
+        }
+      }
+      setState({ kind: 'success', summary: `텍스트 ${textCount}개 · 비주얼 ${visualCount}장 (생성 중)`, details: j })
+    } catch (e) {
+      setState({ kind: 'error', message: String(e) })
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        onClick={generate}
+        disabled={state.kind === 'running'}
+        className="bg-[#00C896] hover:bg-[#00A87E] disabled:opacity-50 text-white font-bold px-4 py-2 rounded-lg text-[12px] transition"
+      >
+        {state.kind === 'running' ? '생성 중 (~30s)...' : '🪄 오늘 콘텐츠 자동 생성'}
+      </button>
+      {state.kind === 'success' && (
+        <span className="text-[11px] text-emerald-300">✓ {state.summary}</span>
+      )}
+      {state.kind === 'error' && (
+        <span className="text-[11px] text-red-300 max-w-xs truncate" title={state.message}>
+          ✕ {state.message.slice(0, 60)}
+        </span>
+      )}
+    </div>
+  )
+}
+
+function HiggsfieldTestButton() {
+  const [state, setState] = useState<
+    | { kind: 'idle' }
+    | { kind: 'submitting' }
+    | { kind: 'processing'; assetId: string; secondsElapsed: number }
+    | { kind: 'success'; imageUrl: string; secondsElapsed: number }
+    | { kind: 'error'; message: string }
+  >({ kind: 'idle' })
+
+  async function getToken(): Promise<string | null> {
+    const { data } = await sb.auth.getSession()
+    return data.session?.access_token || null
+  }
+
+  async function test() {
+    setState({ kind: 'submitting' })
+    const t0 = Date.now()
+    try {
+      const token = await getToken()
       if (!token) { setState({ kind: 'error', message: '세션 만료' }); return }
 
       const res = await fetch('/api/admin/higgsfield/test', {
@@ -33,10 +100,43 @@ function HiggsfieldTestButton() {
       })
       const j = await res.json()
       if (!res.ok || !j.ok) {
-        setState({ kind: 'error', message: j.error || j.stage || '실패' })
+        setState({ kind: 'error', message: j.error || '제출 실패' })
         return
       }
-      setState({ kind: 'success', imageUrl: j.image_url, elapsedMs: j.elapsed_ms })
+
+      // 폴링 시작
+      const assetId = j.asset_id as string
+      setState({ kind: 'processing', assetId, secondsElapsed: 0 })
+
+      let attempts = 0
+      const maxAttempts = 60  // 5초 × 60 = 5분 한도
+      while (attempts < maxAttempts) {
+        await new Promise(r => setTimeout(r, 5000))
+        attempts++
+        const elapsed = Math.round((Date.now() - t0) / 1000)
+        setState({ kind: 'processing', assetId, secondsElapsed: elapsed })
+
+        const t = await getToken()
+        if (!t) { setState({ kind: 'error', message: '세션 만료 (폴링 중)' }); return }
+
+        const statusRes = await fetch(`/api/admin/higgsfield/test?asset_id=${assetId}`, {
+          headers: { Authorization: `Bearer ${t}` },
+        })
+        if (!statusRes.ok) continue
+        const sj = await statusRes.json()
+        const asset = sj.asset
+        if (!asset) continue
+
+        if (asset.generation_status === 'completed') {
+          setState({ kind: 'success', imageUrl: asset.url, secondsElapsed: elapsed })
+          return
+        }
+        if (asset.generation_status === 'failed' || asset.generation_status === 'cancelled') {
+          setState({ kind: 'error', message: asset.generation_error || asset.generation_status })
+          return
+        }
+      }
+      setState({ kind: 'error', message: '폴링 타임아웃 (5분 초과). webhook 미수신.' })
     } catch (e) {
       setState({ kind: 'error', message: String(e) })
     }
@@ -46,16 +146,19 @@ function HiggsfieldTestButton() {
     <div className="flex items-center gap-2">
       <button
         onClick={test}
-        disabled={state.kind === 'running'}
+        disabled={state.kind === 'submitting' || state.kind === 'processing'}
         className="bg-white/10 hover:bg-white/20 disabled:opacity-50 text-white font-semibold px-3 py-2 rounded-lg text-[12px] transition"
       >
-        {state.kind === 'running' ? 'Higgsfield 호출 중...' : '🎨 Higgsfield 테스트'}
+        {state.kind === 'submitting' ? 'Higgsfield 제출 중...' :
+          state.kind === 'processing' ? `Higgsfield 생성 중 (${state.secondsElapsed}s)` :
+          '🎨 Higgsfield 테스트'}
       </button>
       {state.kind === 'success' && (
         <>
           <a href={state.imageUrl} target="_blank" rel="noopener" className="text-[11px] text-[#00C896] hover:underline">
-            ✓ 성공 ({Math.round(state.elapsedMs / 1000)}s)
+            ✓ 성공 ({state.secondsElapsed}s)
           </a>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={state.imageUrl} alt="test" className="w-10 h-10 rounded object-cover border border-white/10" />
         </>
       )}
@@ -236,7 +339,8 @@ export default function AdminOverview() {
             실시간 운영 현황 · {new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          <GenerateNowButton />
           <HiggsfieldTestButton />
           <div className="text-[11px] text-white/40">{state.email}</div>
         </div>
