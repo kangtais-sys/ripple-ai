@@ -251,6 +251,131 @@ export default function AdminOverview() {
         </div>
       </section>
 
+      {/* 내 링크 서비스 */}
+      <section>
+        <h2 className="text-[13px] font-bold uppercase tracking-wider text-white/60 mb-3">내 링크</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+          <MetricCard
+            label="페이지 만든 유저"
+            value={m.link.authors_count}
+            sub={`총 ${m.link.pages_total}개 페이지 · 발행 ${m.link.pages_published}`}
+            accent="text-[#00C896]"
+          />
+          <MetricCard
+            label="총 누적 페이지뷰"
+            value={m.link.total_views.toLocaleString()}
+            sub={`7일 ${m.link.views_7d.toLocaleString()} · UV ${m.link.unique_visitors_7d.toLocaleString()}`}
+          />
+          <MetricCard
+            label="숏링크 발급"
+            value={m.link.short_links_total.toLocaleString()}
+            sub={`클릭 ${m.link.short_link_clicks_total.toLocaleString()} 누적`}
+          />
+          <MetricCard
+            label="숏링크 7일 클릭"
+            value={m.link.short_link_clicks_7d.toLocaleString()}
+            sub="외부 SNS 유입 확인"
+            accent="text-[#00C896]"
+          />
+        </div>
+        {m.link.top_referers.length > 0 && (
+          <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-5 space-y-3">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-white/40">
+              유입처 TOP {m.link.top_referers.length} (최근 30일)
+            </div>
+            {(() => {
+              const total = m.link.top_referers.reduce((s, r) => s + r.count, 0)
+              return m.link.top_referers.map((r) => (
+                <Bar
+                  key={r.source}
+                  label={r.source}
+                  value={r.count}
+                  total={total}
+                  color={
+                    r.source === 'instagram' ? 'bg-pink-500' :
+                    r.source === 'threads' ? 'bg-white/60' :
+                    r.source === 'tiktok' ? 'bg-cyan-400' :
+                    r.source === 'youtube' ? 'bg-red-500' :
+                    r.source === 'x' ? 'bg-white/40' :
+                    r.source === 'facebook' ? 'bg-blue-500' :
+                    r.source === 'kakao' ? 'bg-yellow-400' :
+                    r.source === 'direct' ? 'bg-emerald-400' :
+                    'bg-violet-400'
+                  }
+                />
+              ))
+            })()}
+          </div>
+        )}
+      </section>
+
+      {/* 만들기 (카드뉴스) */}
+      <section>
+        <h2 className="text-[13px] font-bold uppercase tracking-wider text-white/60 mb-3">만들기 (카드뉴스)</h2>
+        <div className="grid grid-cols-3 gap-3">
+          <MetricCard label="총 생성" value={m.cardnews.jobs_total} />
+          <MetricCard label="이번 달" value={m.cardnews.jobs_this_month} accent="text-[#00C896]" />
+          <MetricCard label="발행됨" value={m.cardnews.jobs_published} sub="published_at 있음" />
+        </div>
+        {m.cardnews.by_template.length > 0 && (
+          <div className="mt-3 rounded-2xl bg-white/[0.03] border border-white/5 p-5 space-y-3">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-white/40">템플릿별 사용</div>
+            {(() => {
+              const total = m.cardnews.by_template.reduce((s, r) => s + r.count, 0)
+              return m.cardnews.by_template.map((r) => (
+                <Bar key={r.template} label={r.template} value={r.count} total={total} color="bg-violet-400" />
+              ))
+            })()}
+          </div>
+        )}
+      </section>
+
+      {/* 자동 응대 (댓글·DM) */}
+      <section>
+        <h2 className="text-[13px] font-bold uppercase tracking-wider text-white/60 mb-3">자동 응대 (댓글·DM)</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+          <MetricCard label="이번 달 댓글" value={m.replies.this_month_comments.toLocaleString()} />
+          <MetricCard label="이번 달 DM" value={m.replies.this_month_dms.toLocaleString()} />
+          <MetricCard
+            label="누적 응대"
+            value={m.replies.total.toLocaleString()}
+            sub="전체 reply_logs"
+          />
+          <MetricCard
+            label="긴급 처리"
+            value={m.replies.urgent_count}
+            sub="urgent/high 분류 (30일)"
+            accent={m.replies.urgent_count > 0 ? 'text-amber-400' : 'text-white'}
+          />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+          <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-5 space-y-3">
+            <div className="text-[11px] font-bold uppercase tracking-wider text-white/40">감정 분포 (최근 30일)</div>
+            {(() => {
+              const total =
+                m.replies.by_sentiment.positive +
+                m.replies.by_sentiment.neutral +
+                m.replies.by_sentiment.negative +
+                m.replies.by_sentiment.unknown
+              return (
+                <>
+                  <Bar label="긍정" value={m.replies.by_sentiment.positive} total={total} color="bg-[#00C896]" />
+                  <Bar label="중립" value={m.replies.by_sentiment.neutral} total={total} color="bg-white/40" />
+                  <Bar label="부정" value={m.replies.by_sentiment.negative} total={total} color="bg-red-500" />
+                  <Bar label="미분류" value={m.replies.by_sentiment.unknown} total={total} color="bg-white/20" />
+                </>
+              )
+            })()}
+          </div>
+          <MetricCard
+            label="자동 승인율"
+            value={`${m.replies.approval_rate}%`}
+            sub="AI 응대가 그대로 발송된 비율 (최근 30일)"
+            accent={m.replies.approval_rate >= 70 ? 'text-[#00C896]' : 'text-amber-400'}
+          />
+        </div>
+      </section>
+
       <section>
         <h2 className="text-[13px] font-bold uppercase tracking-wider text-white/60 mb-3">마케팅 발행</h2>
         <div className="grid grid-cols-3 gap-3">
