@@ -25,6 +25,7 @@ export default function AdminLayout({
           </div>
           <nav className="flex items-center gap-6 text-[13px] font-semibold text-white/60">
             <a href="/admin" className="hover:text-white transition">개요</a>
+            <a href="/admin/users" className="hover:text-white transition">가입자</a>
             <a href="/admin/marketing" className="hover:text-white transition">마케팅</a>
             <a href="/app" className="text-white/40 hover:text-white transition">↗ 앱으로</a>
           </nav>
