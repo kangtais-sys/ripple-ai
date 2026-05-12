@@ -202,68 +202,78 @@ export async function getAdminMetrics(): Promise<AdminMetrics> {
     // 테이블 없을 수 있음 (migration 미실행) — 0 으로
   }
 
-  // 7) 내 링크 (link_pages + link_page_daily_stats + short_links + short_link_clicks)
+  // 7~9) 서비스별 통계 — 모든 쿼리 병렬 실행 (이전 직렬 처리 → 느림)
   const link: LinkStats = {
-    pages_total: 0,
-    pages_published: 0,
-    authors_count: 0,
-    total_views: 0,
-    views_7d: 0,
-    unique_visitors_7d: 0,
-    short_links_total: 0,
-    short_link_clicks_total: 0,
-    short_link_clicks_7d: 0,
+    pages_total: 0, pages_published: 0, authors_count: 0,
+    total_views: 0, views_7d: 0, unique_visitors_7d: 0,
+    short_links_total: 0, short_link_clicks_total: 0, short_link_clicks_7d: 0,
     top_referers: [],
   }
+  const cardnews: CardnewsStats = {
+    jobs_total: 0, jobs_published: 0, jobs_this_month: 0, by_template: [],
+  }
+  const replies: ReplyStats = {
+    total: 0, this_month_comments: 0, this_month_dms: 0,
+    by_sentiment: { positive: 0, neutral: 0, negative: 0, unknown: 0 },
+    urgent_count: 0, approval_rate: 0,
+  }
+  const date7dAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+
   try {
-    const { count: linkTotal } = await sb.from('link_pages').select('id', { count: 'exact', head: true })
-    link.pages_total = linkTotal || 0
-    const { count: linkPub } = await sb.from('link_pages').select('id', { count: 'exact', head: true }).eq('published', true)
-    link.pages_published = linkPub || 0
-    const { data: lpRows } = await sb.from('link_pages').select('user_id, view_count')
+    // 모든 쿼리 한 번에 — 4개 sub-system × 다중 쿼리 합쳐서 ~17개 병렬
+    const [
+      linkTotalRes, linkPubRes, lpRowsRes, dailyRowsRes,
+      slTotalRes, slRowsRes, slc7dRes, refRowsRes,
+      cTotalRes, cPubRes, cMonthRes, tplRowsRes,
+      rTotalRes, rcMonthRes, rdMonthRes, sentRowsRes,
+    ] = await Promise.all([
+      // 링크
+      sb.from('link_pages').select('id', { count: 'exact', head: true }),
+      sb.from('link_pages').select('id', { count: 'exact', head: true }).eq('published', true),
+      sb.from('link_pages').select('user_id, view_count'),
+      sb.from('link_page_daily_stats').select('views, unique_visitors').gte('date', date7dAgo),
+      sb.from('short_links').select('code', { count: 'exact', head: true }),
+      sb.from('short_links').select('click_count'),
+      sb.from('short_link_clicks').select('id', { count: 'exact', head: true }).gte('clicked_at', sevenDayAgo),
+      // 유입처 — 30일치 referer (limit 1000 으로 축소, 32만 IG 트래픽 가정에선 충분)
+      sb.from('short_link_clicks').select('referer').gte('clicked_at', thirtyDayAgo).not('referer', 'is', null).limit(1000),
+      // 카드뉴스
+      sb.from('card_news_jobs').select('id', { count: 'exact', head: true }),
+      sb.from('card_news_jobs').select('id', { count: 'exact', head: true }).not('published_at', 'is', null),
+      sb.from('card_news_jobs').select('id', { count: 'exact', head: true }).gte('created_at', startOfMonth.toISOString()),
+      sb.from('card_news_jobs').select('template').not('template', 'is', null).limit(2000),
+      // 응대
+      sb.from('reply_logs').select('id', { count: 'exact', head: true }),
+      sb.from('reply_logs').select('id', { count: 'exact', head: true }).eq('type', 'comment').gte('created_at', startOfMonth.toISOString()),
+      sb.from('reply_logs').select('id', { count: 'exact', head: true }).eq('type', 'dm').gte('created_at', startOfMonth.toISOString()),
+      sb.from('reply_logs').select('sentiment, urgency, is_approved').gte('created_at', thirtyDayAgo).limit(2000),
+    ])
+
+    // 링크 집계
+    link.pages_total = linkTotalRes.count || 0
+    link.pages_published = linkPubRes.count || 0
     const authorSet = new Set<string>()
-    for (const r of lpRows || []) {
+    for (const r of lpRowsRes.data || []) {
       if (r.user_id) authorSet.add(r.user_id as string)
       link.total_views += (r.view_count as number) || 0
     }
     link.authors_count = authorSet.size
-
-    const date7dAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
-    const { data: dailyRows } = await sb
-      .from('link_page_daily_stats')
-      .select('views, unique_visitors')
-      .gte('date', date7dAgo)
-    for (const r of dailyRows || []) {
+    for (const r of dailyRowsRes.data || []) {
       link.views_7d += (r.views as number) || 0
       link.unique_visitors_7d += (r.unique_visitors as number) || 0
     }
+    link.short_links_total = slTotalRes.count || 0
+    for (const r of slRowsRes.data || []) link.short_link_clicks_total += (r.click_count as number) || 0
+    link.short_link_clicks_7d = slc7dRes.count || 0
 
-    const { count: slTotal } = await sb.from('short_links').select('code', { count: 'exact', head: true })
-    link.short_links_total = slTotal || 0
-    const { data: slRows } = await sb.from('short_links').select('click_count')
-    for (const r of slRows || []) link.short_link_clicks_total += (r.click_count as number) || 0
-
-    const { count: slc7d } = await sb
-      .from('short_link_clicks')
-      .select('id', { count: 'exact', head: true })
-      .gte('clicked_at', sevenDayAgo)
-    link.short_link_clicks_7d = slc7d || 0
-
-    // 유입처 분석 — referer 도메인 추출 (최근 30일)
-    const { data: refRows } = await sb
-      .from('short_link_clicks')
-      .select('referer')
-      .gte('clicked_at', thirtyDayAgo)
-      .not('referer', 'is', null)
-      .limit(5000)
+    // 유입처 — referer 도메인 추출
     const refCounts = new Map<string, number>()
-    for (const r of refRows || []) {
+    for (const r of refRowsRes.data || []) {
       const raw = (r.referer as string) || ''
       let source = 'direct'
       if (raw) {
         try {
           const host = new URL(raw).hostname.replace(/^www\./, '')
-          // 도메인 별칭 간단 정규화
           if (host.includes('instagram')) source = 'instagram'
           else if (host.includes('threads.')) source = 'threads'
           else if (host.includes('tiktok')) source = 'tiktok'
@@ -274,9 +284,7 @@ export async function getAdminMetrics(): Promise<AdminMetrics> {
           else if (host.includes('google')) source = 'google'
           else if (host.includes('naver')) source = 'naver'
           else source = host
-        } catch {
-          source = 'unknown'
-        }
+        } catch { source = 'unknown' }
       }
       refCounts.set(source, (refCounts.get(source) || 0) + 1)
     }
@@ -284,31 +292,13 @@ export async function getAdminMetrics(): Promise<AdminMetrics> {
       .map(([source, count]) => ({ source, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 8)
-  } catch {
-    // 테이블 누락 시 0 유지
-  }
 
-  // 8) 만들기 (card_news_jobs)
-  const cardnews: CardnewsStats = {
-    jobs_total: 0,
-    jobs_published: 0,
-    jobs_this_month: 0,
-    by_template: [],
-  }
-  try {
-    const { count: cTotal } = await sb.from('card_news_jobs').select('id', { count: 'exact', head: true })
-    cardnews.jobs_total = cTotal || 0
-    const { count: cPub } = await sb.from('card_news_jobs').select('id', { count: 'exact', head: true }).not('published_at', 'is', null)
-    cardnews.jobs_published = cPub || 0
-    const { count: cMonth } = await sb
-      .from('card_news_jobs')
-      .select('id', { count: 'exact', head: true })
-      .gte('created_at', startOfMonth.toISOString())
-    cardnews.jobs_this_month = cMonth || 0
-
-    const { data: tplRows } = await sb.from('card_news_jobs').select('template').not('template', 'is', null)
+    // 카드뉴스 집계
+    cardnews.jobs_total = cTotalRes.count || 0
+    cardnews.jobs_published = cPubRes.count || 0
+    cardnews.jobs_this_month = cMonthRes.count || 0
     const tplMap = new Map<string, number>()
-    for (const r of tplRows || []) {
+    for (const r of tplRowsRes.data || []) {
       const t = (r.template as string) || 'unknown'
       tplMap.set(t, (tplMap.get(t) || 0) + 1)
     }
@@ -316,44 +306,14 @@ export async function getAdminMetrics(): Promise<AdminMetrics> {
       .map(([template, count]) => ({ template, count }))
       .sort((a, b) => b.count - a.count)
       .slice(0, 10)
-  } catch {
-    // 카드뉴스 파이프라인 미구현 시 0
-  }
 
-  // 9) 자동 응대 (reply_logs)
-  const replies: ReplyStats = {
-    total: 0,
-    this_month_comments: 0,
-    this_month_dms: 0,
-    by_sentiment: { positive: 0, neutral: 0, negative: 0, unknown: 0 },
-    urgent_count: 0,
-    approval_rate: 0,
-  }
-  try {
-    const { count: rTotal } = await sb.from('reply_logs').select('id', { count: 'exact', head: true })
-    replies.total = rTotal || 0
-    // 이번 달 댓글/DM 분리
-    const { count: rcMonth } = await sb
-      .from('reply_logs')
-      .select('id', { count: 'exact', head: true })
-      .eq('type', 'comment')
-      .gte('created_at', startOfMonth.toISOString())
-    replies.this_month_comments = rcMonth || 0
-    const { count: rdMonth } = await sb
-      .from('reply_logs')
-      .select('id', { count: 'exact', head: true })
-      .eq('type', 'dm')
-      .gte('created_at', startOfMonth.toISOString())
-    replies.this_month_dms = rdMonth || 0
-    // 감정 분포 (최근 30일)
-    const { data: sentRows } = await sb
-      .from('reply_logs')
-      .select('sentiment, urgency, is_approved')
-      .gte('created_at', thirtyDayAgo)
-      .limit(5000)
+    // 응대 집계
+    replies.total = rTotalRes.count || 0
+    replies.this_month_comments = rcMonthRes.count || 0
+    replies.this_month_dms = rdMonthRes.count || 0
     let approvedCount = 0
     let totalRecent = 0
-    for (const r of sentRows || []) {
+    for (const r of sentRowsRes.data || []) {
       totalRecent++
       const s = (r.sentiment as string) || 'unknown'
       if (s === 'positive' || s === 'neutral' || s === 'negative') replies.by_sentiment[s]++
@@ -363,7 +323,7 @@ export async function getAdminMetrics(): Promise<AdminMetrics> {
     }
     replies.approval_rate = totalRecent > 0 ? Math.round((approvedCount / totalRecent) * 100) : 0
   } catch {
-    // 누락 시 0 유지
+    // 일부 테이블 없거나 RLS 차단 — 0 유지
   }
 
   return {
