@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
-import { PLANS, type PlanKey, getUsagePercent } from '@/lib/plans'
+import { PLANS, type PlanKey, getUsagePercent, getEffectivePlanKey, isBetaActive } from '@/lib/plans'
 
 // 한도 임박 시 알림 (cron에서 호출)
 export async function GET() {
@@ -11,11 +11,12 @@ export async function GET() {
   const month = new Date().toISOString().slice(0, 7)
 
   const [{ data: profile }, { data: usage }] = await Promise.all([
-    supabase.from('profiles').select('plan').eq('id', user.id).single(),
+    supabase.from('profiles').select('plan, beta, beta_ends_at').eq('id', user.id).single(),
     supabase.from('usage_logs').select('comment_count, dm_count').eq('user_id', user.id).eq('month', month).single(),
   ])
 
-  const plan = (profile?.plan || 'free') as PlanKey
+  // 베타 기간이면 'premium' 권한 효과로 계산
+  const plan = getEffectivePlanKey(profile || {}) as PlanKey
   const comments = usage?.comment_count || 0
   const dms = usage?.dm_count || 0
   const percent = getUsagePercent(plan, comments, dms)
@@ -23,6 +24,7 @@ export async function GET() {
 
   return NextResponse.json({
     plan: planInfo.name,
+    beta: isBetaActive(profile || {}),
     used: comments + dms,
     limit: planInfo.limit === Infinity ? '무제한' : planInfo.limit,
     percent,

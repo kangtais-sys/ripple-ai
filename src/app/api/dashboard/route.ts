@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { NextResponse } from 'next/server'
-import { PLANS, type PlanKey, getUsagePercent } from '@/lib/plans'
+import { PLANS, type PlanKey, getUsagePercent, getEffectivePlanKey, isBetaActive } from '@/lib/plans'
 
 export async function GET() {
   const supabase = await createClient()
@@ -11,14 +11,16 @@ export async function GET() {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  // 1) profiles 테이블에서 plan 정보
+  // 1) profiles 테이블에서 plan + 베타 정보
   const { data: profile } = await supabase
     .from('profiles')
-    .select('plan')
+    .select('plan, beta, beta_ends_at')
     .eq('id', user.id)
     .single()
 
-  const plan = (profile?.plan || 'free') as PlanKey
+  // 베타 기간이면 'premium' 권한 효과
+  const plan = getEffectivePlanKey(profile || {}) as PlanKey
+  const betaActive = isBetaActive(profile || {})
 
   // 2) usage_logs에서 이번 달 comment_count, dm_count
   const now = new Date()
@@ -64,6 +66,10 @@ export async function GET() {
 
   return NextResponse.json({
     plan,
+    beta: {
+      active: betaActive,
+      ends_at: profile?.beta_ends_at || null,
+    },
     usage: {
       comments,
       dms,

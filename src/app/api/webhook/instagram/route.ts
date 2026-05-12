@@ -1,6 +1,6 @@
 import { createClient as createAdminClient, type SupabaseClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
-import { isOverLimit } from '@/lib/plans'
+import { isOverLimit, getEffectivePlanKey } from '@/lib/plans'
 import { logAIUsage } from '@/lib/ai-usage'
 import { classifyText, upsertFollower, recordOutboundMessage, maybeCreateRevenueProposal } from '@/lib/webhook-helpers'
 
@@ -9,13 +9,14 @@ type AdminClient = SupabaseClient
 async function checkUserLimit(supabase: AdminClient, userId: string): Promise<boolean> {
   const month = new Date().toISOString().slice(0, 7)
   const [{ data: profile }, { data: usage }] = await Promise.all([
-    supabase.from('profiles').select('plan').eq('id', userId).single(),
+    supabase.from('profiles').select('plan, beta, beta_ends_at').eq('id', userId).single(),
     supabase.from('usage_logs').select('comment_count, dm_count').eq('user_id', userId).eq('month', month).single(),
   ])
-  const plan = profile?.plan || 'free'
+  // 베타 기간 → PRO 권한 효과 (premium 한도 적용)
+  const effectivePlan = getEffectivePlanKey(profile || {})
   const comments = usage?.comment_count || 0
   const dms = usage?.dm_count || 0
-  return !isOverLimit(plan, comments, dms)
+  return !isOverLimit(effectivePlan, comments, dms)
 }
 
 // Webhook verification (GET)

@@ -3890,10 +3890,20 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   </div>
 </div>
 
-<!-- ════ 이용권 / 결제 (4단계 · 통화 분기) ════ -->
+<!-- ════ 이용권 / 결제 (4단계 · 통화 분기 · 베타 모드) ════ -->
 <div class="ov" id="m-plan" onclick="co(event,'m-plan')">
   <div class="sheet" style="padding:14px 20px 28px;max-height:90vh;overflow-y:auto">
     <div class="s-bar"></div>
+    <!-- 베타 기간 배너 — JS 가 베타 상태일 때만 보이게 -->
+    <div id="plan-beta-banner" style="display:none;background:linear-gradient(135deg,var(--mint-l),#FFF);border:1.5px solid var(--mint);border-radius:14px;padding:14px 16px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+        <span style="font-size:16px">🎉</span>
+        <strong style="font-size:14px;color:var(--mint-d)">베타 기간 — PRO 권한 무료</strong>
+      </div>
+      <div style="font-size:12.5px;color:var(--t2);line-height:1.5">
+        지금은 무료 베타 운영 기간이에요. <span id="plan-beta-countdown" style="font-weight:700;color:var(--t1)"></span>까지 모든 PRO 기능을 자유롭게 사용하실 수 있어요.
+      </div>
+    </div>
     <div class="plan-hero" style="padding:4px 0 12px">
       <div class="plan-title" data-i18n="mod.plan.hero_title">플랜을 선택하세요</div>
       <div class="plan-sub" data-i18n="mod.plan.hero_sub">언제든지 취소할 수 있어요. 약정 없음.</div>
@@ -17294,6 +17304,17 @@ function planApplyCurrency(cur){
 // 구독 시작 — 통화에 따라 NicePay (KRW) / Stripe (USD) 분기
 // (실제 SDK 호출은 NicePay/Stripe 키 받은 후 Task 3·6 에서 wire)
 function planSubscribe(){
+  // 베타 기간 중엔 결제 차단 (서버 보호 + UX 안내)
+  try {
+    var raw = localStorage.getItem('ssobi_beta_state');
+    if(raw){
+      var st = JSON.parse(raw);
+      if(st && st.active && st.expiresAt > Date.now()){
+        alert('베타 기간 동안엔 PRO 권한이 무료로 적용돼 있어요. 베타 종료 후 결제하실 수 있어요.');
+        return;
+      }
+    }
+  } catch(_){}
   if(_selectedPlan === 'free'){ cm('m-plan'); return; }
   var cur = planGetCurrency();
   // TODO Task 3·6: 실제 결제 호출
@@ -17309,6 +17330,58 @@ function planInitOnOpen(){
     var p = new URLSearchParams(location.search).get('plan');
     if(p && PLAN_TIER_NAME[p]) selectPlan(p);
   } catch(_){}
+  // 베타 상태 fetch 후 배너 토글
+  planRefreshBetaState();
+}
+
+// 베타 상태 — /api/dashboard 응답의 beta.active 사용
+//   결과를 localStorage 에 캐시 (5분) 해서 매번 fetch 안 함
+function planRefreshBetaState(){
+  var cached = null;
+  try {
+    var raw = localStorage.getItem('ssobi_beta_state');
+    if(raw){
+      var p = JSON.parse(raw);
+      if(p && p.expiresAt > Date.now()) cached = p;
+    }
+  } catch(_){}
+  if(cached){ planRenderBetaBanner(cached); return; }
+  fetch('/api/dashboard', { credentials: 'include' })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if(!d || !d.beta) return;
+      var state = { active: !!d.beta.active, endsAt: d.beta.ends_at || null, expiresAt: Date.now() + 5*60*1000 };
+      try { localStorage.setItem('ssobi_beta_state', JSON.stringify(state)); } catch(_){}
+      planRenderBetaBanner(state);
+    })
+    .catch(function(){});
+}
+
+function planRenderBetaBanner(state){
+  var banner = document.getElementById('plan-beta-banner');
+  var cta = document.getElementById('plan-cta-btn');
+  if(!banner) return;
+  if(!state.active){
+    banner.style.display = 'none';
+    return;
+  }
+  banner.style.display = 'block';
+  // 종료일 카운트다운
+  var label = document.getElementById('plan-beta-countdown');
+  if(label && state.endsAt){
+    var d = new Date(state.endsAt);
+    var days = Math.max(0, Math.ceil((d.getTime() - Date.now()) / (1000*60*60*24)));
+    label.textContent = (d.getFullYear()) + '. ' + (d.getMonth()+1) + '. ' + d.getDate() + ' (D-' + days + ')';
+  } else if(label){
+    label.textContent = '베타 종료 시점';
+  }
+  // CTA 버튼 — 베타 중엔 결제 막기
+  if(cta){
+    cta.textContent = '베타 기간엔 무료 이용';
+    cta.disabled = true;
+    cta.style.opacity = '0.55';
+    cta.style.cursor = 'not-allowed';
+  }
 }
 
 function addTarget(){

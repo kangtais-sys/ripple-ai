@@ -132,6 +132,34 @@ export function getPlan(plan: string): PlanDef {
   return PLANS[plan as PlanKey] || PLANS.free
 }
 
+// 베타 프로그램 — 베타 기간 동안 모든 가입자에게 PRO 권한 효과
+//   profile.beta = true + beta_ends_at 미경과 → 'premium' 으로 취급
+//   카드뉴스 한도·이미지·링크 게이팅 모두 PRO 기준 적용
+//   TEAM 의 3계정/3멤버 같은 상위 기능은 베타로 안 풀어줌
+export interface BetaSignals {
+  plan?: string | null
+  beta?: boolean | null
+  beta_ends_at?: string | Date | null
+}
+
+export function isBetaActive(p: BetaSignals): boolean {
+  if (!p.beta) return false
+  if (!p.beta_ends_at) return true // ends_at 없으면 무기한 베타
+  const ends = typeof p.beta_ends_at === 'string' ? new Date(p.beta_ends_at) : p.beta_ends_at
+  return ends.getTime() > Date.now()
+}
+
+// 모든 게이팅 체크 진입점 — DB plan 그대로가 아니라 effective plan 사용
+export function getEffectivePlanKey(p: BetaSignals): PlanKey {
+  if (isBetaActive(p)) return 'premium'
+  const k = (p.plan || 'free') as PlanKey
+  return PLANS[k] ? k : 'free'
+}
+
+export function getEffectivePlan(p: BetaSignals): PlanDef {
+  return PLANS[getEffectivePlanKey(p)]
+}
+
 export function isOverLimit(plan: string, commentCount: number, dmCount: number): boolean {
   return (commentCount + dmCount) >= getPlan(plan).limit
 }
