@@ -5,174 +5,15 @@ import { useEffect, useState } from 'react'
 // 동일한 @supabase/supabase-js 로 통일. @supabase/ssr 의 createBrowserClient
 // 는 쿠키 기반이라 app.html 세션을 못 읽음.
 import { createClient } from '@supabase/supabase-js'
-import type { AdminMetrics } from '@/lib/admin-metrics'
+import type { EssentialMetrics, ServiceMetrics } from '@/lib/admin-metrics'
 
 const sb = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
-function GenerateNowButton() {
-  const [state, setState] = useState<
-    | { kind: 'idle' }
-    | { kind: 'running' }
-    | { kind: 'success'; summary: string; details: unknown }
-    | { kind: 'error'; message: string }
-  >({ kind: 'idle' })
-
-  async function generate() {
-    setState({ kind: 'running' })
-    try {
-      const { data } = await sb.auth.getSession()
-      const token = data.session?.access_token
-      if (!token) { setState({ kind: 'error', message: '세션 만료' }); return }
-
-      const res = await fetch('/api/admin/marketing/generate-now', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({}),
-      })
-      const j = await res.json()
-      if (!res.ok || !j.ok) {
-        setState({ kind: 'error', message: j.error || '실패' })
-        return
-      }
-      const results = (j.results || []) as Array<{ generated?: Array<{ language: string; text_post_ids: string[]; asset_id: string | null }> }>
-      let textCount = 0
-      let visualCount = 0
-      for (const r of results) {
-        for (const g of r.generated || []) {
-          textCount += g.text_post_ids?.length || 0
-          if (g.asset_id) visualCount++
-        }
-      }
-      setState({ kind: 'success', summary: `텍스트 ${textCount}개 · 비주얼 ${visualCount}장 (생성 중)`, details: j })
-    } catch (e) {
-      setState({ kind: 'error', message: String(e) })
-    }
-  }
-
-  return (
-    <div className="flex items-center gap-2">
-      <button
-        onClick={generate}
-        disabled={state.kind === 'running'}
-        className="bg-[#00C896] hover:bg-[#00A87E] disabled:opacity-50 text-white font-bold px-4 py-2 rounded-lg text-[12px] transition"
-      >
-        {state.kind === 'running' ? '생성 중 (~30s)...' : '🪄 오늘 콘텐츠 자동 생성'}
-      </button>
-      {state.kind === 'success' && (
-        <span className="text-[11px] text-emerald-300">✓ {state.summary}</span>
-      )}
-      {state.kind === 'error' && (
-        <span className="text-[11px] text-red-300 max-w-xs truncate" title={state.message}>
-          ✕ {state.message.slice(0, 60)}
-        </span>
-      )}
-    </div>
-  )
-}
-
-function HiggsfieldTestButton() {
-  const [state, setState] = useState<
-    | { kind: 'idle' }
-    | { kind: 'submitting' }
-    | { kind: 'processing'; assetId: string; secondsElapsed: number }
-    | { kind: 'success'; imageUrl: string; secondsElapsed: number }
-    | { kind: 'error'; message: string }
-  >({ kind: 'idle' })
-
-  async function getToken(): Promise<string | null> {
-    const { data } = await sb.auth.getSession()
-    return data.session?.access_token || null
-  }
-
-  async function test() {
-    setState({ kind: 'submitting' })
-    const t0 = Date.now()
-    try {
-      const token = await getToken()
-      if (!token) { setState({ kind: 'error', message: '세션 만료' }); return }
-
-      const res = await fetch('/api/admin/higgsfield/test', {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      const j = await res.json()
-      if (!res.ok || !j.ok) {
-        setState({ kind: 'error', message: j.error || '제출 실패' })
-        return
-      }
-
-      // 폴링 시작
-      const assetId = j.asset_id as string
-      setState({ kind: 'processing', assetId, secondsElapsed: 0 })
-
-      let attempts = 0
-      const maxAttempts = 60  // 5초 × 60 = 5분 한도
-      while (attempts < maxAttempts) {
-        await new Promise(r => setTimeout(r, 5000))
-        attempts++
-        const elapsed = Math.round((Date.now() - t0) / 1000)
-        setState({ kind: 'processing', assetId, secondsElapsed: elapsed })
-
-        const t = await getToken()
-        if (!t) { setState({ kind: 'error', message: '세션 만료 (폴링 중)' }); return }
-
-        const statusRes = await fetch(`/api/admin/higgsfield/test?asset_id=${assetId}`, {
-          headers: { Authorization: `Bearer ${t}` },
-        })
-        if (!statusRes.ok) continue
-        const sj = await statusRes.json()
-        const asset = sj.asset
-        if (!asset) continue
-
-        if (asset.generation_status === 'completed') {
-          setState({ kind: 'success', imageUrl: asset.url, secondsElapsed: elapsed })
-          return
-        }
-        if (asset.generation_status === 'failed' || asset.generation_status === 'cancelled') {
-          setState({ kind: 'error', message: asset.generation_error || asset.generation_status })
-          return
-        }
-      }
-      setState({ kind: 'error', message: '폴링 타임아웃 (5분 초과). webhook 미수신.' })
-    } catch (e) {
-      setState({ kind: 'error', message: String(e) })
-    }
-  }
-
-  return (
-    <div className="flex items-center gap-2">
-      <button
-        onClick={test}
-        disabled={state.kind === 'submitting' || state.kind === 'processing'}
-        className="bg-white/10 hover:bg-white/20 disabled:opacity-50 text-white font-semibold px-3 py-2 rounded-lg text-[12px] transition"
-      >
-        {state.kind === 'submitting' ? 'Higgsfield 제출 중...' :
-          state.kind === 'processing' ? `Higgsfield 생성 중 (${state.secondsElapsed}s)` :
-          '🎨 Higgsfield 테스트'}
-      </button>
-      {state.kind === 'success' && (
-        <>
-          <a href={state.imageUrl} target="_blank" rel="noopener" className="text-[11px] text-[#00C896] hover:underline">
-            ✓ 성공 ({state.secondsElapsed}s)
-          </a>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={state.imageUrl} alt="test" className="w-10 h-10 rounded object-cover border border-white/10" />
-        </>
-      )}
-      {state.kind === 'error' && (
-        <span className="text-[11px] text-red-300 max-w-xs truncate" title={state.message}>
-          ✕ {state.message.slice(0, 60)}
-        </span>
-      )}
-    </div>
-  )
-}
-
 type ApiResult =
-  | { ok: true; metrics: AdminMetrics; email: string }
+  | { ok: true; metrics: EssentialMetrics; email: string }
   | { ok?: false; error: 'unauthorized' | 'forbidden'; your_email?: string }
 
 function MetricCard({
@@ -192,6 +33,22 @@ function MetricCard({
       <div className={`text-3xl font-black tracking-tight ${accent || 'text-white'}`}>{value}</div>
       {sub && <div className="text-[12px] text-white/50 mt-2 font-medium">{sub}</div>}
     </div>
+  )
+}
+
+function SectionSkeleton({ title }: { title: string }) {
+  return (
+    <section className="opacity-50">
+      <h2 className="text-[13px] font-bold uppercase tracking-wider text-white/60 mb-3 flex items-center gap-2">
+        {title}
+        <span className="text-[10px] text-white/30 font-medium normal-case tracking-normal">로딩 중...</span>
+      </h2>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="rounded-2xl bg-white/[0.02] border border-white/5 p-5 h-[110px] animate-pulse" />
+        ))}
+      </div>
+    </section>
   )
 }
 
@@ -216,9 +73,10 @@ export default function AdminOverview() {
   const [state, setState] = useState<
     | { kind: 'loading' }
     | { kind: 'denied'; email: string | null; reason: 'unauthenticated' | 'not_admin' }
-    | { kind: 'ok'; metrics: AdminMetrics; email: string }
+    | { kind: 'ok'; metrics: EssentialMetrics; email: string }
     | { kind: 'error'; message: string }
   >({ kind: 'loading' })
+  const [services, setServices] = useState<ServiceMetrics | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -232,11 +90,17 @@ export default function AdminOverview() {
           return
         }
 
-        const res = await fetch('/api/admin/metrics', {
+        // 필수 메트릭 먼저 렌더 → 서비스 메트릭 백그라운드 fetch
+        const essentialPromise = fetch('/api/admin/metrics', {
+          headers: { Authorization: `Bearer ${accessToken}` },
+          credentials: 'include',
+        })
+        const servicesPromise = fetch('/api/admin/metrics/services', {
           headers: { Authorization: `Bearer ${accessToken}` },
           credentials: 'include',
         })
 
+        const res = await essentialPromise
         const json = (await res.json()) as ApiResult
         if (!res.ok) {
           if ('error' in json && json.error === 'forbidden') {
@@ -248,6 +112,13 @@ export default function AdminOverview() {
         }
         if (!cancelled && 'metrics' in json && json.ok) {
           setState({ kind: 'ok', metrics: json.metrics, email: json.email })
+        }
+
+        // 서비스 메트릭 — 따로 렌더
+        const sRes = await servicesPromise
+        if (sRes.ok && !cancelled) {
+          const sj = await sRes.json()
+          if (sj.ok) setServices(sj.metrics as ServiceMetrics)
         }
       } catch (e) {
         if (!cancelled) setState({ kind: 'error', message: String(e) })
@@ -339,11 +210,7 @@ export default function AdminOverview() {
             실시간 운영 현황 · {new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}
           </p>
         </div>
-        <div className="flex items-center gap-3 flex-wrap">
-          <GenerateNowButton />
-          <HiggsfieldTestButton />
-          <div className="text-[11px] text-white/40">{state.email}</div>
-        </div>
+        <div className="text-[11px] text-white/40">{state.email}</div>
       </div>
 
       <section>
@@ -414,130 +281,142 @@ export default function AdminOverview() {
         </div>
       </section>
 
-      {/* 내 링크 서비스 */}
-      <section>
-        <h2 className="text-[13px] font-bold uppercase tracking-wider text-white/60 mb-3">내 링크</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
-          <MetricCard
-            label="페이지 만든 유저"
-            value={m.link.authors_count}
-            sub={`총 ${m.link.pages_total}개 페이지 · 발행 ${m.link.pages_published}`}
-            accent="text-[#00C896]"
-          />
-          <MetricCard
-            label="총 누적 페이지뷰"
-            value={m.link.total_views.toLocaleString()}
-            sub={`7일 ${m.link.views_7d.toLocaleString()} · UV ${m.link.unique_visitors_7d.toLocaleString()}`}
-          />
-          <MetricCard
-            label="숏링크 발급"
-            value={m.link.short_links_total.toLocaleString()}
-            sub={`클릭 ${m.link.short_link_clicks_total.toLocaleString()} 누적`}
-          />
-          <MetricCard
-            label="숏링크 7일 클릭"
-            value={m.link.short_link_clicks_7d.toLocaleString()}
-            sub="외부 SNS 유입 확인"
-            accent="text-[#00C896]"
-          />
-        </div>
-        {m.link.top_referers.length > 0 && (
-          <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-5 space-y-3">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-white/40">
-              유입처 TOP {m.link.top_referers.length} (최근 30일)
-            </div>
-            {(() => {
-              const total = m.link.top_referers.reduce((s, r) => s + r.count, 0)
-              return m.link.top_referers.map((r) => (
-                <Bar
-                  key={r.source}
-                  label={r.source}
-                  value={r.count}
-                  total={total}
-                  color={
-                    r.source === 'instagram' ? 'bg-pink-500' :
-                    r.source === 'threads' ? 'bg-white/60' :
-                    r.source === 'tiktok' ? 'bg-cyan-400' :
-                    r.source === 'youtube' ? 'bg-red-500' :
-                    r.source === 'x' ? 'bg-white/40' :
-                    r.source === 'facebook' ? 'bg-blue-500' :
-                    r.source === 'kakao' ? 'bg-yellow-400' :
-                    r.source === 'direct' ? 'bg-emerald-400' :
-                    'bg-violet-400'
-                  }
-                />
-              ))
-            })()}
+      {/* 내 링크 서비스 — services lazy load */}
+      {services ? (
+        <section>
+          <h2 className="text-[13px] font-bold uppercase tracking-wider text-white/60 mb-3">내 링크</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+            <MetricCard
+              label="페이지 만든 유저"
+              value={services.link.authors_count}
+              sub={`총 ${services.link.pages_total}개 페이지 · 발행 ${services.link.pages_published}`}
+              accent="text-[#00C896]"
+            />
+            <MetricCard
+              label="총 누적 페이지뷰"
+              value={services.link.total_views.toLocaleString()}
+              sub={`7일 ${services.link.views_7d.toLocaleString()} · UV ${services.link.unique_visitors_7d.toLocaleString()}`}
+            />
+            <MetricCard
+              label="숏링크 발급"
+              value={services.link.short_links_total.toLocaleString()}
+              sub={`클릭 ${services.link.short_link_clicks_total.toLocaleString()} 누적`}
+            />
+            <MetricCard
+              label="숏링크 7일 클릭"
+              value={services.link.short_link_clicks_7d.toLocaleString()}
+              sub="외부 SNS 유입 확인"
+              accent="text-[#00C896]"
+            />
           </div>
-        )}
-      </section>
+          {services.link.top_referers.length > 0 && (
+            <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-5 space-y-3">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-white/40">
+                유입처 TOP {services.link.top_referers.length} (최근 30일)
+              </div>
+              {(() => {
+                const total = services.link.top_referers.reduce((s, r) => s + r.count, 0)
+                return services.link.top_referers.map((r) => (
+                  <Bar
+                    key={r.source}
+                    label={r.source}
+                    value={r.count}
+                    total={total}
+                    color={
+                      r.source === 'instagram' ? 'bg-pink-500' :
+                      r.source === 'threads' ? 'bg-white/60' :
+                      r.source === 'tiktok' ? 'bg-cyan-400' :
+                      r.source === 'youtube' ? 'bg-red-500' :
+                      r.source === 'x' ? 'bg-white/40' :
+                      r.source === 'facebook' ? 'bg-blue-500' :
+                      r.source === 'kakao' ? 'bg-yellow-400' :
+                      r.source === 'direct' ? 'bg-emerald-400' :
+                      'bg-violet-400'
+                    }
+                  />
+                ))
+              })()}
+            </div>
+          )}
+        </section>
+      ) : (
+        <SectionSkeleton title="내 링크" />
+      )}
 
       {/* 만들기 (카드뉴스) */}
-      <section>
-        <h2 className="text-[13px] font-bold uppercase tracking-wider text-white/60 mb-3">만들기 (카드뉴스)</h2>
-        <div className="grid grid-cols-3 gap-3">
-          <MetricCard label="총 생성" value={m.cardnews.jobs_total} />
-          <MetricCard label="이번 달" value={m.cardnews.jobs_this_month} accent="text-[#00C896]" />
-          <MetricCard label="발행됨" value={m.cardnews.jobs_published} sub="published_at 있음" />
-        </div>
-        {m.cardnews.by_template.length > 0 && (
-          <div className="mt-3 rounded-2xl bg-white/[0.03] border border-white/5 p-5 space-y-3">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-white/40">템플릿별 사용</div>
-            {(() => {
-              const total = m.cardnews.by_template.reduce((s, r) => s + r.count, 0)
-              return m.cardnews.by_template.map((r) => (
-                <Bar key={r.template} label={r.template} value={r.count} total={total} color="bg-violet-400" />
-              ))
-            })()}
+      {services ? (
+        <section>
+          <h2 className="text-[13px] font-bold uppercase tracking-wider text-white/60 mb-3">만들기 (카드뉴스)</h2>
+          <div className="grid grid-cols-3 gap-3">
+            <MetricCard label="총 생성" value={services.cardnews.jobs_total} />
+            <MetricCard label="이번 달" value={services.cardnews.jobs_this_month} accent="text-[#00C896]" />
+            <MetricCard label="발행됨" value={services.cardnews.jobs_published} sub="published_at 있음" />
           </div>
-        )}
-      </section>
+          {services.cardnews.by_template.length > 0 && (
+            <div className="mt-3 rounded-2xl bg-white/[0.03] border border-white/5 p-5 space-y-3">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-white/40">템플릿별 사용</div>
+              {(() => {
+                const total = services.cardnews.by_template.reduce((s, r) => s + r.count, 0)
+                return services.cardnews.by_template.map((r) => (
+                  <Bar key={r.template} label={r.template} value={r.count} total={total} color="bg-violet-400" />
+                ))
+              })()}
+            </div>
+          )}
+        </section>
+      ) : (
+        <SectionSkeleton title="만들기 (카드뉴스)" />
+      )}
 
       {/* 자동 응대 (댓글·DM) */}
-      <section>
-        <h2 className="text-[13px] font-bold uppercase tracking-wider text-white/60 mb-3">자동 응대 (댓글·DM)</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
-          <MetricCard label="이번 달 댓글" value={m.replies.this_month_comments.toLocaleString()} />
-          <MetricCard label="이번 달 DM" value={m.replies.this_month_dms.toLocaleString()} />
-          <MetricCard
-            label="누적 응대"
-            value={m.replies.total.toLocaleString()}
-            sub="전체 reply_logs"
-          />
-          <MetricCard
-            label="긴급 처리"
-            value={m.replies.urgent_count}
-            sub="urgent/high 분류 (30일)"
-            accent={m.replies.urgent_count > 0 ? 'text-amber-400' : 'text-white'}
-          />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-5 space-y-3">
-            <div className="text-[11px] font-bold uppercase tracking-wider text-white/40">감정 분포 (최근 30일)</div>
-            {(() => {
-              const total =
-                m.replies.by_sentiment.positive +
-                m.replies.by_sentiment.neutral +
-                m.replies.by_sentiment.negative +
-                m.replies.by_sentiment.unknown
-              return (
-                <>
-                  <Bar label="긍정" value={m.replies.by_sentiment.positive} total={total} color="bg-[#00C896]" />
-                  <Bar label="중립" value={m.replies.by_sentiment.neutral} total={total} color="bg-white/40" />
-                  <Bar label="부정" value={m.replies.by_sentiment.negative} total={total} color="bg-red-500" />
-                  <Bar label="미분류" value={m.replies.by_sentiment.unknown} total={total} color="bg-white/20" />
-                </>
-              )
-            })()}
+      {services ? (
+        <section>
+          <h2 className="text-[13px] font-bold uppercase tracking-wider text-white/60 mb-3">자동 응대 (댓글·DM)</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+            <MetricCard label="이번 달 댓글" value={services.replies.this_month_comments.toLocaleString()} />
+            <MetricCard label="이번 달 DM" value={services.replies.this_month_dms.toLocaleString()} />
+            <MetricCard
+              label="누적 응대"
+              value={services.replies.total.toLocaleString()}
+              sub="전체 reply_logs"
+            />
+            <MetricCard
+              label="긴급 처리"
+              value={services.replies.urgent_count}
+              sub="urgent/high 분류 (30일)"
+              accent={services.replies.urgent_count > 0 ? 'text-amber-400' : 'text-white'}
+            />
           </div>
-          <MetricCard
-            label="자동 승인율"
-            value={`${m.replies.approval_rate}%`}
-            sub="AI 응대가 그대로 발송된 비율 (최근 30일)"
-            accent={m.replies.approval_rate >= 70 ? 'text-[#00C896]' : 'text-amber-400'}
-          />
-        </div>
-      </section>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div className="rounded-2xl bg-white/[0.03] border border-white/5 p-5 space-y-3">
+              <div className="text-[11px] font-bold uppercase tracking-wider text-white/40">감정 분포 (최근 30일)</div>
+              {(() => {
+                const total =
+                  services.replies.by_sentiment.positive +
+                  services.replies.by_sentiment.neutral +
+                  services.replies.by_sentiment.negative +
+                  services.replies.by_sentiment.unknown
+                return (
+                  <>
+                    <Bar label="긍정" value={services.replies.by_sentiment.positive} total={total} color="bg-[#00C896]" />
+                    <Bar label="중립" value={services.replies.by_sentiment.neutral} total={total} color="bg-white/40" />
+                    <Bar label="부정" value={services.replies.by_sentiment.negative} total={total} color="bg-red-500" />
+                    <Bar label="미분류" value={services.replies.by_sentiment.unknown} total={total} color="bg-white/20" />
+                  </>
+                )
+              })()}
+            </div>
+            <MetricCard
+              label="자동 승인율"
+              value={`${services.replies.approval_rate}%`}
+              sub="AI 응대가 그대로 발송된 비율 (최근 30일)"
+              accent={services.replies.approval_rate >= 70 ? 'text-[#00C896]' : 'text-amber-400'}
+            />
+          </div>
+        </section>
+      ) : (
+        <SectionSkeleton title="자동 응대 (댓글·DM)" />
+      )}
 
       <section>
         <h2 className="text-[13px] font-bold uppercase tracking-wider text-white/60 mb-3">마케팅 발행</h2>

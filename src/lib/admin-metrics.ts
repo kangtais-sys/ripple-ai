@@ -66,7 +66,7 @@ export interface ReplyStats {
   approval_rate: number       // is_approved=true 비율 (0~100)
 }
 
-export interface AdminMetrics {
+export interface EssentialMetrics {
   signups: SignupBuckets
   active_users: { dau: number; wau: number; mau: number }
   plans: PlanDistribution
@@ -75,12 +75,18 @@ export interface AdminMetrics {
   mrr_usd: number
   beta_expiring_7d: number
   marketing: MarketingStats
+}
+
+export interface ServiceMetrics {
   link: LinkStats
   cardnews: CardnewsStats
   replies: ReplyStats
 }
 
-export async function getAdminMetrics(): Promise<AdminMetrics> {
+export interface AdminMetrics extends EssentialMetrics, ServiceMetrics {}
+
+// 필수 메트릭 — 가입자/플랜/MRR/활동 (빠름, ~1s)
+export async function getEssentialMetrics(): Promise<EssentialMetrics> {
   const sb = adminClient()
 
   const now = new Date()
@@ -202,7 +208,31 @@ export async function getAdminMetrics(): Promise<AdminMetrics> {
     // 테이블 없을 수 있음 (migration 미실행) — 0 으로
   }
 
-  // 7~9) 서비스별 통계 — 모든 쿼리 병렬 실행 (이전 직렬 처리 → 느림)
+  return {
+    signups,
+    active_users,
+    plans,
+    usage: {
+      monthly_comments: monthlyComments,
+      monthly_dms: monthlyDms,
+      monthly_total: monthlyComments + monthlyDms,
+    },
+    mrr_krw: mrrKrw,
+    mrr_usd: mrrUsd,
+    beta_expiring_7d: betaExpiring7d,
+    marketing,
+  }
+}
+
+// 서비스별 무거운 통계 — 링크/카드뉴스/응대 (느림, ~3~5s)
+export async function getServiceMetrics(): Promise<ServiceMetrics> {
+  const sb = adminClient()
+  const now = new Date()
+  const startOfMonth = new Date(now)
+  startOfMonth.setDate(now.getDate() - 30)
+  const sevenDayAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString()
+  const thirtyDayAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString()
+
   const link: LinkStats = {
     pages_total: 0, pages_published: 0, authors_count: 0,
     total_views: 0, views_7d: 0, unique_visitors_7d: 0,
@@ -326,21 +356,11 @@ export async function getAdminMetrics(): Promise<AdminMetrics> {
     // 일부 테이블 없거나 RLS 차단 — 0 유지
   }
 
-  return {
-    signups,
-    active_users,
-    plans,
-    usage: {
-      monthly_comments: monthlyComments,
-      monthly_dms: monthlyDms,
-      monthly_total: monthlyComments + monthlyDms,
-    },
-    mrr_krw: mrrKrw,
-    mrr_usd: mrrUsd,
-    beta_expiring_7d: betaExpiring7d,
-    marketing,
-    link,
-    cardnews,
-    replies,
-  }
+  return { link, cardnews, replies }
+}
+
+// 호환용 — 필수 + 서비스 한 번에 (느림)
+export async function getAdminMetrics(): Promise<AdminMetrics> {
+  const [essential, services] = await Promise.all([getEssentialMetrics(), getServiceMetrics()])
+  return { ...essential, ...services }
 }

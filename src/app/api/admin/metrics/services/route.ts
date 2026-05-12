@@ -1,13 +1,13 @@
+// GET /api/admin/metrics/services — 링크·카드뉴스·응대 통계 (느림, 분리 호출)
+
 import { NextRequest, NextResponse } from 'next/server'
 import { getUserFromRequest } from '@/lib/auth-helper'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { isAdminEmail } from '@/lib/admin'
-import { getEssentialMetrics } from '@/lib/admin-metrics'
+import { getServiceMetrics } from '@/lib/admin-metrics'
 
 export const dynamic = 'force-dynamic'
 
-// admin 메트릭 API — 필수 메트릭만 (빠름)
-// 무거운 서비스별 통계는 /api/admin/metrics/services 로 분리
 export async function GET(req: NextRequest) {
   const u = await getUserFromRequest(req)
   if (!u) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
@@ -19,12 +19,9 @@ export async function GET(req: NextRequest) {
   )
   const { data: userData } = await admin.auth.admin.getUserById(u.id)
   if (!userData?.user || !isAdminEmail(userData.user.email)) {
-    return NextResponse.json({
-      error: 'forbidden',
-      your_email: userData?.user?.email || null,
-    }, { status: 403 })
+    return NextResponse.json({ error: 'forbidden' }, { status: 403 })
   }
 
-  const metrics = await getEssentialMetrics()
-  return NextResponse.json({ ok: true, metrics, email: userData.user.email })
+  const metrics = await getServiceMetrics()
+  return NextResponse.json({ ok: true, metrics })
 }
