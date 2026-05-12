@@ -37,10 +37,13 @@ interface Post {
   published_at: string | null
   error: string | null
   created_at: string
+  persona_id?: string | null
+  topic_pillar?: string | null
 }
 
 function statusBadge(status: string) {
   const map: Record<string, { bg: string; fg: string; label: string }> = {
+    draft:      { bg: 'bg-violet-500/15', fg: 'text-violet-300', label: 'draft' },
     pending:    { bg: 'bg-amber-500/10',  fg: 'text-amber-300',  label: '대기' },
     publishing: { bg: 'bg-blue-500/10',   fg: 'text-blue-300',   label: '발행중' },
     published:  { bg: 'bg-emerald-500/10',fg: 'text-emerald-300',label: '발행됨' },
@@ -255,41 +258,112 @@ export default function MarketingClient() {
         </button>
       </section>
 
-      {/* 목록 */}
-      <section>
-        <h2 className="text-[13px] font-bold uppercase tracking-wider text-white/60 mb-3">최근 큐 ({posts.length})</h2>
-        {posts.length === 0 ? (
-          <div className="text-[13px] text-white/40 py-8 text-center border border-dashed border-white/10 rounded-2xl">아직 등록된 게시물이 없어요</div>
-        ) : (
-          <div className="space-y-2">
-            {posts.map(p => (
-              <div key={p.id} className="rounded-xl bg-white/[0.03] border border-white/5 p-4">
-                <div className="flex items-start justify-between gap-3 mb-2">
-                  <div className="flex items-center gap-2">
-                    {statusBadge(p.status)}
-                    <span className="text-[11px] text-white/40">{new Date(p.created_at).toLocaleString('ko-KR')}</span>
-                  </div>
-                  {(p.status === 'pending' || p.status === 'failed' || p.status === 'cancelled') && (
-                    <button onClick={() => remove(p.id)} className="text-[11px] text-red-400 hover:text-red-300">삭제</button>
+      {/* 목록 + 상태 필터 */}
+      <MarketingList posts={posts} onChange={loadPosts} onRemove={remove} />
+    </div>
+  )
+}
+
+function MarketingList({ posts, onChange, onRemove }: { posts: Post[]; onChange: () => Promise<void> | void; onRemove: (id: string) => Promise<void> | void }) {
+  const [filter, setFilter] = useState<'all' | 'draft' | 'pending' | 'published' | 'failed'>('all')
+
+  async function approve(id: string, scheduleNow: boolean) {
+    const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+    const { data } = await sb.auth.getSession()
+    const token = data.session?.access_token
+    if (!token) { alert('세션 만료'); return }
+    // status='pending' + scheduled_at 갱신 — REST API 직접
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/marketing_posts?id=eq.${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        Authorization: `Bearer ${token}`,
+        Prefer: 'return=minimal',
+      },
+      body: JSON.stringify({
+        status: 'pending',
+        scheduled_at: scheduleNow ? new Date().toISOString() : new Date(Date.now() + 60 * 60 * 1000).toISOString(),
+      }),
+    })
+    if (!res.ok) { alert('승인 실패'); return }
+    await onChange()
+  }
+
+  const filtered = posts.filter((p) => filter === 'all' || p.status === filter)
+  const counts = {
+    all: posts.length,
+    draft: posts.filter((p) => p.status === 'draft').length,
+    pending: posts.filter((p) => p.status === 'pending').length,
+    published: posts.filter((p) => p.status === 'published').length,
+    failed: posts.filter((p) => p.status === 'failed' || p.status === 'partial').length,
+  }
+
+  return (
+    <section>
+      <div className="flex items-end justify-between gap-3 flex-wrap mb-3">
+        <h2 className="text-[13px] font-bold uppercase tracking-wider text-white/60">큐 ({posts.length})</h2>
+        <div className="flex gap-1 text-[11.5px]">
+          {(['all', 'draft', 'pending', 'published', 'failed'] as const).map((k) => (
+            <button key={k} onClick={() => setFilter(k)}
+              className={`px-3 py-1.5 rounded-lg font-semibold transition ${filter === k ? 'bg-[#00C896] text-white' : 'bg-white/5 text-white/50 hover:text-white'}`}>
+              {k === 'all' ? '전체' : k === 'draft' ? `draft (${counts.draft})` : k} {filter !== k && counts[k] > 0 ? `(${counts[k]})` : ''}
+            </button>
+          ))}
+        </div>
+      </div>
+      {filtered.length === 0 ? (
+        <div className="text-[13px] text-white/40 py-8 text-center border border-dashed border-white/10 rounded-2xl">
+          {filter === 'draft' ? 'draft 없음 — /admin/personas 에서 draft 생성하거나 cron 09:00 대기' : '게시물 없음'}
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {filtered.map((p) => (
+            <div key={p.id} className="rounded-xl bg-white/[0.03] border border-white/5 p-4">
+              <div className="flex items-start justify-between gap-3 mb-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  {statusBadge(p.status)}
+                  {p.topic_pillar && (
+                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-violet-500/10 text-violet-300">
+                      {p.topic_pillar}
+                    </span>
+                  )}
+                  <span className="text-[11px] text-white/40">{new Date(p.created_at).toLocaleString('ko-KR')}</span>
+                </div>
+                <div className="flex gap-2 shrink-0">
+                  {p.status === 'draft' && (
+                    <>
+                      <button onClick={() => approve(p.id, true)}
+                        className="text-[11px] bg-[#00C896] hover:bg-[#00A87E] text-white font-bold px-3 py-1 rounded-md transition">
+                        지금 발행
+                      </button>
+                      <button onClick={() => approve(p.id, false)}
+                        className="text-[11px] bg-white/10 hover:bg-white/20 text-white/80 font-semibold px-3 py-1 rounded-md transition">
+                        1시간 후
+                      </button>
+                    </>
+                  )}
+                  {(p.status === 'draft' || p.status === 'pending' || p.status === 'failed' || p.status === 'cancelled') && (
+                    <button onClick={() => onRemove(p.id)} className="text-[11px] text-red-400 hover:text-red-300">삭제</button>
                   )}
                 </div>
-                <div className="text-[13px] text-white/80 whitespace-pre-wrap leading-relaxed mb-2">{p.content}</div>
-                <div className="flex flex-wrap gap-1.5">
-                  {p.channels.map(ch => {
-                    const result = p.results?.[ch]
-                    const okSym = !result ? '' : result.ok ? '✓' : '✕'
-                    const tone = !result ? 'text-white/60 bg-white/5' : result.ok ? 'text-emerald-300 bg-emerald-500/10' : 'text-red-300 bg-red-500/10'
-                    return (
-                      <span key={ch} className={`text-[10.5px] font-semibold px-2 py-0.5 rounded ${tone}`}>{ch} {okSym}</span>
-                    )
-                  })}
-                </div>
-                {p.error && <div className="text-[10.5px] text-red-300 mt-2 font-mono">{p.error}</div>}
               </div>
-            ))}
-          </div>
-        )}
-      </section>
-    </div>
+              <div className="text-[13px] text-white/80 whitespace-pre-wrap leading-relaxed mb-2">{p.content}</div>
+              <div className="flex flex-wrap gap-1.5">
+                {p.channels.map((ch) => {
+                  const result = p.results?.[ch]
+                  const okSym = !result ? '' : result.ok ? '✓' : '✕'
+                  const tone = !result ? 'text-white/60 bg-white/5' : result.ok ? 'text-emerald-300 bg-emerald-500/10' : 'text-red-300 bg-red-500/10'
+                  return (
+                    <span key={ch} className={`text-[10.5px] font-semibold px-2 py-0.5 rounded ${tone}`}>{ch} {okSym}</span>
+                  )
+                })}
+              </div>
+              {p.error && <div className="text-[10.5px] text-red-300 mt-2 font-mono">{p.error}</div>}
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
   )
 }
