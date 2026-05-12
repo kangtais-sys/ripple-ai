@@ -17763,6 +17763,9 @@ async function doSignup() {
 
   if (typeof lkeShowToast === 'function') lkeShowToast('✓ '+(nameEl.value||'환영합니다')+'님, 가입 완료!');
 
+  // 가입 후 자동 리턴 (?next=/admin 등) — 신규 가입자 카테고리 흐름보다 우선
+  if (res.data.session && ssobiMaybeRedirectAfterAuth()) return;
+
   // 신규 가입자: 카테고리 선택 → SNS 연동
   if (res.data.session) {
     openCategoryPicker(true); // skippable
@@ -17875,6 +17878,36 @@ function openCategoryPicker(isSignup){
   };
 }
 
+// 로그인 후 자동 리다이렉트 헬퍼
+//   URL ?next=/path 또는 sessionStorage 'ssobi_next_url' 에 저장된 경로로 이동
+//   same-origin 경로 (/로 시작, //로 시작 X) 만 허용 — open redirect 방지
+function ssobiConsumeNextRedirect(){
+  try {
+    var urlNext = new URLSearchParams(location.search).get('next');
+    if(urlNext && urlNext.charAt(0)==='/' && urlNext.charAt(1)!=='/') return urlNext;
+    var stored = sessionStorage.getItem('ssobi_next_url');
+    if(stored && stored.charAt(0)==='/' && stored.charAt(1)!=='/'){
+      sessionStorage.removeItem('ssobi_next_url');
+      return stored;
+    }
+  } catch(_){}
+  return null;
+}
+function ssobiMaybeRedirectAfterAuth(){
+  var next = ssobiConsumeNextRedirect();
+  if(next){ window.location.replace(next); return true; }
+  return false;
+}
+// OAuth 리다이렉트 전 — 현재 ?next= 를 sessionStorage 에 백업 (round-trip 후 복원)
+function ssobiSaveNextForOAuth(){
+  try {
+    var urlNext = new URLSearchParams(location.search).get('next');
+    if(urlNext && urlNext.charAt(0)==='/' && urlNext.charAt(1)!=='/'){
+      sessionStorage.setItem('ssobi_next_url', urlNext);
+    }
+  } catch(_){}
+}
+
 async function doLogin() {
   var emailEl = document.querySelector('#v-login .inp[type="email"]');
   var pwEl = document.getElementById('login-pw');
@@ -17892,6 +17925,9 @@ async function doLogin() {
     return;
   }
 
+  // 로그인 후 자동 리턴 (예: /admin 에서 왔으면 /admin 으로)
+  if (ssobiMaybeRedirectAfterAuth()) return;
+
   // IG 연동 여부 체크해서 분기
   try {
     var meRes = await fetch('/api/me', {credentials:'include'});
@@ -17906,6 +17942,7 @@ async function doLogin() {
 }
 
 async function doGoogleLogin() {
+  ssobiSaveNextForOAuth();
   await sb.auth.signInWithOAuth({
     provider: 'google',
     options: { redirectTo: window.location.origin + '/app.html' }
@@ -17914,6 +17951,7 @@ async function doGoogleLogin() {
 
 async function doKakaoLogin() {
   try {
+    ssobiSaveNextForOAuth();
     await sb.auth.signInWithOAuth({
       provider: 'kakao',
       options: { redirectTo: window.location.origin + '/app.html' }
@@ -18174,6 +18212,9 @@ async function checkAuth() {
   }
 
   if (res.data.session) {
+    // OAuth round-trip 또는 직접 /app?next=/path 방문 시 자동 리턴
+    if (ssobiMaybeRedirectAfterAuth()) return;
+
     // 해시에 메인 탭이 지정돼 있으면 그 탭으로, 없으면 home
     var mainTabs = ['v-home','v-activity','v-create','v-link','v-me'];
     var initialView = mainTabs.indexOf(hash) >= 0 ? hash.slice(2) : 'home';

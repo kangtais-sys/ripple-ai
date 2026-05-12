@@ -27,7 +27,7 @@ export default async function AdminLayout({
           <p className="text-[14px] text-white/60 leading-relaxed">
             Ssobi Admin 에 접근하려면 먼저 로그인해주세요.
           </p>
-          <a href="/app" className="inline-block bg-[#00C896] hover:bg-[#00A87E] text-white font-bold px-6 py-3 rounded-lg transition">
+          <a href="/app?next=%2Fadmin" className="inline-block bg-[#00C896] hover:bg-[#00A87E] text-white font-bold px-6 py-3 rounded-lg transition">
             로그인하러 가기 →
           </a>
         </div>
