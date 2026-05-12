@@ -12,6 +12,62 @@ const sb = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
+function HiggsfieldTestButton() {
+  const [state, setState] = useState<
+    | { kind: 'idle' }
+    | { kind: 'running' }
+    | { kind: 'success'; imageUrl: string; elapsedMs: number }
+    | { kind: 'error'; message: string }
+  >({ kind: 'idle' })
+
+  async function test() {
+    setState({ kind: 'running' })
+    try {
+      const { data } = await sb.auth.getSession()
+      const token = data.session?.access_token
+      if (!token) { setState({ kind: 'error', message: '세션 만료' }); return }
+
+      const res = await fetch('/api/admin/higgsfield/test', {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const j = await res.json()
+      if (!res.ok || !j.ok) {
+        setState({ kind: 'error', message: j.error || j.stage || '실패' })
+        return
+      }
+      setState({ kind: 'success', imageUrl: j.image_url, elapsedMs: j.elapsed_ms })
+    } catch (e) {
+      setState({ kind: 'error', message: String(e) })
+    }
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        onClick={test}
+        disabled={state.kind === 'running'}
+        className="bg-white/10 hover:bg-white/20 disabled:opacity-50 text-white font-semibold px-3 py-2 rounded-lg text-[12px] transition"
+      >
+        {state.kind === 'running' ? 'Higgsfield 호출 중...' : '🎨 Higgsfield 테스트'}
+      </button>
+      {state.kind === 'success' && (
+        <>
+          <a href={state.imageUrl} target="_blank" rel="noopener" className="text-[11px] text-[#00C896] hover:underline">
+            ✓ 성공 ({Math.round(state.elapsedMs / 1000)}s)
+          </a>
+          <img src={state.imageUrl} alt="test" className="w-10 h-10 rounded object-cover border border-white/10" />
+        </>
+      )}
+      {state.kind === 'error' && (
+        <span className="text-[11px] text-red-300 max-w-xs truncate" title={state.message}>
+          ✕ {state.message.slice(0, 60)}
+        </span>
+      )}
+    </div>
+  )
+}
+
 type ApiResult =
   | { ok: true; metrics: AdminMetrics; email: string }
   | { ok?: false; error: 'unauthorized' | 'forbidden'; your_email?: string }
@@ -173,14 +229,17 @@ export default function AdminOverview() {
 
   return (
     <div className="space-y-8">
-      <div className="flex items-end justify-between">
+      <div className="flex items-end justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-black tracking-tight mb-1">개요</h1>
           <p className="text-[13px] text-white/50">
             실시간 운영 현황 · {new Date().toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}
           </p>
         </div>
-        <div className="text-[11px] text-white/40">{state.email}</div>
+        <div className="flex items-center gap-3">
+          <HiggsfieldTestButton />
+          <div className="text-[11px] text-white/40">{state.email}</div>
+        </div>
       </div>
 
       <section>
