@@ -37,11 +37,13 @@ export const HF_DEFAULTS = {
 } as const
 
 // 채널별 권장 사이즈 (Higgsfield 가 받는 aspect_ratio·resolution 값)
+//   허용 aspect_ratio: '9:16', '16:9', '4:3', '3:4', '1:1', '2:3', '3:2'
+//   허용 resolution: '720p', '1080p' (2K 는 일부 모델만 지원 — 안전하게 1080p 사용)
 export const CHANNEL_DIMENSIONS = {
-  instagram_square: { aspect_ratio: '1:1', resolution: '2K' },     // 1080×1080
-  instagram_portrait: { aspect_ratio: '4:5', resolution: '2K' },   // 1080×1350
-  instagram_story: { aspect_ratio: '9:16', resolution: '2K' },     // 1080×1920
-  reels_tiktok: { aspect_ratio: '9:16', resolution: '2K' },        // 1080×1920
-  card_news_slide: { aspect_ratio: '4:5', resolution: '2K' },      // 1080×1350
-  hero_landscape: { aspect_ratio: '16:9', resolution: '2K' },      // 1920×1080
+  instagram_square: { aspect_ratio: '1:1', resolution: '1080p' },     // 1080×1080
+  instagram_portrait: { aspect_ratio: '3:4', resolution: '1080p' },   // IG 캐러셀 (4:5 X → 3:4)
+  instagram_story: { aspect_ratio: '9:16', resolution: '1080p' },     // 1080×1920
+  reels_tiktok: { aspect_ratio: '9:16', resolution: '1080p' },        // 1080×1920
+  card_news_slide: { aspect_ratio: '3:4', resolution: '1080p' },      // 카드뉴스 (3:4)
+  hero_landscape: { aspect_ratio: '16:9', resolution: '1080p' },      // 1920×1080
 } as const

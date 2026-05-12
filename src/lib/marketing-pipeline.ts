@@ -244,13 +244,15 @@ export async function generateDailyContent(
         assetId = assetRow.id as string
 
         // Higgsfield submit (webhook)
+        //   Soul 모델 허용 aspect_ratio: 9:16, 16:9, 4:3, 3:4, 1:1, 2:3, 3:2
+        //   Soul 모델 허용 resolution: 720p, 1080p
         const webhookUrl = `${webhookOrigin}/api/higgsfield/webhook`
         const submitRes = await submit(
           HF_MODELS.image.soul,
           {
             prompt: t.scene_prompt,
-            aspect_ratio: '4:5',  // IG carousel/portrait
-            resolution: '2K',
+            aspect_ratio: '3:4',     // IG 카드뉴스 세로형
+            resolution: '1080p',
           },
           webhookUrl
         )
