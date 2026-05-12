@@ -1,7 +1,13 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+// app.html 과 동일한 localStorage 기반 supabase-js 사용
+import { createClient } from '@supabase/supabase-js'
+
+const sb = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 type ChannelKey = 'instagram' | 'threads' | 'facebook' | 'x'
 
@@ -61,7 +67,6 @@ export default function MarketingClient() {
 
   // app.html 의 localStorage 세션을 Bearer 헤더로 전달 (SSR 쿠키 우회)
   async function authHeaders(): Promise<HeadersInit> {
-    const sb = createClient()
     const { data } = await sb.auth.getSession()
     const token = data.session?.access_token
     return token ? { Authorization: `Bearer ${token}` } : {}

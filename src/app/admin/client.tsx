@@ -1,8 +1,16 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+// app.html 이 window.supabase.createClient (localStorage 기반) 을 쓰니까
+// 동일한 @supabase/supabase-js 로 통일. @supabase/ssr 의 createBrowserClient
+// 는 쿠키 기반이라 app.html 세션을 못 읽음.
+import { createClient } from '@supabase/supabase-js'
 import type { AdminMetrics } from '@/lib/admin-metrics'
+
+const sb = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+)
 
 type ApiResult =
   | { ok: true; metrics: AdminMetrics; email: string }
@@ -57,7 +65,6 @@ export default function AdminOverview() {
     let cancelled = false
     ;(async () => {
       try {
-        const sb = createClient()
         const { data: sessionData } = await sb.auth.getSession()
         const accessToken = sessionData.session?.access_token
 
