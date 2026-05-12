@@ -1,25 +1,28 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ssobi. | 키우고 · 만들고 · 돈벌고 — 내 SNS 비서</title>
-<meta name="description" content="키우고, 만들고. 이젠 나 대신 Ssobi가. SNS 자동 응대·카드뉴스 생성·내 링크까지 한 곳에서.">
-<meta name="keywords" content="Ssobi, 쏘비, 소셜 비서, SNS 자동화, 카드뉴스, 인플루언서, 링크인바이오, 인스타그램 자동화, K-뷰티">
-<meta name="author" content="(주)공팔리터글로벌">
-<link rel="canonical" href="https://ssobi.ai/">
+<title>Ssobi. | AI Social Assistant for Creators — Grow · Create · Earn</title>
+<meta name="description" content="The AI social assistant for influencers. Auto-reply in your own voice, create card news in 1 second, all-in-one link in bio.">
+<meta name="keywords" content="Ssobi, AI social assistant, influencer tools, Instagram automation, K-beauty, card news, link in bio, social media AI, creator tools">
+<meta name="author" content="0.8L Global Corp.">
+<link rel="canonical" href="https://ssobi.ai/en">
+<link rel="alternate" hreflang="ko" href="https://ssobi.ai/">
+<link rel="alternate" hreflang="en" href="https://ssobi.ai/en">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="apple-touch-icon" href="/apple-icon.png">
 <meta property="og:type" content="website">
-<meta property="og:locale" content="ko_KR">
-<meta property="og:url" content="https://ssobi.ai/">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="ko_KR">
+<meta property="og:url" content="https://ssobi.ai/en">
 <meta property="og:site_name" content="Ssobi.">
-<meta property="og:title" content="Ssobi. — 키우고, 만들고. 이젠 나 대신 Ssobi가.">
-<meta property="og:description" content="SNS 자동 응대·카드뉴스 생성·내 링크까지. 소셜 비서 Ssobi.">
+<meta property="og:title" content="Ssobi. — AI Social Assistant for Creators">
+<meta property="og:description" content="Auto-reply in your voice. 1-second card news. All-in-one link in bio. Built by an influencer, for influencers.">
 <meta property="og:image" content="https://ssobi.ai/og-default.svg">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Ssobi. — 소셜 비서">
-<meta name="twitter:description" content="키우고, 만들고. 이젠 나 대신 Ssobi가.">
+<meta name="twitter:title" content="Ssobi. — AI Social Assistant">
+<meta name="twitter:description" content="Auto-reply in your voice. 1-second card news. Built by an influencer.">
 <meta name="twitter:image" content="https://ssobi.ai/og-default.svg">
 <link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,700;0,9..144,900;1,9..144,400;1,9..144,500;1,9..144,700;1,9..144,900&display=swap" rel="stylesheet">
@@ -570,22 +573,22 @@ body{top:0!important}
   <div class="nav-inner">
     <div class="nav-logo">Ssobi<em>.</em></div>
     <div class="nav-links">
-      <a href="#grow">키우기</a>
-      <a href="#create">만들기</a>
-      <a href="#earn">돈벌기</a>
-      <a href="#pricing">요금제</a>
-      <a href="#faq">자주 묻는 질문</a>
+      <a href="#grow">Grow</a>
+      <a href="#create">Create</a>
+      <a href="#earn">Earn</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
     </div>
     <div class="nav-right">
       <button class="lang-btn" onclick="toggleLangMenu()" aria-label="Language">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
-        <span id="lang-current">KO</span>
+        <span id="lang-current">EN</span>
       </button>
       <div class="lang-menu" id="lang-menu">
-        <button onclick="setLang('ko')" data-lang="ko" class="on">🇰🇷 한국어</button>
-        <button onclick="setLang('en')" data-lang="en">🇺🇸 English</button>
+        <button onclick="setLang('ko')" data-lang="ko">🇰🇷 한국어</button>
+        <button onclick="setLang('en')" data-lang="en" class="on">🇺🇸 English</button>
       </div>
-      <button class="nav-btn" onclick="startPremium()">7일 무료 시작</button>
+      <button class="nav-btn" onclick="startPremium()">Start 7-Day Trial</button>
     </div>
   </div>
 </nav>
@@ -593,31 +596,31 @@ body{top:0!important}
 <section class="hero">
   <div class="hero-eye">
     <svg width="7" height="7" viewBox="0 0 8 8" fill="var(--mint)"><circle cx="4" cy="4" r="4"/></svg>
-    이미 312,847명이 사용 중
+    312,847 creators already using
   </div>
   <h1 class="hero-title">
-    키우고,<span class="mo-br"><br></span>
-    만들고.<br>
-    <strong>이젠 나 대신 <em>Ssobi</em>가.</strong>
+    Grow,<span class="mo-br"><br></span>
+    Create.<br>
+    <strong>Let <em>Ssobi</em> do it for you.</strong>
   </h1>
   <p class="hero-sub">
-    소셜 비서, <strong>Ssobi(쏘비)</strong>.<br>
-    딸깍 한 번이면 SNS가 자동으로 움직여요.
+    Your AI social assistant, <strong>Ssobi</strong>.<br>
+    One click and your social runs itself.
   </p>
   <div class="hero-cta">
-    <button class="btn-main" onclick="start()">1초 만에 내 SNS 비서 만들기</button>
+    <button class="btn-main" onclick="start()">Build my AI assistant in 1 second</button>
     <div class="hero-trust">
       <div class="trust-chip">
         <svg viewBox="0 0 24 24" fill="none"><path d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        카드 등록 없음
+        No card required
       </div>
       <div class="trust-chip">
         <svg viewBox="0 0 24 24" fill="none"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        1분 설정
+        1-minute setup
       </div>
       <div class="trust-chip">
         <svg viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        공식 API 연동
+        Official API
       </div>
     </div>
   </div>
@@ -625,55 +628,55 @@ body{top:0!important}
 
 <!-- PROOF -->
 <div class="proof fade-in">
-  <div class="proof-item"><div class="proof-val">2.1<em>만</em></div><div class="proof-lbl">월 자동 응대건</div></div>
-  <div class="proof-item"><div class="proof-val">1<em>초</em></div><div class="proof-lbl">카드뉴스 생성 시간</div></div>
-  <div class="proof-item"><div class="proof-val">78<em>만</em></div><div class="proof-lbl">월 평균 추가 수익</div></div>
+  <div class="proof-item"><div class="proof-val">21<em>K</em></div><div class="proof-lbl">Auto-replies / month</div></div>
+  <div class="proof-item"><div class="proof-val">1<em>sec</em></div><div class="proof-lbl">Card news generation</div></div>
+  <div class="proof-item"><div class="proof-val">$580<em>+</em></div><div class="proof-lbl">Avg extra income / month</div></div>
 </div>
 
 <!-- DASHBOARD -->
 <section class="dash-bg fade-in">
   <div class="dash-inner wrap">
     <div class="dash-left">
-      <div class="dash-label">지금 이 순간에도</div>
-      <h2>Ssobi가<br>움직이고 있어요.</h2>
-      <p>내가 자는 동안, 쉬는 동안, 촬영하는 동안.<br>팔로워 응대·콘텐츠 제작·수익 제안까지<br>Ssobi가 대신해요.</p>
-      <a class="d-cta-link" onclick="start()">이 대시보드를 내 계정으로 →</a>
+      <div class="dash-label">Right now</div>
+      <h2>Ssobi is<br>working for you.</h2>
+      <p>While you sleep, rest, or film.<br>Reply to followers, create content, sort revenue deals —<br>Ssobi handles it all.</p>
+      <a class="d-cta-link" onclick="start()">Get this dashboard for my account →</a>
     </div>
     <div class="dash-right">
       <div class="d-card">
         <div class="d-card-hdr">
-          <div class="d-card-name">쏘비가 아껴준 내 시간값</div>
+          <div class="d-card-name">Time saved by Ssobi</div>
           <div class="ai-badge"><div class="ai-dot"></div>AI ON</div>
         </div>
-        <div class="d-amount">₩1,248,000</div>
-        <div class="d-amount-note">이번 달 · 절약 시간 72시간 · 진행률 56%</div>
+        <div class="d-amount">$1,040</div>
+        <div class="d-amount-note">This month · 72hrs saved · 56% progress</div>
         <div class="d-stats">
-          <div class="d-stat"><div class="d-stat-v">1,842</div><div class="d-stat-l">자동 응대</div></div>
-          <div class="d-stat"><div class="d-stat-v">12</div><div class="d-stat-l">카드뉴스</div></div>
-          <div class="d-stat"><div class="d-stat-v">+89</div><div class="d-stat-l">신규 팔로워</div></div>
+          <div class="d-stat"><div class="d-stat-v">1,842</div><div class="d-stat-l">Auto replies</div></div>
+          <div class="d-stat"><div class="d-stat-v">12</div><div class="d-stat-l">Card news</div></div>
+          <div class="d-stat"><div class="d-stat-v">+89</div><div class="d-stat-l">New followers</div></div>
         </div>
       </div>
       <div class="d-feed">
         <div class="d-fade t"></div>
         <div class="d-feed-inner">
-          <div class="d-row"><div class="d-tick"></div>@yuna__daily님 제품 문의 — 말투 98% 응대 완료</div>
-          <div class="d-row"><div class="d-tick"></div>오늘의 추천 TOP3 도착 — 레딧·X에서 핫한 주제</div>
-          <div class="d-row"><div class="d-tick"></div>카드뉴스 "글래스 스킨 꿀팁" 생성 완료 (5장)</div>
-          <div class="d-row"><div class="d-tick"></div>@new_beauty_fan님 팔로우 감사 DM 자동 발송</div>
-          <div class="d-row"><div class="d-tick"></div>@cool_tommi99님 구매 링크 DM 발송 완료</div>
-          <div class="d-row"><div class="d-tick"></div>수익 제안 2건 분류 — 협찬·광고 카테고리</div>
-          <div class="d-row"><div class="d-tick"></div>@yuna__daily님 제품 문의 — 말투 98% 응대 완료</div>
-          <div class="d-row"><div class="d-tick"></div>오늘의 추천 TOP3 도착 — 레딧·X에서 핫한 주제</div>
-          <div class="d-row"><div class="d-tick"></div>카드뉴스 "글래스 스킨 꿀팁" 생성 완료 (5장)</div>
-          <div class="d-row"><div class="d-tick"></div>@new_beauty_fan님 팔로우 감사 DM 자동 발송</div>
-          <div class="d-row"><div class="d-tick"></div>@cool_tommi99님 구매 링크 DM 발송 완료</div>
-          <div class="d-row"><div class="d-tick"></div>수익 제안 2건 분류 — 협찬·광고 카테고리</div>
+          <div class="d-row"><div class="d-tick"></div>@yuna__daily product Q — replied with 98% voice match</div>
+          <div class="d-row"><div class="d-tick"></div>Today's TOP 3 trends — hot on Reddit & X</div>
+          <div class="d-row"><div class="d-tick"></div>Card news "Glass skin tips" generated (5 slides)</div>
+          <div class="d-row"><div class="d-tick"></div>@new_beauty_fan thank-you DM auto-sent</div>
+          <div class="d-row"><div class="d-tick"></div>@cool_tommi99 purchase link DM sent</div>
+          <div class="d-row"><div class="d-tick"></div>2 revenue offers classified — sponsorship · ads</div>
+          <div class="d-row"><div class="d-tick"></div>@yuna__daily product Q — replied with 98% voice match</div>
+          <div class="d-row"><div class="d-tick"></div>Today's TOP 3 trends — hot on Reddit & X</div>
+          <div class="d-row"><div class="d-tick"></div>Card news "Glass skin tips" generated (5 slides)</div>
+          <div class="d-row"><div class="d-tick"></div>@new_beauty_fan thank-you DM auto-sent</div>
+          <div class="d-row"><div class="d-tick"></div>@cool_tommi99 purchase link DM sent</div>
+          <div class="d-row"><div class="d-tick"></div>2 revenue offers classified — sponsorship · ads</div>
         </div>
         <div class="d-fade b"></div>
       </div>
       <div class="d-urgent">
         <div class="d-urgent-dot"></div>
-        <div><div class="d-urgent-t">💰 Ssobi 협업 제안 ₩50,000 · 잔여 7/20명</div><div class="d-urgent-s">지금 신청하면 바로 확정 · 카카오톡 알림 발송됨</div></div>
+        <div><div class="d-urgent-t">💰 Ssobi paid deal $40 · 7/20 spots left</div><div class="d-urgent-s">Apply now to confirm · alert sent</div></div>
         <svg style="margin-left:auto;flex-shrink:0" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.3)" stroke-width="2"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
     </div>
@@ -684,21 +687,21 @@ body{top:0!important}
 <section class="sec fade-in" id="how">
   <div class="wrap-narrow">
     <span class="sec-eye">HOW IT WORKS</span>
-    <h2 class="sec-title">딱 3단계면 오늘부터 시작돼요</h2>
-    <p class="sec-sub">복잡한 설정 없이. 지금 당장.</p>
+    <h2 class="sec-title">Start today in just 3 steps</h2>
+    <p class="sec-sub">No complex setup. Right now.</p>
   </div>
   <div class="step-grid">
     <div class="step-card">
       <div class="step-num">1</div>
-      <div><div class="step-t">계정 연동</div><div class="step-d">Instagram, TikTok, YouTube를 공식 API로 안전하게 연결. 비밀번호를 입력하지 않아요.</div><div class="step-tag">🔒 공식 파트너 API</div></div>
+      <div><div class="step-t">Connect your accounts</div><div class="step-d">Link Instagram, TikTok, YouTube via official APIs. You never enter your password.</div><div class="step-tag">🔒 Official Partner APIs</div></div>
     </div>
     <div class="step-card">
       <div class="step-num">2</div>
-      <div><div class="step-t">AI 말투 학습</div><div class="step-d">내 게시물 250개를 분석해 말투·이모지·뉘앙스까지 학습. 팬들이 눈치 못 채는 수준.</div><div class="step-tag">🎯 말투 일치도 98%</div></div>
+      <div><div class="step-t">AI learns your voice</div><div class="step-d">Analyzes 250+ of your posts to capture tone, emojis, and nuance. Fans can't tell the difference.</div><div class="step-tag">🎯 98% voice match</div></div>
     </div>
     <div class="step-card">
       <div class="step-num">3</div>
-      <div><div class="step-t">키우고·만들고·돈벌고</div><div class="step-d">응대·콘텐츠·수익까지 Ssobi가 대신. 중요한 건 카카오톡으로 즉시 알려드려요.</div><div class="step-tag">⚡ 24시간 자동</div></div>
+      <div><div class="step-t">Grow · Create · Earn</div><div class="step-d">Replies, content, and revenue — Ssobi handles it all. Important alerts come to you instantly.</div><div class="step-tag">⚡ 24/7 automated</div></div>
     </div>
   </div>
 </section>
@@ -709,11 +712,11 @@ body{top:0!important}
     <div class="track-header">
       <div class="track-badge grow">
         <svg viewBox="0 0 24 24"><path d="M13 7l5 5-5 5M6 12h12" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        키우기
+        Grow
       </div>
       <span class="sec-eye">GROW</span>
-      <h2 class="sec-title">자는 동안 <em>팔로워가 자라요.</em></h2>
-      <p class="track-hint"><strong>봇이 아니에요.</strong> 공식 API에 Ssobi만의 노하우를 더해,<br>댓글 하나·DM 하나·콘텐츠 하나를 <b>내 계정에 맞춰 최적화</b>해요.</p>
+      <h2 class="sec-title">Your followers grow <em>while you sleep.</em></h2>
+      <p class="track-hint"><strong>Not a bot.</strong> Official APIs powered by Ssobi's secret sauce —<br>every comment, DM, and post is <b>optimized for your account</b>.</p>
     </div>
 
     <!-- 시그니처 카드: 진짜 나처럼 답하기 (말투 98% 링) -->
@@ -733,9 +736,9 @@ body{top:0!important}
           <div class="accent-ring-num">98<span>%</span></div>
         </div>
         <div class="accent-body">
-          <div class="accent-tag"><span class="accent-tag-dot"></span>말투 일치도</div>
-          <div class="feat-name">진짜 나처럼 댓글·DM 답하기<br><span>단 한 명의 메시지도 소중하게</span></div>
-          <div class="feat-desc">24시간 한 명 한 명에게 <b>내 말투 그대로</b> 답해요. 위험한 어뷰징·단순 봇은 그만.</div>
+          <div class="accent-tag"><span class="accent-tag-dot"></span>Voice match</div>
+          <div class="feat-name">Reply to comments & DMs as the real you<br><span>Every message matters</span></div>
+          <div class="feat-desc">24/7 personal replies <b>in your exact voice</b>. No risky scraping, no canned bot replies.</div>
         </div>
       </div>
     </div>
@@ -743,18 +746,18 @@ body{top:0!important}
     <div class="feat-grid-3">
       <div class="feat-card">
         <div class="feat-ico g"><svg viewBox="0 0 24 24"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="feat-name">대화형 루프 알고리즘</div>
-        <div class="feat-desc">"어떤 피부타입이세요?" 같이 팬이 다시 답하게 만드는 질문형 응대. <b>자체 최적화 알고리즘</b>이 대화를 이어 붙여 노출을 키워요.</div>
+        <div class="feat-name">Conversational loop AI</div>
+        <div class="feat-desc">Replies like "What's your skin type?" that keep fans engaged. <b>Our algorithm extends conversations</b> to grow your reach.</div>
       </div>
       <div class="feat-card">
         <div class="feat-ico g"><svg viewBox="0 0 24 24"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="feat-name">업로드 즉시 자동 실행</div>
-        <div class="feat-desc">내 게시물 올리면 셀프 저장·공감 댓글·해시태그 답글이 3~7분 내 자연스럽게 실행. 초반 노출을 키워요.</div>
+        <div class="feat-name">Auto-actions on upload</div>
+        <div class="feat-desc">Auto-save, engaged comments, and hashtag replies fire naturally within 3–7 minutes of every post. Boosts early reach.</div>
       </div>
       <div class="feat-card">
         <div class="feat-ico g"><svg viewBox="0 0 24 24"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="feat-name">댓글 → DM 자동 발송</div>
-        <div class="feat-desc">"링크 알려줘" 댓글에 자동 DM. 전체/특정 단어/답글 여부까지 내가 직접 설정할 수 있어요.</div>
+        <div class="feat-name">Comment → auto DM</div>
+        <div class="feat-desc">Comment says "link please"? Auto DM. Configure trigger words, scope, and reply behavior to your taste.</div>
       </div>
     </div>
 
@@ -763,30 +766,30 @@ body{top:0!important}
       <div style="position:absolute;top:-40px;right:-30px;width:180px;height:180px;background:radial-gradient(circle,rgba(0,200,150,.3),transparent 60%);border-radius:50%;pointer-events:none"></div>
       <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,200,150,.15);border:1px solid rgba(0,200,150,.4);border-radius:100px;padding:5px 12px;font-size:11px;font-weight:800;color:#6EE7B7;margin-bottom:14px;position:relative;z-index:1">
         <span style="width:6px;height:6px;border-radius:50%;background:#6EE7B7;animation:pulse 1.5s infinite"></span>
-        팔로워 0명부터 OK
+        Zero followers? OK
       </div>
-      <h3 style="font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.6px;line-height:1.3;margin-bottom:12px;position:relative;z-index:1">어디서부터 시작할지,<br><em style="font-style:normal;color:var(--mint)">Ssobi가 손잡고 알려줘요.</em></h3>
-      <p style="font-size:14px;color:rgba(255,255,255,.7);line-height:1.75;margin-bottom:22px;position:relative;z-index:1">팔로워 0명이어도 OK. <b style="color:#fff">프로필부터 첫 콘텐츠까지</b> 단계별로 가이드해요.</p>
+      <h3 style="font-size:clamp(22px,3vw,30px);font-weight:800;letter-spacing:-.6px;line-height:1.3;margin-bottom:12px;position:relative;z-index:1">Don't know where to start?<br><em style="font-style:normal;color:var(--mint)">Ssobi guides you step by step.</em></h3>
+      <p style="font-size:14px;color:rgba(255,255,255,.7);line-height:1.75;margin-bottom:22px;position:relative;z-index:1">Zero followers is fine. <b style="color:#fff">From profile setup to your first post,</b> we walk you through it all.</p>
       <div class="start-steps" style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;position:relative;z-index:1">
         <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 10px;text-align:center">
           <div style="width:28px;height:28px;border-radius:8px;background:var(--mint);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;margin:0 auto 8px">1</div>
-          <div style="font-size:12px;font-weight:700;color:#fff">프로필 설정</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:3px">팔로우를 부르는 바이오</div>
+          <div style="font-size:12px;font-weight:700;color:#fff">Profile setup</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:3px">Bio that converts</div>
         </div>
         <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 10px;text-align:center">
           <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;margin:0 auto 8px">2</div>
-          <div style="font-size:12px;font-weight:700;color:#fff">주제 정하기</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:3px">잘 크는 계정 참고</div>
+          <div style="font-size:12px;font-weight:700;color:#fff">Pick a niche</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:3px">Reference top accounts</div>
         </div>
         <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 10px;text-align:center">
           <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;margin:0 auto 8px">3</div>
-          <div style="font-size:12px;font-weight:700;color:#fff">첫 카드뉴스</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:3px">딸깍 한 번이면 끝</div>
+          <div style="font-size:12px;font-weight:700;color:#fff">First card news</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:3px">One click and done</div>
         </div>
         <div style="background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 10px;text-align:center">
           <div style="width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,.1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;margin:0 auto 8px">4</div>
-          <div style="font-size:12px;font-weight:700;color:#fff">자동 운영 시작</div>
-          <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:3px">24시간 Ssobi가 대신</div>
+          <div style="font-size:12px;font-weight:700;color:#fff">Go automated</div>
+          <div style="font-size:10px;color:rgba(255,255,255,.5);margin-top:3px">24/7 Ssobi runs it</div>
         </div>
       </div>
     </div>
@@ -799,73 +802,73 @@ body{top:0!important}
     <div class="track-header">
       <div class="track-badge create">
         <svg viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/></svg>
-        만들기
+        Create
       </div>
       <span class="sec-eye purple">CREATE</span>
-      <h2 class="sec-title">오늘 올릴 카드뉴스까지 <em class="purple">딸깍.</em></h2>
-      <p class="track-hint">AI가 <b>내 주제</b>에 맞는 것만 — 말투까지 나처럼.</p>
+      <h2 class="sec-title">Today's card news, ready with <em class="purple">one click.</em></h2>
+      <p class="track-hint">AI picks only what fits <b>your niche</b> — in your voice.</p>
     </div>
 
     <div class="create-show create-show-simple">
       <div class="phone-wrap">
         <div class="phone-frame">
           <div class="phone-screens" id="phone-carousel">
-            <!-- Scene 1: 추천 TOP 3 -->
+            <!-- Scene 1: Top 3 -->
             <div class="phone-screen">
-              <div class="phone-header"><span>만들기</span><span style="color:var(--purple);font-size:9px">AI 트렌드</span></div>
-              <div class="phone-title">오늘 추천 TOP 3</div>
+              <div class="phone-header"><span>Create</span><span style="color:var(--purple);font-size:9px">AI Trends</span></div>
+              <div class="phone-title">Today's TOP 3</div>
               <div class="phone-trend">
                 <div class="phone-trend-rank">1</div>
                 <div class="phone-trend-b">
                   <div class="phone-trend-src"><span class="phone-src-chip rd">Reddit</span><span class="phone-src-chip ig">IG</span></div>
-                  <div class="phone-trend-t">한국인이 절대 안 하는 7가지 스킨케어 실수</div>
+                  <div class="phone-trend-t">7 K-skincare mistakes you're making</div>
                 </div>
               </div>
               <div class="phone-trend">
                 <div class="phone-trend-rank r2">2</div>
                 <div class="phone-trend-b">
                   <div class="phone-trend-src"><span class="phone-src-chip x">X</span></div>
-                  <div class="phone-trend-t">피부과 의사가 절대 안 사는 성분 3가지</div>
+                  <div class="phone-trend-t">3 ingredients dermatologists avoid</div>
                 </div>
               </div>
               <div class="phone-trend">
                 <div class="phone-trend-rank r3">3</div>
                 <div class="phone-trend-b">
                   <div class="phone-trend-src"><span class="phone-src-chip tk">TikTok</span><span class="phone-src-chip ig">IG</span></div>
-                  <div class="phone-trend-t">2026 유행 글래스 스킨 꿀팁</div>
+                  <div class="phone-trend-t">2026 glass-skin trend tips</div>
                 </div>
               </div>
-              <div class="phone-gen">딸깍 한 번이면 끝</div>
+              <div class="phone-gen">One click and done</div>
             </div>
 
-            <!-- Scene 2: 편집기 -->
+            <!-- Scene 2: Editor -->
             <div class="phone-screen">
-              <div class="phone-header"><span>편집 &amp; 미리보기</span><span style="color:var(--purple);font-size:9px">1080×1080</span></div>
+              <div class="phone-header"><span>Edit &amp; Preview</span><span style="color:var(--purple);font-size:9px">1080×1080</span></div>
               <div class="phone-canvas">
                 <div class="phone-canvas-num">01</div>
-                <div class="phone-canvas-title">한국인이 안 하는<br>스킨케어 실수</div>
-                <div class="phone-canvas-text">저장해두고 따라해봐요</div>
+                <div class="phone-canvas-title">Skincare mistakes<br>you didn't know</div>
+                <div class="phone-canvas-text">Save & try this routine</div>
                 <div class="phone-canvas-dot"><span class="on"></span><span></span><span></span><span></span><span></span></div>
               </div>
-              <div class="phone-section-lbl">편집 도구</div>
+              <div class="phone-section-lbl">Edit tools</div>
               <div class="phone-tools">
-                <div class="phone-tool active">편집</div>
-                <div class="phone-tool">텍스트</div>
-                <div class="phone-tool">이미지</div>
-                <div class="phone-tool">레이어</div>
+                <div class="phone-tool active">Edit</div>
+                <div class="phone-tool">Text</div>
+                <div class="phone-tool">Image</div>
+                <div class="phone-tool">Layer</div>
               </div>
-              <div class="phone-section-lbl">이미지 사이즈</div>
+              <div class="phone-section-lbl">Size</div>
               <div class="phone-sizes">
-                <div class="phone-size on">정사각</div>
-                <div class="phone-size">세로형</div>
-                <div class="phone-size">스토리</div>
+                <div class="phone-size on">Square</div>
+                <div class="phone-size">Portrait</div>
+                <div class="phone-size">Story</div>
               </div>
             </div>
 
-            <!-- Scene 3: 예약 게시 -->
+            <!-- Scene 3: Scheduling -->
             <div class="phone-screen">
-              <div class="phone-header"><span>게시·예약</span><span style="color:var(--purple);font-size:9px">자동화</span></div>
-              <div class="phone-section-lbl" style="padding-top:10px">채널 선택</div>
+              <div class="phone-header"><span>Publish · Schedule</span><span style="color:var(--purple);font-size:9px">Auto</span></div>
+              <div class="phone-section-lbl" style="padding-top:10px">Pick channels</div>
               <div class="phone-chs">
                 <div class="phone-ch on">
                   <div class="phone-ch-tick">✓</div>
@@ -883,12 +886,12 @@ body{top:0!important}
                   <div class="phone-ch-nm">YouTube</div>
                 </div>
               </div>
-              <div class="phone-section-lbl">예약된 게시물</div>
+              <div class="phone-section-lbl">Scheduled</div>
               <div class="phone-sched">
                 <div class="phone-sched-thumb" style="background:url('https://images.unsplash.com/photo-1596462502278-27bfdc403348?auto=format&fit=crop&w=120&q=80') center/cover"></div>
                 <div class="phone-sched-b">
-                  <div class="phone-sched-when">4월 19일 · 오후 7:00</div>
-                  <div class="phone-sched-cap">한국인이 안 하는 스킨케어 실수</div>
+                  <div class="phone-sched-when">Apr 19 · 7:00 PM</div>
+                  <div class="phone-sched-cap">Skincare mistakes you didn't know</div>
                   <div class="phone-sched-chs">
                     <span class="phone-sched-ch" style="background:#FFF0F5;color:#E1306C">IG</span>
                     <span class="phone-sched-ch" style="background:#F0F0F0;color:#111">TK</span>
@@ -898,14 +901,14 @@ body{top:0!important}
               <div class="phone-sched">
                 <div class="phone-sched-thumb" style="background:url('https://images.unsplash.com/photo-1608571423902-eed4a5ad8108?auto=format&fit=crop&w=120&q=80') center/cover"></div>
                 <div class="phone-sched-b">
-                  <div class="phone-sched-when">4월 21일 · 오전 9:00</div>
-                  <div class="phone-sched-cap">성분표 체크하는 법</div>
+                  <div class="phone-sched-when">Apr 21 · 9:00 AM</div>
+                  <div class="phone-sched-cap">How to read ingredient labels</div>
                   <div class="phone-sched-chs">
                     <span class="phone-sched-ch" style="background:#FFF0F5;color:#E1306C">IG</span>
                   </div>
                 </div>
               </div>
-              <div class="phone-gen" style="margin-top:6px">게시 · 예약 확정</div>
+              <div class="phone-gen" style="margin-top:6px">Confirm schedule</div>
             </div>
           </div>
         </div>
@@ -920,18 +923,18 @@ body{top:0!important}
     <div class="feat-grid-3">
       <div class="feat-card purple-hover">
         <div class="feat-ico p"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 10l3-3 3 3M9 15h6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="feat-name">템플릿 5종 + 내 템플릿</div>
-        <div class="feat-desc">미니멀·볼드·민트·매거진·팝 템플릿. 내 브랜드 컬러와 로고로 나만의 템플릿도 만들 수 있어요.</div>
+        <div class="feat-name">5 templates + your own</div>
+        <div class="feat-desc">Minimal · Bold · Mint · Magazine · Pop. Build your own with your brand colors and logo.</div>
       </div>
       <div class="feat-card purple-hover">
         <div class="feat-ico p"><svg viewBox="0 0 24 24"><path d="M4 7V4h16v3M9 20h6M12 4v16" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="feat-name">드래그앤드롭 편집</div>
-        <div class="feat-desc">텍스트·이미지·도형을 손가락으로 끌어서 편집. 사이즈별(정사각/세로/릴스/가로) 자동 맞춤.</div>
+        <div class="feat-name">Drag-and-drop editor</div>
+        <div class="feat-desc">Drag text, images, and shapes. Auto-fits to square, portrait, reels, and landscape sizes.</div>
       </div>
       <div class="feat-card purple-hover">
         <div class="feat-ico p"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M8 2v4M16 2v4M3 10h18" stroke-linecap="round"/></svg></div>
-        <div class="feat-name">예약 게시 · 멀티 채널</div>
-        <div class="feat-desc">Instagram·TikTok·YouTube에 동시 예약. 캘린더에서 한눈에 보고 취소도 한 탭.</div>
+        <div class="feat-name">Multi-channel scheduling</div>
+        <div class="feat-desc">Schedule to Instagram, TikTok, YouTube at once. See everything in a calendar; cancel with one tap.</div>
       </div>
     </div>
   </div>
@@ -943,11 +946,11 @@ body{top:0!important}
     <div class="track-header">
       <div class="track-badge link-badge">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.72M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        내 링크
+        My Link
       </div>
       <span class="sec-eye" style="color:var(--purple)">MY LINK</span>
-      <h2 class="sec-title">남들과 다른,<br><em class="purple">내 사이트같은 링크.</em></h2>
-      <p class="track-hint">프로필 링크 하나에 쇼핑몰·에디토리얼·공구까지.<br>블록 조합으로 내 스타일대로 꾸며요.</p>
+      <h2 class="sec-title">A link that feels<br><em class="purple">like your own site.</em></h2>
+      <p class="track-hint">One profile link — shop, editorial, drops.<br>Build with block combinations in your style.</p>
     </div>
 
     <div class="feat-grid-3">
@@ -956,18 +959,18 @@ body{top:0!important}
           <div class="link-thumb-slide"><div class="lt-label">LIVE</div><div class="lt-title">Glow <em>Drop.</em></div></div>
           <div class="link-thumb-dots"><span class="on"></span><span></span><span></span></div>
         </div>
-        <div class="feat-name">히어로 캐러셀</div>
-        <div class="feat-desc">여러 배너를 좌우 스와이프로. 슬라이드마다 배경 이미지 · 텍스트 따로 편집. 링크트리엔 없는 고유 기능.</div>
+        <div class="feat-name">Hero carousel</div>
+        <div class="feat-desc">Swipe between banners. Per-slide background & text. Not on Linktree.</div>
       </div>
       <div class="feat-card">
         <div class="link-thumb link-thumb-blocks">
-          <div class="lt-block lt-b1">히어로</div>
-          <div class="lt-block lt-b2">카운트다운</div>
+          <div class="lt-block lt-b1">Hero</div>
+          <div class="lt-block lt-b2">Countdown</div>
           <div class="lt-block lt-b3 grid"><span></span><span></span></div>
-          <div class="lt-block lt-b4">매거진</div>
+          <div class="lt-block lt-b4">Magazine</div>
         </div>
-        <div class="feat-name">14종 블록 조합</div>
-        <div class="feat-desc">히어로·카운트다운·제품 그리드·매거진·빅배너·제안함·퀵링크·소셜·여백…. 원하는 대로 블록 꾸러미로 조립.</div>
+        <div class="feat-name">14 block types</div>
+        <div class="feat-desc">Hero · Countdown · Product grid · Magazine · Big banner · Inbox · Quick links · Socials · Spacer… mix and match.</div>
       </div>
       <div class="feat-card">
         <div class="link-thumb link-thumb-drag">
@@ -975,25 +978,25 @@ body{top:0!important}
           <div class="lt-drag-item moving">2 <span class="lt-grip">⋮⋮</span></div>
           <div class="lt-drag-item">3</div>
         </div>
-        <div class="feat-name">드래그 재배치</div>
-        <div class="feat-desc">블록을 손가락으로 끌어서 순서 변경. 제품 카드도 그리드 안에서 개별 드래그 가능.</div>
+        <div class="feat-name">Drag to reorder</div>
+        <div class="feat-desc">Drag blocks to reorder. Product cards drag individually within the grid.</div>
       </div>
       <div class="feat-card">
         <div class="link-thumb link-thumb-short">
           <div class="lt-short-url">ssobi.ai/s/a1b2c3</div>
-          <div class="lt-short-meta">클릭 <b>12</b> · 한국 67%</div>
+          <div class="lt-short-meta">Clicks <b>12</b> · KR 67%</div>
         </div>
-        <div class="feat-name">자동 숏링크</div>
-        <div class="feat-desc">링크 블록마다 ssobi.ai/s/xxxxxx 자동 생성. 클릭·국가·시간대 추적해 인사이트 제공.</div>
+        <div class="feat-name">Auto short links</div>
+        <div class="feat-desc">Every link block auto-generates a ssobi.ai/s/xxxxxx short URL. Tracks clicks, countries, and times.</div>
       </div>
       <div class="feat-card">
         <div class="link-thumb link-thumb-prop">
-          <div class="lt-prop-chip">💌 제안하기</div>
+          <div class="lt-prop-chip">💌 Inquire</div>
           <div class="lt-prop-arrow">→</div>
-          <div class="lt-prop-chip dark">수익제안 +1</div>
+          <div class="lt-prop-chip dark">Offer +1</div>
         </div>
-        <div class="feat-name">제안함 자동 수신</div>
-        <div class="feat-desc">방문자가 "제안하기"로 남긴 협업·광고·공구 문의가 Ssobi 수익제안 탭에 쌓임.</div>
+        <div class="feat-name">Auto-collect offers</div>
+        <div class="feat-desc">"Inquire" submissions for collabs, ads, and drops auto-stack in your Ssobi inbox.</div>
       </div>
       <div class="feat-card">
         <div class="link-thumb link-thumb-tpl">
@@ -1001,8 +1004,8 @@ body{top:0!important}
           <div class="lt-tpl-card"><div class="lt-tpl-b g"></div><div class="lt-tpl-b g"></div></div>
           <div class="lt-tpl-card"><div class="lt-tpl-b p"></div></div>
         </div>
-        <div class="feat-name">3종 템플릿</div>
-        <div class="feat-desc">미니멀 · 쇼핑몰 · 에디토리얼. 고르면 블록 기본 세팅 완성. 이후 내 스타일로 디테일만.</div>
+        <div class="feat-name">3 templates</div>
+        <div class="feat-desc">Minimal · Shop · Editorial. Pick one and start; refine details in your own style.</div>
       </div>
     </div>
   </div>
@@ -1014,50 +1017,50 @@ body{top:0!important}
     <div class="track-header">
       <div class="track-badge earn">
         <svg viewBox="0 0 24 24"><path d="M12 8c-1.7 0-3 .9-3 2s1.3 2 3 2 3 .9 3 2-1.3 2-3 2m0-8c1.1 0 2.1.4 2.6 1M12 8V7m0 1v8m0 0v1" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        돈벌기
+        Earn
       </div>
       <span class="sec-eye amber">EARN</span>
-      <h2 class="sec-title">나에게 온 제안,<br><em class="amber">이제 놓치지 마세요.</em></h2>
-      <p class="track-hint">Ssobi 협업 제안과 DM 광고·협찬까지<br>돈 되는 순간을 자동으로 모아 알려줘요.</p>
+      <h2 class="sec-title">Offers you'd miss,<br><em class="amber">caught for you.</em></h2>
+      <p class="track-hint">Ssobi paid deals plus DM-based sponsorships<br>auto-collected and alerted in real time.</p>
     </div>
 
     <div style="max-width:420px;margin:0 auto 40px">
       <div class="flash-card">
-        <div class="flash-pulse"><div class="flash-pulse-dot"></div>곧 사라져요!</div>
-        <div class="flash-badge">Ssobi 협업 제안 · LIVE</div>
-        <div class="flash-t">₩50,000 벌기</div>
-        <div style="font-size:13px;font-weight:700;color:#6EE7B7;margin-top:-4px;margin-bottom:8px;position:relative;z-index:1;letter-spacing:-.2px">100% 페이백 · 내 계정 매칭</div>
-        <div class="flash-brand">뷰티브랜드 · 글로우 세럼 50ml</div>
+        <div class="flash-pulse"><div class="flash-pulse-dot"></div>Closing soon!</div>
+        <div class="flash-badge">Ssobi paid deal · LIVE</div>
+        <div class="flash-t">Earn $40</div>
+        <div style="font-size:13px;font-weight:700;color:#6EE7B7;margin-top:-4px;margin-bottom:8px;position:relative;z-index:1;letter-spacing:-.2px">100% payback · matched to your account</div>
+        <div class="flash-brand">Beauty brand · Glow Serum 50ml</div>
         <div class="flash-meta">
           <div class="flash-meta-box">
-            <div class="flash-meta-lbl">남은 자리</div>
-            <div class="flash-meta-val">7/20명</div>
+            <div class="flash-meta-lbl">Spots left</div>
+            <div class="flash-meta-val">7/20</div>
           </div>
           <div class="flash-meta-box">
-            <div class="flash-meta-lbl">마감까지</div>
+            <div class="flash-meta-lbl">Ends in</div>
             <div class="flash-meta-val">03:42</div>
           </div>
         </div>
         <div class="flash-bar"><div class="flash-bar-fill"></div></div>
-        <button class="flash-cta">지금 신청하기</button>
+        <button class="flash-cta">Apply now</button>
       </div>
     </div>
 
     <div class="feat-grid-3">
       <div class="feat-card amber-hover">
         <div class="feat-ico a"><svg viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="feat-name">수익 제안 자동 분류</div>
-        <div class="feat-desc">광고·협찬·수출·B2B 문의 자동 분류. 이번 달 수익 제안 합계가 한눈에.</div>
+        <div class="feat-name">Auto-classify offers</div>
+        <div class="feat-desc">Ads, sponsorships, exports, B2B inquiries auto-sorted. See this month's revenue offers at a glance.</div>
       </div>
       <div class="feat-card amber-hover">
         <div class="feat-ico a"><svg viewBox="0 0 24 24"><path d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="feat-name">카카오톡 즉시 알림</div>
-        <div class="feat-desc">부정 이슈·수익 제안·페이백 기회가 오면 즉시 카카오톡. 중요한 것만 직접 챙기면 돼요.</div>
+        <div class="feat-name">Instant alerts</div>
+        <div class="feat-desc">Negative issues, revenue offers, payback chances — pushed to you instantly. Only the important stuff.</div>
       </div>
       <div class="feat-card amber-hover">
         <div class="feat-ico a"><svg viewBox="0 0 24 24"><path d="M8.684 13.342C8.886 12.938 9 12.482 9 12s-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m9.032 4.026a3 3 0 11-2.684-5.368 3 3 0 012.684 5.368zm0-5.368a3 3 0 10-2.684-5.368 3 3 0 002.684 5.368z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="feat-name">친구 초대 포인트</div>
-        <div class="feat-desc">친구가 가입하면 5,000P, 구독하면 20,000P. 포인트는 카드뉴스 만들기·키우기 활동에 바로 써요.</div>
+        <div class="feat-name">Referral credits</div>
+        <div class="feat-desc">Friend signs up = 5,000 pts. Friend subscribes = 20,000 pts. Spend on card news or grow activities.</div>
       </div>
     </div>
   </div>
@@ -1067,30 +1070,30 @@ body{top:0!important}
 <section class="safety-bg fade-in">
   <div class="wrap-narrow" style="text-align:center;margin-bottom:40px">
     <span class="sec-eye">SAFE &amp; LEGAL</span>
-    <h2 class="sec-title" style="margin-bottom:8px">봇 돌렸다가<br><em>계정 날린 적 있나요?</em></h2>
-    <p class="sec-sub">Ssobi는 단순 자동화가 아닙니다.<br>공식 API 위에 노하우를 얹어 <b>안전하게</b> 키워요.</p>
+    <h2 class="sec-title" style="margin-bottom:8px">Ever lost an account<br><em>to a bot?</em></h2>
+    <p class="sec-sub">Ssobi isn't just automation.<br>Official APIs + our know-how grow your account <b>safely</b>.</p>
   </div>
   <div class="safety-grid">
     <div class="safety-col bad">
-      <div class="safety-col-label">기존 봇의 아쉬움</div>
-      <div class="safety-col-t">계정을 키우려다<br>계정이 막혀요.</div>
+      <div class="safety-col-label">Bot risks</div>
+      <div class="safety-col-t">Trying to grow,<br>only to get banned.</div>
       <div class="safety-list">
-        <div class="safety-item"><div class="safety-item-ico">✕</div><div>자동 팔로우·좋아요·스토리 조회로 <b>계정 정지</b> 위험</div></div>
-        <div class="safety-item"><div class="safety-item-ico">✕</div><div>"감사해요" 수준의 <b>단순 봇 답변</b>만 반복</div></div>
-        <div class="safety-item"><div class="safety-item-ico">✕</div><div>주제·말투 학습 없이 모든 계정에 <b>같은 스크립트</b></div></div>
-        <div class="safety-item"><div class="safety-item-ico">✕</div><div>하루 한도·시간대 조절 없음 → <b>스팸 감지</b></div></div>
-        <div class="safety-item"><div class="safety-item-ico">✕</div><div>AI 생성 콘텐츠를 그대로 업로드 → <b>플랫폼 제재</b></div></div>
+        <div class="safety-item"><div class="safety-item-ico">✕</div><div>Auto-follow, likes, story views → <b>account ban</b> risk</div></div>
+        <div class="safety-item"><div class="safety-item-ico">✕</div><div>Repetitive <b>"thank you" bot replies</b></div></div>
+        <div class="safety-item"><div class="safety-item-ico">✕</div><div>No tone or topic learning — <b>same script</b> for everyone</div></div>
+        <div class="safety-item"><div class="safety-item-ico">✕</div><div>No daily caps or schedule control → <b>spam detection</b></div></div>
+        <div class="safety-item"><div class="safety-item-ico">✕</div><div>Raw AI content uploaded as-is → <b>platform penalties</b></div></div>
       </div>
     </div>
     <div class="safety-col good">
-      <div class="safety-col-label">Ssobi의 해결</div>
-      <div class="safety-col-t">공식 API + 노하우로<br>안전하게 키워요.</div>
+      <div class="safety-col-label">The Ssobi way</div>
+      <div class="safety-col-t">Official APIs + know-how<br>= safe growth.</div>
       <div class="safety-list">
-        <div class="safety-item"><div class="safety-item-ico"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div>Meta·TikTok·YouTube <b>공식 파트너 API</b> 전용</div></div>
-        <div class="safety-item"><div class="safety-item-ico"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div>내 게시물 250개 분석 → <b>말투 98% 일치</b> 응대</div></div>
-        <div class="safety-item"><div class="safety-item-ico"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div>질문형 대댓글로 <b>대화가 이어지는</b> 맞춤 응대</div></div>
-        <div class="safety-item"><div class="safety-item-ico"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div>하루 한도·시간대 설정 · <b>비정상 신호 시 자동 감속</b></div></div>
-        <div class="safety-item"><div class="safety-item-ico"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div><b>AI 작성 스탬프</b>로 투명한 생성 콘텐츠 표기 (옵션)</div></div>
+        <div class="safety-item"><div class="safety-item-ico"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div>Meta · TikTok · YouTube <b>Official Partner APIs</b> only</div></div>
+        <div class="safety-item"><div class="safety-item-ico"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div>250+ posts analyzed → <b>98% voice match</b> in replies</div></div>
+        <div class="safety-item"><div class="safety-item-ico"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div>Question-style follow-ups that <b>extend conversations</b></div></div>
+        <div class="safety-item"><div class="safety-item-ico"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div>Daily caps + schedule controls · <b>auto-slowdown</b> on anomalies</div></div>
+        <div class="safety-item"><div class="safety-item-ico"><svg viewBox="0 0 24 24"><path d="M5 13l4 4L19 7" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div>Optional <b>"Made with AI"</b> label for transparency</div></div>
       </div>
     </div>
   </div>
@@ -1100,24 +1103,24 @@ body{top:0!important}
 <section class="sec fade-in">
   <div class="wrap">
     <span class="sec-eye">VS COMPETITORS</span>
-    <h2 class="sec-title" style="margin-bottom:8px">크리에이터 전용 AI 비서는 Ssobi가 유일합니다.</h2>
-    <p class="sec-sub">키우기·만들기·돈벌기를 한 번에 하는 건 Ssobi뿐.</p>
+    <h2 class="sec-title" style="margin-bottom:8px">The only AI assistant built for creators.</h2>
+    <p class="sec-sub">Grow + Create + Earn — all in one. Only Ssobi.</p>
     <div class="comp-table-wrap">
     <table class="comp-table">
-      <thead><tr><th>기능</th><th class="repli-col">Ssobi</th><th>소셜비즈</th><th>ManyChat</th><th>Canva</th></tr></thead>
+      <thead><tr><th>Feature</th><th class="repli-col">Ssobi</th><th>SocialBee</th><th>ManyChat</th><th>Canva</th></tr></thead>
       <tbody>
-        <tr><td><b class="hi">98%</b> 말투 학습</td><td class="repli-td">✓</td><td class="comp-x">✗</td><td class="comp-x">✗</td><td class="comp-x">✗</td></tr>
-        <tr><td><b class="hi">대화형</b> 루프 응대</td><td class="repli-td">✓</td><td class="comp-x">✗</td><td class="comp-x">✗</td><td class="comp-x">✗</td></tr>
-        <tr><td><b class="hi">1초</b> 카드뉴스</td><td class="repli-td">✓</td><td class="comp-x">✗</td><td class="comp-x">✗</td><td class="comp-partial">수동</td></tr>
-        <tr><td><b class="hi">100%</b> 페이백 협업</td><td class="repli-td">✓</td><td class="comp-x">✗</td><td class="comp-x">✗</td><td class="comp-x">✗</td></tr>
-        <tr><td><b class="hi">0명</b>부터 가이드</td><td class="repli-td">✓</td><td class="comp-x">✗</td><td class="comp-x">✗</td><td class="comp-x">✗</td></tr>
-        <tr><td>멀티 플랫폼</td><td class="repli-td">IG·TK·YT</td><td class="comp-partial">IG·FB</td><td class="comp-partial">IG·FB</td><td class="comp-partial">IG</td></tr>
-        <tr><td><b>월 시작가</b></td><td class="repli-td"><b class="hi">무료</b></td><td>₩29,000</td><td>~₩20,000</td><td>₩14,900~</td></tr>
+        <tr><td><b class="hi">98%</b> voice match</td><td class="repli-td">✓</td><td class="comp-x">✗</td><td class="comp-x">✗</td><td class="comp-x">✗</td></tr>
+        <tr><td><b class="hi">Conversational</b> loop AI</td><td class="repli-td">✓</td><td class="comp-x">✗</td><td class="comp-x">✗</td><td class="comp-x">✗</td></tr>
+        <tr><td><b class="hi">1-second</b> card news</td><td class="repli-td">✓</td><td class="comp-x">✗</td><td class="comp-x">✗</td><td class="comp-partial">Manual</td></tr>
+        <tr><td><b class="hi">100%</b> payback deals</td><td class="repli-td">✓</td><td class="comp-x">✗</td><td class="comp-x">✗</td><td class="comp-x">✗</td></tr>
+        <tr><td><b class="hi">Zero-follower</b> guide</td><td class="repli-td">✓</td><td class="comp-x">✗</td><td class="comp-x">✗</td><td class="comp-x">✗</td></tr>
+        <tr><td>Multi-platform</td><td class="repli-td">IG·TT·YT</td><td class="comp-partial">IG·FB</td><td class="comp-partial">IG·FB</td><td class="comp-partial">IG</td></tr>
+        <tr><td><b>Starting price</b></td><td class="repli-td"><b class="hi">Free</b></td><td>$29/mo</td><td>~$15/mo</td><td>$12.99/mo</td></tr>
       </tbody>
     </table>
     </div>
     <div style="text-align:center;margin-top:36px">
-      <button class="btn-final" onclick="start()" style="padding:16px 44px;font-size:16px;animation:none;box-shadow:0 6px 20px rgba(0,200,150,.25)">지금 바로 시작하기</button>
+      <button class="btn-final" onclick="start()" style="padding:16px 44px;font-size:16px;animation:none;box-shadow:0 6px 20px rgba(0,200,150,.25)">Get started now</button>
     </div>
   </div>
 </section>
@@ -1126,12 +1129,12 @@ body{top:0!important}
 <section class="sec feat-bg fade-in">
   <div class="wrap">
     <span class="sec-eye">REVIEWS</span>
-    <h2 class="sec-title" style="margin-bottom:8px">먼저 써본 크리에이터들의 이야기</h2>
-    <p class="sec-sub">솔직한 후기 그대로</p>
+    <h2 class="sec-title" style="margin-bottom:8px">From creators who've tried it</h2>
+    <p class="sec-sub">Honest reviews</p>
     <div class="testi-grid">
-      <div class="testi-card"><div class="stars">★★★★★</div><div class="testi-text">"팔로워가 1만일 때도 지금도 한 명 한 명의 댓글이 소중한 마음은 똑같아요. <strong>이제 그 마음을 실제로 지킬 수 있어요.</strong>"</div><div class="testi-footer"><div class="testi-av">유</div><div><div class="testi-name">유민혜 · @yuminhye_beauty</div><div class="testi-handle">뷰티 인플루언서 · 팔로워 31.2만</div></div></div></div>
-      <div class="testi-card"><div class="stars">★★★★★</div><div class="testi-text">"카드뉴스 만드는 게 제일 귀찮았는데 Ssobi 쓰고 나서 <strong>주 3회 업로드가 가능해졌어요.</strong> 딸깍 한 번이면 완성."</div><div class="testi-footer"><div class="testi-av">지</div><div><div class="testi-name">지수 · @jisu_style</div><div class="testi-handle">패션 크리에이터 · 팔로워 18.4만</div></div></div></div>
-      <div class="testi-card"><div class="stars">★★★★★</div><div class="testi-text">"Ssobi 협업 제안 알림이 뜨자마자 신청했어요. <strong>한 달에 30만 원 추가 수익</strong>이 저절로 들어와요. 이건 진짜..."</div><div class="testi-footer"><div class="testi-av">하</div><div><div class="testi-name">하은 · @hazel_skin</div><div class="testi-handle">스킨케어 유튜버 · 팔로워 24만</div></div></div></div>
+      <div class="testi-card"><div class="stars">★★★★★</div><div class="testi-text">"Whether I had 10K or 300K followers, every comment matters the same to me. <strong>Now I can actually live up to that.</strong>"</div><div class="testi-footer"><div class="testi-av">M</div><div><div class="testi-name">Mina · @millimilli</div><div class="testi-handle">Beauty influencer · 320K followers</div></div></div></div>
+      <div class="testi-card"><div class="stars">★★★★★</div><div class="testi-text">"Card news was my biggest time sink. After Ssobi, <strong>I post 3× a week.</strong> One click, done."</div><div class="testi-footer"><div class="testi-av">J</div><div><div class="testi-name">Jisu · @jisu_style</div><div class="testi-handle">Fashion creator · 184K followers</div></div></div></div>
+      <div class="testi-card"><div class="stars">★★★★★</div><div class="testi-text">"I applied the moment a Ssobi paid deal alert came in. <strong>$250 extra income</strong> per month, on autopilot. This is real..."</div><div class="testi-footer"><div class="testi-av">H</div><div><div class="testi-name">Hazel · @hazel_skin</div><div class="testi-handle">Skincare YouTuber · 240K followers</div></div></div></div>
     </div>
   </div>
 </section>
@@ -1140,67 +1143,67 @@ body{top:0!important}
 <section class="sec fade-in" id="pricing">
   <div class="wrap" style="display:flex;flex-direction:column;align-items:center">
     <span class="sec-eye">PRICING</span>
-    <h2 class="sec-title" style="margin-bottom:8px;text-align:center">먼저, <em>그냥 쓰세요.</em></h2>
-    <p class="sec-sub" style="text-align:center">FREE 평생 무료 · PRO 7일 무료 체험 · 언제든 취소 가능</p>
-    <div class="curr-toggle" role="tablist" aria-label="통화 선택">
+    <h2 class="sec-title" style="margin-bottom:8px;text-align:center">Just <em>use it.</em></h2>
+    <p class="sec-sub" style="text-align:center">FREE forever · PRO 7-day trial · Cancel anytime</p>
+    <div class="curr-toggle" role="tablist" aria-label="Currency">
       <button class="curr-pill" data-cur="KRW" onclick="applyCurrency('KRW')" type="button">₩ KRW</button>
       <button class="curr-pill" data-cur="USD" onclick="applyCurrency('USD')" type="button">$ USD</button>
     </div>
     <div class="pricing-grid" style="width:100%">
       <div class="plan-card">
         <div class="plan-name">FREE</div>
-        <div class="plan-price" data-krw="0" data-usd="0"><span class="px-amount">₩0</span><span class="px-suffix"> / 월</span></div>
-        <div class="plan-desc">일단 무료로 써보세요.</div>
+        <div class="plan-price" data-krw="0" data-usd="0"><span class="px-amount">$0</span><span class="px-suffix"></span></div>
+        <div class="plan-desc">Try it free.</div>
         <div class="plan-feats">
-          <div class="plan-feat">월 300건 자동 응대</div>
-          <div class="plan-feat">연동 계정 1개</div>
-          <div class="plan-feat">AI 톤 학습 월 1회</div>
-          <div class="plan-feat">카드뉴스 월 5개 (워터마크)</div>
-          <div class="plan-feat">내 링크 기본 블록</div>
+          <div class="plan-feat">300 auto-replies / month</div>
+          <div class="plan-feat">1 connected account</div>
+          <div class="plan-feat">AI voice learning 1×/mo</div>
+          <div class="plan-feat">5 card news /mo (watermark)</div>
+          <div class="plan-feat">My Link basic blocks</div>
         </div>
-        <button class="plan-btn dark" onclick="start()">지금 시작</button>
+        <button class="plan-btn dark" onclick="start()">Get started</button>
       </div>
       <div class="plan-card">
         <div class="plan-name">STARTER</div>
-        <div class="plan-price" data-krw="9900" data-usd="7.99"><span class="px-amount">₩9,900</span><span class="px-suffix"> / 월</span></div>
-        <div class="plan-desc">크리에이터 입문자용.</div>
+        <div class="plan-price" data-krw="9900" data-usd="7.99"><span class="px-amount">$7.99</span><span class="px-suffix"> / mo</span></div>
+        <div class="plan-desc">For new creators.</div>
         <div class="plan-feats">
-          <div class="plan-feat">월 3,000건 자동 응대</div>
-          <div class="plan-feat">연동 계정 1개</div>
-          <div class="plan-feat">AI 톤 학습 월 4회</div>
-          <div class="plan-feat">카드뉴스 월 50개 · 워터마크 없음</div>
-          <div class="plan-feat">내 링크 프리미엄 블록·템플릿</div>
-          <div class="plan-feat">예약 발행</div>
+          <div class="plan-feat">3,000 auto-replies / month</div>
+          <div class="plan-feat">1 connected account</div>
+          <div class="plan-feat">AI voice learning 4×/mo</div>
+          <div class="plan-feat">50 card news /mo · no watermark</div>
+          <div class="plan-feat">My Link premium blocks & templates</div>
+          <div class="plan-feat">Scheduled publishing</div>
         </div>
-        <button class="plan-btn dark" onclick="startStarter()">지금 시작</button>
+        <button class="plan-btn dark" onclick="startStarter()">Get started</button>
       </div>
       <div class="plan-card featured">
-        <div class="plan-badge">추천</div>
+        <div class="plan-badge">Recommended</div>
         <div class="plan-name">PRO</div>
-        <div class="plan-price" data-krw="29900" data-usd="22.99"><span class="px-amount">₩29,900</span><span class="px-suffix"> / 월</span></div>
-        <div class="plan-desc">본격 인플루언서를 위한.</div>
+        <div class="plan-price" data-krw="29900" data-usd="22.99"><span class="px-amount">$22.99</span><span class="px-suffix"> / mo</span></div>
+        <div class="plan-desc">For serious influencers.</div>
         <div class="plan-feats">
-          <div class="plan-feat">월 30,000건 자동 응대</div>
-          <div class="plan-feat">연동 계정 1개</div>
-          <div class="plan-feat">AI 톤 학습 무제한</div>
-          <div class="plan-feat">카드뉴스 월 200개</div>
-          <div class="plan-feat">이미지 업로드 무제한</div>
-          <div class="plan-feat">우선 지원</div>
+          <div class="plan-feat">30,000 auto-replies / month</div>
+          <div class="plan-feat">1 connected account</div>
+          <div class="plan-feat">Unlimited AI voice learning</div>
+          <div class="plan-feat">200 card news /mo</div>
+          <div class="plan-feat">Unlimited image uploads</div>
+          <div class="plan-feat">Priority support</div>
         </div>
-        <button class="plan-btn green" onclick="startPremium()">7일 무료로 시작</button>
+        <button class="plan-btn green" onclick="startPremium()">Start 7-day trial</button>
       </div>
       <div class="plan-card">
         <div class="plan-name">TEAM</div>
-        <div class="plan-price" data-krw="79000" data-usd="59.99"><span class="px-amount">₩79,000</span><span class="px-suffix"> / 월</span></div>
-        <div class="plan-desc">브랜드·에이전시 운영용.</div>
+        <div class="plan-price" data-krw="79000" data-usd="59.99"><span class="px-amount">$59.99</span><span class="px-suffix"> / mo</span></div>
+        <div class="plan-desc">For brands & agencies.</div>
         <div class="plan-feats">
-          <div class="plan-feat">자동 응대 Meta 한도까지</div>
-          <div class="plan-feat">연동 계정 3개</div>
-          <div class="plan-feat">팀 멤버 3명 (출시 예정)</div>
-          <div class="plan-feat">카드뉴스 무제한</div>
-          <div class="plan-feat">전담 매니저 지원</div>
+          <div class="plan-feat">Auto-replies up to Meta limits</div>
+          <div class="plan-feat">3 connected accounts</div>
+          <div class="plan-feat">3 team members (coming soon)</div>
+          <div class="plan-feat">Unlimited card news</div>
+          <div class="plan-feat">Dedicated account manager</div>
         </div>
-        <button class="plan-btn dark" onclick="startTeam()">지금 시작</button>
+        <button class="plan-btn dark" onclick="startTeam()">Get started</button>
       </div>
     </div>
   </div>
@@ -1210,39 +1213,39 @@ body{top:0!important}
 <section class="sec feat-bg fade-in" id="faq">
   <div class="wrap">
     <span class="sec-eye">FAQ</span>
-    <h2 class="sec-title" style="margin-bottom:36px">자주 묻는 질문</h2>
+    <h2 class="sec-title" style="margin-bottom:36px">Frequently asked</h2>
     <div class="faq-list">
       <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-q"><div class="faq-q-text">내 계정이 정지되거나 제한될 수 있나요?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="faq-body">아니요. Ssobi는 Meta, TikTok, YouTube의 공식 파트너 API만 사용해요. OAuth 방식으로만 연동되기 때문에 계정 정지 위험이 없어요.</div>
+        <div class="faq-q"><div class="faq-q-text">Can my account get banned or restricted?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="faq-body">No. Ssobi uses only Meta, TikTok, and YouTube's official partner APIs. OAuth connections only — no ban risk.</div>
       </div>
       <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-q"><div class="faq-q-text">팔로워들이 AI인지 눈치챌 수 있나요?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="faq-body">게시물 250개 이상을 분석해 말투·이모지·자주 쓰는 표현까지 학습해요. 말투 일치도 98% 수준으로 팔로워들은 사실상 구별하지 못해요.</div>
+        <div class="faq-q"><div class="faq-q-text">Will my followers notice it's AI?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="faq-body">We analyze 250+ of your posts to learn tone, emojis, and signature phrases. With ~98% voice match, followers virtually can't tell.</div>
       </div>
       <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-q"><div class="faq-q-text">1초 카드뉴스는 정말 1초만에 만들어지나요?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="faq-body">추천 TOP 3 중 하나를 탭하면 즉시 프롬프트가 생성돼요. 내 말투로 쓰인 표지·슬라이드 본문·게시 캡션까지 한 번에. 생성 후 드래그앤드롭 편집기에서 자유롭게 수정 가능해요.</div>
+        <div class="faq-q"><div class="faq-q-text">Is card news really 1 second?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="faq-body">Tap one of the TOP 3 trends and a prompt fires instantly. Cover, slides, and caption — all written in your voice. Then free-form edit with drag-and-drop.</div>
       </div>
       <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-q"><div class="faq-q-text">Ssobi 협업 제안은 어떻게 받나요?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="faq-body">AI가 내 계정과 매칭된 제안만 카카오톡·앱 동시 알림. 지정 링크로 구매 후 SNS에 후기를 올리면 <strong>구매 금액 100% 페이백</strong>돼요. 선착순 한정, 수수료 8% 공제 후 실지급.</div>
+        <div class="faq-q"><div class="faq-q-text">How do Ssobi paid deals work?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="faq-body">AI matches offers to your account and alerts you instantly. Buy via the deal link, post a review on SNS, and get <strong>100% of your purchase back</strong>. First-come limited; 8% fee deducted on payout.</div>
       </div>
       <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-q"><div class="faq-q-text">무료 체험 후 자동으로 결제되나요?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="faq-body">7일 무료 체험 기간 중에는 카드 등록 없이 시작할 수 있어요. 체험 종료 3일 전 카카오톡으로 알림을 드리며, 체험 기간 안에 취소하면 요금이 청구되지 않아요.</div>
+        <div class="faq-q"><div class="faq-q-text">Will I get charged after the trial?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="faq-body">Start the 7-day trial with no card required. We notify you 3 days before trial ends. Cancel before then and no charge.</div>
       </div>
       <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-q"><div class="faq-q-text">TikTok 댓글도 자동으로 응대해주나요?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="faq-body">현재 TikTok은 공식 API 정책상 댓글 답글 기능을 외부 앱에 제공하지 않아요. TikTok에서는 영상 업로드 자동화와 댓글 모니터링은 가능해요. Instagram과 YouTube는 댓글 자동 응대가 완전히 지원돼요.</div>
+        <div class="faq-q"><div class="faq-q-text">Does Ssobi auto-reply to TikTok comments?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="faq-body">TikTok's official API doesn't expose comment-reply to third-party apps. We can automate uploads and monitor comments on TikTok. Instagram and YouTube auto-replies are fully supported.</div>
       </div>
       <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-q"><div class="faq-q-text">팔로워가 적어도 효과가 있나요?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="faq-body">오히려 팔로워가 적을 때 더 효과적이에요. 빠른 댓글 응대는 알고리즘이 선호하는 지표고, 트렌드 기반 카드뉴스가 노출을 키워줘요. 팔로워 1만 계정도 성장 속도가 달라져요.</div>
+        <div class="faq-q"><div class="faq-q-text">Does it work with small followings?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="faq-body">Especially well. Fast replies are a metric the algorithm loves, and trend-based card news boosts reach. Even at 10K, growth pace changes.</div>
       </div>
       <div class="faq-item" onclick="toggleFaq(this)">
-        <div class="faq-q"><div class="faq-q-text">언제든 취소할 수 있나요?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-        <div class="faq-body">네. 앱 내 내 정보 → 이용권에서 언제든 취소할 수 있어요. 취소 후에는 현재 결제 기간이 끝날 때까지 서비스를 계속 이용할 수 있어요. 위약금은 없어요.</div>
+        <div class="faq-q"><div class="faq-q-text">Can I cancel anytime?</div><svg class="faq-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--ink3)" stroke-width="2"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        <div class="faq-body">Yes. Cancel anytime from My Info → Plan. Service continues until your current billing period ends. No cancellation fees.</div>
       </div>
     </div>
   </div>
@@ -1250,11 +1253,11 @@ body{top:0!important}
 
 <!-- FINAL CTA -->
 <section class="final-sec fade-in">
-  <h2 class="final-title">내가 자는 동안<br><em>SNS는 자랍니다.</em></h2>
-  <p class="final-sub">7일 무료 체험. 카드 등록 없음. 언제든 취소 가능.</p>
-  <button class="btn-final" onclick="startPremium()">7일 무료 체험 시작하기</button>
+  <h2 class="final-title">While you sleep,<br><em>your SNS grows.</em></h2>
+  <p class="final-sub">7-day trial. No card required. Cancel anytime.</p>
+  <button class="btn-final" onclick="startPremium()">Start 7-day free trial</button>
   <div class="cta-note">
-    <span>공식 파트너 API</span><div class="cta-dot"></div><span>1분 설정</span><div class="cta-dot"></div><span>즉시 시작</span>
+    <span>Official Partner APIs</span><div class="cta-dot"></div><span>1-minute setup</span><div class="cta-dot"></div><span>Instant access</span>
   </div>
 </section>
 
@@ -1263,12 +1266,12 @@ body{top:0!important}
   <div class="footer-inner">
     <div>
       <div class="footer-logo">Ssobi<em>.</em></div>
-      <div class="footer-info">(주)공팔리터글로벌 · 411-87-02704 · <a href="mailto:repli@08liter.com" style="color:var(--ink3);text-decoration:none">repli@08liter.com</a></div>
+      <div class="footer-info">0.8L Global Corp. · <a href="mailto:repli@08liter.com" style="color:var(--ink3);text-decoration:none">repli@08liter.com</a></div>
     </div>
     <div class="footer-right">
       <div class="footer-links">
-        <a href="/terms">이용약관</a>
-        <a href="/privacy">개인정보처리방침</a>
+        <a href="/terms">Terms</a>
+        <a href="/privacy">Privacy</a>
       </div>
       <div class="footer-copy">© 2026 0.8L Global</div>
     </div>
@@ -1277,7 +1280,7 @@ body{top:0!important}
 
 <!-- STICKY (mobile) -->
 <div class="sticky-bottom" id="sticky">
-  <button class="btn-sticky" onclick="startPremium()">7일 무료 체험 시작하기</button>
+  <button class="btn-sticky" onclick="startPremium()">Start 7-day free trial</button>
 </div>
 
 <script>
@@ -1310,14 +1313,13 @@ function startStarter() { window.location.href = '/app?plan=basic'; }
 function startPremium() { window.location.href = '/app?plan=premium'; }
 function startTeam() { window.location.href = '/app?plan=business'; }
 
-// 가격표 통화 분기 — KRW/USD 토글
-//   ko-* 브라우저는 기본 KRW, 그 외는 USD. 사용자 선택은 localStorage 에 영속화.
+// Currency toggle — KRW/USD. EN page defaults to USD.
 function ssobiGetCurrency(){
   try {
     var stored = localStorage.getItem('ssobi_currency');
     if(stored === 'KRW' || stored === 'USD') return stored;
   } catch(_){}
-  return (navigator.language || '').toLowerCase().indexOf('ko') === 0 ? 'KRW' : 'USD';
+  return 'USD';
 }
 function applyCurrency(cur){
   if(cur !== 'KRW' && cur !== 'USD') cur = 'KRW';
@@ -1330,8 +1332,8 @@ function applyCurrency(cur){
       amount.textContent = usd === 0 ? 'Free' : '$' + usd.toFixed(2);
       suffix.textContent = usd === 0 ? '' : ' / mo';
     } else {
-      amount.textContent = krw === 0 ? '무료' : '₩' + krw.toLocaleString();
-      suffix.textContent = krw === 0 ? '' : ' / 월';
+      amount.textContent = krw === 0 ? 'Free' : '₩' + krw.toLocaleString();
+      suffix.textContent = krw === 0 ? '' : ' / mo';
     }
   });
   document.querySelectorAll('.curr-pill').forEach(function(p){
@@ -1341,7 +1343,7 @@ function applyCurrency(cur){
 }
 document.addEventListener('DOMContentLoaded', function(){ applyCurrency(ssobiGetCurrency()); });
 
-// 언어 선택 — KO/EN. / (한국어) ↔ /en (영문) 페이지 전환
+// Language selection — KO/EN. Navigate between / (Korean) and /en (English).
 function toggleLangMenu(){
   document.getElementById('lang-menu').classList.toggle('on');
 }
@@ -1353,32 +1355,6 @@ function setLang(lang){
   if(lang === 'ko') window.location.href = '/';
   else if(lang === 'en') window.location.href = '/en';
 }
-// 브라우저 언어 자동 감지 (최초 1회) — 영어 사용자에게 영문 페이지 권유
-(function(){
-  try {
-    if(localStorage.getItem('ssobi_lang_checked')) return;
-    var nav = (navigator.language||'ko').slice(0,2);
-    if(nav !== 'ko'){
-      var bar = document.createElement('div');
-      bar.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#1A1F27;color:#fff;padding:12px 18px;border-radius:100px;font-size:13px;font-weight:700;box-shadow:0 10px 30px rgba(0,0,0,.25);z-index:200;display:flex;align-items:center;gap:10px;max-width:92vw;font-family:Pretendard,sans-serif';
-      var label = document.createElement('span');
-      label.textContent = 'View in English?';
-      var btn = document.createElement('button');
-      btn.textContent = 'Switch';
-      btn.style.cssText = 'background:#00C896;color:#fff;border:none;padding:6px 12px;border-radius:100px;font-weight:800;cursor:pointer;font-size:12px;font-family:inherit';
-      btn.onclick = function(){ setLang('en'); };
-      var close = document.createElement('button');
-      close.textContent = '✕';
-      close.style.cssText = 'background:none;border:none;color:rgba(255,255,255,.6);cursor:pointer;font-size:16px;padding:0;line-height:1';
-      close.onclick = function(){ bar.remove(); localStorage.setItem('ssobi_lang_checked','1'); };
-      bar.appendChild(label);
-      bar.appendChild(btn);
-      bar.appendChild(close);
-      document.body.appendChild(bar);
-    }
-    localStorage.setItem('ssobi_lang_checked','1');
-  } catch(e){}
-})();
 
 // 폰 캐러셀
 var phoneCarousel = document.getElementById('phone-carousel');

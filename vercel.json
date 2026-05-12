@@ -31,6 +31,7 @@
   ],
   "rewrites": [
     { "source": "/", "destination": "/landing.html" },
+    { "source": "/en", "destination": "/landing-en.html" },
     { "source": "/terms", "destination": "/terms.html" },
     { "source": "/privacy", "destination": "/terms.html?tab=privacy" },
     { "source": "/app", "destination": "/app.html" }
@@ -38,6 +39,7 @@
   "redirects": [
     { "source": "/app.html", "destination": "/app", "permanent": true },
     { "source": "/landing.html", "destination": "/", "permanent": true },
+    { "source": "/landing-en.html", "destination": "/en", "permanent": true },
     { "source": "/landing", "destination": "/", "permanent": true },
     {
       "source": "/(.*)",
