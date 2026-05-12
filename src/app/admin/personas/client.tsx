@@ -206,7 +206,7 @@ export default function PersonasClient() {
       ) : (
         <div className="space-y-3">
           {personas.map((p) => (
-            <div key={p.id} className="rounded-2xl bg-white/[0.03] border border-white/5 p-5">
+            <a key={p.id} href={`/admin/personas/${p.id}`} className="block rounded-2xl bg-white/[0.03] border border-white/5 p-5 hover:bg-white/[0.05] hover:border-white/10 transition cursor-pointer">
               <div className="flex items-start justify-between gap-4 mb-3 flex-wrap">
                 <div>
                   <div className="flex items-center gap-2 mb-1">
@@ -222,10 +222,7 @@ export default function PersonasClient() {
                     </a>
                   )}
                 </div>
-                <button onClick={() => generateDrafts(p.id)}
-                  className="bg-white/10 hover:bg-white/20 text-white font-semibold px-3 py-2 rounded-lg text-[12px] transition shrink-0">
-                  + draft 생성
-                </button>
+                <span className="text-[11px] text-white/40 shrink-0">설정 →</span>
               </div>
               <div className="flex flex-wrap gap-2 text-[10.5px]">
                 {p.channels.map((c) => (
@@ -240,7 +237,7 @@ export default function PersonasClient() {
                 </span>
                 <span>매일 {p.daily_draft_count}개 자동 생성</span>
               </div>
-            </div>
+            </a>
           ))}
         </div>
       )}
