@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { createClient } from '@/lib/supabase/client'
 
 type ChannelKey = 'instagram' | 'threads' | 'facebook' | 'x'
 
@@ -58,9 +59,18 @@ export default function MarketingClient() {
 
   useEffect(() => { loadPosts() }, [])
 
+  // app.html 의 localStorage 세션을 Bearer 헤더로 전달 (SSR 쿠키 우회)
+  async function authHeaders(): Promise<HeadersInit> {
+    const sb = createClient()
+    const { data } = await sb.auth.getSession()
+    const token = data.session?.access_token
+    return token ? { Authorization: `Bearer ${token}` } : {}
+  }
+
   async function loadPosts() {
     try {
-      const res = await fetch('/api/admin/marketing')
+      const h = await authHeaders()
+      const res = await fetch('/api/admin/marketing', { headers: h })
       if (!res.ok) return
       const j = await res.json()
       setPosts(j.posts || [])
@@ -103,9 +113,10 @@ export default function MarketingClient() {
 
     setLoading(true); setMsg(null)
     try {
+      const h = await authHeaders()
       const res = await fetch('/api/admin/marketing', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', ...h },
         body: JSON.stringify({
           content,
           image_urls: imageUrls,
@@ -125,7 +136,8 @@ export default function MarketingClient() {
 
   async function remove(id: string) {
     if (!confirm('이 글 삭제할까?')) return
-    await fetch(`/api/admin/marketing?id=${id}`, { method: 'DELETE' })
+    const h = await authHeaders()
+    await fetch(`/api/admin/marketing?id=${id}`, { method: 'DELETE', headers: h })
     await loadPosts()
   }
 

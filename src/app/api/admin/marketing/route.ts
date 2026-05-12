@@ -1,14 +1,22 @@
 import { createClient as createAdminClient } from '@supabase/supabase-js'
-import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { getUserFromRequest } from '@/lib/auth-helper'
 import { isAdminEmail } from '@/lib/admin'
 import { CHANNEL_SPECS, type ChannelKey, validatePayload } from '@/lib/marketing-publishers'
 
-async function assertAdmin() {
-  const sb = await createClient()
-  const { data: { user } } = await sb.auth.getUser()
-  if (!user || !isAdminEmail(user.email)) return null
-  return user
+// Bearer 토큰 (app.html localStorage 세션) + 쿠키 (Next.js SSR) 둘 다 지원
+async function assertAdmin(req: Request) {
+  const u = await getUserFromRequest(req)
+  if (!u) return null
+  // 이메일 조회 — admin client 로 auth.users 에서
+  const sb = createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } }
+  )
+  const { data } = await sb.auth.admin.getUserById(u.id)
+  if (!data?.user || !isAdminEmail(data.user.email)) return null
+  return data.user
 }
 
 function admin() {
@@ -19,8 +27,8 @@ function admin() {
 }
 
 // GET — 최근 마케팅 글 목록
-export async function GET() {
-  const u = await assertAdmin()
+export async function GET(req: NextRequest) {
+  const u = await assertAdmin(req)
   if (!u) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const { data } = await admin()
@@ -34,7 +42,7 @@ export async function GET() {
 
 // POST — 새 마케팅 글 큐 등록
 export async function POST(req: NextRequest) {
-  const u = await assertAdmin()
+  const u = await assertAdmin(req)
   if (!u) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const body = await req.json()
@@ -70,7 +78,7 @@ export async function POST(req: NextRequest) {
 
 // DELETE — pending 또는 실패글 삭제
 export async function DELETE(req: NextRequest) {
-  const u = await assertAdmin()
+  const u = await assertAdmin(req)
   if (!u) return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
 
   const id = req.nextUrl.searchParams.get('id')
