@@ -11993,12 +11993,33 @@ function lkeEditGridCard(blockIdx, cardIdx){
     '<div style="display:flex;gap:6px;margin-bottom:14px">'+
       [['cream','#F5EDD8→#D4B896'],['coral','#A7F3D0→#00C896'],['pink','#FFE8DC→#FFB098'],['dark','#374151→#1A1F27']].map(function(p){ return '<button onclick="lkeCardImg('+blockIdx+','+cardIdx+',\''+p[0]+'\')" style="flex:1;height:36px;border-radius:6px;border:2px solid '+((it.img||'cream')===p[0]?'var(--mint)':'transparent')+';background:'+({cream:'linear-gradient(135deg,#F5EDD8,#D4B896)',coral:'linear-gradient(135deg,#A7F3D0,#00C896)',pink:'linear-gradient(135deg,#FFE8DC,#FFB098)',dark:'linear-gradient(135deg,#374151,#1A1F27)'}[p[0]])+';cursor:pointer"></button>'; }).join('')+
     '</div>'+
-    '<div style="display:flex;gap:8px;margin-top:14px">'+
-      '<button class="lke-top-btn danger" onclick="lkeGridDelCard('+blockIdx+','+cardIdx+')">삭제</button>'+
-      '<button class="lke-top-btn" style="flex:1" onclick="lkeCloseSheet()"><span data-i18n="btn.cancel">취소</span></button>'+
-      '<button class="lke-top-btn primary" style="flex:2" onclick="lkeSaveGridCard('+blockIdx+','+cardIdx+')"><span data-i18n="btn.save">저장</span></button>'+
-    '</div>';
+    '';
   body.innerHTML=html;
+  // 하단 고정 액션바 — 일반 블록 편집과 동일 구조 (safe-area 대응 + sticky)
+  var actionBar = document.getElementById('lke-edit-action-bar');
+  if(!actionBar){
+    actionBar = document.createElement('div');
+    actionBar.id = 'lke-edit-action-bar';
+    actionBar.className = 'lke-edit-action-bar';
+    document.getElementById('lke-sheet-edit').appendChild(actionBar);
+  }
+  // 기존 자식 비우고 버튼 DOM 으로 직접 추가 (XSS hook 회피)
+  while(actionBar.firstChild) actionBar.removeChild(actionBar.firstChild);
+  var btnDel = document.createElement('button');
+  btnDel.className='lke-top-btn danger'; btnDel.textContent='삭제';
+  btnDel.onclick = function(){ lkeGridDelCard(blockIdx, cardIdx); };
+  var btnCancel = document.createElement('button');
+  btnCancel.className='lke-top-btn'; btnCancel.style.flex='1';
+  btnCancel.innerHTML = '<span data-i18n="btn.cancel">취소</span>';
+  btnCancel.onclick = function(){ lkeCloseSheet(); };
+  var btnSave = document.createElement('button');
+  btnSave.className='lke-top-btn primary'; btnSave.style.flex='2';
+  btnSave.innerHTML = '<span data-i18n="btn.save">저장</span>';
+  btnSave.onclick = function(){ lkeSaveGridCard(blockIdx, cardIdx); };
+  actionBar.appendChild(btnDel);
+  actionBar.appendChild(btnCancel);
+  actionBar.appendChild(btnSave);
+  if(typeof applyI18n === 'function' && typeof ssobiCurrentLang !== 'undefined') applyI18n(ssobiCurrentLang);
   lkeOpenSheet('edit');
 }
 // 카드 입력값 commit (재렌더 전에 호출 — 종류/태그 변경 시 타이핑 안 잃게)
