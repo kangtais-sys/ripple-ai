@@ -10614,6 +10614,17 @@ function lkeField(label, type, id, val, noMargin){
     '<'+tag+' '+typeAttr+' class="lke-field-input" id="'+id+'"'+attrs+'>'+inner+'</'+tag+'>'+
   '</div>';
 }
+// lkeField + 실시간 핸들러 (oninput state 동기화)
+function lkeFieldLive(label, type, id, val, extraAttrs, noMargin){
+  var typeAttr = type==='textarea' ? '' : 'type="'+type+'"';
+  var tag = type==='textarea' ? 'textarea' : 'input';
+  var inner = type==='textarea' ? (val||'') : '';
+  var attrs = type==='textarea' ? '' : ' value="'+((val||'')+'').replace(/"/g,'&quot;')+'"';
+  return '<div class="lke-field-group"'+(noMargin?' style="margin-bottom:6px"':'')+'>'+
+    '<div class="lke-field-label">'+label+'</div>'+
+    '<'+tag+' '+typeAttr+' class="lke-field-input" id="'+id+'"'+attrs+(extraAttrs||'')+'>'+inner+'</'+tag+'>'+
+  '</div>';
+}
 function lkeSaveBlock(idx){
   var b=lkeState.blocks[idx];
   function v(id){ var el=document.getElementById(id); return el?el.value:undefined; }
@@ -11946,6 +11957,10 @@ function lkeEditGridCard(blockIdx, cardIdx){
   var title=document.getElementById('lke-edit-title');
   var body=document.getElementById('lke-edit-body');
   title.textContent='카드 '+(cardIdx+1)+' 편집';
+  // 실시간 state 반영용 inline handler — IME 합성·blur race 문제 회피
+  function liveAttr(key){
+    return ' oninput="lkeState.blocks['+blockIdx+'].items['+cardIdx+'].'+key+'=this.value;lkeSyncToServer()"';
+  }
   var html='<div class="lke-field-label">종류</div>'+
     '<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">'+
       ['product','channel','content','service'].map(function(k){
@@ -11953,10 +11968,11 @@ function lkeEditGridCard(blockIdx, cardIdx){
         return '<button onclick="lkeGridKindOnly('+blockIdx+','+cardIdx+',\''+k+'\')" style="flex:1;min-width:80px;padding:9px;border-radius:8px;border:1px solid var(--b);background:'+(it.kind===k||(!it.kind&&k==="product")?'var(--mint)':'#fff')+';color:'+(it.kind===k||(!it.kind&&k==="product")?'#fff':'var(--t2)')+';font-size:12px;font-weight:700;cursor:pointer">'+lbl+'</button>';
       }).join('')+
     '</div>'+
-    lkeField('제목','text','ci-title',it.title)+
-    lkeField('시간','text','ci-date',it.date);
+    lkeFieldLive('제목','text','ci-title',it.title, liveAttr('title'))+
+    lkeFieldLive('시간','text','ci-date',it.date, liveAttr('date'));
   if(it.kind==='product'||!it.kind){
-    html += lkeField('판매가','text','ci-price',it.price)+lkeField('원가 (취소선)','text','ci-orig',it.origPrice);
+    html += lkeFieldLive('판매가','text','ci-price',it.price, liveAttr('price'))+
+            lkeFieldLive('원가 (취소선)','text','ci-orig',it.origPrice, liveAttr('origPrice'));
   }
   html += '<div class="lke-field-label">태그</div>'+
     '<div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">'+
@@ -11970,7 +11986,7 @@ function lkeEditGridCard(blockIdx, cardIdx){
       '<label style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t3);font-weight:600">배경<input type="color" id="ci-tagBg" value="'+(it.tagBg||'#1A1F27')+'" oninput="lkeState.blocks['+blockIdx+'].items['+cardIdx+'].tagBg=this.value;lkeRender()" style="width:24px;height:20px;border:none;background:none;cursor:pointer;padding:0"></label>'+
       '<label style="display:flex;align-items:center;gap:4px;font-size:10px;color:var(--t3);font-weight:600">글자<input type="color" id="ci-tagColor" value="'+(it.tagColor||'#FFFFFF')+'" oninput="lkeState.blocks['+blockIdx+'].items['+cardIdx+'].tagColor=this.value;lkeRender()" style="width:24px;height:20px;border:none;background:none;cursor:pointer;padding:0"></label>'+
     '</div>' : '')+
-    lkeField('URL','url','ci-url',it.url)+
+    lkeFieldLive('URL','url','ci-url',it.url, liveAttr('url'))+
     '<div class="lke-field-label">썸네일 이미지</div><label style="display:block;margin-bottom:10px"><input type="file" accept="image/*" onchange="lkeCardImageUpload('+blockIdx+','+cardIdx+',this)" style="display:none"><div style="padding:10px;border:1.5px dashed #D6D3D1;text-align:center;font-size:12px;font-weight:700;color:var(--t2);cursor:pointer;border-radius:6px">'+(it.thumbImg?'이미지 변경 ✓':'사진 선택')+'</div></label>'+
     (it.thumbImg ? '<button type="button" onclick="lkeOpenImgPosPicker(\'griditem\',\''+blockIdx+'_'+cardIdx+'\')" style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:var(--bg);border:1px solid var(--b);border-radius:8px;font-size:12px;font-weight:700;color:var(--t1);cursor:pointer;font-family:\'Pretendard\',sans-serif;margin-bottom:10px"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4" stroke-linecap="round"/></svg>이미지 위치 조정</button>' : '')+
     '<div class="lke-field-label">썸네일 배경 (이미지 없을 때)</div>'+
@@ -12018,7 +12034,12 @@ function lkeGridDelCard(bIdx, cIdx){
 }
 function lkeSaveGridCard(bIdx, cIdx){
   lkeCommitGridCardInputs(bIdx, cIdx);
-  lkeRender(); lkeCloseSheet();
+  lkeRender();
+  // 디바운스 우회 — 저장 클릭 시 즉시 서버 sync (탭 닫기/뒤로가기 race 방지)
+  if(typeof _lkeSyncNow === 'function'){
+    try { _lkeSyncNow(); } catch(_) {}
+  }
+  lkeCloseSheet();
 }
 
 // 시트 내 상호작용
