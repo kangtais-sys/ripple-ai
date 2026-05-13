@@ -31,13 +31,16 @@ export async function GET(req: NextRequest) {
       .eq('generation_status', 'completed').gte('created_at', startOfMonth),
   ])
 
-  return NextResponse.json({
-    email: ud.user.email,
-    usage: {
-      cardnews_jobs_this_month: cardnewsRes.count || 0,
-      reply_logs_this_month: repliesRes.count || 0,
-      higgsfield_assets_this_month: assetsRes.count || 0,
-      higgsfield_credits_balance: null,
+  return NextResponse.json(
+    {
+      email: ud.user.email,
+      usage: {
+        cardnews_jobs_this_month: cardnewsRes.count || 0,
+        reply_logs_this_month: repliesRes.count || 0,
+        higgsfield_assets_this_month: assetsRes.count || 0,
+        higgsfield_credits_balance: null,
+      },
     },
-  })
+    { headers: { 'Cache-Control': 'private, max-age=60' } }
+  )
 }

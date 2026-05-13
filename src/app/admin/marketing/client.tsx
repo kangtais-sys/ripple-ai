@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-// app.html 과 동일한 localStorage 기반 supabase-js 사용
 import { createClient } from '@supabase/supabase-js'
 
 const sb = createClient(
@@ -39,17 +38,20 @@ interface Post {
   created_at: string
   persona_id?: string | null
   topic_pillar?: string | null
+  short_code?: string | null
+  click_count?: number
+  signup_count?: number
 }
 
 function statusBadge(status: string) {
   const map: Record<string, { bg: string; fg: string; label: string }> = {
-    draft:      { bg: 'bg-violet-500/15', fg: 'text-violet-300', label: 'draft' },
-    pending:    { bg: 'bg-amber-500/10',  fg: 'text-amber-300',  label: '대기' },
-    publishing: { bg: 'bg-blue-500/10',   fg: 'text-blue-300',   label: '발행중' },
-    published:  { bg: 'bg-emerald-500/10',fg: 'text-emerald-300',label: '발행됨' },
-    partial:    { bg: 'bg-orange-500/10', fg: 'text-orange-300', label: '부분 성공' },
-    failed:     { bg: 'bg-red-500/10',    fg: 'text-red-300',    label: '실패' },
-    cancelled:  { bg: 'bg-white/10',      fg: 'text-white/40',   label: '취소' },
+    draft:      { bg: 'bg-violet-50',  fg: 'text-violet-700',  label: 'draft' },
+    pending:    { bg: 'bg-amber-50',   fg: 'text-amber-700',   label: '대기' },
+    publishing: { bg: 'bg-blue-50',    fg: 'text-blue-700',    label: '발행중' },
+    published:  { bg: 'bg-emerald-50', fg: 'text-emerald-700', label: '발행됨' },
+    partial:    { bg: 'bg-orange-50',  fg: 'text-orange-700',  label: '부분 성공' },
+    failed:     { bg: 'bg-red-50',     fg: 'text-red-700',     label: '실패' },
+    cancelled:  { bg: 'bg-gray-100',   fg: 'text-gray-500',    label: '취소' },
   }
   const s = map[status] || map.pending
   return <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${s.bg} ${s.fg} uppercase tracking-wider`}>{s.label}</span>
@@ -65,10 +67,10 @@ export default function MarketingClient() {
   const [posts, setPosts] = useState<Post[]>([])
   const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState<string | null>(null)
+  const [advancedMode, setAdvancedMode] = useState(false)  // URL 입력은 수동 모드에서만
 
   useEffect(() => { loadPosts() }, [])
 
-  // app.html 의 localStorage 세션을 Bearer 헤더로 전달 (SSR 쿠키 우회)
   async function authHeaders(): Promise<HeadersInit> {
     const { data } = await sb.auth.getSession()
     const token = data.session?.access_token
@@ -107,7 +109,6 @@ export default function MarketingClient() {
     if (!content.trim()) { setMsg('본문을 입력해주세요'); return }
     if (channels.size === 0) { setMsg('채널을 1개 이상 선택'); return }
 
-    // 채널별 길이 체크
     for (const ch of channels) {
       const info = CHANNELS.find(c => c.key === ch)
       if (!info) continue
@@ -152,31 +153,38 @@ export default function MarketingClient() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-black tracking-tight mb-1">마케팅 발행</h1>
-        <p className="text-[13px] text-white/50">Ssobi 공식 SNS 채널 자동 발행 · 5분마다 큐 처리</p>
+        <h1 className="text-2xl font-black tracking-tight mb-1">콘텐츠 큐</h1>
+        <p className="text-[13px] text-gray-500">페르소나 자동 생성 + 수동 작성. 5분마다 큐 처리 후 발행</p>
       </div>
 
-      {/* 작성 폼 */}
-      <section className="rounded-2xl bg-white/[0.03] border border-white/5 p-6 space-y-4">
-        <h2 className="text-[13px] font-bold uppercase tracking-wider text-white/60">새 게시물</h2>
+      <section className="rounded-2xl bg-white border border-gray-200 p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-[13px] font-bold uppercase tracking-wider text-gray-600">수동 작성</h2>
+          <button
+            onClick={() => setAdvancedMode(!advancedMode)}
+            className="text-[11px] text-gray-500 hover:text-[#1A1F27] font-medium"
+          >
+            {advancedMode ? '간단 모드로' : '고급 모드 (URL 직접 입력)'}
+          </button>
+        </div>
 
         <div>
           <div className="flex justify-between mb-2">
-            <label className="text-[12px] font-semibold text-white/70">본문</label>
-            <span className="text-[11px] text-white/40">{content.length}자</span>
+            <label className="text-[12px] font-semibold text-gray-700">본문</label>
+            <span className="text-[11px] text-gray-500">{content.length}자</span>
           </div>
           <textarea
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="이번 주 Ssobi 핵심 메시지..."
             rows={6}
-            className="w-full bg-black/30 border border-white/10 rounded-lg px-4 py-3 text-[14px] text-white placeholder-white/30 focus:border-[#00C896] focus:outline-none resize-y"
+            className="w-full bg-white border border-gray-300 rounded-lg px-4 py-3 text-[14px] text-[#1A1F27] placeholder-gray-400 focus:border-[#00C896] focus:outline-none resize-y"
           />
           <div className="mt-1.5 flex flex-wrap gap-2 text-[10.5px]">
             {CHANNELS.filter(c => channels.has(c.key)).map(c => {
               const over = content.length > c.maxChars
               return (
-                <span key={c.key} className={`px-2 py-0.5 rounded ${over ? 'bg-red-500/15 text-red-300' : 'bg-white/5 text-white/50'}`}>
+                <span key={c.key} className={`px-2 py-0.5 rounded ${over ? 'bg-red-50 text-red-700' : 'bg-gray-100 text-gray-500'}`}>
                   {c.label} {content.length}/{c.maxChars}
                 </span>
               )
@@ -184,30 +192,52 @@ export default function MarketingClient() {
           </div>
         </div>
 
+        {/* 이미지 — 간단 모드에선 썸네일만, 고급 모드에서만 URL 입력 */}
         <div>
-          <label className="text-[12px] font-semibold text-white/70 mb-2 block">이미지 URL</label>
-          <div className="flex gap-2 mb-2">
-            <input
-              value={imageInput}
-              onChange={(e) => setImageInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addImage() } }}
-              placeholder="https://..."
-              className="flex-1 bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-[13px] text-white placeholder-white/30 focus:border-[#00C896] focus:outline-none"
-            />
-            <button onClick={addImage} className="bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg text-[12px] font-semibold transition">추가</button>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-[12px] font-semibold text-gray-700">이미지</label>
+            {!advancedMode && (
+              <span className="text-[10.5px] text-gray-400">자동 생성 (페르소나 파이프라인)</span>
+            )}
           </div>
-          <div className="space-y-1.5">
-            {imageUrls.map((u, i) => (
-              <div key={i} className="flex items-center gap-2 text-[12px] text-white/60 bg-black/20 rounded-lg px-3 py-1.5">
-                <span className="flex-1 truncate">{u}</span>
-                <button onClick={() => removeImage(i)} className="text-red-400 hover:text-red-300">✕</button>
+          {advancedMode && (
+            <div className="flex gap-2 mb-2">
+              <input
+                value={imageInput}
+                onChange={(e) => setImageInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); addImage() } }}
+                placeholder="https://..."
+                className="flex-1 bg-white border border-gray-300 rounded-lg px-3 py-2 text-[13px] text-[#1A1F27] placeholder-gray-400 focus:border-[#00C896] focus:outline-none"
+              />
+              <button onClick={addImage} className="bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-[12px] font-semibold text-gray-700 transition">추가</button>
+            </div>
+          )}
+          {imageUrls.length > 0 ? (
+            <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+              {imageUrls.map((u, i) => (
+                <div key={i} className="relative aspect-square rounded-lg overflow-hidden border border-gray-200">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={u} alt={`img-${i}`} className="w-full h-full object-cover" />
+                  <button
+                    onClick={() => removeImage(i)}
+                    className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/60 hover:bg-black/80 text-white text-[10px] font-bold flex items-center justify-center"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            !advancedMode && (
+              <div className="text-[11.5px] text-gray-400 py-4 text-center border border-dashed border-gray-300 rounded-lg">
+                이미지 없음 · 페르소나 자동 파이프라인이 채워줍니다
               </div>
-            ))}
-          </div>
+            )
+          )}
         </div>
 
         <div>
-          <label className="text-[12px] font-semibold text-white/70 mb-2 block">채널</label>
+          <label className="text-[12px] font-semibold text-gray-700 mb-2 block">채널</label>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
             {CHANNELS.map(c => {
               const on = channels.has(c.key)
@@ -215,10 +245,10 @@ export default function MarketingClient() {
                 <button
                   key={c.key}
                   onClick={() => toggleChannel(c.key)}
-                  className={`text-left px-3 py-2.5 rounded-lg border transition ${on ? 'border-[#00C896] bg-[#00C896]/10' : 'border-white/10 bg-black/20 hover:border-white/20'}`}
+                  className={`text-left px-3 py-2.5 rounded-lg border transition ${on ? 'border-[#00C896] bg-[#00C896]/10' : 'border-gray-300 bg-white hover:border-gray-400'}`}
                 >
-                  <div className={`text-[13px] font-bold ${on ? 'text-[#00C896]' : 'text-white/80'}`}>{c.label}</div>
-                  <div className="text-[10.5px] text-white/40 mt-0.5">{c.note}</div>
+                  <div className={`text-[13px] font-bold ${on ? 'text-[#00C896]' : 'text-gray-700'}`}>{c.label}</div>
+                  <div className="text-[10.5px] text-gray-500 mt-0.5">{c.note}</div>
                 </button>
               )
             })}
@@ -226,7 +256,7 @@ export default function MarketingClient() {
         </div>
 
         <div>
-          <label className="text-[12px] font-semibold text-white/70 mb-2 block">발행 시각</label>
+          <label className="text-[12px] font-semibold text-gray-700 mb-2 block">발행 시각</label>
           <div className="flex items-center gap-3 mb-2">
             <label className="flex items-center gap-1.5 text-[12px] cursor-pointer">
               <input type="radio" checked={scheduleNow} onChange={() => setScheduleNow(true)} />
@@ -242,12 +272,12 @@ export default function MarketingClient() {
               type="datetime-local"
               value={scheduledAt}
               onChange={(e) => setScheduledAt(e.target.value)}
-              className="bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-[13px] text-white focus:border-[#00C896] focus:outline-none"
+              className="bg-white border border-gray-300 rounded-lg px-3 py-2 text-[13px] text-[#1A1F27] focus:border-[#00C896] focus:outline-none"
             />
           )}
         </div>
 
-        {msg && <div className="text-[12.5px] text-amber-300 bg-amber-500/10 border border-amber-500/20 rounded-lg px-4 py-2">{msg}</div>}
+        {msg && <div className="text-[12.5px] text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-4 py-2">{msg}</div>}
 
         <button
           onClick={submit}
@@ -258,21 +288,20 @@ export default function MarketingClient() {
         </button>
       </section>
 
-      {/* 목록 + 상태 필터 */}
       <MarketingList posts={posts} onChange={loadPosts} onRemove={remove} />
     </div>
   )
 }
 
 function MarketingList({ posts, onChange, onRemove }: { posts: Post[]; onChange: () => Promise<void> | void; onRemove: (id: string) => Promise<void> | void }) {
+  const [view, setView] = useState<'list' | 'calendar'>('list')
   const [filter, setFilter] = useState<'all' | 'draft' | 'pending' | 'published' | 'failed'>('all')
 
   async function approve(id: string, scheduleNow: boolean) {
-    const sb = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
-    const { data } = await sb.auth.getSession()
+    const sbLocal = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!)
+    const { data } = await sbLocal.auth.getSession()
     const token = data.session?.access_token
     if (!token) { alert('세션 만료'); return }
-    // status='pending' + scheduled_at 갱신 — REST API 직접
     const res = await fetch(`${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/marketing_posts?id=eq.${id}`, {
       method: 'PATCH',
       headers: {
@@ -302,68 +331,282 @@ function MarketingList({ posts, onChange, onRemove }: { posts: Post[]; onChange:
   return (
     <section>
       <div className="flex items-end justify-between gap-3 flex-wrap mb-3">
-        <h2 className="text-[13px] font-bold uppercase tracking-wider text-white/60">큐 ({posts.length})</h2>
-        <div className="flex gap-1 text-[11.5px]">
-          {(['all', 'draft', 'pending', 'published', 'failed'] as const).map((k) => (
-            <button key={k} onClick={() => setFilter(k)}
-              className={`px-3 py-1.5 rounded-lg font-semibold transition ${filter === k ? 'bg-[#00C896] text-white' : 'bg-white/5 text-white/50 hover:text-white'}`}>
-              {k === 'all' ? '전체' : k === 'draft' ? `draft (${counts.draft})` : k} {filter !== k && counts[k] > 0 ? `(${counts[k]})` : ''}
+        <h2 className="text-[13px] font-bold uppercase tracking-wider text-gray-600">큐 ({posts.length})</h2>
+        <div className="flex items-center gap-2">
+          <div className="flex bg-gray-100 rounded-lg p-0.5 text-[11.5px]">
+            <button onClick={() => setView('list')}
+              className={`px-3 py-1 rounded-md font-semibold transition ${view === 'list' ? 'bg-white text-[#1A1F27] shadow-sm' : 'text-gray-500'}`}>
+              리스트
             </button>
-          ))}
+            <button onClick={() => setView('calendar')}
+              className={`px-3 py-1 rounded-md font-semibold transition ${view === 'calendar' ? 'bg-white text-[#1A1F27] shadow-sm' : 'text-gray-500'}`}>
+              캘린더
+            </button>
+          </div>
+          {view === 'list' && (
+            <div className="flex gap-1 text-[11.5px]">
+              {(['all', 'draft', 'pending', 'published', 'failed'] as const).map((k) => (
+                <button key={k} onClick={() => setFilter(k)}
+                  className={`px-3 py-1.5 rounded-lg font-semibold transition ${filter === k ? 'bg-[#00C896] text-white' : 'bg-white border border-gray-200 text-gray-500 hover:text-[#1A1F27]'}`}>
+                  {k === 'all' ? '전체' : k === 'draft' ? `draft (${counts.draft})` : k} {filter !== k && counts[k] > 0 ? `(${counts[k]})` : ''}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
-      {filtered.length === 0 ? (
-        <div className="text-[13px] text-white/40 py-8 text-center border border-dashed border-white/10 rounded-2xl">
+
+      {view === 'calendar' ? (
+        <CalendarView posts={posts} />
+      ) : filtered.length === 0 ? (
+        <div className="text-[13px] text-gray-400 py-8 text-center border border-dashed border-gray-300 rounded-2xl">
           {filter === 'draft' ? 'draft 없음 — /admin/personas 에서 draft 생성하거나 cron 09:00 대기' : '게시물 없음'}
         </div>
       ) : (
         <div className="space-y-2">
           {filtered.map((p) => (
-            <div key={p.id} className="rounded-xl bg-white/[0.03] border border-white/5 p-4">
-              <div className="flex items-start justify-between gap-3 mb-2">
-                <div className="flex items-center gap-2 flex-wrap">
-                  {statusBadge(p.status)}
-                  {p.topic_pillar && (
-                    <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-violet-500/10 text-violet-300">
-                      {p.topic_pillar}
-                    </span>
-                  )}
-                  <span className="text-[11px] text-white/40">{new Date(p.created_at).toLocaleString('ko-KR')}</span>
-                </div>
-                <div className="flex gap-2 shrink-0">
-                  {p.status === 'draft' && (
-                    <>
-                      <button onClick={() => approve(p.id, true)}
-                        className="text-[11px] bg-[#00C896] hover:bg-[#00A87E] text-white font-bold px-3 py-1 rounded-md transition">
-                        지금 발행
-                      </button>
-                      <button onClick={() => approve(p.id, false)}
-                        className="text-[11px] bg-white/10 hover:bg-white/20 text-white/80 font-semibold px-3 py-1 rounded-md transition">
-                        1시간 후
-                      </button>
-                    </>
-                  )}
-                  {(p.status === 'draft' || p.status === 'pending' || p.status === 'failed' || p.status === 'cancelled') && (
-                    <button onClick={() => onRemove(p.id)} className="text-[11px] text-red-400 hover:text-red-300">삭제</button>
-                  )}
-                </div>
-              </div>
-              <div className="text-[13px] text-white/80 whitespace-pre-wrap leading-relaxed mb-2">{p.content}</div>
-              <div className="flex flex-wrap gap-1.5">
-                {p.channels.map((ch) => {
-                  const result = p.results?.[ch]
-                  const okSym = !result ? '' : result.ok ? '✓' : '✕'
-                  const tone = !result ? 'text-white/60 bg-white/5' : result.ok ? 'text-emerald-300 bg-emerald-500/10' : 'text-red-300 bg-red-500/10'
-                  return (
-                    <span key={ch} className={`text-[10.5px] font-semibold px-2 py-0.5 rounded ${tone}`}>{ch} {okSym}</span>
-                  )
-                })}
-              </div>
-              {p.error && <div className="text-[10.5px] text-red-300 mt-2 font-mono">{p.error}</div>}
-            </div>
+            <PostCard key={p.id} p={p} onApprove={approve} onRemove={onRemove} />
           ))}
         </div>
       )}
     </section>
+  )
+}
+
+function CalendarView({ posts }: { posts: Post[] }) {
+  const [cursor, setCursor] = useState(() => {
+    const d = new Date()
+    return new Date(d.getFullYear(), d.getMonth(), 1)
+  })
+  const [selectedDate, setSelectedDate] = useState<string | null>(null)
+
+  const year = cursor.getFullYear()
+  const month = cursor.getMonth()
+  const firstDay = new Date(year, month, 1)
+  const startWeekday = firstDay.getDay()
+  const daysInMonth = new Date(year, month + 1, 0).getDate()
+
+  // 날짜별 post 그룹핑 (YYYY-MM-DD key)
+  const postsByDate = new Map<string, Post[]>()
+  for (const p of posts) {
+    const d = new Date(p.scheduled_at)
+    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    const arr = postsByDate.get(key) || []
+    arr.push(p)
+    postsByDate.set(key, arr)
+  }
+
+  function prevMonth() { setCursor(new Date(year, month - 1, 1)); setSelectedDate(null) }
+  function nextMonth() { setCursor(new Date(year, month + 1, 1)); setSelectedDate(null) }
+  function thisMonth() {
+    const d = new Date()
+    setCursor(new Date(d.getFullYear(), d.getMonth(), 1))
+    setSelectedDate(null)
+  }
+
+  const cells: Array<{ day: number; key: string } | null> = []
+  for (let i = 0; i < startWeekday; i++) cells.push(null)
+  for (let d = 1; d <= daysInMonth; d++) {
+    const key = `${year}-${String(month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
+    cells.push({ day: d, key })
+  }
+  while (cells.length % 7 !== 0) cells.push(null)
+
+  const todayKey = (() => {
+    const t = new Date()
+    return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, '0')}-${String(t.getDate()).padStart(2, '0')}`
+  })()
+
+  const selectedPosts = selectedDate ? (postsByDate.get(selectedDate) || []) : []
+
+  return (
+    <div className="space-y-3">
+      <div className="rounded-2xl bg-white border border-gray-200 p-4">
+        <div className="flex items-center justify-between mb-3">
+          <h3 className="text-[15px] font-black tracking-tight">
+            {year}년 {month + 1}월
+          </h3>
+          <div className="flex items-center gap-1">
+            <button onClick={prevMonth} className="w-7 h-7 rounded-md hover:bg-gray-100 text-gray-600 text-[14px]">‹</button>
+            <button onClick={thisMonth} className="px-2 h-7 rounded-md hover:bg-gray-100 text-[11px] text-gray-600 font-semibold">오늘</button>
+            <button onClick={nextMonth} className="w-7 h-7 rounded-md hover:bg-gray-100 text-gray-600 text-[14px]">›</button>
+          </div>
+        </div>
+        <div className="grid grid-cols-7 text-[10.5px] font-bold uppercase tracking-wider text-gray-400 mb-1">
+          {['일', '월', '화', '수', '목', '금', '토'].map((d, i) => (
+            <div key={d} className={`text-center py-1.5 ${i === 0 ? 'text-red-500' : i === 6 ? 'text-blue-500' : ''}`}>{d}</div>
+          ))}
+        </div>
+        <div className="grid grid-cols-7 gap-1">
+          {cells.map((c, i) => {
+            if (!c) return <div key={i} className="aspect-square" />
+            const dayPosts = postsByDate.get(c.key) || []
+            const isToday = c.key === todayKey
+            const isSelected = c.key === selectedDate
+            const weekday = i % 7
+            return (
+              <button
+                key={c.key}
+                onClick={() => setSelectedDate(isSelected ? null : c.key)}
+                className={`aspect-square rounded-lg p-1.5 text-left transition border ${
+                  isSelected ? 'border-[#00C896] bg-[#00C896]/5' :
+                  isToday ? 'border-[#00C896]/30 bg-[#00C896]/[0.03]' :
+                  dayPosts.length > 0 ? 'border-gray-200 hover:border-gray-300 bg-white' :
+                  'border-transparent hover:bg-gray-50'
+                }`}
+              >
+                <div className={`text-[11.5px] font-bold ${
+                  isToday ? 'text-[#00C896]' :
+                  weekday === 0 ? 'text-red-500' :
+                  weekday === 6 ? 'text-blue-500' :
+                  'text-[#1A1F27]'
+                }`}>{c.day}</div>
+                {dayPosts.length > 0 && (
+                  <div className="mt-1 space-y-0.5">
+                    {dayPosts.slice(0, 2).map((p) => (
+                      <div key={p.id} className="text-[9.5px] truncate px-1 py-0.5 rounded leading-tight"
+                        style={{
+                          backgroundColor:
+                            p.status === 'published' ? '#ECFDF5' :
+                            p.status === 'pending' ? '#FFFBEB' :
+                            p.status === 'draft' ? '#F5F3FF' :
+                            p.status === 'failed' || p.status === 'partial' ? '#FEF2F2' :
+                            '#F3F4F6',
+                          color:
+                            p.status === 'published' ? '#047857' :
+                            p.status === 'pending' ? '#B45309' :
+                            p.status === 'draft' ? '#6D28D9' :
+                            p.status === 'failed' || p.status === 'partial' ? '#B91C1C' :
+                            '#6B7280',
+                        }}
+                      >
+                        {p.content.slice(0, 12) || '(빈 본문)'}
+                      </div>
+                    ))}
+                    {dayPosts.length > 2 && (
+                      <div className="text-[9.5px] text-gray-500 px-1">+{dayPosts.length - 2}</div>
+                    )}
+                  </div>
+                )}
+              </button>
+            )
+          })}
+        </div>
+      </div>
+
+      {selectedDate && (
+        <div className="rounded-2xl bg-white border border-gray-200 p-4 space-y-2">
+          <div className="text-[12px] font-bold text-gray-600 mb-2">
+            {selectedDate} · {selectedPosts.length}건
+          </div>
+          {selectedPosts.length === 0 ? (
+            <div className="text-[12px] text-gray-400 py-4 text-center">예약된 글 없음</div>
+          ) : (
+            selectedPosts.map((p) => (
+              <div key={p.id} className="flex gap-3 border-t border-gray-100 pt-2 first:border-t-0 first:pt-0">
+                <div className="w-14 h-14 rounded-lg bg-gray-100 border border-gray-200 overflow-hidden shrink-0">
+                  {p.image_urls && p.image_urls.length > 0 ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.image_urls[0]} alt="" className="w-full h-full object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-[9px] text-gray-400">
+                      텍스트
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    {statusBadge(p.status)}
+                    <span className="text-[11px] text-gray-500">
+                      {new Date(p.scheduled_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                    </span>
+                  </div>
+                  <div className="text-[12px] text-gray-700 line-clamp-2">{p.content}</div>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function PostCard({ p, onApprove, onRemove }: {
+  p: Post
+  onApprove: (id: string, now: boolean) => Promise<void>
+  onRemove: (id: string) => Promise<void> | void
+}) {
+  return (
+    <div className="rounded-xl bg-white border border-gray-200 p-4 flex gap-4">
+      {/* 이미지 썸네일 */}
+      <div className="w-20 h-20 rounded-lg bg-gray-100 border border-gray-200 overflow-hidden shrink-0">
+        {p.image_urls && p.image_urls.length > 0 ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={p.image_urls[0]} alt="" className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-[10px] text-gray-400 text-center">
+            텍스트<br/>only
+          </div>
+        )}
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <div className="flex items-start justify-between gap-3 mb-2">
+          <div className="flex items-center gap-2 flex-wrap">
+            {statusBadge(p.status)}
+            {p.topic_pillar && (
+              <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded bg-violet-50 text-violet-700">
+                {p.topic_pillar}
+              </span>
+            )}
+            <span className="text-[11px] text-gray-400">{new Date(p.created_at).toLocaleString('ko-KR')}</span>
+          </div>
+          <div className="flex gap-2 shrink-0">
+            {p.status === 'draft' && (
+              <>
+                <button onClick={() => onApprove(p.id, true)}
+                  className="text-[11px] bg-[#00C896] hover:bg-[#00A87E] text-white font-bold px-3 py-1 rounded-md transition">
+                  지금 발행
+                </button>
+                <button onClick={() => onApprove(p.id, false)}
+                  className="text-[11px] bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold px-3 py-1 rounded-md transition">
+                  1시간 후
+                </button>
+              </>
+            )}
+            {(p.status === 'draft' || p.status === 'pending' || p.status === 'failed' || p.status === 'cancelled') && (
+              <button onClick={() => onRemove(p.id)} className="text-[11px] text-red-600 hover:text-red-700">삭제</button>
+            )}
+          </div>
+        </div>
+
+        <div className="text-[13px] text-gray-700 whitespace-pre-wrap leading-relaxed mb-2 line-clamp-3">{p.content}</div>
+
+        <div className="flex flex-wrap gap-1.5 mb-2">
+          {p.channels.map((ch) => {
+            const result = p.results?.[ch]
+            const okSym = !result ? '' : result.ok ? '✓' : '✕'
+            const tone = !result ? 'text-gray-600 bg-gray-100' : result.ok ? 'text-emerald-700 bg-emerald-50' : 'text-red-700 bg-red-50'
+            return (
+              <span key={ch} className={`text-[10.5px] font-semibold px-2 py-0.5 rounded ${tone}`}>{ch} {okSym}</span>
+            )
+          })}
+        </div>
+
+        {/* KPI: 클릭 → 가입 attribution */}
+        <div className="flex flex-wrap gap-x-3 text-[11px] text-gray-500">
+          <span>클릭 <strong className="text-[#1A1F27]">{p.click_count ?? 0}</strong></span>
+          <span className={(p.signup_count ?? 0) > 0 ? 'text-[#00C896] font-semibold' : ''}>
+            가입 <strong>{p.signup_count ?? 0}</strong>
+          </span>
+          {p.short_code && (
+            <span className="font-mono text-gray-400">ssobi.ai/s/{p.short_code}</span>
+          )}
+        </div>
+
+        {p.error && <div className="text-[10.5px] text-red-700 mt-2 font-mono">{p.error}</div>}
+      </div>
+    </div>
   )
 }

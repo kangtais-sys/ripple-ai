@@ -23,6 +23,7 @@ interface PersonaRow {
   sample_count: number
   asset_count: number
   draft_count: number
+  anchor_url: string | null
 }
 
 async function authHeaders(): Promise<HeadersInit> {
@@ -37,7 +38,6 @@ export default function PersonasClient() {
   const [showForm, setShowForm] = useState(false)
   const [msg, setMsg] = useState<string | null>(null)
 
-  // 신규 페르소나 폼 상태
   const [form, setForm] = useState({
     name: '',
     language: 'ko' as 'ko' | 'en',
@@ -105,16 +105,6 @@ export default function PersonasClient() {
     await load()
   }
 
-  async function generateDrafts(id: string) {
-    if (!confirm('Claude 호출해서 draft 생성? (비용 ~₩40)')) return
-    const h = await authHeaders()
-    const res = await fetch(`/api/admin/personas/${id}/generate`, { method: 'POST', headers: h })
-    const j = await res.json()
-    if (!res.ok) { alert(`실패: ${j.error}`); return }
-    alert(`draft ${j.inserted}개 생성됨. 마케팅 페이지에서 검수해줘.`)
-    await load()
-  }
-
   function toggleChannel(c: string) {
     const n = new Set(form.channels)
     if (n.has(c)) n.delete(c)
@@ -122,14 +112,14 @@ export default function PersonasClient() {
     setForm({ ...form, channels: n })
   }
 
-  if (loading) return <div className="py-16 text-center text-white/40">로딩 중...</div>
+  if (loading) return <div className="py-16 text-center text-gray-400">로딩 중...</div>
 
   return (
     <div className="space-y-6">
       <div className="flex items-end justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-black tracking-tight mb-1">페르소나</h1>
-          <p className="text-[13px] text-white/50">총 {personas.length}명 · Ssobi 마케팅 자동화용 가상 인플루언서</p>
+          <p className="text-[13px] text-gray-500">총 {personas.length}명 · Ssobi 마케팅 자동화용 가상 인플루언서</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
@@ -139,11 +129,11 @@ export default function PersonasClient() {
         </button>
       </div>
 
-      {msg && <div className="text-[12.5px] text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-4 py-2">{msg}</div>}
+      {msg && <div className="text-[12.5px] text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg px-4 py-2">{msg}</div>}
 
       {showForm && (
-        <section className="rounded-2xl bg-white/[0.03] border border-white/5 p-6 space-y-4">
-          <h2 className="text-[13px] font-bold uppercase tracking-wider text-white/60">새 페르소나</h2>
+        <section className="rounded-2xl bg-white border border-gray-200 p-6 space-y-4">
+          <h2 className="text-[13px] font-bold uppercase tracking-wider text-gray-600">새 페르소나</h2>
           <div className="grid grid-cols-2 gap-3">
             <Field label="이름">
               <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })}
@@ -177,7 +167,7 @@ export default function PersonasClient() {
                 const on = form.channels.has(c)
                 return (
                   <button key={c} type="button" onClick={() => toggleChannel(c)}
-                    className={`px-3 py-2 rounded-lg border transition text-[12.5px] font-semibold ${on ? 'border-[#00C896] bg-[#00C896]/10 text-[#00C896]' : 'border-white/10 bg-black/20 text-white/60'}`}>
+                    className={`px-3 py-2 rounded-lg border transition text-[12.5px] font-semibold ${on ? 'border-[#00C896] bg-[#00C896]/10 text-[#00C896]' : 'border-gray-300 bg-white text-gray-600 hover:border-gray-400'}`}>
                     {c}
                   </button>
                 )
@@ -200,44 +190,13 @@ export default function PersonasClient() {
       )}
 
       {personas.length === 0 ? (
-        <div className="text-[13px] text-white/40 py-12 text-center border border-dashed border-white/10 rounded-2xl">
-          페르소나 0명. 위 "+ 새 페르소나" 로 시작.
+        <div className="text-[13px] text-gray-400 py-12 text-center border border-dashed border-gray-300 rounded-2xl">
+          페르소나 0명. 위 &quot;+ 새 페르소나&quot; 로 시작.
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           {personas.map((p) => (
-            <a key={p.id} href={`/admin/personas/${p.id}`} className="block rounded-2xl bg-white/[0.03] border border-white/5 p-5 hover:bg-white/[0.05] hover:border-white/10 transition cursor-pointer">
-              <div className="flex items-start justify-between gap-4 mb-3 flex-wrap">
-                <div>
-                  <div className="flex items-center gap-2 mb-1">
-                    <h3 className="text-[15px] font-black tracking-tight">{p.name}</h3>
-                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/10 text-white/60 uppercase">{p.language}</span>
-                    {!p.active && <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-white/10 text-white/40">inactive</span>}
-                  </div>
-                  {p.bio && <p className="text-[12px] text-white/60 mb-2">{p.bio}</p>}
-                  <p className="text-[11.5px] text-white/40 max-w-2xl">{p.voice_description.slice(0, 200)}{p.voice_description.length > 200 ? '...' : ''}</p>
-                  {p.reference_account_url && (
-                    <a href={p.reference_account_url} target="_blank" rel="noopener" className="text-[11px] text-[#00C896] hover:underline mt-1.5 inline-block">
-                      참고: {p.reference_account_url}
-                    </a>
-                  )}
-                </div>
-                <span className="text-[11px] text-white/40 shrink-0">설정 →</span>
-              </div>
-              <div className="flex flex-wrap gap-2 text-[10.5px]">
-                {p.channels.map((c) => (
-                  <span key={c} className="px-2 py-0.5 rounded bg-white/5 text-white/60 font-mono">{c}</span>
-                ))}
-              </div>
-              <div className="flex gap-5 mt-3 text-[11.5px] text-white/50">
-                <span>샘플 {p.sample_count}</span>
-                <span>자산 {p.asset_count}</span>
-                <span className={p.draft_count > 0 ? 'text-amber-300 font-semibold' : ''}>
-                  대기 draft {p.draft_count}
-                </span>
-                <span>매일 {p.daily_draft_count}개 자동 생성</span>
-              </div>
-            </a>
+            <PersonaCard key={p.id} p={p} />
           ))}
         </div>
       )}
@@ -245,12 +204,60 @@ export default function PersonasClient() {
   )
 }
 
-const inputCls = 'w-full bg-black/30 border border-white/10 rounded-lg px-3 py-2 text-[13px] text-white placeholder-white/30 focus:border-[#00C896] focus:outline-none'
+function PersonaCard({ p }: { p: PersonaRow }) {
+  return (
+    <a
+      href={`/admin/personas/${p.id}`}
+      className="flex gap-4 rounded-2xl bg-white border border-gray-200 p-4 hover:border-[#00C896]/40 hover:shadow-sm transition"
+    >
+      <div className="w-24 h-24 rounded-xl bg-gray-100 border border-gray-200 overflow-hidden shrink-0 relative">
+        {p.anchor_url ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={p.anchor_url} alt={p.name} className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-[10.5px] text-gray-400 text-center px-1">
+            이미지<br/>없음
+          </div>
+        )}
+        {!p.active && (
+          <div className="absolute inset-0 bg-white/70 flex items-center justify-center text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+            inactive
+          </div>
+        )}
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2 mb-1.5">
+          <h3 className="text-[15px] font-black tracking-tight text-[#1A1F27]">{p.name}</h3>
+          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-gray-100 text-gray-500 uppercase">{p.language}</span>
+        </div>
+        {p.bio && <p className="text-[11.5px] text-gray-600 mb-2 line-clamp-1">{p.bio}</p>}
+
+        <div className="flex flex-wrap gap-1 mb-2">
+          {p.channels.slice(0, 5).map((c) => (
+            <span key={c} className="px-1.5 py-0.5 rounded bg-gray-100 text-gray-600 text-[10px] font-mono">{c}</span>
+          ))}
+        </div>
+
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-gray-500">
+          <span>샘플 <strong className="text-[#1A1F27]">{p.sample_count}</strong></span>
+          <span>자산 <strong className="text-[#1A1F27]">{p.asset_count}</strong></span>
+          <span className={p.draft_count > 0 ? 'text-amber-700 font-semibold' : ''}>
+            대기 draft <strong>{p.draft_count}</strong>
+          </span>
+          <span>일 {p.daily_draft_count}개 자동</span>
+        </div>
+      </div>
+    </a>
+  )
+}
+
+const inputCls = 'w-full bg-white border border-gray-300 rounded-lg px-3 py-2 text-[13px] text-[#1A1F27] placeholder-gray-400 focus:border-[#00C896] focus:outline-none'
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <label className="text-[11px] font-bold uppercase tracking-wider text-white/50 mb-1.5 block">{label}</label>
+      <label className="text-[11px] font-bold uppercase tracking-wider text-gray-500 mb-1.5 block">{label}</label>
       {children}
     </div>
   )

@@ -1,12 +1,12 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
-import { publishToChannel, type ChannelKey } from '@/lib/marketing-publishers'
+import { publishMarketingPost } from '@/lib/zernio/publisher'
 
 export const maxDuration = 60
 
-// 마케팅 발행 cron — 5분마다 due 글 발행
+// 마케팅 발행 cron — 5분마다 due 글 발행 (Zernio API 경유)
 //   marketing_posts 에서 status='pending' 이고 scheduled_at <= now() 인 글 pickup
-//   각 channel 별로 publishToChannel 호출
+//   각 글 → Zernio /posts 단일 호출 (모든 채널 동시 발행)
 //   결과 누적 → status 갱신 (published/partial/failed)
 
 export async function GET(request: NextRequest) {
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
   const { data: dueList, error } = await sb
     .from('marketing_posts')
-    .select('id, content, image_urls, channels')
+    .select('id, channels')
     .eq('status', 'pending')
     .lte('scheduled_at', new Date().toISOString())
     .order('scheduled_at', { ascending: true })
@@ -39,33 +39,27 @@ export async function GET(request: NextRequest) {
     // 1) 락 — publishing 으로 상태 변경
     await sb.from('marketing_posts').update({ status: 'publishing' }).eq('id', post.id)
 
-    const payload = {
-      content: post.content as string,
-      imageUrls: (post.image_urls as string[]) || [],
-    }
-    const results: Record<string, { ok: boolean; id?: string; error?: string }> = {}
-    let successCount = 0
-    let failCount = 0
+    // 2) Zernio 발행
+    const outcome = await publishMarketingPost(sb, post.id as string)
+    const totalChannels = (post.channels as string[]).length
+    const okCount = Object.values(outcome.results).filter((r) => r.ok).length
+    const failCount = totalChannels - okCount
 
-    for (const ch of post.channels as ChannelKey[]) {
-      const r = await publishToChannel(ch, payload)
-      results[ch] = { ok: r.ok, id: r.id, error: r.error }
-      if (r.ok) successCount++
-      else failCount++
-    }
-
-    // 2) 최종 status 결정
     let finalStatus: 'published' | 'partial' | 'failed' = 'failed'
-    if (successCount === (post.channels as ChannelKey[]).length) finalStatus = 'published'
-    else if (successCount > 0) finalStatus = 'partial'
+    if (okCount === totalChannels) finalStatus = 'published'
+    else if (okCount > 0) finalStatus = 'partial'
+
+    const errMsg = !outcome.ok
+      ? (outcome.error || Object.entries(outcome.results).filter(([, v]) => !v.ok).map(([k, v]) => `${k}: ${v.error || 'fail'}`).join(' | '))
+      : null
 
     await sb
       .from('marketing_posts')
       .update({
         status: finalStatus,
-        results,
+        results: outcome.results,
         published_at: new Date().toISOString(),
-        error: failCount > 0 ? Object.entries(results).filter(([, v]) => !v.ok).map(([k, v]) => `${k}: ${v.error}`).join(' | ') : null,
+        error: errMsg,
       })
       .eq('id', post.id)
 

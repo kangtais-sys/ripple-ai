@@ -11,6 +11,7 @@
 import { createClient } from '@supabase/supabase-js'
 import { submit } from '@/lib/higgsfield/client'
 import { HF_MODELS } from '@/lib/higgsfield/models'
+import { createMarketingShortLink, appendAttributionLink } from '@/lib/attribution'
 
 const CLAUDE_MODEL = 'claude-sonnet-4-5-20250929'
 const CLAUDE_URL = 'https://api.anthropic.com/v1/messages'
@@ -24,6 +25,7 @@ interface PersonaRow {
   topic_pillars: Array<{ name: string; weight: number }>
   daily_draft_count: number
   channels: string[]
+  created_by: string | null
 }
 
 interface TopicResult {
@@ -197,14 +199,14 @@ export async function generateDailyContent(
         .single()
       if (topicErr || !topicRow) throw new Error(`topic_insert_failed: ${topicErr?.message}`)
 
-      // 3) 텍스트 포스트 (X + Threads) — draft 상태로
+      // 3) 텍스트 포스트 (X + Threads) — draft 상태로 + short_link 자동 발급
       const textPostIds: string[] = []
       for (const channel of ['x', 'threads'] as const) {
-        const content = channel === 'x' ? t.text_x : t.text_threads
+        const baseContent = channel === 'x' ? t.text_x : t.text_threads
         const { data: postRow } = await sb
           .from('marketing_posts')
           .insert({
-            content,
+            content: baseContent,  // 일단 원본으로 insert, short_link 발급 후 갱신
             image_urls: [],
             channels: [channel],
             scheduled_at: new Date().toISOString(),
@@ -217,7 +219,30 @@ export async function generateDailyContent(
           })
           .select('id')
           .single()
-        if (postRow) textPostIds.push(postRow.id as string)
+        if (postRow) {
+          const postId = postRow.id as string
+          textPostIds.push(postId)
+
+          // attribution short_link — persona.created_by 가 short_links.user_id 로
+          if (persona.created_by) {
+            try {
+              const code = await createMarketingShortLink(
+                sb,
+                postId,
+                persona.created_by,
+                'https://ssobi.ai',
+                `${persona.name} · ${channel} · ${lang}`,
+              )
+              const newContent = appendAttributionLink(baseContent, code)
+              await sb
+                .from('marketing_posts')
+                .update({ content: newContent })
+                .eq('id', postId)
+            } catch (e) {
+              console.error('[marketing-pipeline] short_link failed for', postId, e)
+            }
+          }
+        }
       }
 
       // 4) Higgsfield 비주얼 생성 (카드뉴스 cover · 비동기)

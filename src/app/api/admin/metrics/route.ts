@@ -26,5 +26,8 @@ export async function GET(req: NextRequest) {
   }
 
   const metrics = await getEssentialMetrics()
-  return NextResponse.json({ ok: true, metrics, email: userData.user.email })
+  return NextResponse.json(
+    { ok: true, metrics, email: userData.user.email },
+    { headers: { 'Cache-Control': 'private, max-age=30' } }
+  )
 }

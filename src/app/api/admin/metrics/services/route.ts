@@ -23,5 +23,8 @@ export async function GET(req: NextRequest) {
   }
 
   const metrics = await getServiceMetrics()
-  return NextResponse.json({ ok: true, metrics })
+  return NextResponse.json(
+    { ok: true, metrics },
+    { headers: { 'Cache-Control': 'private, max-age=60' } }
+  )
 }

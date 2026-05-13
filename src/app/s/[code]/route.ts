@@ -1,6 +1,7 @@
-// /s/[code] — Supabase RPC track_short_click 호출 후 302 리다이렉트
+// /s/[code] — Supabase RPC track_short_click 호출 + attribution 쿠키 set + 302
 import { NextResponse } from 'next/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
+import { ATTR_COOKIE_NAME, ATTR_COOKIE_MAX_AGE } from '@/lib/attribution'
 
 export async function GET(req: Request, { params }: { params: Promise<{ code: string }> }) {
   const { code } = await params
@@ -28,10 +29,25 @@ export async function GET(req: Request, { params }: { params: Promise<{ code: st
     p_ip_hash: ipHash,
   })
 
-  if (!target || typeof target !== 'string') {
-    return NextResponse.redirect('https://ssobi.ai/?err=not_found', 302)
+  const targetUrl = (target && typeof target === 'string') ? target : 'https://ssobi.ai/?err=not_found'
+  const res = NextResponse.redirect(targetUrl, 302)
+
+  // 마케팅 post 와 연결된 short_link 면 attribution 쿠키 set
+  const { data: link } = await admin
+    .from('short_links')
+    .select('marketing_post_id')
+    .eq('code', code)
+    .maybeSingle()
+  if (link?.marketing_post_id) {
+    res.cookies.set(ATTR_COOKIE_NAME, code, {
+      maxAge: ATTR_COOKIE_MAX_AGE,
+      path: '/',
+      sameSite: 'lax',
+      secure: true,
+      httpOnly: false,  // client JS 가 디버깅용으로 읽을 수 있게
+    })
   }
-  return NextResponse.redirect(target, 302)
+  return res
 }
 
 async function hashString(s: string) {

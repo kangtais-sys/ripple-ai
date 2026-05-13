@@ -37,12 +37,13 @@ export async function GET(req: NextRequest) {
     .select('*')
     .order('created_at', { ascending: true })
 
-  // 각 페르소나의 샘플·자산 카운트 일괄 조회
+  // 각 페르소나의 샘플·자산 카운트 + active anchor URL 일괄 조회
   const ids = (personas || []).map((p) => p.id as string)
-  const [sampleCounts, assetCounts, draftCounts] = await Promise.all([
+  const [sampleCounts, assetCounts, draftCounts, anchors] = await Promise.all([
     ids.length > 0 ? sb.from('marketing_persona_samples').select('persona_id').in('persona_id', ids) : { data: [] },
     ids.length > 0 ? sb.from('marketing_assets').select('persona_id').in('persona_id', ids) : { data: [] },
     ids.length > 0 ? sb.from('marketing_posts').select('persona_id').in('persona_id', ids).eq('status', 'draft') : { data: [] },
+    ids.length > 0 ? sb.from('marketing_assets').select('persona_id, url').in('persona_id', ids).eq('tag', 'anchor_active') : { data: [] },
   ])
   const tally = (rows: { persona_id?: string | null }[] | null) => {
     const m = new Map<string, number>()
@@ -55,14 +56,22 @@ export async function GET(req: NextRequest) {
   const sM = tally(sampleCounts.data as { persona_id?: string }[])
   const aM = tally(assetCounts.data as { persona_id?: string }[])
   const dM = tally(draftCounts.data as { persona_id?: string }[])
+  const anchorMap = new Map<string, string>()
+  for (const a of (anchors.data || []) as { persona_id?: string; url?: string }[]) {
+    if (a.persona_id && a.url) anchorMap.set(a.persona_id, a.url)
+  }
 
   const result = (personas || []).map((p) => ({
     ...p,
     sample_count: sM.get(p.id as string) || 0,
     asset_count: aM.get(p.id as string) || 0,
     draft_count: dM.get(p.id as string) || 0,
+    anchor_url: anchorMap.get(p.id as string) || null,
   }))
-  return NextResponse.json({ personas: result })
+  return NextResponse.json(
+    { personas: result },
+    { headers: { 'Cache-Control': 'private, max-age=30' } }
+  )
 }
 
 // POST — 페르소나 생성

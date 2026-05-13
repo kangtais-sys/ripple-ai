@@ -67,16 +67,16 @@ export default function BillingClient() {
     return () => { cancelled = true }
   }, [])
 
-  if (state.kind === 'loading') return <div className="py-16 text-center text-white/40">로딩 중...</div>
+  if (state.kind === 'loading') return <div className="py-16 text-center text-gray-500">로딩 중...</div>
   if (state.kind === 'denied') {
     return (
-      <div className="py-16 text-center text-white/60">
+      <div className="py-16 text-center text-gray-700">
         {state.reason === 'unauthenticated' ? '로그인이 필요합니다.' : '관리자 권한이 없습니다.'}
       </div>
     )
   }
   if (state.kind === 'error') {
-    return <div className="py-16 text-red-400 font-mono text-[12px] text-center">{state.message}</div>
+    return <div className="py-16 text-red-600 font-mono text-[12px] text-center">{state.message}</div>
   }
 
   const u = state.usage
@@ -92,33 +92,33 @@ export default function BillingClient() {
       <div className="flex items-end justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-black tracking-tight mb-1">비용관리</h1>
-          <p className="text-[13px] text-white/50">이번 달 인프라 + 변동 비용 추정치 · USD</p>
+          <p className="text-[13px] text-gray-500">이번 달 인프라 + 변동 비용 추정치 · USD</p>
         </div>
-        <div className="text-[11px] text-white/40">{state.email}</div>
+        <div className="text-[11px] text-gray-500">{state.email}</div>
       </div>
 
       {/* 총합 */}
-      <section className="rounded-2xl bg-gradient-to-br from-[#00C896]/15 to-[#00C896]/5 border border-[#00C896]/20 p-6">
+      <section className="rounded-2xl bg-gradient-to-br from-[#00C896]/10 to-[#00C896]/5 border border-[#00C896]/20 p-6">
         <div className="text-[11px] font-bold uppercase tracking-wider text-[#00C896] mb-2">이번 달 총 추정 비용</div>
-        <div className="text-4xl font-black tracking-tight text-white">${grandTotalUsd.toFixed(2)}</div>
-        <div className="text-[12px] text-white/50 mt-2">
+        <div className="text-4xl font-black tracking-tight text-[#1A1F27]">${grandTotalUsd.toFixed(2)}</div>
+        <div className="text-[12px] text-gray-500 mt-2">
           고정 ${fixedTotalUsd.toFixed(2)} + 변동 ${variableTotalUsd.toFixed(2)}
         </div>
       </section>
 
       {/* 고정 비용 */}
       <section>
-        <h2 className="text-[13px] font-bold uppercase tracking-wider text-white/60 mb-3">
+        <h2 className="text-[13px] font-bold uppercase tracking-wider text-gray-700 mb-3">
           고정 비용 (월 ${fixedTotalUsd.toFixed(2)})
         </h2>
         <div className="space-y-2">
           {FIXED_COSTS.map((c) => (
-            <div key={c.name} className="flex items-center justify-between rounded-xl bg-white/[0.03] border border-white/5 p-4">
+            <div key={c.name} className="flex items-center justify-between rounded-xl bg-white border border-gray-200 p-4">
               <div>
                 <div className="text-[14px] font-bold">{c.name}</div>
-                <div className="text-[11.5px] text-white/40 mt-0.5">{c.note}</div>
+                <div className="text-[11.5px] text-gray-500 mt-0.5">{c.note}</div>
               </div>
-              <div className="text-[15px] font-black text-white">${c.monthly_usd.toFixed(2)}</div>
+              <div className="text-[15px] font-black text-[#1A1F27]">${c.monthly_usd.toFixed(2)}</div>
             </div>
           ))}
         </div>
@@ -126,7 +126,7 @@ export default function BillingClient() {
 
       {/* 변동 비용 */}
       <section>
-        <h2 className="text-[13px] font-bold uppercase tracking-wider text-white/60 mb-3">
+        <h2 className="text-[13px] font-bold uppercase tracking-wider text-gray-700 mb-3">
           변동 비용 (이번 달 ${variableTotalUsd.toFixed(2)})
         </h2>
         <div className="space-y-2">
@@ -156,13 +156,13 @@ export default function BillingClient() {
           />
         </div>
         {u.higgsfield_credits_balance !== null && (
-          <div className="mt-3 text-[11.5px] text-white/40">
-            Higgsfield 잔여 크레딧: <span className="text-amber-300 font-bold">{u.higgsfield_credits_balance}</span>
+          <div className="mt-3 text-[11.5px] text-gray-500">
+            Higgsfield 잔여 크레딧: <span className="text-amber-700 font-bold">{u.higgsfield_credits_balance}</span>
           </div>
         )}
       </section>
 
-      <footer className="text-[11px] text-white/30 pt-8 border-t border-white/5">
+      <footer className="text-[11px] text-gray-400 pt-8 border-t border-gray-200">
         ※ 변동 단가는 추정치 · 실제 청구는 각 provider 대시보드 기준
       </footer>
     </div>
@@ -173,15 +173,15 @@ function UsageRow({
   name, sub, count, unit, unitCost, total,
 }: { name: string; sub: string; count: number; unit: string; unitCost: number; total: number }) {
   return (
-    <div className="rounded-xl bg-white/[0.03] border border-white/5 p-4">
+    <div className="rounded-xl bg-white border border-gray-200 p-4">
       <div className="flex items-center justify-between mb-2">
         <div>
           <div className="text-[14px] font-bold">{name}</div>
-          <div className="text-[11.5px] text-white/40 mt-0.5">{sub}</div>
+          <div className="text-[11.5px] text-gray-500 mt-0.5">{sub}</div>
         </div>
-        <div className="text-[15px] font-black text-white">${total.toFixed(2)}</div>
+        <div className="text-[15px] font-black text-[#1A1F27]">${total.toFixed(2)}</div>
       </div>
-      <div className="text-[11px] text-white/40 font-mono">
+      <div className="text-[11px] text-gray-500 font-mono">
         {count.toLocaleString()}{unit} × ${unitCost} = ${total.toFixed(2)}
       </div>
     </div>
