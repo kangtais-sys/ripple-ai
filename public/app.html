@@ -6940,19 +6940,26 @@ window.i18nFindUnmarked = function(){
 
 // 페이지 로드 시 부트스트랩: localStorage > server profile > navigator > 'ko'
 async function bootI18n(){
-  var lang = 'ko';
+  // localStorage 가 source of truth — 사용자가 마지막으로 선택한 언어
+  var lang = 'ko'
+  var hasLocal = false
   try {
     var saved = localStorage.getItem('ssobi_lang');
-    if(saved && I18N[saved]) lang = saved;
+    if(saved && I18N[saved]) { lang = saved; hasLocal = true; }
   } catch(_){}
-  // 서버 동기화 시도 (인증 안 됐으면 그냥 fallback)
-  try {
-    var res = await fetch('/api/profile/language');
-    if(res.ok){
-      var d = await res.json();
-      if(d.ok && d.language && I18N[d.language]) lang = d.language;
-    }
-  } catch(_){}
+  // localStorage 없을 때만 서버 fetch (첫 방문)
+  if(!hasLocal){
+    try {
+      var res = await fetch('/api/profile/language');
+      if(res.ok){
+        var d = await res.json();
+        if(d.ok && d.language && I18N[d.language]){
+          lang = d.language;
+          try { localStorage.setItem('ssobi_lang', lang); } catch(_){}
+        }
+      }
+    } catch(_){}
+  }
   applyI18n(lang);
 }
 document.addEventListener('DOMContentLoaded', bootI18n);
@@ -7046,7 +7053,9 @@ async function onAutoReplyChannelToggle(channel, el){
 
 async function onAppLanguageChange(el){
   var lang = el.value;
-  // 즉시 UI 적용 (서버 저장은 백그라운드)
+  // 1) localStorage 에 저장 (source of truth — bootI18n 에서 우선 사용)
+  try { localStorage.setItem('ssobi_lang', lang); } catch(_){}
+  // 2) 즉시 UI 적용
   if(typeof applyI18n === 'function') applyI18n(lang);
   // 자동 응대 sub 라벨도 lang 따라 갱신
   var masterSub = document.getElementById('ar-master-sub');
