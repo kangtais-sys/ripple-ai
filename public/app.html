@@ -2922,13 +2922,13 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       </div>
     </div>
     <div style="background:var(--mint-l);border-radius:12px;padding:12px 14px;margin-top:16px;font-size:12px;color:var(--mint-d);font-weight:500;line-height:1.6" data-i18n="onb.connect.security">비밀번호는 저장되지 않아요. Meta, TikTok, YouTube 공식 OAuth를 통해 안전하게 연동돼요.</div>
-    <button class="btn-dark" style="margin-top:20px" onclick="go('v-learn')" data-i18n="onb.connect.next">다음 — AI 말투 학습</button>
-    <button class="btn-outline" onclick="go('v-learn')" data-i18n="onb.connect.later">나중에 연동하기</button>
+    <button class="btn-dark" style="margin-top:20px" onclick="go('v-onb-learn')" data-i18n="onb.connect.next">다음 — AI 말투 학습</button>
+    <button class="btn-outline" onclick="go('v-onb-learn')" data-i18n="onb.connect.later">나중에 연동하기</button>
   </div>
 </div>
 
-<!-- ════ AI 말투 학습 진행 ════ -->
-<div class="vw" id="v-learn">
+<!-- ════ AI 말투 학습 진행 (가입 onboarding 전용) ════ -->
+<div class="vw" id="v-onb-learn">
   <div class="hdr">
     <div style="font-size:15px;font-weight:800" data-i18n="onb.step.2">AI 말투 학습</div>
     <div style="font-size:12px;font-weight:700;color:var(--t3)">2/3</div>
@@ -4538,7 +4538,7 @@ function go(v){
       }
     } else if(shade){ shade.style.display = 'none'; }
   } else if(shade){ shade.style.display = 'none'; }
-  if(id === 'learn') setTimeout(startLearnAnim, 400);
+  if(id === 'onb-learn') setTimeout(startLearnAnim, 400);
   if(id === 'home') setTimeout(renderCalendar, 80);
   // v-create (만들기) 제거됨. v-learn (AI 학습) — KB 카드 로드
   if(id === 'learn') {
@@ -4561,7 +4561,7 @@ function go(v){
     if(typeof loadGrowAccounts === 'function') setTimeout(loadGrowAccounts, 60);
   }
   // 온보딩/가입/로그인/연동/학습/완료 화면에서 탭바 숨기기
-  var hideNav = ['onb1','signup','login','connect-account-onb','learn','complete'];
+  var hideNav = ['onb1','signup','login','connect-account-onb','onb-learn','complete'];
   var nav = document.querySelector('.nav');
   if(nav) nav.style.display = hideNav.indexOf(id) >= 0 ? 'none' : 'flex';
   // 메인 탭(홈/키우기/만들기/링크/내정보)은 URL 해시에 기록 — 탭 전환 후 돌아와도 같은 자리
