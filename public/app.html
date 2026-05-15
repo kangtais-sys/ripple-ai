@@ -2232,64 +2232,82 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
   <!-- 기존 홈 (중간 유저 기준) -->
   <div id="home-real">
-  <div class="roi-card">
-    <div class="roi-eye" id="roi-period">—</div>
-    <div class="roi-lbl" data-i18n="home.roi.label">쏘비가 아껴준 내 시간값</div>
-    <div class="roi-amt">₩<span id="roi-v">0</span></div>
-    <div class="roi-track"><div class="roi-fill" id="roi-fill" style="width:0"></div></div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
-      <div style="font-size:11px;font-weight:400;color:var(--t3)"><span id="roi-day">—</span>/<span id="roi-days">—</span><span data-i18n="home.date.day">일</span> <span id="roi-pct" style="color:var(--mint);font-weight:700;margin-left:2px">0%</span></div>
-      <div style="font-size:11px;font-weight:400;color:var(--t3)" id="roi-date">—</div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:0;margin-top:18px">
-      <div style="text-align:center;padding:0 4px">
-        <div id="stat-replies" style="font-size:24px;font-weight:900;color:var(--t1);letter-spacing:-.5px;line-height:1">0</div>
-        <div style="font-size:10px;font-weight:500;color:var(--t3);margin-top:4px" data-i18n="home.roi.replies">자동 응대</div>
+
+  <!-- v2: 작동 중 인디케이터 -->
+  <div style="padding:14px 18px 6px;display:flex;align-items:center;gap:8px">
+    <span class="ai-dot" style="width:8px;height:8px;border-radius:50%;background:var(--mint);animation:pulse 1.5s infinite"></span>
+    <span style="font-size:12px;font-weight:700;color:var(--mint-d)" id="home-status">Ssobi 작동 중</span>
+  </div>
+
+  <!-- v2: Day 1 모드 (KB·데이터 없을 때) -->
+  <div id="home-day1" style="display:none;padding:8px 18px 24px">
+    <div style="background:#fff;border:1px solid var(--b);border-radius:18px;padding:24px;text-align:center">
+      <div style="font-size:22px;font-weight:900;color:var(--t1);margin-bottom:8px">어서오세요! 🎉</div>
+      <div style="font-size:13px;color:var(--t3);line-height:1.6;margin-bottom:20px" id="home-day1-status">
+        지금 Ssobi 는 준비 중이에요
       </div>
-      <div style="text-align:center;padding:0 4px;border-left:1px solid var(--b);border-right:1px solid var(--b)">
-        <div id="stat-hours" style="font-size:24px;font-weight:900;color:var(--t1);letter-spacing:-.5px;line-height:1">0h</div>
-        <div style="font-size:10px;font-weight:500;color:var(--t3);margin-top:4px" data-i18n="home.roi.hours">절약 시간</div>
+
+      <div id="home-day1-tasks" style="text-align:left;background:var(--bg);border-radius:12px;padding:14px;margin-bottom:16px">
+        <!-- JS 로 채움 -->
       </div>
-      <div style="text-align:center;padding:0 4px">
-        <div id="stat-reach" style="font-size:24px;font-weight:900;color:var(--mint);letter-spacing:-.5px;line-height:1">0</div>
-        <div style="font-size:10px;font-weight:500;color:var(--t3);margin-top:4px" data-i18n="home.roi.reach">이번 달 도달</div>
-      </div>
-    </div>
-  </div>
-  <div class="eff-strip" id="eff-repeat-strip" style="display:none">
-    <div><span data-i18n="home.eff.replied">응대한</span> <b id="eff-total-users">0</b> <span data-i18n="home.eff.midfix">명 중</span> <b id="eff-repeat-users" style="color:var(--mint-d)">0</b> <span data-i18n="home.eff.returned">명 재방문 · 관계 전환</span> <span id="eff-repeat-rate">0</span>%</div>
-  </div>
-  <div id="home-alert-urgent" class="alert" onclick="goHomeAlertTarget()">
-    <div><div class="alert-t"><span data-i18n="home.urgent_pending">긴급 응대 대기</span> <span id="home-alert-count">0</span></div><div class="alert-s" id="home-alert-sub" data-i18n="home.urgent_sub">긴급 · 비즈니스 제안</div></div>
-    <div class="alert-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-  </div>
-  <div class="sec-eye" data-i18n="home.live.eyebrow">LIVE</div>
-  <div class="sec-t" data-i18n="home.live.title">Ssobi AI 실시간 활동</div>
-  <div class="live-box" id="home-live-box">
-    <div id="home-live-empty" class="empty-soft">
-      <div class="empty-soft-t" data-i18n="home.live.empty">실시간 활동 기록 없음</div>
-      <div data-i18n="home.live.empty_sub">AI가 응대하거나 분석 이벤트가 발생하면 여기에 표시됩니다.</div>
-    </div>
-  </div>
-  <div class="sec-eye" data-i18n="home.cal.eyebrow">AUTOMATION</div>
-  <div class="sec-t" data-i18n="home.cal.title">자동화 캘린더</div>
-  <div class="cal-card">
-    <div class="cal-hdr">
-      <div class="cal-title" id="cal-title">2026년 4월</div>
-      <div class="cal-nav">
-        <button class="cal-btn" onclick="calNav(-1)">‹</button>
-        <button class="cal-btn" onclick="calNav(1)">›</button>
+
+      <div style="font-size:11.5px;color:var(--t3);line-height:1.5">
+        첫 응대가 오면 알림 보내드릴게요 ✨
       </div>
     </div>
-    <div class="cal-grid" id="cal-grid"></div>
-    <div class="cal-legend">
-      <div class="cal-lg"><div class="cal-lg-dot" style="background:var(--mint)"></div><span data-i18n="home.cal.legend.comment">AI 댓글</span></div>
-      <div class="cal-lg"><div class="cal-lg-dot" style="background:#06B6D4"></div><span data-i18n="home.cal.legend.dm">AI DM</span></div>
-      <div class="cal-lg"><div class="cal-lg-dot" style="background:#F59E0B"></div><span data-i18n="home.cal.legend.followers">팔로워 증가</span></div>
-      <div class="cal-lg"><div class="cal-lg-dot" style="background:#3B82F6"></div><span data-i18n="home.cal.legend.upload">업로드</span></div>
-      <div class="cal-lg"><div class="cal-lg-dot" style="background:#8B5CF6"></div><span data-i18n="home.cal.legend.scheduled">예약</span></div>
+  </div>
+
+  <!-- v2: ROI 카드 (데이터 있을 때) -->
+  <div id="home-roi" style="display:none;padding:0 18px 18px">
+    <div style="background:#fff;border:1px solid var(--b);border-radius:18px;padding:22px">
+      <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.4px;margin-bottom:6px">어제 자는 동안</div>
+      <div style="font-size:30px;font-weight:900;color:var(--t1);letter-spacing:-1px;line-height:1.1;margin-bottom:4px" id="home-hero-value">—</div>
+      <div style="font-size:14px;font-weight:600;color:var(--t2);margin-bottom:14px" id="home-hero-label">—</div>
+      <div style="font-size:12px;color:var(--t3)" id="home-hero-sub">—</div>
     </div>
   </div>
+
+  <!-- v2: 팬들이 자라요 -->
+  <div id="home-fans" style="display:none;padding:0 18px 18px">
+    <div style="background:#fff;border:1px solid var(--b);border-radius:18px;padding:18px;display:flex;gap:14px">
+      <div style="flex:1;text-align:center">
+        <div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:4px">이번 주 재방문</div>
+        <div style="font-size:24px;font-weight:900;color:var(--mint-d)" id="home-returning">0</div>
+      </div>
+      <div style="width:1px;background:var(--b)"></div>
+      <div style="flex:1;text-align:center">
+        <div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:4px">새 팬</div>
+        <div style="font-size:24px;font-weight:900;color:var(--t1)" id="home-newfans">0</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- v2: Ssobi 가 도와준 일 -->
+  <div id="home-helped" style="display:none;padding:0 18px 18px">
+    <div onclick="go('activity')" style="background:#fff;border:1px solid var(--b);border-radius:18px;padding:16px 18px;cursor:pointer;display:flex;align-items:center;justify-content:space-between">
+      <div>
+        <div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:4px">오늘 Ssobi 가 도와준 일</div>
+        <div style="font-size:14px;font-weight:700;color:var(--t1)" id="home-helped-summary">—</div>
+      </div>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+
+  <!-- v2: 지금 일어나는 일 (실시간) -->
+  <div id="home-live-wrap" style="display:none;padding:0 18px 18px">
+    <div class="sec-eye" style="padding:0 0 8px">지금 일어나는 일</div>
+    <div style="background:#fff;border:1px solid var(--b);border-radius:14px;padding:6px 0;max-height:200px;overflow:hidden;position:relative">
+      <div id="home-live-list" style="display:flex;flex-direction:column">
+        <!-- JS -->
+      </div>
+    </div>
+  </div>
+
+  <!-- v2: 누적 -->
+  <div id="home-lifetime" style="display:none;padding:0 18px 36px">
+    <div style="font-size:11px;color:var(--t3);text-align:center;line-height:1.5" id="home-lifetime-text">—</div>
+  </div>
+
   </div><!-- /home-real -->
 </div>
 
@@ -4539,7 +4557,10 @@ function go(v){
     } else if(shade){ shade.style.display = 'none'; }
   } else if(shade){ shade.style.display = 'none'; }
   if(id === 'onb-learn') setTimeout(startLearnAnim, 400);
-  if(id === 'home') setTimeout(renderCalendar, 80);
+  if(id === 'home') {
+    setTimeout(renderCalendar, 80);
+    if(typeof loadHomeDashboard === 'function') setTimeout(loadHomeDashboard, 60);
+  }
   // v-create (만들기) 제거됨. v-learn (AI 학습) — KB 카드 로드
   if(id === 'learn') {
     if(typeof loadLearnOverview === 'function') setTimeout(loadLearnOverview, 60)
@@ -18197,6 +18218,124 @@ async function loadGrowAccounts(){
     });
   } catch(e){
     list.innerHTML = '<div style="font-size:12px;color:var(--t3);text-align:center;padding:8px">계정 정보를 불러올 수 없어요</div>';
+  }
+}
+
+// 홈 탭 v2 — Day 1 vs ROI 분기 + 사용자 유형별 카피
+async function loadHomeDashboard(){
+  var day1El = document.getElementById('home-day1')
+  var roiEl = document.getElementById('home-roi')
+  var fansEl = document.getElementById('home-fans')
+  var helpedEl = document.getElementById('home-helped')
+  var liveWrap = document.getElementById('home-live-wrap')
+  var lifetimeEl = document.getElementById('home-lifetime')
+  if(!day1El) return
+  try {
+    var h = await authHeaders()
+    var res = await fetch('/api/home/dashboard', { headers: h, credentials: 'include' })
+    if(!res.ok){
+      // 비로그인 — 다 숨기고 Day 1 안내만
+      day1El.style.display = 'block'
+      document.getElementById('home-day1-status').textContent = '로그인이 필요해요'
+      return
+    }
+    var j = await res.json()
+
+    if(j.mode === 'day1'){
+      day1El.style.display = 'block'
+      roiEl.style.display = 'none'
+      fansEl.style.display = 'none'
+      helpedEl.style.display = 'none'
+      liveWrap.style.display = 'none'
+      lifetimeEl.style.display = 'none'
+
+      // 진행 상태 메시지
+      var statusParts = []
+      if(j.signals.has_ig) statusParts.push('인스타 연동 완료')
+      else statusParts.push('인스타 연동 필요')
+      if(j.signals.has_kb) statusParts.push('지식 학습됨')
+      else statusParts.push('학습 자료 추가 필요')
+      document.getElementById('home-day1-status').textContent = statusParts.join(' · ')
+
+      // 다음 액션 박스
+      var tasks = document.getElementById('home-day1-tasks')
+      while(tasks.firstChild) tasks.removeChild(tasks.firstChild)
+      var stepIdx = 1
+      function addTask(title, desc, action, done){
+        var row = document.createElement('div')
+        row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 0' + (done ? ';opacity:.5' : '')
+        var dot = document.createElement('div')
+        dot.style.cssText = 'width:24px;height:24px;border-radius:50%;background:'+(done?'var(--mint)':'#fff')+';border:1.5px solid var(--mint);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0'
+        dot.textContent = done ? '✓' : String(stepIdx)
+        var info = document.createElement('div')
+        info.style.cssText = 'flex:1;min-width:0'
+        info.innerHTML = '<div style="font-size:13px;font-weight:700;color:var(--t1)">'+title+'</div><div style="font-size:11.5px;color:var(--t3);margin-top:2px">'+desc+'</div>'
+        row.appendChild(dot); row.appendChild(info)
+        if(action){
+          var btn = document.createElement('button')
+          btn.textContent = done ? '완료' : '시작'
+          btn.style.cssText = 'padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;border:none;background:'+(done?'var(--bg)':'var(--dark)')+';color:'+(done?'var(--t3)':'#fff')+';cursor:'+(done?'default':'pointer')
+          if(!done) btn.onclick = action
+          row.appendChild(btn)
+        }
+        tasks.appendChild(row)
+        if(!done) stepIdx++
+      }
+      addTask('인스타 연동', '@username 으로 자동 학습 시작', function(){ if(typeof connectIG === 'function') connectIG() }, j.signals.has_ig)
+      addTask('내 링크 만들기', '학습 자료 자동 등록 + 외부 공개 페이지', function(){ go('link') }, j.signals.has_kb)
+      addTask('인스타 바이오에 링크', j.link_handle ? 'ssobi.ai/u/'+j.link_handle : 'ssobi.ai/u/[handle]', function(){
+        if(j.link_handle){
+          try { navigator.clipboard.writeText('https://ssobi.ai/u/'+j.link_handle); lkeShowToast && lkeShowToast('링크 복사됨') } catch(_){}
+        } else go('link')
+      }, false)
+      return
+    }
+
+    // ROI 모드 (어제 데이터 있음)
+    day1El.style.display = 'none'
+    roiEl.style.display = 'block'
+    fansEl.style.display = 'block'
+    helpedEl.style.display = 'block'
+    lifetimeEl.style.display = 'block'
+
+    // Hero — 유저 유형 별 동적
+    var y = j.yesterday
+    var heroValueEl = document.getElementById('home-hero-value')
+    var heroLabelEl = document.getElementById('home-hero-label')
+    var heroSubEl = document.getElementById('home-hero-sub')
+    if(y){
+      if(y.headline_unit === 'KRW'){
+        heroValueEl.textContent = '₩' + (y.headline_value || 0).toLocaleString()
+      } else {
+        heroValueEl.textContent = (y.headline_value || 0).toLocaleString() + (y.headline_unit ? y.headline_unit : '')
+      }
+      heroLabelEl.textContent = y.headline_label
+      heroSubEl.textContent = y.click_count + '명 클릭 · ' + y.reply_count + '건 응대'
+        + (y.urgent_count > 0 ? ' · 긴급 ' + y.urgent_count + '건' : '')
+    }
+
+    // 팬 활동
+    document.getElementById('home-returning').textContent = j.week.returning_fans
+    document.getElementById('home-newfans').textContent = j.week.new_fans
+
+    // Ssobi 가 도와준 일
+    if(y){
+      var hours = Math.round((y.reply_count * 3) / 60)  // 1응대=3분 가정
+      document.getElementById('home-helped-summary').textContent =
+        y.reply_count + '건 응대 · 약 ' + hours + '시간 절약'
+    }
+
+    // 누적
+    var lifetime = j.lifetime
+    var ltText = lifetime.days + '일째 · 누적 ' + lifetime.total_replies + '건 응대'
+    if(lifetime.est_revenue_krw > 0){
+      var lakh = (lifetime.est_revenue_krw / 1_000_000).toFixed(1)
+      ltText += ' · ₩' + lakh + 'M 매출 영향'
+    }
+    document.getElementById('home-lifetime-text').textContent = ltText
+
+  } catch(e){
+    console.error('[loadHomeDashboard]', e)
   }
 }
 
