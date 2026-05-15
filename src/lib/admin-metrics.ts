@@ -31,12 +31,6 @@ export interface UsageStats {
   monthly_total: number
 }
 
-export interface MarketingStats {
-  pending: number
-  published_30d: number
-  failed_30d: number
-}
-
 export interface LinkStats {
   pages_total: number              // 만든 페이지 총 수
   pages_published: number          // 발행된 페이지 수
@@ -74,7 +68,6 @@ export interface EssentialMetrics {
   mrr_krw: number
   mrr_usd: number
   beta_expiring_7d: number
-  marketing: MarketingStats
 }
 
 export interface ServiceMetrics {
@@ -193,21 +186,6 @@ export async function getEssentialMetrics(): Promise<EssentialMetrics> {
     }
   }
 
-  // 6) 마케팅 발행 통계 (marketing_posts 테이블 — Phase 1.5 마지막 작업에서 생성될 예정)
-  const marketing: MarketingStats = { pending: 0, published_30d: 0, failed_30d: 0 }
-  try {
-    const [pendingRes, publishedRes, failedRes] = await Promise.all([
-      sb.from('marketing_posts').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
-      sb.from('marketing_posts').select('id', { count: 'exact', head: true }).eq('status', 'published').gte('published_at', thirtyDayAgo),
-      sb.from('marketing_posts').select('id', { count: 'exact', head: true }).eq('status', 'failed').gte('published_at', thirtyDayAgo),
-    ])
-    marketing.pending = pendingRes.count || 0
-    marketing.published_30d = publishedRes.count || 0
-    marketing.failed_30d = failedRes.count || 0
-  } catch {
-    // 테이블 없을 수 있음 (migration 미실행) — 0 으로
-  }
-
   return {
     signups,
     active_users,
@@ -220,7 +198,6 @@ export async function getEssentialMetrics(): Promise<EssentialMetrics> {
     mrr_krw: mrrKrw,
     mrr_usd: mrrUsd,
     beta_expiring_7d: betaExpiring7d,
-    marketing,
   }
 }
 

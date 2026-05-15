@@ -24,21 +24,17 @@ export async function GET(req: NextRequest) {
   const now = new Date()
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
 
-  const [cardnewsRes, repliesRes, assetsRes] = await Promise.all([
-    sb.from('card_news_jobs').select('id', { count: 'exact', head: true }).gte('created_at', startOfMonth),
+  const [repliesRes, voyageRes] = await Promise.all([
     sb.from('reply_logs').select('id', { count: 'exact', head: true }).gte('created_at', startOfMonth),
-    sb.from('marketing_assets').select('id', { count: 'exact', head: true })
-      .eq('generation_status', 'completed').gte('created_at', startOfMonth),
+    sb.from('knowledge_chunks').select('id', { count: 'exact', head: true }).gte('created_at', startOfMonth),
   ])
 
   return NextResponse.json(
     {
       email: ud.user.email,
       usage: {
-        cardnews_jobs_this_month: cardnewsRes.count || 0,
         reply_logs_this_month: repliesRes.count || 0,
-        higgsfield_assets_this_month: assetsRes.count || 0,
-        higgsfield_credits_balance: null,
+        voyage_embeddings_this_month: voyageRes.count || 0,
       },
     },
     { headers: { 'Cache-Control': 'private, max-age=60' } }

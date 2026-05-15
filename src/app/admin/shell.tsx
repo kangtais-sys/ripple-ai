@@ -13,13 +13,6 @@ const NAV: NavItem[] = [
   { label: '대시보드', href: '/admin' },
   { label: '회원관리', href: '/admin/users' },
   { label: '비용관리', href: '/admin/billing' },
-  {
-    label: '마케팅 자동화',
-    children: [
-      { label: '페르소나', href: '/admin/personas' },
-      { label: '콘텐츠 큐', href: '/admin/marketing' },
-    ],
-  },
 ]
 
 export default function AdminShell({ children }: { children: React.ReactNode }) {

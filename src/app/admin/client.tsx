@@ -418,21 +418,8 @@ export default function AdminOverview() {
         <SectionSkeleton title="자동 응대 (댓글·DM)" />
       )}
 
-      <section>
-        <h2 className="text-[13px] font-bold uppercase tracking-wider text-gray-700 mb-3">마케팅 발행</h2>
-        <div className="grid grid-cols-3 gap-3">
-          <MetricCard label="대기" value={m.marketing.pending} sub="예약된 발행" />
-          <MetricCard label="발행 (30일)" value={m.marketing.published_30d} accent="text-[#00C896]" />
-          <MetricCard
-            label="실패 (30일)"
-            value={m.marketing.failed_30d}
-            accent={m.marketing.failed_30d > 0 ? 'text-red-600' : 'text-[#1A1F27]'}
-          />
-        </div>
-      </section>
-
       <footer className="text-[11px] text-gray-400 pt-8 border-t border-gray-200">
-        Ssobi Admin · Phase 1.5 베타 운영 모드 · 모든 데이터는 실시간 (캐싱 없음)
+        Ssobi Admin · v2 · CS 응대 SaaS · 모든 데이터는 실시간 (캐싱 없음)
       </footer>
     </div>
   )

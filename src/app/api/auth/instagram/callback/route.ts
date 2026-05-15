@@ -48,12 +48,14 @@ export async function GET(request: NextRequest) {
     const expiresIn = longData.expires_in || 3600
     console.log('[IG OAuth] Long-lived token obtained, expires in:', expiresIn)
 
-    // 3. 유저 정보 가져오기
+    // 3. 유저 정보 가져오기 — instagram_business_basic 권한이 허용하는 메타데이터 풀로
+    //    username, account_type (BUSINESS/MEDIA_CREATOR), media_count, followers_count,
+    //    profile_picture_url 까지 한 번에 fetch. 키우기 탭 "연동 계정" 카드 표시용.
     const meRes = await fetch(
-      `https://graph.instagram.com/v21.0/me?fields=user_id,username&access_token=${accessToken}`
+      `https://graph.instagram.com/v21.0/me?fields=user_id,username,account_type,media_count,followers_count,profile_picture_url&access_token=${accessToken}`
     )
     const meData = await meRes.json()
-    console.log('[IG OAuth] Me data:', JSON.stringify(meData).substring(0, 200))
+    console.log('[IG OAuth] Me data:', JSON.stringify(meData).substring(0, 300))
 
     if (!meData.username) {
       console.error('[IG OAuth] Me error:', meData)
@@ -103,6 +105,11 @@ export async function GET(request: NextRequest) {
       ig_username: meData.username,
       access_token: accessToken,
       token_expires_at: expiresAt,
+      account_type: meData.account_type || null,
+      media_count: typeof meData.media_count === 'number' ? meData.media_count : null,
+      followers_count: typeof meData.followers_count === 'number' ? meData.followers_count : null,
+      profile_picture_url: meData.profile_picture_url || null,
+      metadata_synced_at: new Date().toISOString(),
     }, { onConflict: 'user_id,ig_user_id' })
 
     if (dbError) {

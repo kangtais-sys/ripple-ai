@@ -19,14 +19,6 @@
     {
       "path": "/api/cron/beta-lifecycle",
       "schedule": "0 0 * * *"
-    },
-    {
-      "path": "/api/cron/publish-marketing",
-      "schedule": "*/5 * * * *"
-    },
-    {
-      "path": "/api/cron/generate-drafts",
-      "schedule": "0 0 * * *"
     }
   ],
   "rewrites": [

@@ -9,24 +9,21 @@ const sb = createClient(
 )
 
 interface UsageRow {
-  cardnews_jobs_this_month: number
   reply_logs_this_month: number
-  higgsfield_assets_this_month: number
-  higgsfield_credits_balance: number | null
+  voyage_embeddings_this_month: number
 }
 
 // 인프라 고정 비용 (월 단위, USD 기준)
 const FIXED_COSTS = [
   { name: 'Vercel Pro', monthly_usd: 20, note: 'Fluid Compute · 1TB egress · cron' },
-  { name: 'Supabase Pro', monthly_usd: 25, note: 'Postgres + Auth + Storage (8GB)' },
+  { name: 'Supabase Pro', monthly_usd: 25, note: 'Postgres + pgvector + Auth + Storage' },
   { name: 'ssobi.ai 도메인', monthly_usd: 1.5, note: '연 ~$18 / 12개월' },
 ]
 
 // 변동 비용 (사용량 기반 추정 단가)
 const VARIABLE_UNIT_COSTS = {
-  claude_sonnet_per_call_usd: 0.015,   // 카드뉴스 1회 평균 토큰 추정
-  claude_haiku_per_reply_usd: 0.0008,  // 응대 1건 평균
-  higgsfield_per_image_usd: 0.05,      // Soul Standard 추정 (실제 크레딧 ÷ 환율)
+  claude_haiku_per_reply_usd: 0.0008,    // 응대 1건 평균
+  voyage_embedding_per_1k_usd: 0.0001,   // voyage-3-lite $0.02/M tokens 가정 평균 청크 500 tokens
 }
 
 export default function BillingClient() {
@@ -81,10 +78,9 @@ export default function BillingClient() {
 
   const u = state.usage
   const fixedTotalUsd = FIXED_COSTS.reduce((s, c) => s + c.monthly_usd, 0)
-  const claudeContentCost = u.cardnews_jobs_this_month * VARIABLE_UNIT_COSTS.claude_sonnet_per_call_usd
   const claudeReplyCost = u.reply_logs_this_month * VARIABLE_UNIT_COSTS.claude_haiku_per_reply_usd
-  const higgsfieldCost = u.higgsfield_assets_this_month * VARIABLE_UNIT_COSTS.higgsfield_per_image_usd
-  const variableTotalUsd = claudeContentCost + claudeReplyCost + higgsfieldCost
+  const voyageCost = u.voyage_embeddings_this_month * VARIABLE_UNIT_COSTS.voyage_embedding_per_1k_usd
+  const variableTotalUsd = claudeReplyCost + voyageCost
   const grandTotalUsd = fixedTotalUsd + variableTotalUsd
 
   return (
@@ -131,14 +127,6 @@ export default function BillingClient() {
         </h2>
         <div className="space-y-2">
           <UsageRow
-            name="Claude Sonnet 4.5"
-            sub="카드뉴스·페르소나 콘텐츠 생성"
-            count={u.cardnews_jobs_this_month}
-            unit="회"
-            unitCost={VARIABLE_UNIT_COSTS.claude_sonnet_per_call_usd}
-            total={claudeContentCost}
-          />
-          <UsageRow
             name="Claude Haiku 4.5"
             sub="댓글/DM 응대 (webhook)"
             count={u.reply_logs_this_month}
@@ -147,19 +135,14 @@ export default function BillingClient() {
             total={claudeReplyCost}
           />
           <UsageRow
-            name="Higgsfield"
-            sub="페르소나 이미지·비디오 생성"
-            count={u.higgsfield_assets_this_month}
-            unit="장"
-            unitCost={VARIABLE_UNIT_COSTS.higgsfield_per_image_usd}
-            total={higgsfieldCost}
+            name="Voyage AI 임베딩"
+            sub="지식베이스 학습 (KB chunks)"
+            count={u.voyage_embeddings_this_month}
+            unit="청크"
+            unitCost={VARIABLE_UNIT_COSTS.voyage_embedding_per_1k_usd}
+            total={voyageCost}
           />
         </div>
-        {u.higgsfield_credits_balance !== null && (
-          <div className="mt-3 text-[11.5px] text-gray-500">
-            Higgsfield 잔여 크레딧: <span className="text-amber-700 font-bold">{u.higgsfield_credits_balance}</span>
-          </div>
-        )}
       </section>
 
       <footer className="text-[11px] text-gray-400 pt-8 border-t border-gray-200">

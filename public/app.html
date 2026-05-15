@@ -2310,7 +2310,15 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <button onclick="go('manage')"><span class="act-dot red"></span><span data-i18n="grow.tab.realtime">실시간 관리</span> <span class="act-badge" id="urgent-badge" style="display:none">0</span></button>
   </div>
   <div id="sub-auto">
-  <div class="sec-eye" style="margin-top:4px" data-i18n="grow.eyebrow.automation">AUTOMATION</div>
+  <!-- 연동된 SNS 계정 카드 — 메타 검수: instagram_business_basic 으로 가져온 데이터 표시 위치 -->
+  <div class="sec-eye" style="margin-top:4px" data-i18n="grow.eyebrow.accounts">CONNECTED ACCOUNTS</div>
+  <div id="grow-accounts-card" style="background:#fff;border:1px solid var(--b);border-radius:14px;padding:14px;margin:6px 18px 12px;display:flex;flex-direction:column;gap:10px">
+    <div id="grow-accounts-list" style="display:flex;flex-direction:column;gap:8px">
+      <div style="font-size:12px;color:var(--t3);text-align:center;padding:8px">로딩 중...</div>
+    </div>
+  </div>
+
+  <div class="sec-eye" data-i18n="grow.eyebrow.automation">AUTOMATION</div>
 
   <div class="acc" id="acc-auto">
     <div class="acc-hdr" onclick="toggleAcc('acc-auto')">
@@ -4888,6 +4896,9 @@ function go(v){
   if(id === 'manage') {
     var ab=document.getElementById('nb-activity'); if(ab) ab.classList.add('on');
     setTimeout(loadRecentPublished, 60);
+  }
+  if(id === 'activity') {
+    if(typeof loadGrowAccounts === 'function') setTimeout(loadGrowAccounts, 60);
   }
   // 온보딩/가입/로그인/연동/학습/완료 화면에서 탭바 숨기기
   var hideNav = ['onb1','signup','login','connect-account-onb','learn','complete'];
@@ -18425,6 +18436,98 @@ function updateIGConnectUI(connected, username){
     if(accBtn){ accBtn.style.display = ''; accBtn.textContent = connectLabel; accBtn.style.background = 'var(--dark)'; accBtn.style.color = '#fff'; }
     if(accDisc){ accDisc.style.display = 'none'; }
     if(accRow){ accRow.style.background = 'var(--bg)'; accRow.style.borderColor = 'var(--b)'; }
+  }
+}
+
+// 키우기 탭 — 연동 계정 카드 렌더 (IG / TikTok / YouTube 통합)
+async function loadGrowAccounts(){
+  var list = document.getElementById('grow-accounts-list');
+  if(!list) return;
+  try {
+    var h = await authHeaders();
+    var res = await fetch('/api/grow/accounts', { headers: h, credentials: 'include' });
+    if(!res.ok){
+      list.innerHTML = '<div style="font-size:12px;color:var(--t3);text-align:center;padding:8px">로그인이 필요해요</div>';
+      return;
+    }
+    var j = await res.json();
+    var accs = j.accounts || [];
+    // 기존 자식 제거 후 카드 생성
+    while(list.firstChild) list.removeChild(list.firstChild);
+    accs.forEach(function(a){
+      var row = document.createElement('div');
+      row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 12px;background:'+(a.connected?'var(--mint-l)':'var(--bg)')+';border:1px solid '+(a.connected?'#A7F3D0':'var(--b)')+';border-radius:10px';
+      // 좌측 아이콘
+      var ico = document.createElement('div');
+      ico.style.cssText = 'width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff;flex-shrink:0;'+
+        (a.platform==='instagram' ? 'background:linear-gradient(135deg,#FEDA75,#FA7E1E 30%,#D62976 60%,#962FBF 80%,#4F5BD5)' :
+         a.platform==='tiktok' ? 'background:#000' :
+         'background:#FF0000');
+      ico.textContent = a.platform==='instagram' ? 'IG' : a.platform==='tiktok' ? 'TT' : 'YT';
+      row.appendChild(ico);
+      // 가운데 정보
+      var info = document.createElement('div');
+      info.style.cssText = 'flex:1;min-width:0';
+      var name = document.createElement('div');
+      name.style.cssText = 'font-size:13px;font-weight:700;color:var(--t1)';
+      name.textContent = a.platform==='instagram' ? 'Instagram' : a.platform==='tiktok' ? 'TikTok' : 'YouTube';
+      info.appendChild(name);
+      var sub = document.createElement('div');
+      sub.style.cssText = 'font-size:11px;color:var(--t3);margin-top:2px;line-height:1.4';
+      if(a.connected){
+        var parts = ['@'+a.username];
+        if(a.account_type) parts.push(a.account_type.toLowerCase().replace('_',' '));
+        if(typeof a.media_count === 'number') parts.push(a.media_count.toLocaleString()+' posts');
+        if(typeof a.followers_count === 'number' && a.followers_count > 0) parts.push(a.followers_count.toLocaleString()+' followers');
+        sub.textContent = parts.join(' · ');
+      } else {
+        sub.textContent = '미연결';
+      }
+      info.appendChild(sub);
+      row.appendChild(info);
+      // 우측 액션
+      var actions = document.createElement('div');
+      actions.style.cssText = 'display:flex;align-items:center;gap:6px;flex-shrink:0';
+      if(a.connected){
+        // 자동 응대 토글 (현재 IG 만 기능 동작 — 다른 채널은 placeholder)
+        var stateLabel = document.createElement('span');
+        stateLabel.style.cssText = 'font-size:10px;font-weight:800;color:var(--mint-d);letter-spacing:.5px';
+        stateLabel.textContent = a.auto_reply_enabled ? 'ON' : 'OFF';
+        actions.appendChild(stateLabel);
+        var toggleWrap = document.createElement('label');
+        toggleWrap.className = 'tog';
+        var input = document.createElement('input');
+        input.type = 'checkbox';
+        input.checked = !!a.auto_reply_enabled;
+        if(a.platform === 'instagram'){
+          input.onchange = function(){
+            stateLabel.textContent = input.checked ? 'ON' : 'OFF';
+            if(typeof onAutoReplyMasterToggle === 'function') onAutoReplyMasterToggle(input);
+          };
+        } else {
+          input.disabled = true;
+        }
+        toggleWrap.appendChild(input);
+        var slider = document.createElement('span');
+        slider.className = 'tsl';
+        toggleWrap.appendChild(slider);
+        actions.appendChild(toggleWrap);
+      } else {
+        var btn = document.createElement('button');
+        btn.style.cssText = 'padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;border:1px solid var(--b);background:#fff;color:var(--t2);cursor:'+(a.platform==='instagram'?'pointer':'not-allowed')+';opacity:'+(a.platform==='instagram'?'1':'.5');
+        btn.textContent = '연동하기';
+        if(a.platform === 'instagram'){
+          btn.onclick = function(){ if(typeof connectIG === 'function') connectIG(); };
+        } else {
+          btn.disabled = true;
+        }
+        actions.appendChild(btn);
+      }
+      row.appendChild(actions);
+      list.appendChild(row);
+    });
+  } catch(e){
+    list.innerHTML = '<div style="font-size:12px;color:var(--t3);text-align:center;padding:8px">계정 정보를 불러올 수 없어요</div>';
   }
 }
 
