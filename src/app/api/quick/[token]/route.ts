@@ -99,9 +99,39 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ token: str
     : pending.ai_draft
   if (!finalMessage) return NextResponse.json({ error: 'empty_message' }, { status: 400 })
 
-  // 1) IG Graph API 호출 — Phase B Week 4 에 통합 예정.
-  //    현재는 *발송 의사 표시* 만 기록 (Tester 환경 + 정확한 IG API call 통합 후 활성화)
-  //    TODO: send via @/lib/ig-send (DM 또는 reply API)
+  // 1) IG Graph API 호출
+  const { data: igAcc } = await sb
+    .from('ig_accounts')
+    .select('access_token')
+    .eq('user_id', pending.user_id)
+    .maybeSingle()
+  if (!igAcc?.access_token) {
+    return NextResponse.json({ error: 'no_ig_token' }, { status: 500 })
+  }
+
+  // DM 의 경우 recipient (fan) 의 ig_user_id 필요
+  let recipientIgUserId: string | null = null
+  if (pending.channel === 'dm' && pending.fan_id) {
+    const { data: fan } = await sb
+      .from('fan_profiles').select('ig_user_id').eq('id', pending.fan_id).maybeSingle()
+    recipientIgUserId = fan?.ig_user_id || null
+  }
+
+  const { sendCommentReply, sendDirectMessage } = await import('@/lib/v2-reply/send')
+  const sendResult = pending.channel === 'comment'
+    ? await sendCommentReply(igAcc.access_token, pending.original_message_id, finalMessage)
+    : recipientIgUserId
+      ? await sendDirectMessage(igAcc.access_token, recipientIgUserId, finalMessage)
+      : { ok: false as const, error: 'no_recipient_id' }
+
+  if (!sendResult.ok) {
+    await sb.from('send_attempts').insert({
+      user_id: pending.user_id, fan_id: pending.fan_id,
+      channel: pending.channel, draft_content: finalMessage,
+      status: 'failed', block_reason: sendResult.error,
+    })
+    return NextResponse.json({ error: 'send_failed', detail: sendResult.error }, { status: 502 })
+  }
 
   // 2) pending_replies 상태 갱신
   await sb.from('pending_replies').update({
@@ -121,6 +151,8 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ token: str
     ai_drafted: true,
     is_approved: true,
     approved_by_user: true,
+    ig_message_id: pending.channel === 'dm' ? sendResult.id : null,
+    ig_comment_id: pending.channel === 'comment' ? sendResult.id : null,
   })
 
   // 4) send_attempts audit
@@ -132,5 +164,5 @@ export async function POST(req: NextRequest, ctx: { params: Promise<{ token: str
     status: 'sent',
   })
 
-  return NextResponse.json({ ok: true, action, final_message: finalMessage })
+  return NextResponse.json({ ok: true, action, final_message: finalMessage, ig_id: sendResult.id })
 }

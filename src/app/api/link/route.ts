@@ -103,7 +103,77 @@ export async function POST(req: NextRequest) {
   // ISR 캐시 무효화 — 저장 직후 /u/[handle] 페이지 캐시 비움 → 다음 방문은 새 데이터
   try { revalidatePath('/u/' + body.handle) } catch (_) {}
 
+  // 백그라운드 KB 학습 — 링크 블록 텍스트 + 외부 URL 자동 임베딩
+  //   await 안 해도 됨 (fire-and-forget, 응답 빠르게 반환)
+  embedLinkBlocksBackground(sb, user.id, blocks).catch((e) => {
+    console.error('[/api/link] background KB embed failed:', e)
+  })
+
   return NextResponse.json({ page: data })
+}
+
+// 백그라운드 KB 임베딩 — 링크 블록의 텍스트 + 외부 URL 자동 학습
+async function embedLinkBlocksBackground(sb: SupabaseClient, userId: string, blocks: AnyRecord[]): Promise<void> {
+  const { storeKnowledge } = await import('@/lib/kb/store')
+  const { quickParse } = await import('@/lib/parsers/quick')
+
+  for (const block of blocks) {
+    // 1) 블록 자체 텍스트 임베딩 (title/sub/text/desc/caption 합쳐서)
+    const blockText = ['title', 'sub', 'text', 'desc', 'caption']
+      .map((k) => (typeof block[k] === 'string' ? block[k] : ''))
+      .filter(Boolean)
+      .join('\n')
+    if (blockText.length > 30) {
+      try {
+        await storeKnowledge(sb, userId, blockText, {
+          sourceType: 'link',
+          sourceLabel: (block.title as string) || (block.label as string) || (block.type as string) || 'link block',
+        })
+      } catch (e) {
+        console.error('[embedLinkBlocks] block text failed:', e)
+      }
+    }
+
+    // 2) 외부 URL 자동 학습 (있으면)
+    const url = typeof block.url === 'string' ? block.url : ''
+    if (url && /^https?:\/\//.test(url)) {
+      try {
+        const parsed = await quickParse(url)
+        if (parsed.ok && parsed.text) {
+          const content = [parsed.title, parsed.description, parsed.text].filter(Boolean).join('\n\n')
+          await storeKnowledge(sb, userId, content, {
+            sourceType: 'link_url',
+            sourceUrl: url,
+            sourceLabel: parsed.title || (block.title as string) || 'external link',
+          })
+        }
+      } catch (e) {
+        console.error('[embedLinkBlocks] url failed:', url, e)
+      }
+    }
+
+    // 3) items 안의 url 들도 (quicklinks·grid)
+    if (Array.isArray(block.items)) {
+      for (const item of (block.items as AnyRecord[]).slice(0, 10)) {
+        const itemUrl = typeof item.url === 'string' ? item.url : ''
+        if (itemUrl && /^https?:\/\//.test(itemUrl)) {
+          try {
+            const p = await quickParse(itemUrl)
+            if (p.ok && p.text) {
+              const content = [p.title, p.description, p.text].filter(Boolean).join('\n\n')
+              await storeKnowledge(sb, userId, content, {
+                sourceType: 'link_url',
+                sourceUrl: itemUrl,
+                sourceLabel: p.title || (item.title as string) || 'external link',
+              })
+            }
+          } catch (e) {
+            console.error('[embedLinkBlocks] item url failed:', itemUrl, e)
+          }
+        }
+      }
+    }
+  }
 }
 
 // 6자리 영숫자 코드 생성

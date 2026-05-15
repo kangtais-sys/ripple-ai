@@ -220,12 +220,35 @@ export async function handleInboundMessage(
     }
   }
 
-  // 7) auto 모드 — 즉시 발송 (IG Graph API)
-  //    실제 IG API 호출은 별도 helper. 여기선 send_attempts 만 기록.
-  //    Phase B Week 4 에서 IG API 호출 통합.
+  // 7) auto 모드 — 즉시 IG Graph API 호출
+  const { data: igAcc } = await sb
+    .from('ig_accounts')
+    .select('access_token, ig_user_id')
+    .eq('user_id', msg.userId)
+    .maybeSingle()
 
-  // 임시: 우선 outbound conversation 만 기록하고 send_attempts 에 'sent' 로 표시
-  // (실제 IG API 호출은 다음 commit 에서 통합)
+  if (!igAcc?.access_token) {
+    await logSendAttempt(sb, {
+      userId: msg.userId, fanId, channel: msg.channel,
+      draftContent: result.reply, status: 'failed', blockReason: 'no_ig_token',
+    })
+    return { ok: false, action: 'failed', error: 'no_ig_token', intent: intent.intent }
+  }
+
+  const { sendCommentReply, sendDirectMessage } = await import('@/lib/v2-reply/send')
+  const sendResult = msg.channel === 'comment'
+    ? await sendCommentReply(igAcc.access_token, msg.igCommentId || '', result.reply)
+    : await sendDirectMessage(igAcc.access_token, msg.fromIgUserId, result.reply)
+
+  if (!sendResult.ok) {
+    await logSendAttempt(sb, {
+      userId: msg.userId, fanId, channel: msg.channel,
+      draftContent: result.reply, status: 'failed', blockReason: sendResult.error,
+    })
+    return { ok: false, action: 'failed', error: sendResult.error, intent: intent.intent }
+  }
+
+  // 성공 — outbound conversation 기록
   await sb.from('conversations').insert({
     user_id: msg.userId,
     fan_id: fanId,
@@ -235,6 +258,8 @@ export async function handleInboundMessage(
     ai_drafted: true,
     is_approved: true,
     approved_by_user: false,
+    ig_message_id: msg.channel === 'dm' ? sendResult.id : null,
+    ig_comment_id: msg.channel === 'comment' ? sendResult.id : null,
   })
 
   await logSendAttempt(sb, {

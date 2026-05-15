@@ -3,6 +3,17 @@ import { NextRequest, NextResponse } from 'next/server'
 import { isOverLimit, getEffectivePlanKey } from '@/lib/plans'
 import { logAIUsage } from '@/lib/ai-usage'
 import { classifyText, upsertFollower, recordOutboundMessage, maybeCreateRevenueProposal } from '@/lib/webhook-helpers'
+import { handleInboundMessage } from '@/lib/v2-reply'
+
+// v2 활성화 체크 — knowledge_chunks 가 있으면 v2 엔진으로
+async function isV2Active(supabase: AdminClient, userId: string): Promise<boolean> {
+  const { count } = await supabase
+    .from('knowledge_chunks')
+    .select('id', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .eq('is_active', true)
+  return !!count && count > 0
+}
 
 type AdminClient = SupabaseClient
 
@@ -123,6 +134,27 @@ async function handleComment(supabase: AdminClient, value: any) {
     if (account.ig_user_id === igUserId) {
       console.log('[Webhook/Comment] skip self-comment (account=commenter)', account.ig_user_id)
       continue
+    }
+
+    // v2 엔진 분기 — KB 가 있으면 v2 새 엔진으로 (말투·페르소나·KB RAG·차등 컨텍스트)
+    if (await isV2Active(supabase, account.user_id)) {
+      try {
+        const out = await handleInboundMessage(supabase, {
+          userId: account.user_id,
+          channel: 'comment',
+          igCommentId: commentId,
+          igMediaId: value.media?.id || '',
+          fromIgUserId: igUserId,
+          fromUsername: value.from?.username || '',
+          content: text,
+        })
+        console.log('[Webhook/Comment v2]', account.user_id, '→', out.action, out.intent)
+        // v2 처리 끝 → 다음 account 로
+        continue
+      } catch (e) {
+        console.error('[Webhook/Comment v2] failed, fallback to v1:', e)
+        // v2 실패 시 v1 로 fallback
+      }
     }
 
     // 플랜 한도 체크
@@ -299,6 +331,24 @@ async function handleMessage(supabase: AdminClient, value: any) {
 
   for (const account of accounts) {
     if (account.ig_user_id === senderId) continue
+
+    // v2 엔진 분기 — KB 있으면 v2 (24h 창 + 차등 컨텍스트 + 솔라피 알림)
+    if (await isV2Active(supabase, account.user_id)) {
+      try {
+        const out = await handleInboundMessage(supabase, {
+          userId: account.user_id,
+          channel: 'dm',
+          igMessageId: messageId,
+          fromIgUserId: String(senderId),
+          fromUsername: value.sender?.username || '',
+          content: text,
+        })
+        console.log('[Webhook/DM v2]', account.user_id, '→', out.action, out.intent)
+        continue
+      } catch (e) {
+        console.error('[Webhook/DM v2] failed, fallback to v1:', e)
+      }
+    }
 
     const withinLimit = await checkUserLimit(supabase, account.user_id)
     if (!withinLimit) {
