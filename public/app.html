@@ -19020,10 +19020,26 @@ async function loadLearnOverview(){
     // Persona 카드
     var nameEl = document.getElementById('learn-persona-name')
     var descEl = document.getElementById('learn-persona-desc')
-    if(j.tone && j.tone.persona_summary){
+    var hasTone = j.tone && (j.tone.persona_summary || j.tone.learned_style)
+    if(hasTone){
       var ownerPrefix = j.ig_username ? j.ig_username : (ssobiCurrentLang === 'en' ? 'My' : '내')
       nameEl.textContent = ownerPrefix + t('learn2.persona_owner_post','의 Ssobi')
-      descEl.innerHTML = (j.tone.learned_style && typeof j.tone.learned_style === 'string' ? j.tone.learned_style.slice(0, 60) : t('learn2.persona_done','학습 완료'))
+      // learned_style 이 객체면 tone 필드 추출, 문자열이면 그대로 슬라이스
+      var styleLine = ''
+      if(j.tone.learned_style){
+        if(typeof j.tone.learned_style === 'string'){
+          styleLine = j.tone.learned_style.slice(0, 60)
+        } else if(typeof j.tone.learned_style === 'object'){
+          var s = j.tone.learned_style
+          var parts = []
+          if(s.tone) parts.push(s.tone)
+          if(s.length) parts.push(s.length)
+          if(s.emoji_style) parts.push(s.emoji_style)
+          styleLine = parts.join(' · ').slice(0, 80) || t('learn2.persona_done','학습 완료')
+        }
+      }
+      if(!styleLine) styleLine = t('learn2.persona_done','학습 완료')
+      descEl.innerHTML = styleLine
         + (j.tone.persona_summary ? '<br/><span style="color:var(--t3)">'+j.tone.persona_summary.slice(0, 60)+'</span>' : '')
     } else if(j.ig_username){
       // IG 연동됐는데 tone 학습 안 됨 → 자동 학습 백그라운드 시작
