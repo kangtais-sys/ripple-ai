@@ -16936,54 +16936,70 @@ function toneFmt(v){
   return String(v);
 }
 
+function renderToneState(j){
+  var statusEl = document.getElementById('tone-status-label');
+  var countEl = document.getElementById('tone-sample-count');
+  var charsEl = document.getElementById('tone-characteristics');
+  if(j && j.learned_style){
+    if(statusEl) statusEl.textContent = '학습완료';
+    if(countEl) countEl.textContent = (j.sample_texts||[]).length;
+    if(charsEl){
+      var s = j.learned_style;
+      var lines = [];
+      var tone = toneFmt(s.tone);
+      var ending = toneFmt(s.sentence_ending);
+      var emoji = toneFmt(s.emoji_style);
+      var length = toneFmt(s.length);
+      var example = toneFmt(s.example_reply);
+      var chars = Array.isArray(s.characteristics) ? s.characteristics : (s.characteristics ? [s.characteristics] : []);
+      if(tone) lines.push('<b>어조</b> · ' + tone);
+      if(ending) lines.push('<b>종결어미</b> · ' + ending);
+      if(emoji) lines.push('<b>이모지</b> · ' + emoji);
+      if(length) lines.push('<b>길이</b> · ' + length);
+      chars.forEach(function(c){ var t = toneFmt(c); if(t) lines.push('✓ ' + t); });
+      if(example) lines.push('<div style="margin-top:10px;padding:10px;background:#fff;border-radius:8px;font-size:11.5px;color:var(--t1);border:1px solid var(--b)"><b>예시 답글</b><br>' + example + '</div>');
+      if(lines.length === 0){
+        charsEl.innerHTML = '<div style="font-family:monospace;font-size:10px;color:var(--t3);white-space:pre-wrap;word-break:break-all">' + JSON.stringify(s, null, 2) + '</div>';
+      } else {
+        charsEl.innerHTML = lines.join('<br>');
+      }
+    }
+  } else {
+    if(statusEl) statusEl.textContent = '미학습';
+    if(countEl) countEl.textContent = '0';
+    if(charsEl) charsEl.textContent = '아직 학습된 말투가 없어요. 아래 버튼으로 학습을 시작해주세요.';
+  }
+}
+
+function renderToneContext(ctx){
+  var bcEl = document.getElementById('tone-brand-context');
+  var bwEl = document.getElementById('tone-banned-words');
+  if(bcEl) bcEl.value = (ctx && ctx.brand_context) || '';
+  if(bwEl) bwEl.value = ctx && Array.isArray(ctx.banned_words) ? ctx.banned_words.join(', ') : '';
+}
+
 async function loadToneState(){
+  // 1) 캐시 즉시 표시
+  try {
+    var rawT = localStorage.getItem('ssobi_tone_state_cache')
+    var rawC = localStorage.getItem('ssobi_tone_context_cache')
+    if(rawT) renderToneState(JSON.parse(rawT))
+    if(rawC) renderToneContext(JSON.parse(rawC))
+  } catch(_){}
+  // 2) fetch
   try {
     var h = await authHeaders();
-    // context (금지어, 브랜드 정보) 같이 로드
     fetch('/api/tone/context', {credentials:'include', headers: h})
       .then(function(r){ return r.json(); })
       .then(function(ctx){
-        var bcEl = document.getElementById('tone-brand-context');
-        var bwEl = document.getElementById('tone-banned-words');
-        if(bcEl) bcEl.value = ctx.brand_context || '';
-        if(bwEl) bwEl.value = Array.isArray(ctx.banned_words) ? ctx.banned_words.join(', ') : '';
+        try { localStorage.setItem('ssobi_tone_context_cache', JSON.stringify(ctx)) } catch(_){}
+        renderToneContext(ctx)
       }).catch(function(){});
     var res = await fetch('/api/tone/learn', {credentials:'include', headers: h});
     var j = await res.json();
     console.log('[tone] learned:', j);
-    var statusEl = document.getElementById('tone-status-label');
-    var countEl = document.getElementById('tone-sample-count');
-    var charsEl = document.getElementById('tone-characteristics');
-    if(j.learned_style){
-      if(statusEl) statusEl.textContent = '학습완료';
-      if(countEl) countEl.textContent = (j.sample_texts||[]).length;
-      if(charsEl){
-        var s = j.learned_style;
-        var lines = [];
-        var tone = toneFmt(s.tone);
-        var ending = toneFmt(s.sentence_ending);
-        var emoji = toneFmt(s.emoji_style);
-        var length = toneFmt(s.length);
-        var example = toneFmt(s.example_reply);
-        var chars = Array.isArray(s.characteristics) ? s.characteristics : (s.characteristics ? [s.characteristics] : []);
-        if(tone) lines.push('<b>어조</b> · ' + tone);
-        if(ending) lines.push('<b>종결어미</b> · ' + ending);
-        if(emoji) lines.push('<b>이모지</b> · ' + emoji);
-        if(length) lines.push('<b>길이</b> · ' + length);
-        chars.forEach(function(c){ var t = toneFmt(c); if(t) lines.push('✓ ' + t); });
-        if(example) lines.push('<div style="margin-top:10px;padding:10px;background:#fff;border-radius:8px;font-size:11.5px;color:var(--t1);border:1px solid var(--b)"><b>예시 답글</b><br>' + example + '</div>');
-        // 모든 필드가 빈 경우 raw JSON 표시 (디버깅)
-        if(lines.length === 0){
-          charsEl.innerHTML = '<div style="font-family:monospace;font-size:10px;color:var(--t3);white-space:pre-wrap;word-break:break-all">' + JSON.stringify(s, null, 2) + '</div>';
-        } else {
-          charsEl.innerHTML = lines.join('<br>');
-        }
-      }
-    } else {
-      if(statusEl) statusEl.textContent = '미학습';
-      if(countEl) countEl.textContent = '0';
-      if(charsEl) charsEl.textContent = '아직 학습된 말투가 없어요. 아래 버튼으로 학습을 시작해주세요.';
-    }
+    try { localStorage.setItem('ssobi_tone_state_cache', JSON.stringify(j)) } catch(_){}
+    renderToneState(j)
   } catch(e){ console.warn('tone state load failed', e); }
 }
 
@@ -19001,7 +19017,15 @@ function learnRenderListGroup(label, hint, items){
 }
 
 async function loadLearnOverview(){
-  // 헤더 + persona 카드 + 채팅 자동 학습 자료
+  // 1) 캐시된 응답 있으면 즉시 렌더 (깜빡임 제거)
+  try {
+    var cachedRaw = localStorage.getItem('ssobi_learn_overview_cache')
+    if(cachedRaw){
+      var cached = JSON.parse(cachedRaw)
+      if(cached) renderLearnOverview(cached)
+    }
+  } catch(_){}
+  // 2) fetch 시작 (background)
   try {
     var h = await authHeaders()
     var res = await fetch('/api/learn/overview', { headers: h, credentials: 'include' })
@@ -19011,7 +19035,15 @@ async function loadLearnOverview(){
       return
     }
     var j = await res.json()
+    try { localStorage.setItem('ssobi_learn_overview_cache', JSON.stringify(j)) } catch(_){}
+    renderLearnOverview(j)
+  } catch(e){
+    console.error('[loadLearnOverview]', e)
+  }
+}
 
+function renderLearnOverview(j){
+  try {
     // 헤더 sub
     var totalChunks = j.stats?.total_chunks || 0
     var totalItems = (j.stats?.total_products || 0) + (j.stats?.total_files || 0) + (j.urgent?.length || 0)
@@ -19094,7 +19126,7 @@ async function loadLearnOverview(){
     // 목록 뷰 채우기
     learnRenderListView(j)
   } catch(e){
-    console.error('[loadLearnOverview]', e)
+    console.error('[renderLearnOverview]', e)
   }
 }
 
