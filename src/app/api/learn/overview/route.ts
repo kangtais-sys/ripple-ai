@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
   const now = new Date().toISOString()
 
   // 병렬 fetch
-  const [toneR, profR, chunksR, filesR, urgentR] = await Promise.all([
+  const [toneR, profR, chunksR, filesR, urgentR, igR] = await Promise.all([
     sb.from('tone_profiles')
       .select('learned_style, persona_summary, persona_details, user_corrections, validation_completed_at')
       .eq('user_id', u.id)
@@ -57,6 +57,11 @@ export async function GET(req: NextRequest) {
       .eq('is_active', true)
       .or(`expires_at.is.null,expires_at.gt.${now}`)
       .order('created_at', { ascending: false }),
+    sb.from('ig_accounts')
+      .select('ig_username')
+      .eq('user_id', u.id)
+      .limit(1)
+      .maybeSingle(),
   ])
 
   // 청크 → source_url 별 group
@@ -100,6 +105,7 @@ export async function GET(req: NextRequest) {
   return NextResponse.json({
     tone: toneR.data,
     profile: profR.data,
+    ig_username: igR.data?.ig_username || null,
     products: products.slice(0, 50),
     files: filesR.data || [],
     urgent: urgentR.data || [],
