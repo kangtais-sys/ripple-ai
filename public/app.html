@@ -314,12 +314,12 @@ input:checked+.tsl::before{transform:translateX(18px)}
 .ins-card{background:#fff;border:1px solid var(--b);border-radius:12px;padding:14px 12px;text-align:left}
 .ins-lbl{font-size:10.5px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px}
 .ins-val{font-size:20px;font-weight:900;color:var(--t1);letter-spacing:-.3px}
-.p-stats{display:grid;grid-template-columns:repeat(3,1fr);background:var(--s);border-radius:20px;border:1px solid var(--b);overflow:hidden;margin-bottom:20px}
-.p-stat{padding:15px 8px;text-align:center;border-right:1px solid var(--b);position:relative;transition:background .1s}
+.p-stats{display:grid;grid-template-columns:repeat(3,1fr);background:#fff;border-radius:16px;border:1px solid var(--b);overflow:hidden;margin-bottom:20px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.p-stat{padding:14px 14px;text-align:left;border-right:1px solid var(--b);position:relative;transition:background .1s}
 .p-stat:last-child{border:none}
 .p-stat[onclick]:active{background:var(--bg)}
-.p-stat[onclick]::after{content:'›';position:absolute;top:6px;right:8px;font-size:16px;color:var(--t3);font-weight:700;line-height:1}
-.p-sv{font-size:20px;font-weight:900;color:var(--t1)}.p-sv.g{color:var(--mint)}.p-sl{font-size:11px;color:var(--t3);font-weight:600;margin-top:4px}
+.p-stat[onclick]::after{content:'›';position:absolute;top:10px;right:10px;font-size:14px;color:var(--t3);font-weight:700;line-height:1}
+.p-sv{font-size:22px;font-weight:800;color:var(--t1);letter-spacing:-.4px;line-height:1.1}.p-sv.g{color:var(--mint-d)}.p-sl{font-size:10px;color:var(--t3);font-weight:700;margin-top:5px;letter-spacing:.3px}
 .menu{background:var(--s);border-radius:20px;border:1px solid var(--b);overflow:hidden;margin-bottom:10px}
 .mitem{display:flex;align-items:center;gap:14px;padding:16px 18px;border-bottom:1px solid var(--b);cursor:pointer;transition:background .1s}
 .mitem-kakao{background:linear-gradient(90deg,#FFFBE6,#FFF8D9);border-left:3px solid #FEE500}
@@ -1322,8 +1322,10 @@ body.edt-fullscreen .edt-panel.on{ top:12px }
 
 /* ── 친구 초대 ── */
 .invite-card{background:linear-gradient(135deg,#00C896 0%,#06B6D4 100%);border-radius:20px;padding:18px;color:#fff;margin-bottom:10px;position:relative;overflow:hidden}
-.invite-card-sm{padding:14px 16px}
-.invite-card-sm::before{width:100px;height:100px;top:-20px;right:-10px}
+.invite-card-sm{padding:14px 16px;background:var(--mint-l);border:1px solid rgba(0,200,150,.18);color:var(--t1)}
+.invite-card-sm::before{display:none}
+.invite-card-sm .invite-tt{color:var(--t1)}
+.invite-card-sm .invite-ss{color:var(--t2);opacity:1}
 .invite-card::before{content:'';position:absolute;top:-30px;right:-20px;width:120px;height:120px;background:rgba(255,255,255,.08);border-radius:50%}
 .invite-tt{font-size:17px;font-weight:900;letter-spacing:-.3px;margin-bottom:4px;position:relative;z-index:1}
 .invite-ss{font-size:12px;opacity:.95;line-height:1.55;margin-bottom:14px;position:relative;z-index:1}
@@ -1376,12 +1378,12 @@ body.edt-fullscreen .edt-panel.on{ top:12px }
 .proof-slim .proof-tag{font-size:10.5px;color:var(--mint);font-weight:700}
 
 /* Upsell bar — proof-banner와 비슷하지만 변형 */
-.upsell-bar{display:flex;align-items:center;gap:10px;padding:10px 12px 10px 14px;border-radius:14px;background:linear-gradient(135deg,#1A1F27 0%,#2A3544 100%);color:#fff;cursor:pointer;position:relative;overflow:hidden;margin-top:10px;margin-bottom:20px;transition:transform .1s}
+.upsell-bar{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:14px;background:linear-gradient(135deg,#1A1F27 0%,#2A3544 100%);color:#fff;cursor:pointer;position:relative;overflow:hidden;margin-top:10px;margin-bottom:20px;transition:transform .1s}
 .upsell-bar::before{content:'';position:absolute;top:-40px;right:-30px;width:140px;height:140px;background:radial-gradient(circle,rgba(245,158,11,.25),transparent 70%);pointer-events:none}
 .upsell-bar:active{transform:scale(.98)}
 .upsell-spark{position:relative;z-index:1;font-size:16px;color:var(--amber);filter:drop-shadow(0 0 8px rgba(245,158,11,.5));animation:lke-pulse 2s infinite;flex-shrink:0}
 .upsell-body{position:relative;z-index:1;display:flex;align-items:center;gap:6px;flex:1;min-width:0;overflow:hidden}
-.upsell-body b{font-size:12.5px;font-weight:800;letter-spacing:-.2px}
+.upsell-body b{font-size:13px;font-weight:800;letter-spacing:-.2px;color:#fff}
 .upsell-body span{color:rgba(255,255,255,.62);font-size:11.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .upsell-arr{position:relative;z-index:1;color:var(--amber);font-size:16px;font-weight:800;flex-shrink:0}
 
@@ -2390,7 +2392,33 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       </div>
     </div>
 
-    <!-- 긴급 알림 블록 (활동 카드 아래) -->
+    <!-- 지금 응대중 — 심플 -->
+    <div style="padding:0 0 18px">
+      <div style="display:flex;align-items:center;gap:8px;padding:0 4px 8px">
+        <span style="display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;background:var(--red);color:#fff;font-size:9px;font-weight:800;letter-spacing:.5px">
+          <span style="width:5px;height:5px;border-radius:3px;background:#fff;animation:bl 1.5s ease infinite"></span>
+          LIVE
+        </span>
+        <span style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px">지금 응대중</span>
+      </div>
+      <div style="background:#fff;border:1px solid var(--b);border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(16,24,40,.04)">
+        <!-- ticker + fade 마스크 한 컨테이너 안에 -->
+        <div style="position:relative;height:130px;overflow:hidden">
+          <div class="ssobi-ticker" id="home-live-list" style="padding:10px 0"></div>
+          <!-- 상단 페이드 -->
+          <div style="position:absolute;top:0;left:0;right:0;height:24px;background:linear-gradient(to bottom,#fff 0%,rgba(255,255,255,.7) 50%,rgba(255,255,255,0) 100%);pointer-events:none"></div>
+          <!-- 하단 페이드 — ticker 컨테이너 바로 끝에 붙음 -->
+          <div style="position:absolute;bottom:0;left:0;right:0;height:24px;background:linear-gradient(to top,#fff 0%,rgba(255,255,255,.7) 50%,rgba(255,255,255,0) 100%);pointer-events:none"></div>
+        </div>
+        <div style="padding:9px 14px;border-top:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="go('manage')">
+          <span class="tnum" style="font-size:11px;color:var(--t2)">최근 5분 <span style="color:var(--t1);font-weight:700" id="home-recent-count">0건</span></span>
+          <span style="font-size:11px;color:var(--mint-d);font-weight:700">전체 보기 →</span>
+        </div>
+      </div>
+      <span id="home-live-typing" style="display:none"></span>
+    </div>
+
+    <!-- 긴급 알림 블록 (지금 응대중 아래) -->
     <div id="home-urgent-pill" style="background:var(--dark);border-radius:16px;padding:13px 16px;color:#fff;margin-bottom:18px;display:flex;align-items:center;gap:10px;position:relative;overflow:hidden;cursor:pointer;box-shadow:0 8px 20px rgba(15,19,25,.18)" onclick="goHomeUrgentTarget()">
       <div id="home-urgent-pill-glow" style="position:absolute;top:-30px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(0,200,150,.3),transparent 60%);border-radius:50%;pointer-events:none"></div>
       <span style="position:relative;width:8px;height:8px;border-radius:50%;flex-shrink:0;z-index:1" id="home-urgent-pill-dot-wrap">
@@ -2419,32 +2447,6 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         </div>
       </div>
       <svg width="7" height="12" viewBox="0 0 8 14" style="flex-shrink:0"><path d="M1 1l6 6-6 6" stroke="rgba(255,255,255,.6)" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
-    </div>
-
-    <!-- 지금 응대중 — 심플 -->
-    <div style="padding:0 0 18px">
-      <div style="display:flex;align-items:center;gap:8px;padding:0 4px 8px">
-        <span style="display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;background:var(--red);color:#fff;font-size:9px;font-weight:800;letter-spacing:.5px">
-          <span style="width:5px;height:5px;border-radius:3px;background:#fff;animation:bl 1.5s ease infinite"></span>
-          LIVE
-        </span>
-        <span style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px">지금 응대중</span>
-      </div>
-      <div style="background:#fff;border:1px solid var(--b);border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(16,24,40,.04)">
-        <!-- ticker + fade 마스크 한 컨테이너 안에 -->
-        <div style="position:relative;height:130px;overflow:hidden">
-          <div class="ssobi-ticker" id="home-live-list" style="padding:10px 0"></div>
-          <!-- 상단 페이드 -->
-          <div style="position:absolute;top:0;left:0;right:0;height:24px;background:linear-gradient(to bottom,#fff 0%,rgba(255,255,255,.7) 50%,rgba(255,255,255,0) 100%);pointer-events:none"></div>
-          <!-- 하단 페이드 — ticker 컨테이너 바로 끝에 붙음 -->
-          <div style="position:absolute;bottom:0;left:0;right:0;height:24px;background:linear-gradient(to top,#fff 0%,rgba(255,255,255,.7) 50%,rgba(255,255,255,0) 100%);pointer-events:none"></div>
-        </div>
-        <div style="padding:9px 14px;border-top:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="go('manage')">
-          <span class="tnum" style="font-size:11px;color:var(--t2)">최근 5분 <span style="color:var(--t1);font-weight:700" id="home-recent-count">0건</span></span>
-          <span style="font-size:11px;color:var(--mint-d);font-weight:700">전체 보기 →</span>
-        </div>
-      </div>
-      <span id="home-live-typing" style="display:none"></span>
     </div>
 
     <!-- 호환성: 기존 JS 참조용 hidden -->
@@ -2904,11 +2906,16 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
 <!-- 내 정보 -->
 <div class="vw" id="v-profile">
-  <div class="hdr"><div class="logo" style="font-size:18px" data-i18n="profile.title">내 정보</div></div>
-
-  <div class="p-top" style="display:block;padding:4px 0 18px">
-    <div id="p-display-name" style="font-size:24px;font-weight:900;color:var(--t1);letter-spacing:-.6px">—</div>
-    <div id="p-email" style="font-size:12.5px;color:var(--t3);margin-top:3px">—</div>
+  <!-- Hero (홈/학습탭 결 통일) -->
+  <div style="padding:8px 4px 18px">
+    <div style="font-size:24px;font-weight:800;letter-spacing:-.8px;line-height:1.2;color:var(--t1)">
+      안녕하세요, <span id="p-display-name" style="color:var(--mint-d)">—</span>님
+    </div>
+    <div id="p-email" style="font-size:12.5px;color:var(--t3);margin-top:4px">—</div>
+    <div style="margin-top:12px;display:inline-flex;align-items:center;gap:7px;padding:5px 10px;background:#fff;border-radius:999px;border:1px solid var(--b);font-size:12px;color:var(--t2)">
+      <span style="width:5px;height:5px;border-radius:3px;background:var(--mint)"></span>
+      <span id="p-status-pill" data-i18n="profile.plan.free">무료 플랜</span>
+    </div>
   </div>
 
   <div class="p-stats">
@@ -2927,7 +2934,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   </div>
 
   <!-- 친구 초대 (축소) -->
-  <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.3px;margin-bottom:8px" data-i18n="profile.invite_section">친구 초대</div>
+  <div style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px;padding:0 4px;margin-bottom:8px" data-i18n="profile.invite_section">친구 초대</div>
   <div class="invite-card invite-card-sm">
     <div style="display:flex;align-items:center;gap:12px;position:relative;z-index:1">
       <div style="flex:1;min-width:0">
@@ -2948,7 +2955,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div class="upsell-arr">→</div>
   </div>
 
-  <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.3px;margin-bottom:8px" data-i18n="profile.section.settings">설정</div>
+  <div style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px;padding:0 4px;margin-bottom:8px" data-i18n="profile.section.settings">설정</div>
   <div class="menu">
     <div class="mitem" onclick="openModal('m-account')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div><div class="mbd"><div class="mname2" data-i18n="profile.menu.account_int">계정 연동</div><div class="msub2" data-i18n="profile.menu.account_int_sub">Instagram · TikTok · YouTube</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
     <div class="mitem" onclick="go('targets')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mbd"><div class="mname2" data-i18n="profile.menu.target">참고 계정 분석</div><div class="msub2" data-i18n="profile.menu.target_sub">경쟁 계정 해시태그 · 게시 패턴 분석</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
@@ -2964,7 +2971,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div class="mitem mitem-kakao" onclick="openModal('m-kakao')"><div class="mico" style="background:#FEE500;border-color:#FEE500"><svg viewBox="0 0 24 24" fill="none" stroke="#3A1D1D" stroke-width="1.8"><path d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mbd"><div class="mname2" style="color:#3A1D1D" data-i18n="profile.menu.kakao">카카오톡으로 알림 받기</div><div class="msub2" data-i18n="profile.menu.kakao_sub">요주의·수익제안·일일 리포트 즉시</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
     <div class="mitem" onclick="openModal('m-plan')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div><div class="mbd"><div class="mname2" data-i18n="profile.menu.plan">이용권</div><div class="msub2" data-i18n="profile.plan.premium_trial">프리미엄 · 무료체험 D-4</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
   </div>
-  <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.3px;margin:16px 0 8px" data-i18n="profile.section.account">계정</div>
+  <div style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px;padding:0 4px;margin:18px 0 8px" data-i18n="profile.section.account">계정</div>
   <div class="menu">
     <div class="mitem" onclick="openModal('m-find-account')"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mbd"><div class="mname2" data-i18n="profile.menu.find">아이디 · 비밀번호 찾기</div><div class="msub2" data-i18n="profile.menu.find_sub">가입 이메일로 재설정 링크 발송</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
     <div class="mitem" onclick="go('login')">
@@ -2982,7 +2989,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     </div>
   </div>
 
-  <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:.3px;margin:16px 0 8px" data-i18n="profile.section.legal">법적 고지 · 고객센터</div>
+  <div style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px;padding:0 4px;margin:18px 0 8px" data-i18n="profile.section.legal">법적 고지 · 고객센터</div>
   <div class="menu">
     <a class="mitem" href="/terms" target="_blank" style="text-decoration:none;color:inherit"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke-linecap="round" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke-linecap="round" stroke-linejoin="round"/><line x1="16" y1="13" x2="8" y2="13" stroke-linecap="round"/><line x1="16" y1="17" x2="8" y2="17" stroke-linecap="round"/></svg></div><div class="mbd"><div class="mname2" data-i18n="profile.legal.terms">이용약관</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></a>
     <a class="mitem" href="/privacy" target="_blank" style="text-decoration:none;color:inherit"><div class="mico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke-linecap="round" stroke-linejoin="round"/></svg></div><div class="mbd"><div class="mname2" data-i18n="profile.legal.privacy">개인정보처리방침</div></div><div class="marr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></a>
@@ -18297,7 +18304,10 @@ async function bootstrapUser(){
     } catch(_){}
 
     var email = user.email || '';
-    var displayName = user.user_metadata?.display_name;
+    var displayName = user.user_metadata?.display_name
+      || user.user_metadata?.full_name      // Google OAuth
+      || user.user_metadata?.name            // Kakao OAuth
+      || user.user_metadata?.user_name;      // 일부 provider
     var name = displayName || (email ? email.split('@')[0] : '사용자');
 
     // 1. 내 정보 프로필 카드 이름·이메일
@@ -18622,6 +18632,15 @@ async function loadHomeDashboard(){
   var roiEl = document.getElementById('home-roi-wrap')
   if(!day1El || !roiEl) return
 
+  // 즉시 표시 — 마지막 모드 캐시로 분기 (perceived 속도)
+  try {
+    var cachedMode = localStorage.getItem('ssobi_home_mode')
+    if(cachedMode === 'roi'){ roiEl.style.display = 'block'; day1El.style.display = 'none' }
+    else { day1El.style.display = 'block'; roiEl.style.display = 'none' }
+  } catch(_){
+    day1El.style.display = 'block'; roiEl.style.display = 'none'
+  }
+
   // 활동 바 + 라이브 ticker 는 항상 demo로 채워둠 (실데이터 들어오면 갈아끼움)
   homeRenderActivityBar(HOME_ACTIVITY_PATTERN_DEFAULT)
   homeRenderLiveList(HOME_LIVE_EVENTS_DEFAULT)
@@ -18649,6 +18668,7 @@ async function loadHomeDashboard(){
     }
 
     if(j.mode === 'day1'){
+      try { localStorage.setItem('ssobi_home_mode', 'day1') } catch(_){}
       day1El.style.display = 'block'
       roiEl.style.display = 'none'
 
@@ -18743,6 +18763,7 @@ async function loadHomeDashboard(){
     }
 
     // ─────────────── ROI 모드 ───────────────
+    try { localStorage.setItem('ssobi_home_mode', 'roi') } catch(_){}
     day1El.style.display = 'none'
     roiEl.style.display = 'block'
 
