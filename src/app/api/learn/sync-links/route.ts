@@ -1,0 +1,115 @@
+// POST /api/learn/sync-links
+//   사용자 link_pages.blocks 의 모든 URL 을 자동 임베딩 (신규만)
+//   학습탭 진입 또는 명시적 trigger 시 호출
+//
+// Body: {} (인증 헤더만)
+// Response: { triggered: number, skipped: number }
+
+import { NextRequest, NextResponse } from 'next/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
+import { getUserFromRequest } from '@/lib/auth-helper'
+
+export const dynamic = 'force-dynamic'
+export const maxDuration = 300 // 11개 × 평균 5초 + buffer
+
+function admin() {
+  return createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    { auth: { persistSession: false } }
+  )
+}
+
+type AnyRecord = Record<string, unknown>
+
+export async function POST(req: NextRequest) {
+  const u = await getUserFromRequest(req)
+  if (!u) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+
+  const sb = admin()
+
+  // 1) link_pages.blocks 조회
+  const { data: page } = await sb
+    .from('link_pages')
+    .select('blocks')
+    .eq('user_id', u.id)
+    .maybeSingle()
+
+  const blocks: AnyRecord[] = Array.isArray(page?.blocks) ? page.blocks : []
+  if (blocks.length === 0) {
+    return NextResponse.json({ triggered: 0, skipped: 0, reason: 'no_blocks' })
+  }
+
+  // 2) URL 수집
+  type UrlEntry = { url: string; label: string }
+  const allUrls: UrlEntry[] = []
+  for (const block of blocks) {
+    const url = typeof block.url === 'string' ? block.url : ''
+    if (url && /^https?:\/\//.test(url)) {
+      allUrls.push({ url, label: (block.title as string) || (block.label as string) || 'external link' })
+    }
+    if (Array.isArray(block.items)) {
+      for (const item of block.items as AnyRecord[]) {
+        const iu = typeof item.url === 'string' ? item.url : ''
+        if (iu && /^https?:\/\//.test(iu)) {
+          allUrls.push({ url: iu, label: (item.title as string) || (item.label as string) || 'external link' })
+        }
+      }
+    }
+  }
+
+  // 3) 이미 임베딩된 URL skip
+  const uniqueUrls = Array.from(new Set(allUrls.map(u => u.url)))
+  let alreadyEmbedded = new Set<string>()
+  if (uniqueUrls.length > 0) {
+    const { data: existingChunks } = await sb
+      .from('knowledge_chunks')
+      .select('source_url')
+      .eq('user_id', u.id)
+      .eq('is_active', true)
+      .in('source_url', uniqueUrls)
+    alreadyEmbedded = new Set((existingChunks || []).map((c: { source_url: string | null }) => c.source_url).filter(Boolean) as string[])
+  }
+
+  const seen = new Set<string>()
+  const toEmbed = allUrls.filter(u => {
+    if (alreadyEmbedded.has(u.url)) return false
+    if (seen.has(u.url)) return false
+    seen.add(u.url)
+    return true
+  })
+
+  // 4) 신규 URL 즉시 처리 (await — vercel maxDuration 안에서)
+  const { storeKnowledge } = await import('@/lib/kb/store')
+  const { quickParse } = await import('@/lib/parsers/quick')
+
+  let ok = 0
+  let failed = 0
+  for (const { url, label } of toEmbed) {
+    try {
+      const parsed = await quickParse(url)
+      if (parsed.ok && parsed.text) {
+        const content = [parsed.title, parsed.description, parsed.text].filter(Boolean).join('\n\n')
+        await storeKnowledge(sb, u.id, content, {
+          sourceType: 'link_url',
+          sourceUrl: url,
+          sourceLabel: parsed.title || label,
+        })
+        ok++
+      } else {
+        failed++
+        console.warn('[sync-links] parse failed:', url, parsed.error || 'no text')
+      }
+    } catch (e) {
+      failed++
+      console.error('[sync-links] error:', url, e)
+    }
+  }
+
+  return NextResponse.json({
+    triggered: toEmbed.length,
+    embedded: ok,
+    failed,
+    skipped: alreadyEmbedded.size,
+  })
+}

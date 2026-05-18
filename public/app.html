@@ -19027,6 +19027,23 @@ async function loadLearnOverview(){
       if(cached) renderLearnOverview(cached)
     }
   } catch(_){}
+  // 1.5) 신규 URL 백그라운드 임베딩 trigger (5분당 1회)
+  try {
+    var lastSync = parseInt(localStorage.getItem('ssobi_sync_links_at') || '0', 10)
+    var now = Date.now()
+    if(now - lastSync > 5 * 60 * 1000){
+      localStorage.setItem('ssobi_sync_links_at', String(now))
+      authHeaders().then(function(h){
+        return fetch('/api/learn/sync-links', { method:'POST', headers: h, credentials:'include' })
+      }).then(function(r){ return r && r.ok ? r.json() : null }).then(function(j){
+        if(j && j.embedded > 0){
+          console.log('[sync-links] embedded:', j.embedded, '/ failed:', j.failed, '/ skipped:', j.skipped)
+          // 새 자료 들어왔으면 overview 다시 fetch
+          loadLearnOverview()
+        }
+      }).catch(function(e){ console.warn('[sync-links] error', e) })
+    }
+  } catch(_){}
   // 2) fetch 시작 (background)
   try {
     var h = await authHeaders()
