@@ -2130,137 +2130,6 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     </div>
   </div>
 
-  <!-- 신규 유저 모드 (기본 숨김) -->
-  <div id="newbie-pane" style="display:none">
-    <div class="nb-hero">
-      <div class="nb-hero-tag"><div class="nb-hero-tag-dot"></div><span data-i18n="newbie.hero.tag">Ssobi 학습 중</span></div>
-      <div class="nb-hero-t" data-i18n="newbie.hero.title">안녕, 유민혜님. 오늘이 Ssobi 첫날이에요</div>
-      <div class="nb-hero-s" data-i18n="newbie.hero.sub">3단계만 완료하면 AI가 24시간 자동으로 움직여요.</div>
-      <div class="nb-progress-wrap">
-        <div class="nb-progress-meta">
-          <div class="nb-progress-lbl" data-i18n="newbie.progress.label">준비 진행률</div>
-          <div class="nb-progress-n" id="nb-progress-n">0 / 5</div>
-        </div>
-        <div class="nb-progress-bar"><div class="nb-progress-fill" id="nb-progress-fill" style="width:0"></div></div>
-      </div>
-    </div>
-
-    <div class="sec-eye" style="margin-top:18px" data-i18n="newbie.checklist.eyebrow">CHECKLIST</div>
-    <div class="sec-t" data-i18n="newbie.checklist.title">오늘 할 일</div>
-    <div class="nb-check-list">
-      <div class="nb-check active" id="ck-ig" onclick="startProcessStep('ig')">
-        <div class="nb-check-num">1</div>
-        <div class="nb-check-b">
-          <div class="nb-check-t" data-i18n="newbie.check.ig">SNS 계정 연동</div>
-          <div class="nb-check-s" data-i18n="newbie.check.ig.sub">Instagram · TikTok · YouTube 공식 API</div>
-        </div>
-        <span class="nb-check-reward">+5,000P</span>
-        <div class="nb-check-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      </div>
-      <div class="nb-check" id="ck-tone" onclick="startProcessStep('tone')">
-        <div class="nb-check-num">2</div>
-        <div class="nb-check-b">
-          <div class="nb-check-t" data-i18n="newbie.check.tone">AI 말투 학습</div>
-          <div class="nb-check-s" data-i18n="newbie.check.tone.sub">내 게시물 250개로 자동 학습 · 1분이면 끝</div>
-        </div>
-        <span class="nb-check-reward">+3,000P</span>
-        <div class="nb-check-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      </div>
-      <div class="nb-check" id="ck-target" onclick="startProcessStep('target')">
-        <div class="nb-check-num">3</div>
-        <div class="nb-check-b">
-          <div class="nb-check-t" data-i18n="newbie.check.target">참고 계정·해시태그 설정</div>
-          <div class="nb-check-s" data-i18n="newbie.check.target.sub">경쟁 계정 분석으로 틈새 해시태그 발굴</div>
-        </div>
-        <span class="nb-check-reward">+2,000P</span>
-        <div class="nb-check-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      </div>
-      <div class="nb-check" id="ck-kakao" onclick="startProcessStep('kakao')">
-        <div class="nb-check-num">+</div>
-        <div class="nb-check-b">
-          <div class="nb-check-t"><span data-i18n="newbie.check.kakao">카카오톡 알림 연동</span><span class="nb-check-optional" data-i18n="newbie.optional">선택</span></div>
-          <div class="nb-check-s" data-i18n="newbie.check.kakao.sub">긴급 메시지·수익 제안 즉시 알림</div>
-        </div>
-        <span class="nb-check-reward">+2,000P</span>
-        <div class="nb-check-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      </div>
-    </div>
-
-    <div class="sec-eye" data-i18n="newbie.forecast.eyebrow">FORECAST</div>
-    <div class="sec-t" data-i18n="newbie.forecast.title">이렇게 자라요</div>
-    <div class="nb-forecast">
-      <div class="nb-forecast-top">
-        <div class="nb-forecast-hd">
-          <div class="nb-forecast-t" data-i18n="newbie.forecast.followers">7일 뒤 신규 팔로워</div>
-          <div class="nb-forecast-tag" data-i18n="newbie.forecast.ai_predict">AI 예측</div>
-        </div>
-        <div class="nb-forecast-hero">
-          <div class="nb-forecast-hero-n"><span style="font-size:32px;vertical-align:6px">+</span>52</div>
-        </div>
-        <div class="nb-forecast-hero-l" data-i18n="newbie.forecast.hero_label">자동 응대·스토리 조회·AI 선댓글 누적 효과</div>
-
-        <div class="nb-forecast-chart">
-          <svg viewBox="0 0 300 52" preserveAspectRatio="none">
-            <defs>
-              <linearGradient id="forecastGrad" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#00C896" stop-opacity="0.5"/>
-                <stop offset="100%" stop-color="#00C896" stop-opacity="0"/>
-              </linearGradient>
-            </defs>
-            <path class="nb-forecast-chart-area" d="M 0,50 L 0,46 L 50,42 L 100,36 L 150,28 L 200,20 L 250,10 L 300,4 L 300,50 Z"/>
-            <path class="nb-forecast-chart-line" d="M 0,46 L 50,42 L 100,36 L 150,28 L 200,20 L 250,10 L 300,4"/>
-            <g class="nb-forecast-chart-dots">
-              <circle cx="0" cy="46" r="3"/>
-              <circle cx="50" cy="42" r="3"/>
-              <circle cx="100" cy="36" r="3"/>
-              <circle cx="150" cy="28" r="3"/>
-              <circle cx="200" cy="20" r="3"/>
-              <circle cx="250" cy="10" r="3"/>
-              <circle cx="300" cy="4" r="4.5" class="last"/>
-            </g>
-          </svg>
-        </div>
-        <div class="nb-forecast-chart-labels">
-          <span data-i18n="newbie.forecast.today">오늘</span><span>D+2</span><span>D+4</span><span style="color:var(--mint-d);font-weight:800">D+7</span>
-        </div>
-      </div>
-
-      <div class="nb-forecast-stats">
-        <div class="nb-forecast-stat">
-          <div class="nb-forecast-stat-v">900</div>
-          <div class="nb-forecast-stat-l" data-i18n="newbie.forecast.replies">자동 응대</div>
-        </div>
-        <div class="nb-forecast-stat">
-          <div class="nb-forecast-stat-v"><span class="pl">×</span>2.1</div>
-          <div class="nb-forecast-stat-l" data-i18n="newbie.forecast.reach">평균 도달</div>
-        </div>
-        <div class="nb-forecast-stat">
-          <div class="nb-forecast-stat-v"><span class="pl">+</span>38<span>%</span></div>
-          <div class="nb-forecast-stat-l" data-i18n="newbie.forecast.save">저장·공유</div>
-        </div>
-      </div>
-
-      <div class="nb-forecast-note" data-i18n="newbie.forecast.note">같은 플랜 사용자 평균 기준 · 체크리스트 완료 후 24시간부터 실제 데이터</div>
-    </div>
-
-    <div class="nb-live-wrap">
-      <div class="live-stream">
-        <div class="lrow"><div class="ldash"></div>@yuna__daily님 제품 문의 — 말투 98% 댓글 응대 완료</div>
-        <div class="lrow"><div class="ldash"></div>@hazel_skin님 댓글 → "어떤 피부타입이세요?" 질문형 답변</div>
-        <div class="lrow"><div class="ldash"></div>게시물 업로드 감지 → 저장·댓글 자동 실행</div>
-        <div class="lrow"><div class="ldash"></div>@collab_brand_k 협업 문의 — 수익제안 분류 완료</div>
-        <div class="lrow"><div class="ldash"></div>AI 선댓글 초안 8건 준비 완료</div>
-        <div class="lrow"><div class="ldash"></div>@yuna__daily님 제품 문의 — 말투 98% 댓글 응대 완료</div>
-        <div class="lrow"><div class="ldash"></div>@hazel_skin님 댓글 → "어떤 피부타입이세요?" 질문형 답변</div>
-      </div>
-      <div class="nb-live-overlay">
-        <div class="nb-live-badge"><div class="nb-live-badge-dot"></div><span data-i18n="newbie.live.badge">곧 시작돼요</span></div>
-        <div class="nb-live-t" data-i18n="newbie.live.title">위 5개 완료하면 바로 움직여요</div>
-        <div class="nb-live-s" data-i18n="newbie.live.sub">이건 다른 유저들의 실시간 활동이에요. 체크리스트 끝나면 내 피드도 채워집니다</div>
-      </div>
-    </div>
-  </div>
-
   <!-- 기존 홈 (중간 유저 기준) -->
   <div id="home-real">
 
@@ -3943,7 +3812,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div class="preview-shade-t" id="preview-shade-t" data-i18n="newbie.shade.title">이런 기능이 있어요</div>
     <div class="preview-shade-s" data-i18n="newbie.shade.sub">3단계 완료하면 바로 쓸 수 있어요</div>
   </div>
-  <button class="preview-shade-cta" onclick="backToNewbie()" data-i18n="newbie.shade.cta">지금 시작</button>
+  <button class="preview-shade-cta" onclick="go('home')" data-i18n="newbie.shade.cta">지금 시작</button>
 </div>
 
 <!-- MODALS -->
@@ -4827,20 +4696,9 @@ function go(v){
   if(el) el.classList.add('on');
   if(nb) nb.classList.add('on');
 
-  // 첫날 모드 + 필수 미완료 시 키우기·만들기·관리는 블러 프리뷰
+  // 프리뷰 shade 사용 안 함 (v2 pivot)
   var shade = document.getElementById('preview-shade');
-  var labels = {activity:'키우기', create:'만들기', manage:'관리'};
-  if(newbieMode && labels[id]){
-    var allDone = newbieRequired.every(function(k){ return newbieChecks[k]; });
-    if(!allDone){
-      if(el) el.classList.add('preview-locked');
-      if(shade){
-        shade.style.display = 'flex';
-        var t = document.getElementById('preview-shade-t');
-        if(t) t.textContent = labels[id]+' 탭 미리보기';
-      }
-    } else if(shade){ shade.style.display = 'none'; }
-  } else if(shade){ shade.style.display = 'none'; }
+  if(shade) shade.style.display = 'none';
   if(id === 'onb-learn') setTimeout(startLearnAnim, 400);
   if(id === 'home') {
     setTimeout(renderCalendar, 80);
@@ -4852,12 +4710,6 @@ function go(v){
   }
   if(id === 'link') {
     setTimeout(initLinkView, 80);
-    // 첫날 모드 + 최초 진입 시 안내
-    try {
-      if(newbieMode && !localStorage.getItem('ssobi_link_welcomed')){
-        setTimeout(function(){ openModal('m-link-welcome'); }, 200);
-      }
-    } catch(e){}
   }
   if(id === 'manage') {
     var ab=document.getElementById('nb-activity'); if(ab) ab.classList.add('on');
@@ -4934,15 +4786,15 @@ function renderTodayHints(){
 
 // ═══════════════ 신규 유저 모드 ═══════════════
 var newbieMode = false;
-var newbieRequired = ['ig','tone','target']; // 필수 3단계
-var newbieChecks = { ig:false, tone:false, target:false, kakao:false };
 function toggleNewbie(){
+  // v2 pivot — 레거시 newbie-pane 폐기. home-day1 (Claude 핸드오프) ↔ home-roi-wrap 전환.
   newbieMode = !newbieMode;
-  var pane = document.getElementById('newbie-pane');
-  var real = document.getElementById('home-real');
+  var day1 = document.getElementById('home-day1');
+  var roi = document.getElementById('home-roi-wrap');
+  if(day1) day1.style.display = newbieMode ? 'block' : 'none';
+  if(roi) roi.style.display = newbieMode ? 'none' : 'block';
+  try { localStorage.setItem('ssobi_home_mode', newbieMode ? 'day1' : 'roi') } catch(_){}
   var btn = document.getElementById('newbie-toggle');
-  if(pane) pane.style.display = newbieMode ? 'block' : 'none';
-  if(real) real.style.display = newbieMode ? 'none' : 'block';
   if(btn){
     btn.classList.toggle('on', newbieMode);
     var _lang = (typeof ssobiCurrentLang !== 'undefined') ? ssobiCurrentLang : 'ko';
@@ -4953,7 +4805,6 @@ function toggleNewbie(){
   }
   refreshNavLock();
   window.scrollTo(0,0);
-  // 튜토리얼 오버레이 제거됨 — 더 이상 트리거 안 함
 }
 // 튜토리얼 오버레이 제거됨 — stub 으로 호출 안전 유지
 function tutOpen(){ /* removed */ }
@@ -4963,118 +4814,6 @@ function tutNext(e){ /* no-op */ }
 function refreshNavLock(){
   // 자물쇠 대신 블러 프리뷰 방식으로 변경됨. 남겨진 훅은 비워둠.
 }
-function backToNewbie(){
-  var shade = document.getElementById('preview-shade');
-  if(shade) shade.style.display = 'none';
-  go('home');
-}
-function checkNewbie(key){
-  newbieChecks[key] = true;
-  var el = document.getElementById('ck-'+key);
-  if(el){ el.classList.add('on'); el.classList.remove('active'); }
-  updateNewbieProgress();
-}
-
-function updateNewbieProgress(){
-  var done = 0;
-  newbieRequired.forEach(function(k){ if(newbieChecks[k]) done++; });
-  var total = newbieRequired.length;
-  var nEl = document.getElementById('nb-progress-n');
-  var fEl = document.getElementById('nb-progress-fill');
-  if(nEl) nEl.textContent = done+' / '+total;
-  if(fEl) fEl.style.width = (done/total*100)+'%';
-  // 다음 active 단계 계산 (필수만 대상)
-  document.querySelectorAll('.nb-check').forEach(function(el){
-    if(!el.classList.contains('on')) el.classList.remove('active');
-  });
-  for(var i=0;i<newbieRequired.length;i++){
-    var k = newbieRequired[i];
-    if(!newbieChecks[k]){
-      var nx = document.getElementById('ck-'+k);
-      if(nx) nx.classList.add('active');
-      break;
-    }
-  }
-  refreshNavLock();
-  if(done === total){
-    setTimeout(function(){ celebrateNewbie(); }, 450);
-  }
-}
-
-// 각 단계 클릭 시 해당 설정 화면 호출
-function startProcessStep(key){
-  var handlers = {
-    ig: function(){
-      openModal('m-account');
-      markProcessReady('ig', 'm-account');
-    },
-    tone: function(){
-      openModal('m-ai-style');
-      markProcessReady('tone', 'm-ai-style');
-    },
-    target: function(){
-      go('targets');
-      // v-targets 페이지에서 사용자가 "확인 완료" 버튼을 눌러야 완료 처리됨
-    },
-    kakao: function(){
-      openModal('m-kakao-popup');
-      markProcessReady('kakao', 'm-kakao-popup');
-    }
-  };
-  if(handlers[key]) handlers[key]();
-}
-
-// 모달에 완료 버튼 로직: 모달 내부 주 CTA 클릭 시 완료 처리
-function markProcessReady(stepKey, modalId){
-  var modal = document.getElementById(modalId);
-  if(!modal) return;
-  // 주 CTA 버튼 (.btn-p) 에 원클릭 래핑
-  var ctas = modal.querySelectorAll('.btn-p');
-  ctas.forEach(function(btn){
-    if(btn.dataset._procBound) return;
-    btn.dataset._procBound = '1';
-    btn.addEventListener('click', function(){
-      setTimeout(function(){ checkNewbie(stepKey); }, 150);
-    }, { once:true });
-  });
-}
-function celebrateNewbie(){
-  // 축하 메시지 오버레이
-  var overlay = document.createElement('div');
-  overlay.style.cssText = 'position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.6);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;animation:rise .3s ease';
-  var card = document.createElement('div');
-  card.style.cssText = 'background:#fff;border-radius:24px;padding:32px 28px;text-align:center;max-width:300px;margin:0 20px';
-  var emo = document.createElement('div');
-  emo.style.cssText = 'font-size:54px;margin-bottom:12px';
-  emo.textContent = '🎉';
-  var t = makeEl('div',null,'준비 완료!');
-  t.style.cssText = 'font-size:22px;font-weight:900;color:var(--t1);margin-bottom:8px;letter-spacing:-.5px';
-  var s = makeEl('div',null,'지금부터 AI가 나 대신 움직여요. 실데이터는 24시간 뒤부터 쌓여요.');
-  s.style.cssText = 'font-size:13px;color:var(--t2);line-height:1.6;margin-bottom:20px';
-  var btn = makeEl('button',null,'대시보드 보기');
-  btn.style.cssText = 'width:100%;padding:14px;border-radius:12px;background:var(--mint);color:#fff;border:none;font-size:15px;font-weight:800;cursor:pointer';
-  btn.addEventListener('click', function(){
-    overlay.remove();
-    // 체크 초기화
-    Object.keys(newbieChecks).forEach(function(k){
-      newbieChecks[k] = false;
-      var el = document.getElementById('ck-'+k); if(el) el.classList.remove('on');
-    });
-    var nEl = document.getElementById('nb-progress-n'); if(nEl) nEl.textContent = '0 / 5';
-    var fEl = document.getElementById('nb-progress-fill'); if(fEl) fEl.style.width = '0';
-    // 실데이터 모드로
-    if(newbieMode) toggleNewbie();
-    // ROI 카운트업 다시
-    applyDashboard(demoDashboard);
-    // 홈으로 이동 (어느 화면에서 완료했든)
-    go('home');
-  });
-  card.appendChild(emo); card.appendChild(t); card.appendChild(s); card.appendChild(btn);
-  overlay.appendChild(card);
-  overlay.addEventListener('click', function(e){ if(e.target===overlay){ overlay.remove(); } });
-  document.body.appendChild(overlay);
-}
-
 // ═══════════════ MINI CALENDAR ═══════════════
 var calDate = new Date(2026, 3, 1);
 // 실데이터로 채워질 캘린더 이벤트 (댓글/DM/팔로워/업로드/예약)
@@ -17445,12 +17184,9 @@ function addTarget(){
 }
 function delTarget(btn){ btn.closest('.target-item').remove(); }
 function finalizeTargets(){
-  checkNewbie('target');
   // AI 말투 학습 반영 토스트
   lkeShowToast('✓ 참고 계정·해시태그가 <b>AI 말투 학습</b>에 반영됐어요');
-  // 필수 3단계 완료 시 celebrate에서 홈 이동 처리. 아니면 수동으로 홈으로
-  var allDone = newbieRequired.every(function(k){ return newbieChecks[k]; });
-  if(!allDone) setTimeout(function(){ go('home'); }, 900);
+  setTimeout(function(){ go('home'); }, 900);
 }
 // 간단 토스트
 function lkeShowToast(html){
@@ -18107,28 +17843,6 @@ function applyDashboard(d) {
   var sre = document.getElementById('stat-reach');
   if (sre) sre.textContent = (d.monthReach === null || d.monthReach === undefined) ? '—' : d.monthReach.toLocaleString('ko-KR');
 
-  // 첫날 모드 체크리스트: 이미 연동된 상태면 자동 체크
-  if (d.igConnected && !newbieChecks.ig) {
-    newbieChecks.ig = true;
-    var igEl = document.getElementById('ck-ig');
-    if (igEl) { igEl.classList.add('on'); igEl.classList.remove('active'); }
-  }
-  if (d.toneLearned && !newbieChecks.tone) {
-    newbieChecks.tone = true;
-    var tEl = document.getElementById('ck-tone');
-    if (tEl) tEl.classList.add('on');
-  }
-  if (d.targetCount && d.targetCount > 0 && !newbieChecks.target) {
-    newbieChecks.target = true;
-    var tgEl = document.getElementById('ck-target');
-    if (tgEl) tgEl.classList.add('on');
-  }
-  if (d.kakaoLinked && !newbieChecks.kakao) {
-    newbieChecks.kakao = true;
-    var kEl = document.getElementById('ck-kakao');
-    if (kEl) kEl.classList.add('on');
-  }
-  updateNewbieProgress();
 }
 
 // 빈 상태 기본값 (데모 숫자 제거)
