@@ -5296,6 +5296,9 @@ var I18N = {
     'learn2.persona_desc_default':'말투 학습 전 — 인스타 연동 후 자동 학습돼요',
     'learn2.persona_done':'학습 완료',
     'learn2.persona_owner_post':'의 Ssobi',
+    'learn2.persona_learning':'말투 학습 중…',
+    'learn2.persona_learning_sub':'최근 게시물 캡션을 분석하고 있어요',
+    'learn2.persona_learn_failed':'학습 실패 — 잠시 후 다시 시도해주세요',
     'learn2.edit_btn':'수정',
     'learn2.divider_day1':'가입 직후',
     'learn2.divider_today_pre':'오늘 · ',
@@ -6266,6 +6269,9 @@ var I18N = {
     'learn2.persona_desc_default':'Tone unlearned — auto-learns after Instagram link',
     'learn2.persona_done':'Learned',
     'learn2.persona_owner_post':'\'s Ssobi',
+    'learn2.persona_learning':'Learning your tone…',
+    'learn2.persona_learning_sub':'Analyzing recent post captions',
+    'learn2.persona_learn_failed':'Learning failed — please try again later',
     'learn2.edit_btn':'Edit',
     'learn2.divider_day1':'Day 1',
     'learn2.divider_today_pre':'Today · ',
@@ -19017,6 +19023,11 @@ async function loadLearnOverview(){
       nameEl.textContent = ownerPrefix + t('learn2.persona_owner_post','의 Ssobi')
       descEl.innerHTML = (j.tone.learned_style && typeof j.tone.learned_style === 'string' ? j.tone.learned_style.slice(0, 60) : t('learn2.persona_done','학습 완료'))
         + (j.tone.persona_summary ? '<br/><span style="color:var(--t3)">'+j.tone.persona_summary.slice(0, 60)+'</span>' : '')
+    } else if(j.ig_username){
+      // IG 연동됐는데 tone 학습 안 됨 → 자동 학습 백그라운드 시작
+      nameEl.textContent = j.ig_username + t('learn2.persona_owner_post','의 Ssobi')
+      descEl.innerHTML = '<span style="color:var(--mint-d);font-weight:700">' + t('learn2.persona_learning','말투 학습 중…') + '</span><br/><span style="color:var(--t3)">' + t('learn2.persona_learning_sub','최근 게시물 캡션을 분석하고 있어요') + '</span>'
+      learnAutoStartTone()
     } else {
       nameEl.textContent = t('learn2.persona_default','내 Ssobi')
       descEl.textContent = t('learn2.persona_desc_default','말투 학습 전 — 인스타 연동 후 자동 학습돼요')
@@ -19110,6 +19121,41 @@ async function openLearnDetail(source, label, domain){
   } catch(e){
     console.error('[openLearnDetail]', e)
     metaEl.textContent = t('learn2.detail_failed','불러오기 실패')
+  }
+}
+
+// IG 연동 + tone 미학습 상태에서 자동으로 말투 학습 백그라운드 실행
+var learnToneAutoState = 'idle' // idle | running | done | failed
+async function learnAutoStartTone(){
+  if(learnToneAutoState !== 'idle') return
+  learnToneAutoState = 'running'
+  try {
+    var h = await authHeaders()
+    var postsRes = await fetch('/api/tone/fetch-posts', {credentials:'include', headers: h})
+    if(!postsRes.ok) throw new Error('fetch-posts failed: ' + postsRes.status)
+    var posts = await postsRes.json()
+    var captions = posts.captions || []
+    var h2 = await authHeaders()
+    var body = captions.length < 3
+      ? JSON.stringify({ samples: captions, use_default: true })
+      : JSON.stringify({ samples: captions.slice(0, 15) })
+    var learnRes = await fetch('/api/tone/learn', {
+      method:'POST', headers: h2, credentials:'include', body: body
+    })
+    if(!learnRes.ok) throw new Error('tone learn failed: ' + learnRes.status)
+    var result = await learnRes.json()
+    if(result.success){
+      learnToneAutoState = 'done'
+      // overview 다시 불러와서 persona 갱신 (j.tone 채워짐 → 정상 분기)
+      loadLearnOverview()
+    } else {
+      throw new Error('learn returned not success: ' + JSON.stringify(result).slice(0, 100))
+    }
+  } catch(e){
+    console.error('[learnAutoStartTone]', e)
+    learnToneAutoState = 'failed'
+    var descEl = document.getElementById('learn-persona-desc')
+    if(descEl) descEl.textContent = t('learn2.persona_learn_failed','학습 실패 — 잠시 후 다시 시도해주세요')
   }
 }
 
