@@ -19161,20 +19161,28 @@ function renderLearnOverview(j){
   }
 }
 
+function sanitizeLabel(s){
+  if(!s) return ''
+  return String(s).replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim()
+}
+
 async function openLearnDetail(source, label, domain){
   if(!source) return
   var listEl = document.getElementById('learn-detail-list')
   var titleEl = document.getElementById('learn-detail-title')
   var hostEl = document.getElementById('learn-detail-host')
   var metaEl = document.getElementById('learn-detail-meta')
-  titleEl.textContent = label || t('learn2.detail_default_title','학습 자료')
+  titleEl.textContent = sanitizeLabel(label) || t('learn2.detail_default_title','학습 자료')
   hostEl.textContent = domain || ''
   metaEl.textContent = t('learn2.detail_loading','불러오는 중…')
   while(listEl.firstChild) listEl.removeChild(listEl.firstChild)
   openModal('m-learn-detail')
   try {
     var h = await authHeaders()
-    var res = await fetch('/api/learn/detail?source=' + encodeURIComponent(source), { headers: h, credentials: 'include' })
+    // raw label 도 같이 보내 source_url=null + 같은 source_label chunks 매칭
+    var detailUrl = '/api/learn/detail?source=' + encodeURIComponent(source)
+    if(label) detailUrl += '&label=' + encodeURIComponent(label)
+    var res = await fetch(detailUrl, { headers: h, credentials: 'include' })
     if(!res.ok){ metaEl.textContent = t('learn2.detail_failed','불러오기 실패'); return }
     var j = await res.json()
     var cat = j.source?.category
