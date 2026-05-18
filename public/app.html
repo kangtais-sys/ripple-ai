@@ -2518,13 +2518,13 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div style="padding:8px 4px 0">
     <div style="display:flex;align-items:baseline;justify-content:space-between">
       <div>
-        <div style="font-size:22px;font-weight:800;letter-spacing:-.6px;color:var(--t1)">학습</div>
+        <div style="font-size:22px;font-weight:800;letter-spacing:-.6px;color:var(--t1)" data-i18n="learn2.title">학습</div>
         <div style="font-size:12px;color:var(--t3);margin-top:3px" id="learn-meta">자료 0개 · 외운 게 0개</div>
       </div>
       <!-- segmented [채팅 / 목록] -->
       <div style="display:flex;padding:2px;border-radius:999px;background:#fff;border:1px solid var(--b)">
-        <button onclick="learnSetView('chat')" id="learn-tab-chat" style="padding:5px 12px;border-radius:999px;border:none;background:var(--t1);color:#fff;font-size:11px;font-weight:700;letter-spacing:-.2px;cursor:pointer">채팅</button>
-        <button onclick="learnSetView('list')" id="learn-tab-list" style="padding:5px 12px;border-radius:999px;border:none;background:transparent;color:var(--t2);font-size:11px;font-weight:700;letter-spacing:-.2px;cursor:pointer">목록</button>
+        <button onclick="learnSetView('chat')" id="learn-tab-chat" style="padding:5px 12px;border-radius:999px;border:none;background:var(--t1);color:#fff;font-size:11px;font-weight:700;letter-spacing:-.2px;cursor:pointer" data-i18n="learn2.tab_chat">채팅</button>
+        <button onclick="learnSetView('list')" id="learn-tab-list" style="padding:5px 12px;border-radius:999px;border:none;background:transparent;color:var(--t2);font-size:11px;font-weight:700;letter-spacing:-.2px;cursor:pointer" data-i18n="learn2.tab_list">목록</button>
       </div>
     </div>
   </div>
@@ -2534,12 +2534,12 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div style="padding:14px 16px;background:#fff;border:1px solid var(--b);border-radius:14px;display:flex;align-items:flex-start;gap:12px">
       <div style="width:32px;height:32px;border-radius:10px;flex-shrink:0;background:var(--t1);color:#fff;font-weight:800;font-size:14px;letter-spacing:-.3px;display:flex;align-items:center;justify-content:center">S</div>
       <div style="flex:1;min-width:0">
-        <div style="font-size:14px;font-weight:700;letter-spacing:-.3px;color:var(--t1)" id="learn-persona-name">내 Ssobi</div>
-        <div style="font-size:12px;color:var(--t2);margin-top:3px;line-height:1.5" id="learn-persona-desc">
+        <div style="font-size:14px;font-weight:700;letter-spacing:-.3px;color:var(--t1)" id="learn-persona-name" data-i18n="learn2.persona_default">내 Ssobi</div>
+        <div style="font-size:12px;color:var(--t2);margin-top:3px;line-height:1.5" id="learn-persona-desc" data-i18n="learn2.persona_desc_default">
           말투 학습 전 — 인스타 연동 후 자동 학습돼요
         </div>
       </div>
-      <button onclick="openModal('m-ai-style')" style="background:transparent;border:none;font-size:12px;font-weight:600;color:var(--t2);padding:2px 4px;cursor:pointer;font-family:inherit">수정</button>
+      <button onclick="openModal('m-ai-style')" style="background:transparent;border:none;font-size:12px;font-weight:600;color:var(--t2);padding:2px 4px;cursor:pointer;font-family:inherit" data-i18n="learn2.edit_btn">수정</button>
     </div>
   </div>
 
@@ -2548,26 +2548,26 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <!-- Day 1 — 가입 직후 -->
     <div style="display:flex;align-items:center;gap:10px;padding:20px 0 6px">
       <div style="flex:1;height:1px;background:var(--b)"></div>
-      <span style="font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--t3);text-transform:uppercase">가입 직후</span>
+      <span style="font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--t3);text-transform:uppercase" data-i18n="learn2.divider_day1">가입 직후</span>
       <div style="flex:1;height:1px;background:var(--b)"></div>
     </div>
 
     <!-- Ssobi welcome -->
     <div style="display:flex;flex-direction:column;align-items:flex-start;margin-top:16px">
-      <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:-.1px;margin-bottom:5px;padding-left:2px">Ssobi</div>
+      <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:-.1px;margin-bottom:5px;padding-left:2px" data-i18n="learn2.bot_name">Ssobi</div>
       <div style="max-width:86%;background:#fff;color:var(--t1);padding:12px 14px;border-radius:14px 14px 14px 4px;border:1px solid var(--b)">
         <div style="font-size:14px;line-height:1.55">
-          안녕하세요. 학습할 자료를 여기로 보내주세요.<br/>
-          <span style="color:var(--t2)">파일, 링크, 짧은 메모 모두 됩니다.</span>
+          <span data-i18n="learn2.welcome_l1">안녕하세요. 학습할 자료를 여기로 보내주세요.</span><br/>
+          <span style="color:var(--t2)" data-i18n="learn2.welcome_l2">파일, 링크, 짧은 메모 모두 됩니다.</span>
         </div>
       </div>
     </div>
 
     <!-- 자동 학습된 자료 (Ssobi message + attachments) -->
     <div id="learn-auto-msg" style="display:none;flex-direction:column;align-items:flex-start;margin-top:18px">
-      <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:-.1px;margin-bottom:5px;padding-left:2px">Ssobi</div>
+      <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:-.1px;margin-bottom:5px;padding-left:2px" data-i18n="learn2.bot_name">Ssobi</div>
       <div style="max-width:86%;background:#fff;color:var(--t1);padding:12px 14px;border-radius:14px 14px 14px 4px;border:1px solid var(--b)">
-        <div style="font-size:14px;line-height:1.55;margin-bottom:10px">인스타랑 내 링크에서 미리 외워둔 게 있어요.</div>
+        <div style="font-size:14px;line-height:1.55;margin-bottom:10px" data-i18n="learn2.auto_intro">인스타랑 내 링크에서 미리 외워둔 게 있어요.</div>
         <div id="learn-auto-list" style="display:flex;flex-direction:column;gap:8px"></div>
       </div>
     </div>
@@ -2596,10 +2596,10 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <button onclick="learnClearAttach()" style="background:none;border:none;color:var(--t3);font-size:14px;cursor:pointer;padding:0 4px;line-height:1">×</button>
     </div>
     <div id="learn-input-box" style="pointer-events:auto;display:flex;align-items:center;gap:8px;padding:8px 8px 8px 12px;background:#fff;border:1px solid var(--b);border-radius:24px;box-shadow:0 4px 14px rgba(16,24,40,.06),0 1px 2px rgba(16,24,40,.04)">
-      <button onclick="document.getElementById('learn-file-input').click()" title="파일 첨부" style="background:transparent;border:none;cursor:pointer;padding:6px;display:flex">
+      <button onclick="document.getElementById('learn-file-input').click()" title="파일 첨부" data-i18n-title="learn2.input_attach_title" style="background:transparent;border:none;cursor:pointer;padding:6px;display:flex">
         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="var(--t2)" stroke-width="1.7" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg>
       </button>
-      <textarea id="learn-chat-input" rows="1" placeholder="Ssobi 에게 보내기 — 파일, 링크, 메모" style="flex:1;min-height:24px;max-height:120px;padding:6px 0;border:none;background:transparent;font-size:13px;color:var(--t1);resize:none;font-family:inherit;line-height:1.45;outline:none" oninput="learnAutoResize(this)" onkeydown="learnHandleKey(event)"></textarea>
+      <textarea id="learn-chat-input" rows="1" placeholder="Ssobi 에게 보내기 — 파일, 링크, 메모" data-i18n-ph="learn2.input_ph" style="flex:1;min-height:24px;max-height:120px;padding:6px 0;border:none;background:transparent;font-size:13px;color:var(--t1);resize:none;font-family:inherit;line-height:1.45;outline:none" oninput="learnAutoResize(this)" onkeydown="learnHandleKey(event)"></textarea>
       <button onclick="learnSend()" id="learn-send-btn" style="width:34px;height:34px;border-radius:999px;background:var(--t1);border:none;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;transition:transform .1s" onmousedown="this.style.transform='scale(.92)'" onmouseup="this.style.transform='scale(1)'" onmouseout="this.style.transform='scale(1)'">
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h7M7 3l4 4-4 4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
@@ -3871,7 +3871,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div id="learn-detail-meta" style="font-size:12px;color:var(--t2);margin-top:6px"></div>
   </div>
   <div id="learn-detail-list" style="display:flex;flex-direction:column;gap:10px"></div>
-  <button class="btn-s" onclick="cm('m-learn-detail')" style="margin-top:18px">닫기</button>
+  <button class="btn-s" onclick="cm('m-learn-detail')" style="margin-top:18px" data-i18n="learn2.detail_close">닫기</button>
 </div></div>
 
 <!-- 긴급 메시지 설정 -->
@@ -5235,6 +5235,53 @@ document.addEventListener('DOMContentLoaded', syncToneChip);
 // ═══════════════════════════════════════════════════════════════════
 var I18N = {
   ko: {
+    // ─────── learn2.* — v2 학습탭 ───────
+    'learn2.title':'학습',
+    'learn2.meta_loading':'로그인 후 자료가 보여요',
+    'learn2.meta_fmt':'자료 {n}개 · 외운 게 {m}개',
+    'learn2.tab_chat':'채팅',
+    'learn2.tab_list':'목록',
+    'learn2.persona_default':'내 Ssobi',
+    'learn2.persona_desc_default':'말투 학습 전 — 인스타 연동 후 자동 학습돼요',
+    'learn2.persona_done':'학습 완료',
+    'learn2.persona_owner_post':'의 Ssobi',
+    'learn2.edit_btn':'수정',
+    'learn2.divider_day1':'가입 직후',
+    'learn2.divider_today_pre':'오늘 · ',
+    'learn2.divider_today_month':'월 ',
+    'learn2.divider_today_day':'일',
+    'learn2.bot_name':'Ssobi',
+    'learn2.welcome_l1':'안녕하세요. 학습할 자료를 여기로 보내주세요.',
+    'learn2.welcome_l2':'파일, 링크, 짧은 메모 모두 됩니다.',
+    'learn2.auto_intro':'인스타랑 내 링크에서 미리 외워둔 게 있어요.',
+    'learn2.urgent_msg':'긴급 공지로 표시했어요.',
+    'learn2.urgent_sub':'관련 응대에 즉시 반영됩니다.',
+    'learn2.urgent_badge':'긴급 공지 활성',
+    'learn2.file_received_pre':'잘 받았어요. ',
+    'learn2.file_received_post':'개로 외워뒀습니다.',
+    'learn2.file_received_sub':'관련 질문이 오면 인용해서 답할게요.',
+    'learn2.cat_product':'제품',
+    'learn2.cat_content':'콘텐츠',
+    'learn2.cat_class':'강의',
+    'learn2.cat_link':'링크',
+    'learn2.unit_memory_post':'개 기억',
+    'learn2.group_auto':'자동 학습',
+    'learn2.group_auto_hint':'인스타 · 내 링크',
+    'learn2.group_manual':'추가 학습',
+    'learn2.group_manual_hint':'내가 보낸 자료',
+    'learn2.group_count_unit':'개',
+    'learn2.urgent_note_meta':'메모 · 긴급 공지',
+    'learn2.pin_badge':'긴급',
+    'learn2.empty':'학습된 자료가 없어요. 채팅에서 파일이나 링크를 보내주세요.',
+    'learn2.input_ph':'Ssobi 에게 보내기 — 파일, 링크, 메모',
+    'learn2.input_attach_title':'파일 첨부',
+    'learn2.detail_loading':'불러오는 중…',
+    'learn2.detail_failed':'불러오기 실패',
+    'learn2.detail_empty':'외운 내용이 없어요.',
+    'learn2.detail_meta_pre':' · 외운 게 ',
+    'learn2.detail_meta_post':'개',
+    'learn2.detail_close':'닫기',
+    'learn2.detail_default_title':'학습 자료',
     // ─────── home2.* — v2 홈탭 (Day1 + ROI + 긴급) ───────
     'home2.day1.welcome_pre':'어서오세요, ',
     'home2.day1.welcome_post':'님 👋',
@@ -6104,6 +6151,53 @@ var I18N = {
     'newbie.live.sub':'이건 다른 유저들의 실시간 활동이에요\n체크리스트 끝나면 내 피드도 채워집니다',
   },
   en: {
+    // ─────── learn2.* — v2 learn tab ───────
+    'learn2.title':'Learn',
+    'learn2.meta_loading':'Sign in to see resources',
+    'learn2.meta_fmt':'{n} resources · {m} memorized',
+    'learn2.tab_chat':'Chat',
+    'learn2.tab_list':'List',
+    'learn2.persona_default':'My Ssobi',
+    'learn2.persona_desc_default':'Tone unlearned — auto-learns after Instagram link',
+    'learn2.persona_done':'Learned',
+    'learn2.persona_owner_post':'\'s Ssobi',
+    'learn2.edit_btn':'Edit',
+    'learn2.divider_day1':'Day 1',
+    'learn2.divider_today_pre':'Today · ',
+    'learn2.divider_today_month':'/',
+    'learn2.divider_today_day':'',
+    'learn2.bot_name':'Ssobi',
+    'learn2.welcome_l1':'Hi. Drop resources here to teach Ssobi.',
+    'learn2.welcome_l2':'Files, links, short notes all work.',
+    'learn2.auto_intro':'Pre-learned from your Instagram and link page.',
+    'learn2.urgent_msg':'Marked as urgent notice.',
+    'learn2.urgent_sub':'Applied to all replies immediately.',
+    'learn2.urgent_badge':'Urgent active',
+    'learn2.file_received_pre':'Got it. Memorized as ',
+    'learn2.file_received_post':' pieces.',
+    'learn2.file_received_sub':'I\'ll quote it when relevant questions come in.',
+    'learn2.cat_product':'Product',
+    'learn2.cat_content':'Content',
+    'learn2.cat_class':'Class',
+    'learn2.cat_link':'Link',
+    'learn2.unit_memory_post':' memories',
+    'learn2.group_auto':'Auto-learned',
+    'learn2.group_auto_hint':'Instagram · my link',
+    'learn2.group_manual':'Added by me',
+    'learn2.group_manual_hint':'My uploads',
+    'learn2.group_count_unit':'',
+    'learn2.urgent_note_meta':'Note · urgent',
+    'learn2.pin_badge':'URGENT',
+    'learn2.empty':'No resources yet. Send a file or link in chat.',
+    'learn2.input_ph':'Send to Ssobi — files, links, notes',
+    'learn2.input_attach_title':'Attach file',
+    'learn2.detail_loading':'Loading…',
+    'learn2.detail_failed':'Failed to load',
+    'learn2.detail_empty':'Nothing memorized yet.',
+    'learn2.detail_meta_pre':' · ',
+    'learn2.detail_meta_post':' memories',
+    'learn2.detail_close':'Close',
+    'learn2.detail_default_title':'Resource',
     // ─────── home2.* — v2 home tab ───────
     'home2.day1.welcome_pre':'Welcome, ',
     'home2.day1.welcome_post':' 👋',
@@ -7017,6 +7111,8 @@ function applyI18n(lang){
   try { if(typeof loadPendingDrafts === 'function') loadPendingDrafts(); } catch(_){}
   // 홈탭 동적 텍스트 즉시 갱신 (Day1 task / ROI hero / 긴급 pill)
   try { if(typeof loadHomeDashboard === 'function') loadHomeDashboard(); } catch(_){}
+  // 학습탭 동적 텍스트 즉시 갱신 (자료 메타, persona, 자동학습 목록, 응답 메시지)
+  try { if(typeof loadLearnOverview === 'function') loadLearnOverview(); } catch(_){}
   // 만들기 탭 "내 주제 · ___" 라벨 갱신 (lang 따라 카테고리명 swap)
   try { if(typeof syncToneChip === 'function') syncToneChip(); } catch(_){}
   // edt-size-badge 갱신 (사용자가 cs-4 에 있을 때 lang 변경되면)
@@ -18747,7 +18843,7 @@ function learnRenderListGroup(label, hint, items){
   var hdr = document.createElement('div')
   hdr.style.cssText = 'display:flex;align-items:baseline;justify-content:space-between;padding:0 4px 8px'
   hdr.innerHTML = '<span style="font-size:12px;font-weight:700;color:var(--t1);letter-spacing:-.2px">'+label+'</span>'
-    +'<span style="font-size:11px;color:var(--t3)">'+hint+' · '+items.length+'개</span>'
+    +'<span style="font-size:11px;color:var(--t3)">'+hint+' · '+items.length+t('learn2.group_count_unit','개')+'</span>'
   wrap.appendChild(hdr)
   // card
   var card = document.createElement('div')
@@ -18764,7 +18860,7 @@ function learnRenderListGroup(label, hint, items){
     var info = document.createElement('div')
     info.style.cssText = 'flex:1;min-width:0'
     info.innerHTML = '<div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px;font-weight:700;color:var(--t1);letter-spacing:-.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+it.title+'</span>'
-      +(it.pinned ? '<span style="padding:1px 6px;border-radius:999px;background:var(--mint-l);color:var(--mint-d);font-size:9px;font-weight:800;letter-spacing:.4px">긴급</span>' : '')
+      +(it.pinned ? '<span style="padding:1px 6px;border-radius:999px;background:var(--mint-l);color:var(--mint-d);font-size:9px;font-weight:800;letter-spacing:.4px">'+t('learn2.pin_badge','긴급')+'</span>' : '')
       +'</div>'
       +'<div style="font-size:11px;color:var(--t3);margin-top:1px">'+it.meta+'</div>'
     row.appendChild(info)
@@ -18786,26 +18882,27 @@ async function loadLearnOverview(){
     var res = await fetch('/api/learn/overview', { headers: h, credentials: 'include' })
     if(!res.ok){
       // 비로그인 — 기본 상태 (Ssobi welcome 만 표시)
-      document.getElementById('learn-meta').textContent = '로그인 후 자료가 보여요'
+      document.getElementById('learn-meta').textContent = t('learn2.meta_loading','로그인 후 자료가 보여요')
       return
     }
     var j = await res.json()
 
-    // 헤더 sub: 자료 N개 · 외운 게 M개
+    // 헤더 sub
     var totalChunks = j.stats?.total_chunks || 0
     var totalItems = (j.stats?.total_products || 0) + (j.stats?.total_files || 0) + (j.urgent?.length || 0)
-    document.getElementById('learn-meta').textContent = '자료 ' + totalItems + '개 · 외운 게 ' + totalChunks + '개'
+    document.getElementById('learn-meta').textContent = t('learn2.meta_fmt','자료 {n}개 · 외운 게 {m}개').replace('{n}', totalItems).replace('{m}', totalChunks)
 
     // Persona 카드
     var nameEl = document.getElementById('learn-persona-name')
     var descEl = document.getElementById('learn-persona-desc')
     if(j.tone && j.tone.persona_summary){
-      nameEl.textContent = (j.ig_username ? j.ig_username : '내') + '의 Ssobi'
-      descEl.innerHTML = (j.tone.learned_style && typeof j.tone.learned_style === 'string' ? j.tone.learned_style.slice(0, 60) : '학습 완료')
+      var ownerPrefix = j.ig_username ? j.ig_username : (ssobiCurrentLang === 'en' ? 'My' : '내')
+      nameEl.textContent = ownerPrefix + t('learn2.persona_owner_post','의 Ssobi')
+      descEl.innerHTML = (j.tone.learned_style && typeof j.tone.learned_style === 'string' ? j.tone.learned_style.slice(0, 60) : t('learn2.persona_done','학습 완료'))
         + (j.tone.persona_summary ? '<br/><span style="color:var(--t3)">'+j.tone.persona_summary.slice(0, 60)+'</span>' : '')
     } else {
-      nameEl.textContent = '내 Ssobi'
-      descEl.textContent = '말투 학습 전 — 인스타 연동 후 자동 학습돼요'
+      nameEl.textContent = t('learn2.persona_default','내 Ssobi')
+      descEl.textContent = t('learn2.persona_desc_default','말투 학습 전 — 인스타 연동 후 자동 학습돼요')
     }
 
     // 자동 학습 자료 — Ssobi 메시지 + AttachmentCard 들
@@ -18816,11 +18913,12 @@ async function loadLearnOverview(){
     if(autoItems.length > 0){
       autoMsg.style.display = 'flex'
       autoItems.forEach(function(p){
+        var catLabel = p.category === 'product' ? t('learn2.cat_product','제품') : p.category === 'content' ? t('learn2.cat_content','콘텐츠') : p.category === 'class' ? t('learn2.cat_class','강의') : t('learn2.cat_link','링크')
         autoList.appendChild(learnRenderAttachment({
           kind: 'link',
           host: p.source_domain || 'ssobi.ai',
-          title: p.source_label || p.source_url || '제목 없음',
-          meta: (p.category === 'product' ? '제품' : p.category === 'content' ? '콘텐츠' : p.category === 'class' ? '강의' : '링크') + ' · ' + (p.chunk_count || 0) + '개 기억',
+          title: p.source_label || p.source_url || (ssobiCurrentLang === 'en' ? 'Untitled' : '제목 없음'),
+          meta: catLabel + ' · ' + (p.chunk_count || 0) + t('learn2.unit_memory_post','개 기억'),
           onClick: function(){ openLearnDetail(p.source_url || p.source_label, p.source_label || p.source_url, p.source_domain) },
         }))
       })
@@ -18837,7 +18935,7 @@ async function loadLearnOverview(){
       var div = document.getElementById('learn-today-divider')
       div.style.display = 'flex'
       var d = new Date()
-      document.getElementById('learn-today-label').textContent = '오늘 · ' + (d.getMonth()+1) + '월 ' + d.getDate() + '일'
+      document.getElementById('learn-today-label').textContent = t('learn2.divider_today_pre','오늘 · ') + (d.getMonth()+1) + t('learn2.divider_today_month','월 ') + d.getDate() + t('learn2.divider_today_day','일')
       // 각 자료: UserMsg (attachment 또는 메모) + SsobiMsg 응답
       todayItems.forEach(function(it){
         userMsgs.appendChild(learnRenderUserMsg(it))
@@ -18860,23 +18958,23 @@ async function openLearnDetail(source, label, domain){
   var titleEl = document.getElementById('learn-detail-title')
   var hostEl = document.getElementById('learn-detail-host')
   var metaEl = document.getElementById('learn-detail-meta')
-  titleEl.textContent = label || '학습 자료'
+  titleEl.textContent = label || t('learn2.detail_default_title','학습 자료')
   hostEl.textContent = domain || ''
-  metaEl.textContent = '불러오는 중…'
+  metaEl.textContent = t('learn2.detail_loading','불러오는 중…')
   while(listEl.firstChild) listEl.removeChild(listEl.firstChild)
   openModal('m-learn-detail')
   try {
     var h = await authHeaders()
     var res = await fetch('/api/learn/detail?source=' + encodeURIComponent(source), { headers: h, credentials: 'include' })
-    if(!res.ok){ metaEl.textContent = '불러오기 실패'; return }
+    if(!res.ok){ metaEl.textContent = t('learn2.detail_failed','불러오기 실패'); return }
     var j = await res.json()
     var cat = j.source?.category
-    var catLabel = cat === 'product' ? '제품' : cat === 'content' ? '콘텐츠' : cat === 'class' ? '강의' : '링크'
-    metaEl.textContent = catLabel + ' · 외운 게 ' + (j.count || 0) + '개'
+    var catLabel = cat === 'product' ? t('learn2.cat_product','제품') : cat === 'content' ? t('learn2.cat_content','콘텐츠') : cat === 'class' ? t('learn2.cat_class','강의') : t('learn2.cat_link','링크')
+    metaEl.textContent = catLabel + t('learn2.detail_meta_pre',' · 외운 게 ') + (j.count || 0) + t('learn2.detail_meta_post','개')
     if(!j.chunks || j.chunks.length === 0){
       var empty = document.createElement('div')
       empty.style.cssText = 'padding:30px 0;text-align:center;font-size:12px;color:var(--t3)'
-      empty.textContent = '외운 내용이 없어요.'
+      empty.textContent = t('learn2.detail_empty','외운 내용이 없어요.')
       listEl.appendChild(empty)
       return
     }
@@ -18894,7 +18992,7 @@ async function openLearnDetail(source, label, domain){
     })
   } catch(e){
     console.error('[openLearnDetail]', e)
-    metaEl.textContent = '불러오기 실패'
+    metaEl.textContent = t('learn2.detail_failed','불러오기 실패')
   }
 }
 
@@ -18921,14 +19019,14 @@ function learnRenderUserMsg(it){
 function learnRenderSsobiResponse(it){
   var col = document.createElement('div')
   col.style.cssText = 'display:flex;flex-direction:column;align-items:flex-start;margin-top:18px'
-  col.innerHTML = '<div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:-.1px;margin-bottom:5px;padding-left:2px">Ssobi</div>'
+  col.innerHTML = '<div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:-.1px;margin-bottom:5px;padding-left:2px">'+t('learn2.bot_name','Ssobi')+'</div>'
   var bubble = document.createElement('div')
   bubble.style.cssText = 'max-width:86%;background:#fff;color:var(--t1);padding:12px 14px;border-radius:14px 14px 14px 4px;border:1px solid var(--b)'
   if(it._urgent){
-    bubble.innerHTML = '<div style="font-size:14px;line-height:1.55">긴급 공지로 표시했어요.<br/><span style="color:var(--t2)">관련 응대에 즉시 반영됩니다.</span></div>'
-      +'<div style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:var(--mint-l);color:var(--mint-d);font-size:11px;font-weight:700;letter-spacing:-.1px"><span style="width:5px;height:5px;border-radius:3px;background:var(--mint-d)"></span>긴급 공지 활성</div>'
+    bubble.innerHTML = '<div style="font-size:14px;line-height:1.55">'+t('learn2.urgent_msg','긴급 공지로 표시했어요.')+'<br/><span style="color:var(--t2)">'+t('learn2.urgent_sub','관련 응대에 즉시 반영됩니다.')+'</span></div>'
+      +'<div style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:var(--mint-l);color:var(--mint-d);font-size:11px;font-weight:700;letter-spacing:-.1px"><span style="width:5px;height:5px;border-radius:3px;background:var(--mint-d)"></span>'+t('learn2.urgent_badge','긴급 공지 활성')+'</div>'
   } else {
-    bubble.innerHTML = '<div style="font-size:14px;line-height:1.55">잘 받았어요. <span style="font-weight:700">'+(it.chunk_count||0)+'개</span>로 외워뒀습니다.<br/><span style="color:var(--t2)">관련 질문이 오면 인용해서 답할게요.</span></div>'
+    bubble.innerHTML = '<div style="font-size:14px;line-height:1.55">'+t('learn2.file_received_pre','잘 받았어요. ')+'<span style="font-weight:700">'+(it.chunk_count||0)+'</span>'+t('learn2.file_received_post','개로 외워뒀습니다.')+'<br/><span style="color:var(--t2)">'+t('learn2.file_received_sub','관련 질문이 오면 인용해서 답할게요.')+'</span></div>'
   }
   col.appendChild(bubble)
   return col
@@ -18942,10 +19040,11 @@ function learnRenderListView(j){
 
   // 자동 학습 그룹
   var autoItems = (j.products || []).map(function(p){
+    var catLabel = p.category === 'product' ? t('learn2.cat_product','제품') : p.category === 'content' ? t('learn2.cat_content','콘텐츠') : p.category === 'class' ? t('learn2.cat_class','강의') : t('learn2.cat_link','링크')
     return {
       kind: 'link',
-      title: p.source_label || p.source_url || '제목 없음',
-      meta: (p.category === 'product' ? '제품' : p.category === 'content' ? '콘텐츠' : p.category === 'class' ? '강의' : '링크') + ' · ' + (p.chunk_count || 0) + '개 기억',
+      title: p.source_label || p.source_url || (ssobiCurrentLang === 'en' ? 'Untitled' : '제목 없음'),
+      meta: catLabel + ' · ' + (p.chunk_count || 0) + t('learn2.unit_memory_post','개 기억'),
       used: '',
       when: '',
       _src: p.source_url || p.source_label,
@@ -18954,7 +19053,7 @@ function learnRenderListView(j){
     }
   })
   if(autoItems.length > 0){
-    autoWrap.appendChild(learnRenderListGroup('자동 학습', '인스타 · 내 링크', autoItems))
+    autoWrap.appendChild(learnRenderListGroup(t('learn2.group_auto','자동 학습'), t('learn2.group_auto_hint','인스타 · 내 링크'), autoItems))
   }
 
   // 추가 학습 그룹 (files + urgent)
@@ -18963,7 +19062,7 @@ function learnRenderListView(j){
     manualItems.push({
       kind: 'file', ext: (f.file_type || 'FILE').toUpperCase().slice(0, 4),
       title: f.file_name,
-      meta: ((f.file_size_bytes/1024/1024).toFixed(1)) + ' MB · ' + (f.chunk_count||0) + '개 기억',
+      meta: ((f.file_size_bytes/1024/1024).toFixed(1)) + ' MB · ' + (f.chunk_count||0) + t('learn2.unit_memory_post','개 기억'),
       used: '', when: '',
       _src: f.file_name,
       _label: f.file_name,
@@ -18973,19 +19072,19 @@ function learnRenderListView(j){
     manualItems.push({
       kind: 'note',
       title: u.content.slice(0, 40),
-      meta: '메모 · 긴급 공지',
+      meta: t('learn2.urgent_note_meta','메모 · 긴급 공지'),
       used: '', when: '',
       pinned: true,
     })
   })
   if(manualItems.length > 0){
-    manualWrap.appendChild(learnRenderListGroup('추가 학습', '내가 보낸 자료', manualItems))
+    manualWrap.appendChild(learnRenderListGroup(t('learn2.group_manual','추가 학습'), t('learn2.group_manual_hint','내가 보낸 자료'), manualItems))
   }
 
   if(autoItems.length === 0 && manualItems.length === 0){
     var empty = document.createElement('div')
     empty.style.cssText = 'padding:40px 0;text-align:center;font-size:12px;color:var(--t3)'
-    empty.textContent = '학습된 자료가 없어요. 채팅에서 파일이나 링크를 보내주세요.'
+    empty.textContent = t('learn2.empty','학습된 자료가 없어요. 채팅에서 파일이나 링크를 보내주세요.')
     autoWrap.appendChild(empty)
   }
 }
