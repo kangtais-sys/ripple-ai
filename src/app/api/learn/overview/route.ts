@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
   const now = new Date().toISOString()
 
   // 병렬 fetch
-  const [toneR, profR, chunksR, filesR, urgentR, igR] = await Promise.all([
+  const [toneR, profR, chunksR, filesR, urgentR, igR, linkR] = await Promise.all([
     sb.from('tone_profiles')
       .select('learned_style, persona_summary, persona_details, user_corrections, validation_completed_at')
       .eq('user_id', u.id)
@@ -61,6 +61,10 @@ export async function GET(req: NextRequest) {
       .select('ig_username')
       .eq('user_id', u.id)
       .limit(1)
+      .maybeSingle(),
+    sb.from('link_pages')
+      .select('blocks, handle')
+      .eq('user_id', u.id)
       .maybeSingle(),
   ])
 
@@ -93,6 +97,27 @@ export async function GET(req: NextRequest) {
     const entry = productMap.get(key)!
     entry.chunk_count++
     if (c.detected_price && !entry.price) entry.price = c.detected_price
+  }
+
+  // 내 링크 페이지의 모든 link 블록 → products 와 merge (knowledge_chunks 에 없는 링크는 chunk_count:0)
+  const linkBlocks = Array.isArray(linkR.data?.blocks) ? linkR.data.blocks : []
+  type LinkBlock = { type?: string; url?: string; title?: string; label?: string; sub?: string }
+  for (const blk of linkBlocks as LinkBlock[]) {
+    if (blk?.type !== 'link' || !blk.url) continue
+    const key = blk.url
+    if (productMap.has(key)) continue // knowledge_chunks 에서 이미 잡힘
+    let domain: string | null = null
+    try { domain = new URL(blk.url).hostname.replace(/^www\./, '') } catch {}
+    productMap.set(key, {
+      source_url: blk.url,
+      source_label: blk.title || blk.label || blk.url,
+      source_domain: domain,
+      category: null,
+      price: null,
+      currency: null,
+      chunk_count: 0,
+      content_preview: '',
+    })
   }
 
   const products = Array.from(productMap.values()).sort((a, b) => {
