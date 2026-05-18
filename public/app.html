@@ -19118,7 +19118,7 @@ function renderLearnOverview(j){
     var autoList = document.getElementById('learn-auto-list')
     var autoMsg = document.getElementById('learn-auto-msg')
     while(autoList.firstChild) autoList.removeChild(autoList.firstChild)
-    var autoItems = (j.products || []).slice(0, 5)
+    var autoItems = (j.products || [])
     if(autoItems.length > 0){
       autoMsg.style.display = 'flex'
       autoItems.forEach(function(p){

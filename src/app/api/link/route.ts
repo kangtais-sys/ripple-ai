@@ -149,16 +149,19 @@ async function embedLinkBlocksBackground(sb: SupabaseClient, userId: string, blo
     alreadyEmbedded = new Set((existingChunks || []).map((c: { source_url: string | null }) => c.source_url).filter(Boolean) as string[])
   }
 
-  // 3) block 자체 텍스트 임베딩 (변경 적은 영역 — 매번 새로 저장)
+  // 3) block 자체 텍스트 임베딩 — url 있으면 같이 저장해 외부 URL chunks 와 통합
+  //    (없으면 source_url=null 로 저장하지만, 가능한 url 매칭으로 dedup)
   for (const block of blocks) {
     const blockText = ['title', 'sub', 'text', 'desc', 'caption']
       .map((k) => (typeof block[k] === 'string' ? block[k] : ''))
       .filter(Boolean)
       .join('\n')
     if (blockText.length > 30) {
+      const blockUrl = typeof block.url === 'string' && /^https?:\/\//.test(block.url) ? block.url : undefined
       try {
         await storeKnowledge(sb, userId, blockText, {
           sourceType: 'link',
+          sourceUrl: blockUrl,
           sourceLabel: (block.title as string) || (block.label as string) || (block.type as string) || 'link block',
         })
       } catch (e) {
