@@ -3896,14 +3896,14 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div style="margin-top:24px;padding-top:18px;border-top:1px solid var(--b)">
     <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:6px" data-i18n="mod.tone.brand_section">내 계정 추가 정보</div>
     <div style="font-size:12px;color:var(--t3);margin-bottom:8px;line-height:1.55" data-i18n="mod.tone.brand_sub">Ssobi가 꼭 알아야 할 것. 사이트·카카오채널·대표 제품·일정·성향·활동 영역 등 자유롭게</div>
-    <textarea id="tone-brand-context" class="sheet-ta" rows="4" placeholder="예1) Millimilli — 감성 K-뷰티 브랜드. 공식 사이트 millimilli.co · 카카오 @millimilli · 매주 토요일 공구&#10;예2) 서울 거주, 독서·러닝 주제 계정. 협업 문의는 이메일(me@mail.com)로만 받음. 아직 제품·공구 없음" data-i18n-ph="mod.tone.brand_ph"></textarea>
+    <textarea id="tone-brand-context" class="sheet-ta" rows="4" placeholder="사이트 / 카카오채널 / 대표 제품 / 일정 / 활동 영역 등" data-i18n-ph="mod.tone.brand_ph"></textarea>
   </div>
 
   <!-- 금지어 -->
   <div style="margin-top:18px">
     <div style="font-size:14px;font-weight:800;color:var(--t1);margin-bottom:6px" data-i18n="mod.tone.banned_section">사용하지 않을 표현</div>
     <div style="font-size:12px;color:var(--t3);margin-bottom:8px;line-height:1.55" data-i18n="mod.tone.banned_sub">AI가 절대 쓰지 않을 단어·문구. 콤마로 구분</div>
-    <input id="tone-banned-words" class="sheet-in" type="text" placeholder="예) 고객님, 부탁드립니다, 구매하세요" data-i18n-ph="mod.tone.banned_ph">
+    <input id="tone-banned-words" class="sheet-in" type="text" placeholder="쉼표로 구분" data-i18n-ph="mod.tone.banned_ph">
   </div>
 
   <button class="btn-p" onclick="saveToneContext()" id="tone-context-save" style="margin-top:16px" data-i18n="mod.tone.save_btn">브랜드 정보·금지어 저장</button>
@@ -5763,10 +5763,10 @@ var I18N = {
     'mod.tone.learn_hint':'Instagram 연동 필수 · 최근 게시물 캡션 25개까지 분석',
     'mod.tone.brand_section':'내 계정 추가 정보',
     'mod.tone.brand_sub':'Ssobi가 꼭 알아야 할 것. 사이트·카카오채널·대표 제품·일정·성향·활동 영역 등 자유롭게',
-    'mod.tone.brand_ph':'예1) Millimilli — 감성 K-뷰티 브랜드. 공식 사이트 millimilli.co · 카카오 @millimilli · 매주 토요일 공구\n예2) 서울 거주, 독서·러닝 주제 계정. 협업 문의는 이메일(me@mail.com)로만 받음.',
+    'mod.tone.brand_ph':'사이트 / 카카오채널 / 대표 제품 / 일정 / 활동 영역 등',
     'mod.tone.banned_section':'사용하지 않을 표현',
     'mod.tone.banned_sub':'AI가 절대 쓰지 않을 단어·문구. 콤마로 구분',
-    'mod.tone.banned_ph':'예) 고객님, 부탁드립니다, 구매하세요',
+    'mod.tone.banned_ph':'쉼표로 구분',
     'mod.tone.save_btn':'브랜드 정보·금지어 저장',
     // 공통 버튼 (반복 사용)
     'btn.approve_send':'승인 · 바로 발송',
@@ -6737,10 +6737,10 @@ var I18N = {
     'mod.tone.learn_hint':'Instagram connection required · Up to 25 recent captions analyzed',
     'mod.tone.brand_section':'Account context',
     'mod.tone.brand_sub':'Anything Ssobi should know — site, channels, products, schedule, personality, niche.',
-    'mod.tone.brand_ph':'e.g. 1) Millimilli — emotive K-beauty brand. millimilli.co · KakaoTalk @millimilli · group buys every Saturday\ne.g. 2) Based in Seoul, books & running niche. Inquiries by email only (me@mail.com).',
+    'mod.tone.brand_ph':'Site / channel / featured product / schedule / niche',
     'mod.tone.banned_section':'Banned expressions',
     'mod.tone.banned_sub':'Words/phrases the AI must never use. Separate by commas.',
-    'mod.tone.banned_ph':'e.g. dear customer, please, buy now',
+    'mod.tone.banned_ph':'Comma-separated',
     'mod.tone.save_btn':'Save brand info & banned words',
     // common buttons
     'btn.approve_send':'Approve · Send',
