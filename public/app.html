@@ -2346,8 +2346,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <!-- 연동 채널 (Instagram + YouTube — TikTok 은 API 정책상 자동 응대 불가) -->
     <div>
       <div style="display:flex;align-items:baseline;justify-content:space-between;padding:0 4px;margin-bottom:8px">
-        <span style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px">연동 채널</span>
-        <span style="font-size:11px;color:var(--t3)" id="reply-channel-hint">댓글·DM 자동 응대</span>
+        <span style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px" data-i18n="reply2.ch_section">연동 채널</span>
+        <span style="font-size:11px;color:var(--t3)" id="reply-channel-hint" data-i18n="reply2.ch_hint">댓글·DM 자동 응대</span>
       </div>
       <div style="background:#fff;border:1px solid var(--b);border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(16,24,40,.04)">
         <!-- Instagram -->
@@ -2361,7 +2361,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
           </div>
           <span id="reply-ch-ig-status" style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;background:var(--mint-l);color:var(--mint-d);font-size:10.5px;font-weight:700;flex-shrink:0">
             <span style="width:4px;height:4px;border-radius:50%;background:var(--mint-d)"></span>
-            연결됨
+            <span data-i18n="reply2.ch_status_connected">연결됨</span>
           </span>
           <span id="reply-ch-ig-meta" style="display:none"></span>
         </div>
@@ -2374,7 +2374,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
             <span style="font-size:13.5px;font-weight:700;letter-spacing:-.2px;color:var(--t1);flex-shrink:0">YouTube</span>
             <span style="font-size:11.5px;color:var(--t3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="reply-ch-yt-handle"></span>
           </div>
-          <button style="background:#fff;color:var(--t1);border:1px solid var(--b);padding:3px 9px;border-radius:999px;font-size:10.5px;font-weight:700;flex-shrink:0;cursor:pointer">연결</button>
+          <button style="background:#fff;color:var(--t1);border:1px solid var(--b);padding:3px 9px;border-radius:999px;font-size:10.5px;font-weight:700;flex-shrink:0;cursor:pointer" data-i18n="reply2.ch_connect_btn">연결</button>
         </div>
       </div>
     </div>
@@ -2382,7 +2382,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <!-- 자동 관리 토글 — 펼침형 -->
     <div>
       <div style="display:flex;align-items:baseline;justify-content:space-between;padding:0 4px;margin-bottom:8px">
-        <span style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px">자동 관리</span>
+        <span style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px" data-i18n="reply2.auto_section">자동 관리</span>
         <span style="font-size:10px;font-weight:700;color:var(--mint-d);letter-spacing:.3px" id="reply-auto-count">3 / 4 작동중</span>
       </div>
       <div style="display:flex;flex-direction:column;gap:8px">
@@ -2390,8 +2390,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         <div id="rep-acc-comment" style="background:#fff;border:1px solid var(--b);border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(16,24,40,.04)">
           <div onclick="repToggle('rep-acc-comment')" style="display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer">
             <div style="flex:1;min-width:0">
-              <div style="font-size:14px;font-weight:700;letter-spacing:-.2px;color:var(--t1)">댓글 자동 응대</div>
-              <div style="font-size:11px;color:var(--t3);margin-top:2px">98% 말투 일치 · 즉시 발송</div>
+              <div style="font-size:14px;font-weight:700;letter-spacing:-.2px;color:var(--t1)" data-i18n="reply2.comment_title">댓글 자동 응대</div>
+              <div style="font-size:11px;color:var(--t3);margin-top:2px" data-i18n="reply2.comment_sub">98% 말투 일치 · 즉시 발송</div>
             </div>
             <label class="tog" onclick="event.stopPropagation()" style="flex-shrink:0"><input type="checkbox" id="ar-ch-comment" onchange="onAutoReplyChannelToggle('ig_comment', this)" checked><span class="tsl"></span></label>
             <svg class="rep-acc-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" style="flex-shrink:0;transition:transform .2s"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -2400,7 +2400,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
             <div style="padding-top:12px;display:flex;flex-direction:column;gap:10px">
               <!-- 채널 -->
               <div>
-                <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px">대상 채널</div>
+                <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px" data-i18n="reply2.acc_target_channel">대상 채널</div>
                 <div style="display:flex;gap:6px;flex-wrap:wrap">
                   <label style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;background:var(--mint-l);border:1px solid var(--mint);font-size:11.5px;font-weight:700;color:var(--mint-d);cursor:pointer"><input type="checkbox" checked style="margin:0">Instagram</label>
                   <label style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;background:#fff;border:1px solid var(--b);font-size:11.5px;font-weight:600;color:var(--t2);cursor:pointer"><input type="checkbox" style="margin:0">YouTube</label>
@@ -2408,7 +2408,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
               </div>
               <!-- 응대 시간대 -->
               <div>
-                <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px">응대 시간대</div>
+                <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px" data-i18n="reply2.acc_hours">응대 시간대</div>
                 <div style="display:flex;align-items:center;gap:6px">
                   <input type="time" value="08:00" style="padding:5px 8px;border:1px solid var(--b);border-radius:8px;font-size:12px;width:88px;background:#fff">
                   <span style="font-size:11px;color:var(--t3)">~</span>
@@ -2417,7 +2417,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
               </div>
               <!-- 하루 한도 -->
               <div>
-                <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px">하루 응대 한도</div>
+                <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px" data-i18n="reply2.acc_daily_limit">하루 응대 한도</div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:#fff;border:1px solid var(--b);border-radius:8px">
                   <button onclick="adj('c',-10)" style="background:none;border:none;font-size:16px;color:var(--t2);cursor:pointer;width:24px">−</button>
                   <span class="tnum" id="q-comment" style="font-size:13px;font-weight:800;color:var(--t1)">200</span>
@@ -2427,8 +2427,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
               <!-- 질문형 모드 -->
               <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#fff;border:1px solid var(--b);border-radius:10px">
                 <div style="flex:1;min-width:0">
-                  <div style="font-size:12.5px;font-weight:700;color:var(--t1)">질문형 대댓글</div>
-                  <div style="font-size:11px;color:var(--t3);margin-top:1px;line-height:1.4">"어떤 타입이세요?" 같이 대화 유도</div>
+                  <div style="font-size:12.5px;font-weight:700;color:var(--t1)" data-i18n="reply2.acc_question_title">질문형 대댓글</div>
+                  <div style="font-size:11px;color:var(--t3);margin-top:1px;line-height:1.4" data-i18n="reply2.acc_question_sub">"어떤 타입이세요?" 같이 대화 유도</div>
                 </div>
                 <label class="tog" style="flex-shrink:0"><input type="checkbox" checked><span class="tsl"></span></label>
               </div>
@@ -2440,8 +2440,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         <div id="rep-acc-dm" style="background:#fff;border:1px solid var(--b);border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(16,24,40,.04)">
           <div onclick="repToggle('rep-acc-dm')" style="display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer">
             <div style="flex:1;min-width:0">
-              <div style="font-size:14px;font-weight:700;letter-spacing:-.2px;color:var(--t1)">DM 자동 응대</div>
-              <div style="font-size:11px;color:var(--t3);margin-top:2px">대화형 루프 · 24h 윈도우</div>
+              <div style="font-size:14px;font-weight:700;letter-spacing:-.2px;color:var(--t1)" data-i18n="reply2.dm_title">DM 자동 응대</div>
+              <div style="font-size:11px;color:var(--t3);margin-top:2px" data-i18n="reply2.dm_sub">대화형 루프 · 24h 윈도우</div>
             </div>
             <label class="tog" onclick="event.stopPropagation()" style="flex-shrink:0"><input type="checkbox" id="ar-ch-dm" onchange="onAutoReplyChannelToggle('ig_dm', this)" checked><span class="tsl"></span></label>
             <svg class="rep-acc-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" style="flex-shrink:0;transition:transform .2s"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -2449,14 +2449,14 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
           <div class="rep-acc-body" style="display:none;padding:0 14px 14px;border-top:1px solid var(--b);background:#FAFBFC">
             <div style="padding-top:12px;display:flex;flex-direction:column;gap:10px">
               <div>
-                <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px">대상 채널</div>
+                <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px" data-i18n="reply2.acc_target_channel">대상 채널</div>
                 <div style="display:flex;gap:6px;flex-wrap:wrap">
                   <label style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;background:var(--mint-l);border:1px solid var(--mint);font-size:11.5px;font-weight:700;color:var(--mint-d);cursor:pointer"><input type="checkbox" checked style="margin:0">Instagram</label>
                 </div>
-                <div style="font-size:10.5px;color:var(--t3);margin-top:4px;line-height:1.4">YouTube DM 은 정책상 자동 응대 불가</div>
+                <div style="font-size:10.5px;color:var(--t3);margin-top:4px;line-height:1.4" data-i18n="reply2.dm_yt_note">YouTube DM 은 정책상 자동 응대 불가</div>
               </div>
               <div>
-                <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px">응대 시간대</div>
+                <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px" data-i18n="reply2.acc_hours">응대 시간대</div>
                 <div style="display:flex;align-items:center;gap:6px">
                   <input type="time" value="08:00" style="padding:5px 8px;border:1px solid var(--b);border-radius:8px;font-size:12px;width:88px;background:#fff">
                   <span style="font-size:11px;color:var(--t3)">~</span>
@@ -2464,7 +2464,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
                 </div>
               </div>
               <div>
-                <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px">하루 DM 한도</div>
+                <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px" data-i18n="reply2.acc_daily_dm_limit">하루 DM 한도</div>
                 <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:#fff;border:1px solid var(--b);border-radius:8px">
                   <button onclick="adj('d',-5)" style="background:none;border:none;font-size:16px;color:var(--t2);cursor:pointer;width:24px">−</button>
                   <span class="tnum" id="q-dm" style="font-size:13px;font-weight:800;color:var(--t1)">100</span>
@@ -2479,10 +2479,10 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         <div style="background:#fff;border:1px solid var(--b);border-radius:14px;display:flex;align-items:center;gap:12px;padding:13px 14px;box-shadow:0 1px 2px rgba(16,24,40,.04)">
           <div style="flex:1;min-width:0">
             <div style="display:flex;align-items:center;gap:6px">
-              <span style="font-size:14px;font-weight:700;letter-spacing:-.2px;color:var(--t1)">댓글 → DM 자동 발송</span>
+              <span style="font-size:14px;font-weight:700;letter-spacing:-.2px;color:var(--t1)" data-i18n="reply2.cmdm_title">댓글 → DM 자동 발송</span>
               <span style="font-size:9px;font-weight:700;color:var(--t3);padding:1px 6px;border-radius:999px;background:var(--bg);border:1px solid var(--b);letter-spacing:.2px" id="reply-trigger-count">트리거 0개</span>
             </div>
-            <div style="font-size:11px;color:var(--t3);margin-top:2px">트리거 단어로 자동 DM</div>
+            <div style="font-size:11px;color:var(--t3);margin-top:2px" data-i18n="reply2.cmdm_sub">트리거 단어로 자동 DM</div>
           </div>
           <label class="tog" style="flex-shrink:0"><input type="checkbox" checked><span class="tsl"></span></label>
         </div>
@@ -2505,7 +2505,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <div style="width:22px;height:22px;border-radius:50%;background:var(--mint-l);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
         <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--mint-d)" stroke-width="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <div style="flex:1;font-size:11px;color:var(--t2);line-height:1.6">
+      <div style="flex:1;font-size:11px;color:var(--t2);line-height:1.6" data-i18n="reply2.safety_msg">
         댓글·DM 발송은 하루 사용량과 각 채널 정책에 따라 계정 안전성을 위해 유연하게 조정돼요.
       </div>
     </div>
@@ -2625,10 +2625,10 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
   <!-- 실시간 관리 — 기존 4탭 구조 (분석 제외) -->
   <div class="tbar" style="margin-bottom:14px">
-    <button class="tab on" id="tab-urgent"   onclick="setTab('urgent')">긴급</button>
-    <button class="tab"    id="tab-comments" onclick="setTab('comments')">댓글·DM</button>
-    <button class="tab"    id="tab-crm"      onclick="setTab('crm')">주요 팔로워</button>
-    <button class="tab"    id="tab-revenue"  onclick="setTab('revenue')">협업·제안</button>
+    <button class="tab on" id="tab-urgent"   onclick="setTab('urgent')" data-i18n="reply2.mtab_urgent">긴급</button>
+    <button class="tab"    id="tab-comments" onclick="setTab('comments')" data-i18n="reply2.mtab_commdm">댓글·DM</button>
+    <button class="tab"    id="tab-crm"      onclick="setTab('crm')" data-i18n="reply2.mtab_crm">주요 팔로워</button>
+    <button class="tab"    id="tab-revenue"  onclick="setTab('revenue')" data-i18n="reply2.mtab_revenue">협업·제안</button>
   </div>
 
   <!-- 긴급 (default 표시) -->
@@ -2637,14 +2637,14 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <!-- 봐야 할 것 (긴급 + 24h 임박) -->
     <div>
       <div style="display:flex;align-items:baseline;justify-content:space-between;padding:0 4px;margin-bottom:8px">
-        <span style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px">봐야 할 것</span>
-        <span style="font-size:12px;color:var(--t3)" id="manage-pending-hint">0건</span>
+        <span style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px" data-i18n="reply2.urgent_section">봐야 할 것</span>
+        <span style="font-size:12px;color:var(--t3)" id="manage-pending-hint">0</span>
       </div>
       <div id="manage-urgent-list" style="display:flex;flex-direction:column;gap:8px">
         <!-- JS 가 채움. 빈 상태 -->
         <div id="manage-urgent-empty" class="empty-soft">
-          <div class="empty-soft-t">긴급 응대 대기 없음</div>
-          <div>결제 오류·환불·24h 임박 메시지가 오면 여기로 올라옵니다.</div>
+          <div class="empty-soft-t" data-i18n="reply2.urgent_empty_t">긴급 응대 대기 없음</div>
+          <div data-i18n="reply2.urgent_empty_sub">결제 오류·환불·24h 임박 메시지가 오면 여기로 올라옵니다.</div>
         </div>
       </div>
       <!-- DEV 시뮬레이션 -->
@@ -2657,25 +2657,25 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <!-- 지금 응대중 (실시간 feed) -->
     <div>
       <div style="display:flex;align-items:baseline;justify-content:space-between;padding:0 4px;margin-bottom:8px">
-        <span style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px">지금 응대중</span>
+        <span style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px" data-i18n="reply2.live_section">지금 응대중</span>
         <span style="display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:999px;background:#fff;border:1px solid rgba(0,200,150,.25);font-size:9px;font-weight:800;color:var(--mint-d);letter-spacing:.4px">
           <span style="width:5px;height:5px;border-radius:3px;background:var(--mint);animation:bl 1.4s ease infinite"></span>
-          LIVE
+          <span data-i18n="reply2.live_badge">LIVE</span>
         </span>
       </div>
       <div style="background:#fff;border:1px solid var(--b);border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(16,24,40,.04)">
         <!-- 3-column stat -->
         <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--b)">
           <div style="padding:12px 14px">
-            <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.3px;text-transform:uppercase">자동 처리</div>
+            <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.3px;text-transform:uppercase" data-i18n="reply2.stat_auto">자동 처리</div>
             <div class="tnum" id="manage-stat-auto" style="font-size:24px;font-weight:800;color:var(--mint-d);letter-spacing:-.6px;line-height:1.1;margin-top:3px">0</div>
           </div>
           <div style="padding:12px 14px;border-left:1px solid var(--b)">
-            <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.3px;text-transform:uppercase">사람 개입</div>
+            <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.3px;text-transform:uppercase" data-i18n="reply2.stat_human">사람 개입</div>
             <div class="tnum" id="manage-stat-human" style="font-size:24px;font-weight:800;color:var(--t1);letter-spacing:-.6px;line-height:1.1;margin-top:3px">0</div>
           </div>
           <div style="padding:12px 14px;border-left:1px solid var(--b)">
-            <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.3px;text-transform:uppercase">평균 응답</div>
+            <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.3px;text-transform:uppercase" data-i18n="reply2.stat_avg">평균 응답</div>
             <div class="tnum" id="manage-stat-avg" style="font-size:18px;font-weight:800;color:var(--t1);letter-spacing:-.6px;line-height:1.1;margin-top:3px">—</div>
           </div>
         </div>
@@ -2683,15 +2683,15 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         <!-- 실시간 대화 행들 -->
         <div id="manage-live-feed" style="max-height:320px;overflow:hidden">
           <div id="replies-sent-empty" class="empty-soft" style="margin:14px">
-            <div class="empty-soft-t">자동 응대 내역 없음</div>
-            <div>댓글·DM 이 들어오면 여기에 쌓입니다.</div>
+            <div class="empty-soft-t" data-i18n="reply2.feed_empty_t">자동 응대 내역 없음</div>
+            <div data-i18n="reply2.feed_empty_sub">댓글·DM 이 들어오면 여기에 쌓입니다.</div>
           </div>
           <div class="msg-card" id="replies-sent-card" style="display:none"></div>
         </div>
 
         <!-- 전체 보기 -->
         <button style="appearance:none;border:none;background:#fff;width:100%;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;font-family:inherit;cursor:pointer;border-top:1px solid var(--b)">
-          <span style="font-size:12px;font-weight:600;color:var(--t1)">전체 대화 보기</span>
+          <span style="font-size:12px;font-weight:600;color:var(--t1)" data-i18n="reply2.feed_see_all">전체 대화 보기</span>
           <svg width="6" height="10" viewBox="0 0 6 10"><path d="M1 1l4 4-4 4" stroke="var(--t3)" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
         </button>
       </div>
@@ -2709,24 +2709,24 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div class="tc" id="tc-comments" style="display:none">
     <div class="msg-card" id="replies-sent-card"></div>
     <div id="replies-sent-empty" class="empty-soft">
-      <div class="empty-soft-t">자동 응대 내역 없음</div>
-      <div>일반 댓글·DM이 도착하면 AI가 답장하고 여기에 쌓입니다.</div>
+      <div class="empty-soft-t" data-i18n="reply2.commdm_empty_t">자동 응대 내역 없음</div>
+      <div data-i18n="reply2.commdm_empty_sub">일반 댓글·DM이 도착하면 AI가 답장하고 여기에 쌓입니다.</div>
     </div>
   </div>
 
   <!-- 주요 팔로워 -->
   <div class="tc" id="tc-crm" style="display:none">
     <div class="follower-section">
-      <div class="fs-header"><div class="fs-title">긍정 팔로워</div><div class="fs-count" id="pos-count">0</div></div>
+      <div class="fs-header"><div class="fs-title" data-i18n="reply2.crm_pos">긍정 팔로워</div><div class="fs-count" id="pos-count">0</div></div>
       <div class="msg-card" id="pos-followers-list"></div>
     </div>
     <div class="follower-section">
-      <div class="fs-header"><div class="fs-title">부정 팔로워</div><div class="fs-count" id="neg-count" style="color:var(--red)">0</div></div>
+      <div class="fs-header"><div class="fs-title" data-i18n="reply2.crm_neg">부정 팔로워</div><div class="fs-count" id="neg-count" style="color:var(--red)">0</div></div>
       <div class="msg-card" id="neg-followers-list"></div>
     </div>
     <div id="followers-empty" class="empty-soft" style="margin-top:10px">
-      <div class="empty-soft-t">팔로워 데이터 없음</div>
-      <div>댓글·DM이 쌓이면 팔로워별로 자동 분류됩니다.</div>
+      <div class="empty-soft-t" data-i18n="reply2.crm_empty_t">팔로워 데이터 없음</div>
+      <div data-i18n="reply2.crm_empty_sub">댓글·DM이 쌓이면 팔로워별로 자동 분류됩니다.</div>
     </div>
   </div>
 
@@ -2734,25 +2734,25 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <div class="tc" id="tc-revenue" style="display:none">
     <div id="sobi-collab-section"></div>
     <div style="background:var(--s);border-radius:18px;border:1px solid var(--b);padding:16px 18px;margin-bottom:12px">
-      <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;text-transform:uppercase;margin-bottom:4px">이번 달 제안 합계</div>
-      <div class="tnum" style="font-size:26px;font-weight:800;color:var(--t1);letter-spacing:-.6px;margin-bottom:12px" id="rev-total-krw">0원</div>
+      <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;text-transform:uppercase;margin-bottom:4px" data-i18n="reply2.rev_section">이번 달 제안 합계</div>
+      <div class="tnum" style="font-size:26px;font-weight:800;color:var(--t1);letter-spacing:-.6px;margin-bottom:12px" id="rev-total-krw">0</div>
       <div style="display:flex;gap:8px">
         <div style="flex:1;background:var(--bg);border-radius:10px;padding:10px 12px">
-          <div style="font-size:10px;color:var(--t3);font-weight:600">협찬·광고·기타</div>
+          <div style="font-size:10px;color:var(--t3);font-weight:600" data-i18n="reply2.rev_sponsor">협찬·광고·기타</div>
           <div class="tnum" style="font-size:14px;font-weight:800;color:var(--t1);margin-top:3px" id="rev-sp">0</div>
-          <div style="font-size:10px;color:var(--t3);margin-top:2px">DM 현금 제안 합산</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:2px" data-i18n="reply2.rev_sponsor_sub">DM 현금 제안 합산</div>
         </div>
         <div style="flex:1;background:var(--bg);border-radius:10px;padding:10px 12px">
-          <div style="font-size:10px;color:var(--t3);font-weight:600">내 링크 제안</div>
+          <div style="font-size:10px;color:var(--t3);font-weight:600" data-i18n="reply2.rev_link">내 링크 제안</div>
           <div class="tnum" style="font-size:14px;font-weight:800;color:var(--t1);margin-top:3px" id="rev-linkcount">0</div>
-          <div style="font-size:10px;color:var(--t3);margin-top:2px">제안하기 폼으로 도착</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:2px" data-i18n="reply2.rev_link_sub">제안하기 폼으로 도착</div>
         </div>
       </div>
     </div>
     <div class="msg-card" id="revenue-list"></div>
     <div id="revenue-empty" class="empty-soft">
-      <div class="empty-soft-t">제안 없음</div>
-      <div>협찬·광고 DM 또는 내 링크 제안이 접수되면 AI가 분류해서 모아둡니다.</div>
+      <div class="empty-soft-t" data-i18n="reply2.rev_empty_t">제안 없음</div>
+      <div data-i18n="reply2.rev_empty_sub">협찬·광고 DM 또는 내 링크 제안이 접수되면 AI가 분류해서 모아둡니다.</div>
     </div>
   </div>
 
@@ -5235,6 +5235,57 @@ document.addEventListener('DOMContentLoaded', syncToneChip);
 // ═══════════════════════════════════════════════════════════════════
 var I18N = {
   ko: {
+    // ─────── reply2.* — v2 응대탭 (자동 + 실시간) ───────
+    'reply2.ch_section':'연동 채널',
+    'reply2.ch_hint':'댓글·DM 자동 응대',
+    'reply2.ch_status_connected':'연결됨',
+    'reply2.ch_connect_btn':'연결',
+    'reply2.auto_section':'자동 관리',
+    'reply2.auto_count_fmt':'{n} / 4 작동중',
+    'reply2.comment_title':'댓글 자동 응대',
+    'reply2.comment_sub':'98% 말투 일치 · 즉시 발송',
+    'reply2.acc_target_channel':'대상 채널',
+    'reply2.acc_hours':'응대 시간대',
+    'reply2.acc_daily_limit':'하루 응대 한도',
+    'reply2.acc_daily_dm_limit':'하루 DM 한도',
+    'reply2.acc_question_title':'질문형 대댓글',
+    'reply2.acc_question_sub':'"어떤 타입이세요?" 같이 대화 유도',
+    'reply2.dm_title':'DM 자동 응대',
+    'reply2.dm_sub':'대화형 루프 · 24h 윈도우',
+    'reply2.dm_yt_note':'YouTube DM 은 정책상 자동 응대 불가',
+    'reply2.cmdm_title':'댓글 → DM 자동 발송',
+    'reply2.cmdm_trigger_fmt':'트리거 {n}개',
+    'reply2.cmdm_sub':'트리거 단어로 자동 DM',
+    'reply2.safety_msg':'댓글·DM 발송은 하루 사용량과 각 채널 정책에 따라 계정 안전성을 위해 유연하게 조정돼요.',
+    'reply2.mtab_urgent':'긴급',
+    'reply2.mtab_commdm':'댓글·DM',
+    'reply2.mtab_crm':'주요 팔로워',
+    'reply2.mtab_revenue':'협업·제안',
+    'reply2.urgent_section':'봐야 할 것',
+    'reply2.urgent_hint_fmt':'{n}건',
+    'reply2.urgent_empty_t':'긴급 응대 대기 없음',
+    'reply2.urgent_empty_sub':'결제 오류·환불·24h 임박 메시지가 오면 여기로 올라옵니다.',
+    'reply2.live_section':'지금 응대중',
+    'reply2.live_badge':'LIVE',
+    'reply2.stat_auto':'자동 처리',
+    'reply2.stat_human':'사람 개입',
+    'reply2.stat_avg':'평균 응답',
+    'reply2.feed_empty_t':'자동 응대 내역 없음',
+    'reply2.feed_empty_sub':'댓글·DM 이 들어오면 여기에 쌓입니다.',
+    'reply2.feed_see_all':'전체 대화 보기',
+    'reply2.commdm_empty_t':'자동 응대 내역 없음',
+    'reply2.commdm_empty_sub':'일반 댓글·DM이 도착하면 AI가 답장하고 여기에 쌓입니다.',
+    'reply2.crm_pos':'긍정 팔로워',
+    'reply2.crm_neg':'부정 팔로워',
+    'reply2.crm_empty_t':'팔로워 데이터 없음',
+    'reply2.crm_empty_sub':'댓글·DM이 쌓이면 팔로워별로 자동 분류됩니다.',
+    'reply2.rev_section':'이번 달 제안 합계',
+    'reply2.rev_sponsor':'협찬·광고·기타',
+    'reply2.rev_sponsor_sub':'DM 현금 제안 합산',
+    'reply2.rev_link':'내 링크 제안',
+    'reply2.rev_link_sub':'제안하기 폼으로 도착',
+    'reply2.rev_empty_t':'제안 없음',
+    'reply2.rev_empty_sub':'협찬·광고 DM 또는 내 링크 제안이 접수되면 AI가 분류해서 모아둡니다.',
     // ─────── learn2.* — v2 학습탭 ───────
     'learn2.title':'학습',
     'learn2.meta_loading':'로그인 후 자료가 보여요',
@@ -6151,6 +6202,57 @@ var I18N = {
     'newbie.live.sub':'이건 다른 유저들의 실시간 활동이에요\n체크리스트 끝나면 내 피드도 채워집니다',
   },
   en: {
+    // ─────── reply2.* — v2 reply tab (auto + live) ───────
+    'reply2.ch_section':'Connected channels',
+    'reply2.ch_hint':'Comment & DM auto-reply',
+    'reply2.ch_status_connected':'Connected',
+    'reply2.ch_connect_btn':'Connect',
+    'reply2.auto_section':'Auto-manage',
+    'reply2.auto_count_fmt':'{n} / 4 active',
+    'reply2.comment_title':'Comment auto-reply',
+    'reply2.comment_sub':'98% tone match · instant',
+    'reply2.acc_target_channel':'Channels',
+    'reply2.acc_hours':'Reply hours',
+    'reply2.acc_daily_limit':'Daily reply limit',
+    'reply2.acc_daily_dm_limit':'Daily DM limit',
+    'reply2.acc_question_title':'Question replies',
+    'reply2.acc_question_sub':'"What type are you?" — conversation prompts',
+    'reply2.dm_title':'DM auto-reply',
+    'reply2.dm_sub':'Conversational · 24h window',
+    'reply2.dm_yt_note':'YouTube DM not supported by API policy',
+    'reply2.cmdm_title':'Comment → DM auto-send',
+    'reply2.cmdm_trigger_fmt':'{n} triggers',
+    'reply2.cmdm_sub':'Trigger words → auto DM',
+    'reply2.safety_msg':'Comment & DM sending adjusts based on daily usage and channel policies to keep your account safe.',
+    'reply2.mtab_urgent':'Urgent',
+    'reply2.mtab_commdm':'Comments & DMs',
+    'reply2.mtab_crm':'Top fans',
+    'reply2.mtab_revenue':'Deals',
+    'reply2.urgent_section':'Need attention',
+    'reply2.urgent_hint_fmt':'{n}',
+    'reply2.urgent_empty_t':'No urgent items',
+    'reply2.urgent_empty_sub':'Payment errors, refunds, and 24h-window messages will appear here.',
+    'reply2.live_section':'Live now',
+    'reply2.live_badge':'LIVE',
+    'reply2.stat_auto':'Auto-handled',
+    'reply2.stat_human':'Manual',
+    'reply2.stat_avg':'Avg reply',
+    'reply2.feed_empty_t':'No auto-replies yet',
+    'reply2.feed_empty_sub':'Replies pile up here as comments & DMs come in.',
+    'reply2.feed_see_all':'See all conversations',
+    'reply2.commdm_empty_t':'No auto-replies yet',
+    'reply2.commdm_empty_sub':'AI replies and stacks here when normal comments & DMs arrive.',
+    'reply2.crm_pos':'Positive fans',
+    'reply2.crm_neg':'Negative fans',
+    'reply2.crm_empty_t':'No fan data',
+    'reply2.crm_empty_sub':'Auto-categorized by fan as comments & DMs accumulate.',
+    'reply2.rev_section':'This month\'s offers',
+    'reply2.rev_sponsor':'Sponsorships / ads',
+    'reply2.rev_sponsor_sub':'Cash offers via DM',
+    'reply2.rev_link':'Link page offers',
+    'reply2.rev_link_sub':'From the proposal form',
+    'reply2.rev_empty_t':'No offers',
+    'reply2.rev_empty_sub':'AI sorts and gathers sponsorship DMs and link page offers here.',
     // ─────── learn2.* — v2 learn tab ───────
     'learn2.title':'Learn',
     'learn2.meta_loading':'Sign in to see resources',
@@ -7113,6 +7215,15 @@ function applyI18n(lang){
   try { if(typeof loadHomeDashboard === 'function') loadHomeDashboard(); } catch(_){}
   // 학습탭 동적 텍스트 즉시 갱신 (자료 메타, persona, 자동학습 목록, 응답 메시지)
   try { if(typeof loadLearnOverview === 'function') loadLearnOverview(); } catch(_){}
+  // 응대탭 fmt 텍스트 (auto count, trigger count, urgent hint) — JS 가 다시 안 채우므로 직접 갱신
+  try {
+    var rAuto = document.getElementById('reply-auto-count')
+    if(rAuto) rAuto.textContent = t('reply2.auto_count_fmt','{n} / 4 작동중').replace('{n}', '3')
+    var rTrig = document.getElementById('reply-trigger-count')
+    if(rTrig) rTrig.textContent = t('reply2.cmdm_trigger_fmt','트리거 {n}개').replace('{n}', '0')
+    var rPend = document.getElementById('manage-pending-hint')
+    if(rPend) rPend.textContent = t('reply2.urgent_hint_fmt','{n}건').replace('{n}', '0')
+  } catch(_){}
   // 만들기 탭 "내 주제 · ___" 라벨 갱신 (lang 따라 카테고리명 swap)
   try { if(typeof syncToneChip === 'function') syncToneChip(); } catch(_){}
   // edt-size-badge 갱신 (사용자가 cs-4 에 있을 때 lang 변경되면)
