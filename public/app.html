@@ -110,6 +110,35 @@ body{font-family:'Pretendard',sans-serif;background:var(--bg);color:var(--t1);ma
 .sec-eye + .sec-t{margin-top:0}
 .sec-t.xl{font-size:20px;letter-spacing:-.6px;margin-top:0;margin-bottom:14px}
 
+/* ─── Ssobi v2 디자인 토큰 (Claude Design 핸드오프) ─── */
+/* em-serif 강조 — Fraunces italic, 한 글자 강조 패턴 */
+.em-serif{font-family:'Fraunces','Pretendard','Noto Sans KR',sans-serif;font-style:italic;font-weight:500;letter-spacing:-.01em}
+.tnum{font-feature-settings:"tnum"}
+
+/* hero 숫자 rise */
+@keyframes ssobi-rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.ssobi-rise{animation:ssobi-rise .7s cubic-bezier(.2,.7,.3,1) both}
+
+/* live pulse (라이브 dot 확산) */
+@keyframes ssobi-pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.8);opacity:0}}
+.ssobi-pulse-dot{position:relative;width:8px;height:8px;border-radius:50%;background:var(--mint);display:inline-block;flex-shrink:0}
+.ssobi-pulse-dot::after{content:'';position:absolute;inset:0;border-radius:50%;background:var(--mint);animation:ssobi-pulse 1.8s ease-out infinite}
+
+/* 신규 ticker — live-stream(lu) 와 별개로 새 디자인 영역에서 사용 */
+@keyframes ssobi-ticker{0%{transform:translateY(0)}100%{transform:translateY(-50%)}}
+.ssobi-ticker{animation:ssobi-ticker 28s linear infinite}
+
+/* typing dots */
+@keyframes ssobi-bounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-3px);opacity:1}}
+.ssobi-typedot{display:inline-block;width:4px;height:4px;border-radius:50%;background:currentColor;margin:0 1px}
+.ssobi-typedot:nth-child(1){animation:ssobi-bounce 1.2s ease-in-out infinite}
+.ssobi-typedot:nth-child(2){animation:ssobi-bounce 1.2s ease-in-out .15s infinite}
+.ssobi-typedot:nth-child(3){animation:ssobi-bounce 1.2s ease-in-out .3s infinite}
+
+/* newest feed row blink */
+@keyframes ssobi-blink{0%{background:rgba(0,200,150,.25)}100%{background:transparent}}
+.ssobi-blink{animation:ssobi-blink 1.5s ease-out both}
+
 /* LIVE */
 .live-box{background:var(--s);border-radius:20px;border:1px solid var(--b);overflow:hidden;height:98px;position:relative;margin-bottom:14px}
 .live-stream{animation:lu 10s linear infinite;padding:6px 0}
@@ -2233,79 +2262,193 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
   <!-- 기존 홈 (중간 유저 기준) -->
   <div id="home-real">
 
-  <!-- v2: 작동 중 인디케이터 -->
-  <div style="padding:14px 18px 6px;display:flex;align-items:center;gap:8px">
-    <span class="ai-dot" style="width:8px;height:8px;border-radius:50%;background:var(--mint);animation:pulse 1.5s infinite"></span>
-    <span style="font-size:12px;font-weight:700;color:var(--mint-d)" id="home-status">Ssobi 작동 중</span>
-  </div>
-
-  <!-- v2: Day 1 모드 (KB·데이터 없을 때) -->
-  <div id="home-day1" style="display:none;padding:8px 18px 24px">
-    <div style="background:#fff;border:1px solid var(--b);border-radius:18px;padding:24px;text-align:center">
-      <div style="font-size:22px;font-weight:900;color:var(--t1);margin-bottom:8px">어서오세요! 🎉</div>
-      <div style="font-size:13px;color:var(--t3);line-height:1.6;margin-bottom:20px" id="home-day1-status">
-        지금 Ssobi 는 준비 중이에요
+  <!-- ─────────────── Day 1 모드 ─────────────── -->
+  <div id="home-day1" style="display:none;padding:0 0 24px">
+    <!-- 인사말 -->
+    <div style="padding:0 4px 16px">
+      <div style="font-size:24px;font-weight:800;letter-spacing:-.8px;line-height:1.2;color:var(--t1)">
+        어서오세요, <span class="em-serif" id="home-day1-name" style="color:var(--mint-d)">민혜</span>님 👋
       </div>
-
-      <div id="home-day1-tasks" style="text-align:left;background:var(--bg);border-radius:12px;padding:14px;margin-bottom:16px">
-        <!-- JS 로 채움 -->
+      <div style="margin-top:10px;display:inline-flex;align-items:center;gap:7px;padding:5px 10px;background:#fff;border-radius:999px;border:1px solid var(--b);font-size:12px;color:var(--t2)">
+        <span style="width:5px;height:5px;border-radius:3px;background:var(--mint)"></span>
+        <span id="home-day1-status">진행 상태 불러오는 중…</span>
       </div>
+    </div>
 
-      <div style="font-size:11.5px;color:var(--t3);line-height:1.5">
-        첫 응대가 오면 알림 보내드릴게요 ✨
+    <!-- 다음 액션 (3-step 카드) -->
+    <div style="display:flex;align-items:baseline;justify-content:space-between;padding:0 4px 8px">
+      <div style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px">다음 액션</div>
+      <div style="font-size:12px;color:var(--t3)" id="home-day1-progress">0 / 3 단계</div>
+    </div>
+    <div id="home-day1-tasks" style="display:flex;flex-direction:column;gap:8px"></div>
+
+    <!-- 작동 미리보기 -->
+    <div style="padding:18px 4px 0">
+      <div style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px;margin-bottom:8px">이렇게 작동할 거예요</div>
+      <div style="padding:12px 14px;border-radius:12px;background:#fff;border:1px dashed var(--b);display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:flex-start">
+          <div style="max-width:78%;padding:7px 11px;border-radius:12px;background:var(--bg);color:var(--t1);font-size:12px;line-height:1.45">
+            <div style="font-size:9px;font-weight:700;opacity:.65;margin-bottom:1px">@minju_fan</div>
+            이거 언제 와요?
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end">
+          <div style="max-width:78%;padding:7px 11px;border-radius:12px;background:var(--mint-d);color:#fff;font-size:12px;line-height:1.45">
+            <div style="font-size:9px;font-weight:700;opacity:.65;margin-bottom:1px">ssobi</div>
+            영업일 2~3일이면 도착해용 💌
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 첫 응대 hint -->
+    <div style="padding:14px 4px 0;text-align:center">
+      <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--t2)">
+        <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="var(--t3)" stroke-width="1.6"><path d="M7 1v6l3 2"/><circle cx="7" cy="7" r="6"/></svg>
+        첫 응대가 오면 알림 보내드릴게요
       </div>
     </div>
   </div>
 
-  <!-- v2: ROI 카드 (데이터 있을 때) -->
-  <div id="home-roi" style="display:none;padding:0 18px 18px">
-    <div style="background:#fff;border:1px solid var(--b);border-radius:18px;padding:22px">
-      <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.4px;margin-bottom:6px">어제 자는 동안</div>
-      <div style="font-size:30px;font-weight:900;color:var(--t1);letter-spacing:-1px;line-height:1.1;margin-bottom:4px" id="home-hero-value">—</div>
-      <div style="font-size:14px;font-weight:600;color:var(--t2);margin-bottom:14px" id="home-hero-label">—</div>
-      <div style="font-size:12px;color:var(--t3)" id="home-hero-sub">—</div>
-    </div>
-  </div>
+  <!-- ─────────────── ROI 모드 (클로드 디자인 핸드오프 SsobiHomeROI 그대로) ─────────────── -->
+  <div id="home-roi-wrap" style="display:none">
 
-  <!-- v2: 팬들이 자라요 -->
-  <div id="home-fans" style="display:none;padding:0 18px 18px">
-    <div style="background:#fff;border:1px solid var(--b);border-radius:18px;padding:18px;display:flex;gap:14px">
-      <div style="flex:1;text-align:center">
-        <div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:4px">이번 주 재방문</div>
-        <div style="font-size:24px;font-weight:900;color:var(--mint-d)" id="home-returning">0</div>
-      </div>
-      <div style="width:1px;background:var(--b)"></div>
-      <div style="flex:1;text-align:center">
-        <div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:4px">새 팬</div>
-        <div style="font-size:24px;font-weight:900;color:var(--t1)" id="home-newfans">0</div>
-      </div>
-    </div>
-  </div>
+    <!-- (긴급 알림 블록은 활동 카드 위로 이동됨 — 아래) -->
 
-  <!-- v2: Ssobi 가 도와준 일 -->
-  <div id="home-helped" style="display:none;padding:0 18px 18px">
-    <div onclick="go('activity')" style="background:#fff;border:1px solid var(--b);border-radius:18px;padding:16px 18px;cursor:pointer;display:flex;align-items:center;justify-content:space-between">
-      <div>
-        <div style="font-size:11px;font-weight:700;color:var(--t3);margin-bottom:4px">오늘 Ssobi 가 도와준 일</div>
-        <div style="font-size:14px;font-weight:700;color:var(--t1)" id="home-helped-summary">—</div>
+    <!-- Hero — "가입 N일째 · 누적" + "Ssobi 가 대신 응대한 시간" + 큰 숫자 -->
+    <div style="padding:0 4px 22px">
+      <div style="display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.5px;text-transform:uppercase">
+        <span style="width:10px;height:1px;background:var(--t3);display:inline-block"></span>
+        <span id="home-hero-eyebrow">가입 1일째 · 누적</span>
       </div>
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <div style="font-size:13px;font-weight:600;color:var(--t2);margin-top:10px;letter-spacing:-.2px" id="home-hero-label">Ssobi 가 대신 응대한 시간</div>
+      <div class="ssobi-rise" style="display:flex;align-items:baseline;gap:6px;margin-top:4px">
+        <div class="tnum" id="home-hero-value" style="font-size:48px;font-weight:800;letter-spacing:-1.8px;color:var(--t1);line-height:1">0</div>
+        <div id="home-hero-unit" style="font-size:20px;font-weight:700;color:var(--t2);letter-spacing:-.4px">시간</div>
+      </div>
+      <div style="font-size:11px;color:var(--t3);margin-top:10px" id="home-hero-sub">—</div>
     </div>
-  </div>
 
-  <!-- v2: 지금 일어나는 일 (실시간) -->
-  <div id="home-live-wrap" style="display:none;padding:0 18px 18px">
-    <div class="sec-eye" style="padding:0 0 8px">지금 일어나는 일</div>
-    <div style="background:#fff;border:1px solid var(--b);border-radius:14px;padding:6px 0;max-height:200px;overflow:hidden;position:relative">
-      <div id="home-live-list" style="display:flex;flex-direction:column">
-        <!-- JS -->
+    <!-- 3-column 타임라인 (오늘/어제/이번 주) -->
+    <div style="padding:0 0 22px">
+      <div style="background:#fff;border:1px solid var(--b);border-radius:16px;overflow:hidden;display:grid;grid-template-columns:1fr 1fr 1fr;box-shadow:0 1px 2px rgba(16,24,40,.04)">
+        <div style="padding:13px 12px;background:var(--mint-l)">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.4px;color:var(--mint-d);text-transform:uppercase;display:flex;align-items:center;gap:4px">
+            <span style="width:5px;height:5px;border-radius:3px;background:var(--mint-d)"></span>오늘
+          </div>
+          <div class="tnum" id="home-tl-today-v" style="font-size:17px;font-weight:800;color:var(--t1);letter-spacing:-.4px;margin-top:5px;line-height:1.1">—</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:3px" id="home-tl-today-h">—</div>
+        </div>
+        <div style="padding:13px 12px;border-left:1px solid var(--b)">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.4px;color:var(--t3);text-transform:uppercase">어제</div>
+          <div class="tnum" id="home-tl-yest-v" style="font-size:17px;font-weight:800;color:var(--t1);letter-spacing:-.4px;margin-top:5px;line-height:1.1">—</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:3px" id="home-tl-yest-h">—</div>
+        </div>
+        <div style="padding:13px 12px;border-left:1px solid var(--b)">
+          <div style="font-size:10px;font-weight:700;letter-spacing:.4px;color:var(--t3);text-transform:uppercase">이번 달</div>
+          <div class="tnum" id="home-tl-week-v" style="font-size:17px;font-weight:800;color:var(--t1);letter-spacing:-.4px;margin-top:5px;line-height:1.1">—</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:3px" id="home-tl-week-h">—</div>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- v2: 누적 -->
-  <div id="home-lifetime" style="display:none;padding:0 18px 36px">
-    <div style="font-size:11px;color:var(--t3);text-align:center;line-height:1.5" id="home-lifetime-text">—</div>
+    <!-- 활동 카드: 시간대별 24h 바 + 재방문/새 팬 -->
+    <div style="padding:0 0 22px">
+      <div style="background:linear-gradient(180deg,#fff 0%,#FAFBFC 100%);border:1px solid var(--b);border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(16,24,40,.06),0 1px 2px rgba(16,24,40,.04)">
+        <div style="padding:16px 18px 10px;display:flex;align-items:center;gap:8px">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--mint);animation:bl 1.5s ease infinite"></span>
+          <span style="font-size:11px;font-weight:700;color:var(--t2);letter-spacing:.3px;text-transform:uppercase">오늘 · 시간대별 응대</span>
+        </div>
+        <div id="home-activity-bar" style="display:flex;align-items:flex-end;gap:3px;padding:6px 18px 4px;height:48px"></div>
+        <!-- 시간 축 (0/6/12/18/23) -->
+        <div class="tnum" style="display:flex;justify-content:space-between;padding:0 18px 12px;font-size:9px;color:var(--t3);font-weight:600;letter-spacing:.3px">
+          <span>0시</span>
+          <span>6시</span>
+          <span>12시</span>
+          <span>18시</span>
+          <span>23시</span>
+        </div>
+        <!-- hidden: JS 호환 -->
+        <span id="home-bar-count" style="display:none"></span>
+        <span id="home-bar-saved" style="display:none"></span>
+        <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--b);background:#fff">
+          <div style="padding:14px 18px">
+            <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.3px;text-transform:uppercase">재방문 팬</div>
+            <div style="display:flex;align-items:baseline;gap:6px;margin-top:4px">
+              <div class="tnum" id="home-returning" style="font-size:22px;font-weight:800;color:var(--t1);letter-spacing:-.4px;line-height:1">0</div>
+              <div style="font-size:11px;font-weight:700;color:var(--mint-d)" id="home-returning-delta">+0 이번주</div>
+            </div>
+          </div>
+          <div style="padding:14px 18px;border-left:1px solid var(--b)">
+            <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.3px;text-transform:uppercase">새 팬</div>
+            <div style="display:flex;align-items:baseline;gap:6px;margin-top:4px">
+              <div class="tnum" id="home-newfans" style="font-size:22px;font-weight:800;color:var(--t1);letter-spacing:-.4px;line-height:1">0</div>
+              <div style="font-size:11px;font-weight:700;color:var(--mint-d)" id="home-newfans-delta">+0 이번주</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 긴급 알림 블록 (활동 카드 아래) -->
+    <div id="home-urgent-pill" style="background:var(--dark);border-radius:16px;padding:13px 16px;color:#fff;margin-bottom:18px;display:flex;align-items:center;gap:10px;position:relative;overflow:hidden;cursor:pointer;box-shadow:0 8px 20px rgba(15,19,25,.18)" onclick="goHomeUrgentTarget()">
+      <div id="home-urgent-pill-glow" style="position:absolute;top:-30px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(0,200,150,.3),transparent 60%);border-radius:50%;pointer-events:none"></div>
+      <span style="position:relative;width:8px;height:8px;border-radius:50%;flex-shrink:0;z-index:1" id="home-urgent-pill-dot-wrap">
+        <span id="home-urgent-pill-dot-inner" style="position:absolute;inset:0;border-radius:50%;background:var(--mint);animation:ssobi-pulse 1.4s ease-out infinite"></span>
+      </span>
+      <div style="flex:1;min-width:0;z-index:1;font-size:13px;font-weight:700;color:#fff;letter-spacing:-.2px">
+        <span id="home-urgent-pill-msg">모든 응대 정상</span>
+        <span style="color:rgba(255,255,255,.55);font-weight:500;margin-left:6px" id="home-urgent-pill-sub">긴급 대기 없음</span>
+      </div>
+      <div id="home-urgent-pill-cta" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;background:var(--mint);color:#fff;font-size:10px;font-weight:800;letter-spacing:.3px;flex-shrink:0;z-index:1">
+        <span id="home-urgent-pill-cta-text">안전</span>
+      </div>
+    </div>
+
+    <!-- 긴급 quote 카드 (긴급 떴을 때만) -->
+    <div id="home-urgent" style="display:none;padding:12px 14px;background:var(--t1);border-radius:14px;align-items:center;gap:12px;cursor:pointer;box-shadow:0 4px 16px rgba(16,24,40,.14);margin-bottom:18px" onclick="goHomeUrgentTarget()">
+      <div style="flex-shrink:0">
+        <div style="padding:3px 8px;border-radius:4px;background:var(--red);color:#fff;font-size:9px;font-weight:800;letter-spacing:.5px">긴급</div>
+      </div>
+      <div style="flex:1;min-width:0">
+        <div id="home-urgent-msg" style="font-size:13px;color:#fff;font-weight:600;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</div>
+        <div style="font-size:10px;color:rgba(255,255,255,.55);margin-top:2px;display:flex;align-items:center;gap:6px">
+          <span id="home-urgent-from">@—</span>
+          <span style="opacity:.5">·</span>
+          <span id="home-urgent-time" style="color:#FFB4B4;font-weight:700">— 남음</span>
+        </div>
+      </div>
+      <svg width="7" height="12" viewBox="0 0 8 14" style="flex-shrink:0"><path d="M1 1l6 6-6 6" stroke="rgba(255,255,255,.6)" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    </div>
+
+    <!-- 지금 응대중 — 심플 -->
+    <div style="padding:0 0 18px">
+      <div style="display:flex;align-items:center;gap:8px;padding:0 4px 8px">
+        <span style="display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;background:var(--red);color:#fff;font-size:9px;font-weight:800;letter-spacing:.5px">
+          <span style="width:5px;height:5px;border-radius:3px;background:#fff;animation:bl 1.5s ease infinite"></span>
+          LIVE
+        </span>
+        <span style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px">지금 응대중</span>
+      </div>
+      <div style="background:#fff;border:1px solid var(--b);border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(16,24,40,.04)">
+        <!-- ticker + fade 마스크 한 컨테이너 안에 -->
+        <div style="position:relative;height:130px;overflow:hidden">
+          <div class="ssobi-ticker" id="home-live-list" style="padding:10px 0"></div>
+          <!-- 상단 페이드 -->
+          <div style="position:absolute;top:0;left:0;right:0;height:24px;background:linear-gradient(to bottom,#fff 0%,rgba(255,255,255,.7) 50%,rgba(255,255,255,0) 100%);pointer-events:none"></div>
+          <!-- 하단 페이드 — ticker 컨테이너 바로 끝에 붙음 -->
+          <div style="position:absolute;bottom:0;left:0;right:0;height:24px;background:linear-gradient(to top,#fff 0%,rgba(255,255,255,.7) 50%,rgba(255,255,255,0) 100%);pointer-events:none"></div>
+        </div>
+        <div style="padding:9px 14px;border-top:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="go('manage')">
+          <span class="tnum" style="font-size:11px;color:var(--t2)">최근 5분 <span style="color:var(--t1);font-weight:700" id="home-recent-count">0건</span></span>
+          <span style="font-size:11px;color:var(--mint-d);font-weight:700">전체 보기 →</span>
+        </div>
+      </div>
+      <span id="home-live-typing" style="display:none"></span>
+    </div>
+
+    <!-- 호환성: 기존 JS 참조용 hidden -->
+    <div id="home-lifetime-text" style="display:none"></div>
   </div>
 
   </div><!-- /home-real -->
@@ -2327,184 +2470,270 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <button class="on"><span class="act-dot"></span><span data-i18n="grow.tab.automation">SNS 자동화</span></button>
     <button onclick="go('manage')"><span class="act-dot red"></span><span data-i18n="grow.tab.realtime">실시간 관리</span> <span class="act-badge" id="urgent-badge" style="display:none">0</span></button>
   </div>
-  <div id="sub-auto">
-  <!-- 연동된 SNS 계정 카드 — 메타 검수: instagram_business_basic 으로 가져온 데이터 표시 위치 -->
-  <div class="sec-eye" style="margin-top:4px" data-i18n="grow.eyebrow.accounts">CONNECTED ACCOUNTS</div>
-  <div id="grow-accounts-card" style="background:#fff;border:1px solid var(--b);border-radius:14px;padding:14px;margin:6px 18px 12px;display:flex;flex-direction:column;gap:10px">
-    <div id="grow-accounts-list" style="display:flex;flex-direction:column;gap:8px">
-      <div style="font-size:12px;color:var(--t3);text-align:center;padding:8px">로딩 중...</div>
-    </div>
-  </div>
+  <div id="sub-auto" style="display:flex;flex-direction:column;gap:22px">
 
-  <div class="sec-eye" data-i18n="grow.eyebrow.automation">AUTOMATION</div>
-
-  <div class="acc" id="acc-auto">
-    <div class="acc-hdr" onclick="toggleAcc('acc-auto')">
-      <div class="acc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="acc-copy"><div class="acc-name" data-i18n="grow.ai_card.title">AI가 나 대신 댓글·DM 응대</div><div class="acc-sub" id="ar-master-sub" data-i18n="grow.ai_card.sub.on">24시간 내 말투로 자동 처리 중</div></div>
-      <div class="acc-aside"><span id="ar-master-state" style="font-size:10px;font-weight:800;color:var(--mint-d);margin-right:6px;letter-spacing:.5px">ON</span><label class="tog" onclick="event.stopPropagation()"><input type="checkbox" id="ar-master-toggle" onchange="onAutoReplyMasterToggle(this)" checked><span class="tsl"></span></label><div class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-    </div>
-    <div class="acc-body">
-      <div class="ai-stats">
-        <div class="ai-stat"><div class="ai-stat-v" id="q-used">0</div><div class="ai-stat-l" data-i18n="grow.stat.today">오늘 응대</div></div>
-        <div class="ai-stat"><div class="ai-stat-v" id="q-left">—</div><div class="ai-stat-l" data-i18n="grow.stat.left">남은 응대</div></div>
-        <div class="ai-stat"><div class="ai-stat-v" id="q-tone">—</div><div class="ai-stat-l" data-i18n="grow.stat.tone">말투 일치도</div></div>
+    <!-- 연동 채널 (Instagram + YouTube — TikTok 은 API 정책상 자동 응대 불가) -->
+    <div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;padding:0 4px;margin-bottom:8px">
+        <span style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px">연동 채널</span>
+        <span style="font-size:11px;color:var(--t3)" id="reply-channel-hint">댓글·DM 자동 응대</span>
       </div>
+      <div style="background:#fff;border:1px solid var(--b);border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(16,24,40,.04)">
+        <!-- Instagram -->
+        <div id="reply-ch-ig" style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:1px solid var(--b)">
+          <div style="width:28px;height:28px;border-radius:8px;flex-shrink:0;background:var(--bg);border:1px solid var(--b);display:flex;align-items:center;justify-content:center">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="var(--t1)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="12" height="12" rx="3.5"/><circle cx="8" cy="8" r="2.6"/><circle cx="11.6" cy="4.4" r=".5" fill="var(--t1)" stroke="none"/></svg>
+          </div>
+          <div style="flex:1;min-width:0;display:flex;align-items:center;gap:6px;overflow:hidden">
+            <span style="font-size:13.5px;font-weight:700;letter-spacing:-.2px;color:var(--t1);flex-shrink:0">Instagram</span>
+            <span style="font-size:11.5px;color:var(--t3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="reply-ch-ig-handle">@—</span>
+          </div>
+          <span id="reply-ch-ig-status" style="display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:999px;background:var(--mint-l);color:var(--mint-d);font-size:10.5px;font-weight:700;flex-shrink:0">
+            <span style="width:4px;height:4px;border-radius:50%;background:var(--mint-d)"></span>
+            연결됨
+          </span>
+          <span id="reply-ch-ig-meta" style="display:none"></span>
+        </div>
+        <!-- YouTube -->
+        <div id="reply-ch-yt" style="display:flex;align-items:center;gap:10px;padding:11px 14px;opacity:.92">
+          <div style="width:28px;height:28px;border-radius:8px;flex-shrink:0;background:transparent;border:1px solid var(--b);display:flex;align-items:center;justify-content:center">
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="var(--t3)" stroke-width="1.5" stroke-linejoin="round"><rect x="1.5" y="4" width="13" height="8" rx="2.2"/><path d="M7 6.5l3 1.5-3 1.5z" fill="var(--t3)" stroke="none"/></svg>
+          </div>
+          <div style="flex:1;min-width:0;display:flex;align-items:center;gap:6px;overflow:hidden">
+            <span style="font-size:13.5px;font-weight:700;letter-spacing:-.2px;color:var(--t1);flex-shrink:0">YouTube</span>
+            <span style="font-size:11.5px;color:var(--t3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap" id="reply-ch-yt-handle"></span>
+          </div>
+          <button style="background:#fff;color:var(--t1);border:1px solid var(--b);padding:3px 9px;border-radius:999px;font-size:10.5px;font-weight:700;flex-shrink:0;cursor:pointer">연결</button>
+        </div>
+      </div>
+    </div>
 
-      <!-- 채널별 자동 응대 토글 (Meta App Review: 사용자 통제권 명시) -->
-      <div style="background:var(--bg);border-radius:12px;padding:14px;margin-bottom:10px">
-        <div style="font-size:12px;font-weight:700;color:var(--t3);margin-bottom:10px" data-i18n="grow.channel.section">채널별 자동 응대</div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--b)">
+    <!-- 자동 관리 토글 — 펼침형 -->
+    <div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;padding:0 4px;margin-bottom:8px">
+        <span style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px">자동 관리</span>
+        <span style="font-size:10px;font-weight:700;color:var(--mint-d);letter-spacing:.3px" id="reply-auto-count">3 / 4 작동중</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <!-- 댓글 자동 응대 (펼침) -->
+        <div id="rep-acc-comment" style="background:#fff;border:1px solid var(--b);border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(16,24,40,.04)">
+          <div onclick="repToggle('rep-acc-comment')" style="display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:14px;font-weight:700;letter-spacing:-.2px;color:var(--t1)">댓글 자동 응대</div>
+              <div style="font-size:11px;color:var(--t3);margin-top:2px">98% 말투 일치 · 즉시 발송</div>
+            </div>
+            <label class="tog" onclick="event.stopPropagation()" style="flex-shrink:0"><input type="checkbox" id="ar-ch-comment" onchange="onAutoReplyChannelToggle('ig_comment', this)" checked><span class="tsl"></span></label>
+            <svg class="rep-acc-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" style="flex-shrink:0;transition:transform .2s"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="rep-acc-body" style="display:none;padding:0 14px 14px;border-top:1px solid var(--b);background:#FAFBFC">
+            <div style="padding-top:12px;display:flex;flex-direction:column;gap:10px">
+              <!-- 채널 -->
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px">대상 채널</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <label style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;background:var(--mint-l);border:1px solid var(--mint);font-size:11.5px;font-weight:700;color:var(--mint-d);cursor:pointer"><input type="checkbox" checked style="margin:0">Instagram</label>
+                  <label style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;background:#fff;border:1px solid var(--b);font-size:11.5px;font-weight:600;color:var(--t2);cursor:pointer"><input type="checkbox" style="margin:0">YouTube</label>
+                </div>
+              </div>
+              <!-- 응대 시간대 -->
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px">응대 시간대</div>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <input type="time" value="08:00" style="padding:5px 8px;border:1px solid var(--b);border-radius:8px;font-size:12px;width:88px;background:#fff">
+                  <span style="font-size:11px;color:var(--t3)">~</span>
+                  <input type="time" value="23:00" style="padding:5px 8px;border:1px solid var(--b);border-radius:8px;font-size:12px;width:88px;background:#fff">
+                </div>
+              </div>
+              <!-- 하루 한도 -->
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px">하루 응대 한도</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:#fff;border:1px solid var(--b);border-radius:8px">
+                  <button onclick="adj('c',-10)" style="background:none;border:none;font-size:16px;color:var(--t2);cursor:pointer;width:24px">−</button>
+                  <span class="tnum" id="q-comment" style="font-size:13px;font-weight:800;color:var(--t1)">200</span>
+                  <button onclick="adj('c',10)" style="background:none;border:none;font-size:16px;color:var(--t2);cursor:pointer;width:24px">+</button>
+                </div>
+              </div>
+              <!-- 질문형 모드 -->
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#fff;border:1px solid var(--b);border-radius:10px">
+                <div style="flex:1;min-width:0">
+                  <div style="font-size:12.5px;font-weight:700;color:var(--t1)">질문형 대댓글</div>
+                  <div style="font-size:11px;color:var(--t3);margin-top:1px;line-height:1.4">"어떤 타입이세요?" 같이 대화 유도</div>
+                </div>
+                <label class="tog" style="flex-shrink:0"><input type="checkbox" checked><span class="tsl"></span></label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DM 자동 응대 (펼침) -->
+        <div id="rep-acc-dm" style="background:#fff;border:1px solid var(--b);border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(16,24,40,.04)">
+          <div onclick="repToggle('rep-acc-dm')" style="display:flex;align-items:center;gap:12px;padding:13px 14px;cursor:pointer">
+            <div style="flex:1;min-width:0">
+              <div style="font-size:14px;font-weight:700;letter-spacing:-.2px;color:var(--t1)">DM 자동 응대</div>
+              <div style="font-size:11px;color:var(--t3);margin-top:2px">대화형 루프 · 24h 윈도우</div>
+            </div>
+            <label class="tog" onclick="event.stopPropagation()" style="flex-shrink:0"><input type="checkbox" id="ar-ch-dm" onchange="onAutoReplyChannelToggle('ig_dm', this)" checked><span class="tsl"></span></label>
+            <svg class="rep-acc-chev" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2" style="flex-shrink:0;transition:transform .2s"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <div class="rep-acc-body" style="display:none;padding:0 14px 14px;border-top:1px solid var(--b);background:#FAFBFC">
+            <div style="padding-top:12px;display:flex;flex-direction:column;gap:10px">
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px">대상 채널</div>
+                <div style="display:flex;gap:6px;flex-wrap:wrap">
+                  <label style="display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;background:var(--mint-l);border:1px solid var(--mint);font-size:11.5px;font-weight:700;color:var(--mint-d);cursor:pointer"><input type="checkbox" checked style="margin:0">Instagram</label>
+                </div>
+                <div style="font-size:10.5px;color:var(--t3);margin-top:4px;line-height:1.4">YouTube DM 은 정책상 자동 응대 불가</div>
+              </div>
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px">응대 시간대</div>
+                <div style="display:flex;align-items:center;gap:6px">
+                  <input type="time" value="08:00" style="padding:5px 8px;border:1px solid var(--b);border-radius:8px;font-size:12px;width:88px;background:#fff">
+                  <span style="font-size:11px;color:var(--t3)">~</span>
+                  <input type="time" value="23:00" style="padding:5px 8px;border:1px solid var(--b);border-radius:8px;font-size:12px;width:88px;background:#fff">
+                </div>
+              </div>
+              <div>
+                <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;margin-bottom:6px">하루 DM 한도</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 12px;background:#fff;border:1px solid var(--b);border-radius:8px">
+                  <button onclick="adj('d',-5)" style="background:none;border:none;font-size:16px;color:var(--t2);cursor:pointer;width:24px">−</button>
+                  <span class="tnum" id="q-dm" style="font-size:13px;font-weight:800;color:var(--t1)">100</span>
+                  <button onclick="adj('d',5)" style="background:none;border:none;font-size:16px;color:var(--t2);cursor:pointer;width:24px">+</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 댓글 → DM 자동 발송 -->
+        <div style="background:#fff;border:1px solid var(--b);border-radius:14px;display:flex;align-items:center;gap:12px;padding:13px 14px;box-shadow:0 1px 2px rgba(16,24,40,.04)">
           <div style="flex:1;min-width:0">
-            <div style="font-size:13px;font-weight:700;color:var(--t1)" data-i18n="grow.channel.comment.title">댓글 자동 응대</div>
-            <div style="font-size:11px;color:var(--t3);margin-top:2px;line-height:1.45" data-i18n="grow.channel.comment.sub">Instagram 댓글에 AI가 내 말투로 답변</div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <span style="font-size:14px;font-weight:700;letter-spacing:-.2px;color:var(--t1)">댓글 → DM 자동 발송</span>
+              <span style="font-size:9px;font-weight:700;color:var(--t3);padding:1px 6px;border-radius:999px;background:var(--bg);border:1px solid var(--b);letter-spacing:.2px" id="reply-trigger-count">트리거 0개</span>
+            </div>
+            <div style="font-size:11px;color:var(--t3);margin-top:2px">트리거 단어로 자동 DM</div>
           </div>
-          <span id="ar-ch-comment-state" style="font-size:10px;font-weight:800;color:var(--mint-d);margin-right:6px;letter-spacing:.5px">ON</span>
-          <label class="tog" style="flex-shrink:0"><input type="checkbox" id="ar-ch-comment" onchange="onAutoReplyChannelToggle('ig_comment', this)" checked><span class="tsl"></span></label>
-        </div>
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0">
-          <div style="flex:1;min-width:0">
-            <div style="font-size:13px;font-weight:700;color:var(--t1)" data-i18n="grow.channel.dm.title">DM 자동 응대</div>
-            <div style="font-size:11px;color:var(--t3);margin-top:2px;line-height:1.45" data-i18n="grow.channel.dm.sub">개별 대화는 직접 답변 모드로 전환 가능</div>
-          </div>
-          <span id="ar-ch-dm-state" style="font-size:10px;font-weight:800;color:var(--mint-d);margin-right:6px;letter-spacing:.5px">ON</span>
-          <label class="tog" style="flex-shrink:0"><input type="checkbox" id="ar-ch-dm" onchange="onAutoReplyChannelToggle('ig_dm', this)" checked><span class="tsl"></span></label>
+          <label class="tog" style="flex-shrink:0"><input type="checkbox" checked><span class="tsl"></span></label>
         </div>
       </div>
+    </div>
 
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:var(--bg);border-radius:12px;margin-bottom:10px">
-        <div style="flex:1;min-width:0">
-          <div style="font-size:13px;font-weight:700;color:var(--t1)" data-i18n="grow.question_mode.title">질문형 대댓글 모드</div>
-          <div style="font-size:11px;color:var(--t3);margin-top:2px;line-height:1.45" data-i18n="grow.question_mode.sub">"어떤 타입이세요?" 같이 대화 유도 — 알고리즘 노출 ↑</div>
-        </div>
-        <label class="tog" style="flex-shrink:0"><input type="checkbox" checked><span class="tsl"></span></label>
-      </div>
+    <!-- 호환성: 일일 리포트 ID 들은 hidden 으로 유지 (홈에 이미 통계 있음) -->
+    <div style="display:none">
+      <span id="reply-report-date"></span>
+      <span id="reply-report-replies"></span>
+      <span id="reply-report-replies-delta"></span>
+      <span id="reply-report-time"></span>
+      <span id="reply-report-time-delta"></span>
+      <span id="reply-report-peak"></span>
+      <span id="reply-report-peak-delta"></span>
+    </div>
 
-      <div style="background:var(--bg);border-radius:12px;padding:14px;margin-bottom:14px">
-        <div style="font-size:12px;font-weight:700;color:var(--t3);margin-bottom:10px" data-i18n="grow.quota.section">하루 응대량 설정</div>
-        <div class="quota-row"><div class="quota-lbl" data-i18n="grow.quota.comment">댓글 응대</div><div class="quota-ctrl"><button class="qbtn" onclick="adj('c',-10)">−</button><div class="qval" id="q-comment">200</div><button class="qbtn" onclick="adj('c',10)">+</button></div></div>
-        <div class="quota-row"><div class="quota-lbl" data-i18n="grow.quota.dm">DM 응대</div><div class="quota-ctrl"><button class="qbtn" onclick="adj('d',-5)">−</button><div class="qval" id="q-dm">100</div><button class="qbtn" onclick="adj('d',5)">+</button></div></div>
-        <div class="quota-row" style="border:none;padding-bottom:0">
-          <div class="quota-lbl" data-i18n="grow.quota.hours">응대 시간대</div>
-          <div style="display:flex;align-items:center;gap:6px">
-            <input type="time" value="08:00" class="sheet-in" style="padding:6px 8px;width:84px;margin:0;font-size:12px">
-            <span style="color:var(--t3);font-size:12px">~</span>
-            <input type="time" value="23:00" class="sheet-in" style="padding:6px 8px;width:84px;margin:0;font-size:12px">
-          </div>
-        </div>
+    <!-- 안전성 안내 -->
+    <div style="padding:12px 14px;background:var(--bg);border-radius:12px;border:1px solid var(--b);display:flex;gap:10px;align-items:flex-start;margin-bottom:16px">
+      <div style="width:22px;height:22px;border-radius:50%;background:var(--mint-l);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--mint-d)" stroke-width="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </div>
-      <div style="display:flex;gap:8px">
-        <button class="dbtn db-e" style="flex:1;border-radius:10px;padding:12px;font-size:12px" onclick="go('manage');setTab('comments')" data-i18n="grow.btn.history">응대한 내용 보기</button>
-        <button class="dbtn db-s" style="flex:1;border-radius:10px;padding:12px;background:var(--mint-l);color:var(--mint-d);font-size:12px;font-weight:700" onclick="openModal('m-ai-style')" data-i18n="grow.btn.tone">말투 수정하기</button>
+      <div style="flex:1;font-size:11px;color:var(--t2);line-height:1.6">
+        댓글·DM 발송은 하루 사용량과 각 채널 정책에 따라 계정 안전성을 위해 유연하게 조정돼요.
       </div>
     </div>
-  </div>
-
-  <!-- 댓글 감지 DM -->
-  <div class="acc" id="acc-dm-manage">
-    <div class="acc-hdr" onclick="toggleAcc('acc-dm-manage')">
-      <div class="acc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="acc-copy"><div class="acc-name" data-i18n="grow.dmrule.title">댓글 감지 → DM 자동 발송</div><div class="acc-sub" id="dm-rule-count-sub" data-i18n="grow.dmrule.empty">설정된 룰 없음</div></div>
-      <div class="acc-aside">
-        <label class="tog" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="tsl"></span></label>
-        <div class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      </div>
-    </div>
-    <div class="acc-body">
-      <div style="margin-bottom:16px">
-        <div style="font-size:12px;font-weight:700;color:var(--t3);margin-bottom:8px" data-i18n="grow.dmrule.target">대상 게시물 선택</div>
-        <div id="dm-post-row" style="display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;-webkit-overflow-scrolling:touch">
-          <div onclick="openPostPicker()" style="flex-shrink:0;width:68px;height:68px;border-radius:12px;background:var(--bg);border:1.5px dashed var(--b);cursor:pointer;display:flex;align-items:center;justify-content:center">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--t3)" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
-          </div>
-          <div onclick="selectPost(this)" class="post-thumb" style="flex-shrink:0;width:68px;height:68px;border-radius:12px;background:linear-gradient(135deg,#f8c8d4,#fde8b0);border:2px solid var(--mint);cursor:pointer;position:relative">
-            <div style="position:absolute;bottom:3px;left:3px;font-size:9px;font-weight:700;color:#fff;background:rgba(0,0,0,.45);padding:1px 5px;border-radius:3px" data-i18n="grow.dmrule.recent">최근</div>
-          </div>
-          <div onclick="selectPost(this)" class="post-thumb" style="flex-shrink:0;width:68px;height:68px;border-radius:12px;background:linear-gradient(135deg,#c8e6f8,#d4f8e8);border:2px solid transparent;cursor:pointer"></div>
-          <div onclick="selectPost(this)" class="post-thumb" style="flex-shrink:0;width:68px;height:68px;border-radius:12px;background:linear-gradient(135deg,#f8d4c8,#f8e8fd);border:2px solid transparent;cursor:pointer"></div>
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
-        <div style="font-size:12px;font-weight:700;color:var(--t3)" data-i18n="grow.dmrule.active">진행 중인 DM 발송</div>
-        <button onclick="openModal('m-dm-all')" style="background:none;border:none;font-size:11px;font-weight:700;color:var(--mint-d);cursor:pointer;display:flex;align-items:center;gap:3px"><span data-i18n="grow.dmrule.see_all">목록 더보기</span> <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      </div>
-      <div id="dm-active-list" class="empty-soft" style="margin-bottom:14px">
-        <div class="empty-soft-t" data-i18n="grow.dmrule.empty_title">설정된 룰 없음</div>
-        <div data-i18n="grow.dmrule.empty_sub">"+ 컨텐츠 추가"로 댓글 감지 룰을 만들 수 있습니다.</div>
-      </div>
-      <button onclick="addDmRule()" style="width:100%;padding:11px;border-radius:12px;border:1.5px dashed var(--b);background:none;font-size:13px;font-weight:700;color:var(--t3);cursor:pointer" data-i18n="grow.dmrule.add">+ 컨텐츠 추가</button>
-      <div class="tip" style="margin-top:10px" data-i18n="grow.dmrule.tip">댓글이 달리면 조건을 확인하고 내 말투로 DM을 보내요.</div>
-    </div>
-  </div>
-
-  <!-- 업로드 즉시 자동 액션 -->
-  <div class="acc" id="acc-upload">
-    <div class="acc-hdr" onclick="toggleAcc('acc-upload')">
-      <div class="acc-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M13 10V3L4 14h7v7l9-11h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-      <div class="acc-copy"><div class="acc-name" data-i18n="grow.upload.title">업로드 즉시 자동 액션</div><div class="acc-sub" data-i18n="grow.upload.sub">저장 · 공감 댓글 · 해시태그 3단계</div></div>
-      <div class="acc-aside"><label class="tog" onclick="event.stopPropagation()"><input type="checkbox" checked><span class="tsl"></span></label><div class="acc-chev"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M6 9l6 6 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg></div></div>
-    </div>
-    <div class="acc-body">
-      <div class="step"><div class="sn">1</div><div><div class="st" data-i18n="grow.upload.step1">셀프 저장</div><div class="sd" data-i18n="grow.upload.step1.sub">업로드 직후 내 계정에서 게시물 저장 — 알고리즘 초기 신호 부스트</div></div></div>
-      <div class="step"><div class="sn">2</div><div><div class="st" data-i18n="grow.upload.step2">공감 댓글 등록</div><div class="sd" data-i18n="grow.upload.step2.sub">내 말투로 게시물에 어울리는 댓글 1개 자동 작성</div><div class="seg" data-i18n="grow.upload.step2.example">오늘도 너무 예쁘게 나왔다, 이 무드 너무 좋아!</div></div></div>
-      <div class="step"><div class="sn">3</div><div><div class="st" data-i18n="grow.upload.step3">해시태그 답글</div><div class="sd" data-i18n="grow.upload.step3.sub">공감 댓글의 답글로 연관 해시태그 자동 추가</div><div class="seg" data-i18n="grow.upload.step3.example">#스킨케어루틴 #데일리뷰티 #저장각 #BEST</div></div></div>
-      <div class="tip" data-i18n="grow.upload.tip">업로드 후 3~7분 이내 랜덤 간격으로 자연스럽게 실행돼요</div>
-    </div>
-  </div>
-
-  <!-- 안전성 안내 -->
-  <div style="margin-top:14px;padding:12px 14px;background:var(--bg);border-radius:12px;border:1px solid var(--b);display:flex;gap:10px;align-items:flex-start">
-    <div style="width:22px;height:22px;border-radius:50%;background:var(--mint-l);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px">
-      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="var(--mint-d)" stroke-width="2.5"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round"/></svg>
-    </div>
-    <div style="flex:1;font-size:11px;color:var(--t2);line-height:1.6" data-i18n="grow.safety">
-      댓글·DM 발송은 하루 사용량과 각 채널 정책에 따라 계정 안전성을 위해 유연하게 조정돼요.
-    </div>
-  </div>
   </div><!-- /sub-auto -->
 </div>
 
-<!-- LEARN (AI 학습) — KB 카드 -->
+<!-- LEARN (AI 학습) — 클로드 디자인 LearningChat 결 -->
 <div class="vw" id="v-learn">
-  <div class="hdr"><div class="logo" style="font-size:18px" data-i18n="app.title.learn">AI 학습</div></div>
-
-  <!-- 내 AI -->
-  <div class="sec-eye" style="padding:18px 18px 6px">내 AI 가 알고 있는 것</div>
-  <div style="padding:0 18px 12px">
-    <div id="learn-tone-card" style="background:#fff;border:1px solid var(--b);border-radius:14px;padding:14px;margin-bottom:8px">
-      <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.4px;margin-bottom:6px">💬 말투</div>
-      <div id="learn-tone-text" style="font-size:13px;color:var(--t1);line-height:1.55">학습 중...</div>
+  <!-- 헤더 + 토글 -->
+  <div style="padding:8px 4px 0">
+    <div style="display:flex;align-items:baseline;justify-content:space-between">
+      <div>
+        <div style="font-size:22px;font-weight:800;letter-spacing:-.6px;color:var(--t1)">학습</div>
+        <div style="font-size:12px;color:var(--t3);margin-top:3px" id="learn-meta">자료 0개 · 외운 게 0개</div>
+      </div>
+      <!-- segmented [채팅 / 목록] -->
+      <div style="display:flex;padding:2px;border-radius:999px;background:#fff;border:1px solid var(--b)">
+        <button onclick="learnSetView('chat')" id="learn-tab-chat" style="padding:5px 12px;border-radius:999px;border:none;background:var(--t1);color:#fff;font-size:11px;font-weight:700;letter-spacing:-.2px;cursor:pointer">채팅</button>
+        <button onclick="learnSetView('list')" id="learn-tab-list" style="padding:5px 12px;border-radius:999px;border:none;background:transparent;color:var(--t2);font-size:11px;font-weight:700;letter-spacing:-.2px;cursor:pointer">목록</button>
+      </div>
     </div>
-    <div id="learn-persona-card" style="background:#fff;border:1px solid var(--b);border-radius:14px;padding:14px">
-      <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.4px;margin-bottom:6px">🎭 페르소나</div>
-      <div id="learn-persona-text" style="font-size:13px;color:var(--t1);line-height:1.55">학습 중...</div>
+  </div>
+
+  <!-- Pinned persona 카드 -->
+  <div style="padding:18px 0 0">
+    <div style="padding:14px 16px;background:#fff;border:1px solid var(--b);border-radius:14px;display:flex;align-items:flex-start;gap:12px">
+      <div style="width:32px;height:32px;border-radius:10px;flex-shrink:0;background:var(--t1);color:#fff;font-weight:800;font-size:14px;letter-spacing:-.3px;display:flex;align-items:center;justify-content:center">S</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:14px;font-weight:700;letter-spacing:-.3px;color:var(--t1)" id="learn-persona-name">내 Ssobi</div>
+        <div style="font-size:12px;color:var(--t2);margin-top:3px;line-height:1.5" id="learn-persona-desc">
+          말투 학습 전 — 인스타 연동 후 자동 학습돼요
+        </div>
+      </div>
+      <button onclick="openModal('m-ai-style')" style="background:transparent;border:none;font-size:12px;font-weight:600;color:var(--t2);padding:2px 4px;cursor:pointer;font-family:inherit">수정</button>
     </div>
   </div>
 
-  <!-- 내 제품·자료 -->
-  <div class="sec-eye" style="padding:18px 18px 6px">자동 학습된 자료 <span id="learn-products-count" style="color:var(--t3);font-weight:500"></span></div>
-  <div id="learn-products-list" style="padding:0 18px 12px">
-    <div style="font-size:12px;color:var(--t3);text-align:center;padding:16px">로딩 중...</div>
+  <!-- 채팅 뷰 -->
+  <div id="learn-view-chat" style="padding:8px 0 100px">
+    <!-- Day 1 — 가입 직후 -->
+    <div style="display:flex;align-items:center;gap:10px;padding:20px 0 6px">
+      <div style="flex:1;height:1px;background:var(--b)"></div>
+      <span style="font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--t3);text-transform:uppercase">가입 직후</span>
+      <div style="flex:1;height:1px;background:var(--b)"></div>
+    </div>
+
+    <!-- Ssobi welcome -->
+    <div style="display:flex;flex-direction:column;align-items:flex-start;margin-top:16px">
+      <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:-.1px;margin-bottom:5px;padding-left:2px">Ssobi</div>
+      <div style="max-width:86%;background:#fff;color:var(--t1);padding:12px 14px;border-radius:14px 14px 14px 4px;border:1px solid var(--b)">
+        <div style="font-size:14px;line-height:1.55">
+          안녕하세요. 학습할 자료를 여기로 보내주세요.<br/>
+          <span style="color:var(--t2)">파일, 링크, 짧은 메모 모두 됩니다.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 자동 학습된 자료 (Ssobi message + attachments) -->
+    <div id="learn-auto-msg" style="display:none;flex-direction:column;align-items:flex-start;margin-top:18px">
+      <div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:-.1px;margin-bottom:5px;padding-left:2px">Ssobi</div>
+      <div style="max-width:86%;background:#fff;color:var(--t1);padding:12px 14px;border-radius:14px 14px 14px 4px;border:1px solid var(--b)">
+        <div style="font-size:14px;line-height:1.55;margin-bottom:10px">인스타랑 내 링크에서 미리 외워둔 게 있어요.</div>
+        <div id="learn-auto-list" style="display:flex;flex-direction:column;gap:8px"></div>
+      </div>
+    </div>
+
+    <!-- Today 구분선 (자료 추가됐을 때만) -->
+    <div id="learn-today-divider" style="display:none;align-items:center;gap:10px;padding:20px 0 6px">
+      <div style="flex:1;height:1px;background:var(--b)"></div>
+      <span style="font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--t3);text-transform:uppercase" id="learn-today-label">오늘</span>
+      <div style="flex:1;height:1px;background:var(--b)"></div>
+    </div>
+
+    <!-- 사용자가 추가한 메시지 (Today) — JS 가 채움 -->
+    <div id="learn-user-msgs"></div>
   </div>
 
-  <!-- 추가 학습 자료 -->
-  <div class="sec-eye" style="padding:18px 18px 6px">추가 학습 자료 <span id="learn-files-count" style="color:var(--t3);font-weight:500"></span></div>
-  <div id="learn-files-list" style="padding:0 18px 12px">
-    <div style="font-size:12px;color:var(--t3);text-align:center;padding:8px">아직 첨부된 자료가 없어요</div>
+  <!-- 목록 뷰 -->
+  <div id="learn-view-list" style="display:none;padding:8px 0 100px">
+    <div id="learn-list-auto" style="margin-top:18px"></div>
+    <div id="learn-list-manual" style="margin-top:18px"></div>
   </div>
 
-  <!-- 긴급 공지 -->
-  <div class="sec-eye" style="padding:18px 18px 6px">긴급 공지 <span id="learn-urgent-count" style="color:var(--t3);font-weight:500"></span></div>
-  <div id="learn-urgent-list" style="padding:0 18px 12px">
-    <div style="font-size:12px;color:var(--t3);text-align:center;padding:8px">활성 공지가 없어요</div>
-  </div>
-  <div style="padding:0 18px 24px">
-    <button id="learn-urgent-add-btn" onclick="learnOpenUrgent()" style="width:100%;background:var(--bg);border:1px dashed var(--b);border-radius:12px;padding:14px;font-size:13px;font-weight:700;color:var(--t2);cursor:pointer">+ 새 긴급 공지 추가</button>
-  </div>
-
-  <!-- 큰 자료 추가 버튼 -->
-  <div style="padding:0 18px 36px;position:sticky;bottom:80px;background:linear-gradient(180deg,transparent,var(--bg) 20%)">
-    <button onclick="learnOpenAddSheet()" style="width:100%;background:var(--mint);color:#fff;font-weight:800;font-size:15px;padding:16px;border-radius:14px;border:none;cursor:pointer;box-shadow:0 8px 20px rgba(0,200,150,.25)">+ 자료 추가</button>
+  <!-- Sticky input bar -->
+  <div style="position:fixed;bottom:calc(var(--nav-h) + env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:100%;max-width:430px;padding:10px 14px;background:linear-gradient(to top,var(--bg) 60%,transparent);pointer-events:none;z-index:50">
+    <div id="learn-attach-preview" style="display:none;pointer-events:auto;padding:6px 10px;margin-bottom:6px;background:var(--bg);border:1px solid var(--b);border-radius:8px;font-size:12px;color:var(--t2);align-items:center;gap:6px">
+      <span id="learn-attach-name" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></span>
+      <button onclick="learnClearAttach()" style="background:none;border:none;color:var(--t3);font-size:14px;cursor:pointer;padding:0 4px;line-height:1">×</button>
+    </div>
+    <div id="learn-input-box" style="pointer-events:auto;display:flex;align-items:center;gap:8px;padding:8px 8px 8px 12px;background:#fff;border:1px solid var(--b);border-radius:24px;box-shadow:0 4px 14px rgba(16,24,40,.06),0 1px 2px rgba(16,24,40,.04)">
+      <button onclick="document.getElementById('learn-file-input').click()" title="파일 첨부" style="background:transparent;border:none;cursor:pointer;padding:6px;display:flex">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="var(--t2)" stroke-width="1.7" stroke-linecap="round"><path d="M10 4v12M4 10h12"/></svg>
+      </button>
+      <textarea id="learn-chat-input" rows="1" placeholder="Ssobi 에게 보내기 — 파일, 링크, 메모" style="flex:1;min-height:24px;max-height:120px;padding:6px 0;border:none;background:transparent;font-size:13px;color:var(--t1);resize:none;font-family:inherit;line-height:1.45;outline:none" oninput="learnAutoResize(this)" onkeydown="learnHandleKey(event)"></textarea>
+      <button onclick="learnSend()" id="learn-send-btn" style="width:34px;height:34px;border-radius:999px;background:var(--t1);border:none;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;transition:transform .1s" onmousedown="this.style.transform='scale(.92)'" onmouseup="this.style.transform='scale(1)'" onmouseout="this.style.transform='scale(1)'">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7h7M7 3l4 4-4 4" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+    </div>
+    <input type="file" id="learn-file-input" style="display:none" accept=".pdf,.docx,.csv,.txt,image/*" onchange="learnPickFile(this)" />
   </div>
 </div>
 
@@ -2523,114 +2752,152 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <button class="on"><span class="act-dot red"></span><span data-i18n="grow.tab.realtime">실시간 관리</span> <span class="act-badge" id="urgent-badge" style="display:none">0</span></button>
   </div>
 
-  <div class="tbar">
-    <button class="tab on" id="tab-urgent"   onclick="setTab('urgent')" data-i18n="manage.tab.urgent">긴급</button>
-    <button class="tab"    id="tab-comments" onclick="setTab('comments')" data-i18n="manage.tab.comments">댓글·DM</button>
-    <button class="tab"    id="tab-crm"      onclick="setTab('crm')" data-i18n="manage.tab.crm">주요 팔로워</button>
-    <button class="tab"    id="tab-revenue"  onclick="setTab('revenue')" data-i18n="manage.tab.revenue">협업/제안</button>
-    <button class="tab"    id="tab-insight"  onclick="setTab('insight')" data-i18n="manage.tab.insight">분석</button>
+  <!-- 실시간 관리 — 기존 4탭 구조 (분석 제외) -->
+  <div class="tbar" style="margin-bottom:14px">
+    <button class="tab on" id="tab-urgent"   onclick="setTab('urgent')">긴급</button>
+    <button class="tab"    id="tab-comments" onclick="setTab('comments')">댓글·DM</button>
+    <button class="tab"    id="tab-crm"      onclick="setTab('crm')">주요 팔로워</button>
+    <button class="tab"    id="tab-revenue"  onclick="setTab('revenue')">협업·제안</button>
   </div>
 
-  <!-- 긴급 -->
-  <div class="tc on" id="tc-urgent">
-    <!-- DEV 전용: 긴급 시뮬레이션 -->
-    <div class="dev-only" style="display:none;margin-bottom:10px;gap:6px">
-      <button onclick="devSimulate('comment','urgent')" style="padding:8px 12px;border-radius:8px;background:#FEE2E2;border:1px dashed var(--red);color:#991B1B;font-size:11px;font-weight:800;cursor:pointer"><span data-i18n="dev.sim.urgent_comment">🧪 긴급 댓글 (승인 대기)</span></button>
-      <button onclick="devSimulate('dm','urgent')" style="padding:8px 12px;border-radius:8px;background:#FEE2E2;border:1px dashed var(--red);color:#991B1B;font-size:11px;font-weight:800;cursor:pointer;margin-left:6px"><span data-i18n="dev.sim.urgent_dm">🧪 긴급 DM (승인 대기)</span></button>
+  <!-- 긴급 (default 표시) -->
+  <div class="tc on" id="tc-urgent" style="display:flex;flex-direction:column;gap:22px">
+
+    <!-- 봐야 할 것 (긴급 + 24h 임박) -->
+    <div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;padding:0 4px;margin-bottom:8px">
+        <span style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px">봐야 할 것</span>
+        <span style="font-size:12px;color:var(--t3)" id="manage-pending-hint">0건</span>
+      </div>
+      <div id="manage-urgent-list" style="display:flex;flex-direction:column;gap:8px">
+        <!-- JS 가 채움. 빈 상태 -->
+        <div id="manage-urgent-empty" class="empty-soft">
+          <div class="empty-soft-t">긴급 응대 대기 없음</div>
+          <div>결제 오류·환불·24h 임박 메시지가 오면 여기로 올라옵니다.</div>
+        </div>
+      </div>
+      <!-- DEV 시뮬레이션 -->
+      <div class="dev-only" style="display:none;margin-top:10px;gap:6px">
+        <button onclick="devSimulate('comment','urgent')" style="padding:8px 12px;border-radius:8px;background:#FEE2E2;border:1px dashed var(--red);color:#991B1B;font-size:11px;font-weight:800;cursor:pointer">🧪 긴급 댓글</button>
+        <button onclick="devSimulate('dm','urgent')" style="padding:8px 12px;border-radius:8px;background:#FEE2E2;border:1px dashed var(--red);color:#991B1B;font-size:11px;font-weight:800;cursor:pointer;margin-left:6px">🧪 긴급 DM</button>
+      </div>
     </div>
 
-    <!-- AI 초안 승인 대기 (실데이터 — 긴급 케이스만) -->
-    <div id="drafts-pending" style="margin-bottom:14px"></div>
-    <!-- 빈 상태 -->
-    <div id="urgent-empty" class="empty-soft">
-      <div class="empty-soft-t" data-i18n="manage.urgent.empty">긴급 응대 대기 없음</div>
-      <div data-i18n="manage.urgent.empty_sub">결제 오류·부정 이슈 같은 중요한 메시지가 도착하면 AI 초안이 여기로 올라옵니다.</div>
+    <!-- 지금 응대중 (실시간 feed) -->
+    <div>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;padding:0 4px;margin-bottom:8px">
+        <span style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px">지금 응대중</span>
+        <span style="display:inline-flex;align-items:center;gap:4px;padding:1px 7px;border-radius:999px;background:#fff;border:1px solid rgba(0,200,150,.25);font-size:9px;font-weight:800;color:var(--mint-d);letter-spacing:.4px">
+          <span style="width:5px;height:5px;border-radius:3px;background:var(--mint);animation:bl 1.4s ease infinite"></span>
+          LIVE
+        </span>
+      </div>
+      <div style="background:#fff;border:1px solid var(--b);border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(16,24,40,.04)">
+        <!-- 3-column stat -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;border-bottom:1px solid var(--b)">
+          <div style="padding:12px 14px">
+            <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.3px;text-transform:uppercase">자동 처리</div>
+            <div class="tnum" id="manage-stat-auto" style="font-size:24px;font-weight:800;color:var(--mint-d);letter-spacing:-.6px;line-height:1.1;margin-top:3px">0</div>
+          </div>
+          <div style="padding:12px 14px;border-left:1px solid var(--b)">
+            <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.3px;text-transform:uppercase">사람 개입</div>
+            <div class="tnum" id="manage-stat-human" style="font-size:24px;font-weight:800;color:var(--t1);letter-spacing:-.6px;line-height:1.1;margin-top:3px">0</div>
+          </div>
+          <div style="padding:12px 14px;border-left:1px solid var(--b)">
+            <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.3px;text-transform:uppercase">평균 응답</div>
+            <div class="tnum" id="manage-stat-avg" style="font-size:18px;font-weight:800;color:var(--t1);letter-spacing:-.6px;line-height:1.1;margin-top:3px">—</div>
+          </div>
+        </div>
+
+        <!-- 실시간 대화 행들 -->
+        <div id="manage-live-feed" style="max-height:320px;overflow:hidden">
+          <div id="replies-sent-empty" class="empty-soft" style="margin:14px">
+            <div class="empty-soft-t">자동 응대 내역 없음</div>
+            <div>댓글·DM 이 들어오면 여기에 쌓입니다.</div>
+          </div>
+          <div class="msg-card" id="replies-sent-card" style="display:none"></div>
+        </div>
+
+        <!-- 전체 보기 -->
+        <button style="appearance:none;border:none;background:#fff;width:100%;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;font-family:inherit;cursor:pointer;border-top:1px solid var(--b)">
+          <span style="font-size:12px;font-weight:600;color:var(--t1)">전체 대화 보기</span>
+          <svg width="6" height="10" viewBox="0 0 6 10"><path d="M1 1l4 4-4 4" stroke="var(--t3)" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+        </button>
+      </div>
     </div>
-  </div>
+
+    <!-- DEV: 일반 시뮬레이션 -->
+    <div class="dev-only" style="display:none;gap:6px">
+      <button onclick="devSimulate('comment')" style="padding:8px 12px;border-radius:8px;background:#FEF3C7;border:1px dashed #F59E0B;color:#78350F;font-size:11px;font-weight:800;cursor:pointer">🧪 일반 댓글</button>
+      <button onclick="devSimulate('dm')" style="padding:8px 12px;border-radius:8px;background:#FEF3C7;border:1px dashed #F59E0B;color:#78350F;font-size:11px;font-weight:800;cursor:pointer;margin-left:6px">🧪 일반 DM</button>
+    </div>
+
+  </div><!-- /tc-urgent -->
 
   <!-- 댓글·DM (자동 응대 완료 이력) -->
-  <div class="tc" id="tc-comments">
-    <!-- DEV 전용: 시뮬레이션 드래프트 생성 -->
-    <div class="dev-only" style="display:none;margin-bottom:10px;gap:6px">
-      <button onclick="devSimulate('comment')" style="padding:8px 12px;border-radius:8px;background:#FEF3C7;border:1px dashed #F59E0B;color:#78350F;font-size:11px;font-weight:800;cursor:pointer"><span data-i18n="dev.sim.normal_comment">🧪 일반 댓글 (자동발송)</span></button>
-      <button onclick="devSimulate('dm')" style="padding:8px 12px;border-radius:8px;background:#FEF3C7;border:1px dashed #F59E0B;color:#78350F;font-size:11px;font-weight:800;cursor:pointer;margin-left:6px"><span data-i18n="dev.sim.normal_dm">🧪 일반 DM (자동발송)</span></button>
-    </div>
-
+  <div class="tc" id="tc-comments" style="display:none">
     <div class="msg-card" id="replies-sent-card"></div>
     <div id="replies-sent-empty" class="empty-soft">
-      <div class="empty-soft-t" data-i18n="manage.comments.empty.full">자동 응대 내역 없음</div>
-      <div data-i18n="manage.comments.empty_sub.full">일반 댓글·DM이 도착하면 AI가 답장하고 여기에 쌓입니다.</div>
+      <div class="empty-soft-t">자동 응대 내역 없음</div>
+      <div>일반 댓글·DM이 도착하면 AI가 답장하고 여기에 쌓입니다.</div>
     </div>
   </div>
 
   <!-- 주요 팔로워 -->
-  <div class="tc" id="tc-crm">
+  <div class="tc" id="tc-crm" style="display:none">
     <div class="follower-section">
-      <div class="fs-header"><div class="fs-title" data-i18n="manage.crm.positive">긍정 팔로워</div><div class="fs-count" id="pos-count">0</div></div>
+      <div class="fs-header"><div class="fs-title">긍정 팔로워</div><div class="fs-count" id="pos-count">0</div></div>
       <div class="msg-card" id="pos-followers-list"></div>
     </div>
     <div class="follower-section">
-      <div class="fs-header"><div class="fs-title" data-i18n="manage.crm.negative">부정 팔로워</div><div class="fs-count" id="neg-count" style="color:var(--red)">0</div></div>
+      <div class="fs-header"><div class="fs-title">부정 팔로워</div><div class="fs-count" id="neg-count" style="color:var(--red)">0</div></div>
       <div class="msg-card" id="neg-followers-list"></div>
     </div>
     <div id="followers-empty" class="empty-soft" style="margin-top:10px">
-      <div class="empty-soft-t" data-i18n="manage.crm.empty">팔로워 데이터 없음</div>
-      <div data-i18n="manage.crm.empty_sub">댓글·DM이 쌓이면 팔로워별로 자동 분류됩니다.</div>
+      <div class="empty-soft-t">팔로워 데이터 없음</div>
+      <div>댓글·DM이 쌓이면 팔로워별로 자동 분류됩니다.</div>
     </div>
   </div>
 
-  <!-- 협업/제안 -->
-  <div class="tc" id="tc-revenue">
+  <!-- 협업·제안 -->
+  <div class="tc" id="tc-revenue" style="display:none">
     <div id="sobi-collab-section"></div>
-
-    <div class="sec-t" style="margin-top:0;font-size:14px" data-i18n="manage.rev.section">DM·링크 제안 요약</div>
-    <div style="background:var(--s);border-radius:20px;border:1px solid var(--b);padding:18px;margin-bottom:12px">
-      <div style="font-size:12px;font-weight:600;color:var(--t3);margin-bottom:4px" data-i18n="manage.rev.month_total">이번 달 제안 합계</div>
-      <div style="font-size:30px;font-weight:900;color:var(--t1);letter-spacing:-1px;margin-bottom:14px" id="rev-total-krw">0원</div>
+    <div style="background:var(--s);border-radius:18px;border:1px solid var(--b);padding:16px 18px;margin-bottom:12px">
+      <div style="font-size:11px;font-weight:700;color:var(--t3);letter-spacing:.3px;text-transform:uppercase;margin-bottom:4px">이번 달 제안 합계</div>
+      <div class="tnum" style="font-size:26px;font-weight:800;color:var(--t1);letter-spacing:-.6px;margin-bottom:12px" id="rev-total-krw">0원</div>
       <div style="display:flex;gap:8px">
-        <div style="flex:1;background:var(--bg);border-radius:12px;padding:11px 12px">
-          <div style="font-size:10px;color:var(--t3);font-weight:600" data-i18n="manage.rev.sponsor">협찬/광고/기타</div>
-          <div style="font-size:15px;font-weight:800;color:var(--t1);margin-top:3px" id="rev-sp">0</div>
-          <div style="font-size:10px;color:var(--t3);margin-top:2px" data-i18n="manage.rev.sponsor_sub">DM 현금 제안 합산</div>
+        <div style="flex:1;background:var(--bg);border-radius:10px;padding:10px 12px">
+          <div style="font-size:10px;color:var(--t3);font-weight:600">협찬·광고·기타</div>
+          <div class="tnum" style="font-size:14px;font-weight:800;color:var(--t1);margin-top:3px" id="rev-sp">0</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:2px">DM 현금 제안 합산</div>
         </div>
-        <div style="flex:1;background:var(--bg);border-radius:12px;padding:11px 12px">
-          <div style="font-size:10px;color:var(--t3);font-weight:600" data-i18n="manage.rev.link">내 링크 제안</div>
-          <div style="font-size:15px;font-weight:800;color:var(--t1);margin-top:3px" id="rev-linkcount">0</div>
-          <div style="font-size:10px;color:var(--t3);margin-top:2px" data-i18n="manage.rev.link_sub">제안하기 폼으로 도착</div>
+        <div style="flex:1;background:var(--bg);border-radius:10px;padding:10px 12px">
+          <div style="font-size:10px;color:var(--t3);font-weight:600">내 링크 제안</div>
+          <div class="tnum" style="font-size:14px;font-weight:800;color:var(--t1);margin-top:3px" id="rev-linkcount">0</div>
+          <div style="font-size:10px;color:var(--t3);margin-top:2px">제안하기 폼으로 도착</div>
         </div>
       </div>
     </div>
-
     <div class="msg-card" id="revenue-list"></div>
     <div id="revenue-empty" class="empty-soft">
-      <div class="empty-soft-t" data-i18n="manage.rev.empty">제안 없음</div>
-      <div data-i18n="manage.rev.empty_sub">협찬·광고 DM 또는 내 링크 제안이 접수되면 AI가 분류해서 모아둡니다.</div>
+      <div class="empty-soft-t">제안 없음</div>
+      <div>협찬·광고 DM 또는 내 링크 제안이 접수되면 AI가 분류해서 모아둡니다.</div>
     </div>
   </div>
 
-  <!-- 분석 -->
-  <div class="tc" id="tc-insight">
-    <div id="insight-loading" class="empty-soft">
-      <div class="empty-soft-t" data-i18n="manage.insight.loading">인사이트 불러오는 중</div>
-      <div data-i18n="manage.insight.loading_sub">Graph API 실데이터 동기화 중…</div>
-    </div>
-    <div id="insight-content" style="display:none">
-      <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px">
-        <div class="ins-card"><div class="ins-lbl" data-i18n="manage.insight.followers">팔로워</div><div class="ins-val" id="ins-followers">—</div></div>
-        <div class="ins-card"><div class="ins-lbl" data-i18n="manage.insight.posts">게시물</div><div class="ins-val" id="ins-media">—</div></div>
-        <div class="ins-card"><div class="ins-lbl" data-i18n="manage.insight.reach_7d">최근 7일 도달</div><div class="ins-val" id="ins-reach">—</div></div>
-        <div class="ins-card"><div class="ins-lbl" data-i18n="manage.insight.imp_7d">최근 7일 노출</div><div class="ins-val" id="ins-imp">—</div></div>
-        <div class="ins-card"><div class="ins-lbl" data-i18n="manage.insight.profile_views">프로필 방문</div><div class="ins-val" id="ins-pv">—</div></div>
-        <div class="ins-card"><div class="ins-lbl" data-i18n="manage.insight.website_clicks">웹사이트 클릭</div><div class="ins-val" id="ins-wc">—</div></div>
-      </div>
-      <div style="font-size:13px;font-weight:800;color:var(--t1);margin:10px 0 8px" data-i18n="manage.insight.recent_posts">최근 게시물</div>
-      <div id="ins-media-list"></div>
-    </div>
-    <div id="insight-empty" class="empty-soft" style="display:none">
-      <div class="empty-soft-t" data-i18n="manage.insight.connect_required">Instagram 연동이 필요합니다</div>
-      <div data-i18n="manage.insight.connect_sub">연동 후 실데이터 분석이 여기에 나타납니다.</div>
-    </div>
-    <div id="insight-error" style="display:none;padding:40px 16px;text-align:center;color:var(--red);font-size:12.5px;background:#FEF2F2;border-radius:14px;border:1px dashed var(--red-l);line-height:1.6"></div>
+  <!-- 호환성: 분석 탭 ID 들 (제거됐지만 JS 참조) -->
+  <div style="display:none">
+    <div id="insight-loading"></div>
+    <div id="insight-content"></div>
+    <div id="insight-empty"></div>
+    <div id="insight-error"></div>
+    <div id="ins-followers"></div>
+    <div id="ins-media"></div>
+    <div id="ins-reach"></div>
+    <div id="ins-imp"></div>
+    <div id="ins-pv"></div>
+    <div id="ins-wc"></div>
+    <div id="ins-media-list"></div>
   </div>
 </div>
 
@@ -3656,8 +3923,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 <!-- NAV -->
 <nav class="nav">
   <button class="nb on" id="nb-home" onclick="go('home')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="tab.home">홈</span></button>
-  <button class="nb" id="nb-activity" data-lock="1" onclick="go('activity')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 7l5 5-5 5M6 12h12" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="tab.grow">키우기</span></button>
   <button class="nb" id="nb-learn" data-lock="1" onclick="go('learn')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg><span data-i18n="tab.learn">AI 학습</span></button>
+  <button class="nb" id="nb-activity" data-lock="1" onclick="go('activity')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M13 7l5 5-5 5M6 12h12" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="tab.grow">응대</span></button>
   <button class="nb" id="nb-link" onclick="go('link')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.72M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="tab.link">내 링크</span></button>
   <button class="nb" id="nb-profile" onclick="go('profile')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" stroke-linecap="round" stroke-linejoin="round"/></svg><span data-i18n="tab.profile">내 정보</span></button>
 </nav>
@@ -3719,6 +3986,17 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 <div class="ov" id="m-rev1" onclick="co(event,'m-rev1')"><div class="sheet"><div class="s-bar"></div><div class="s-title" data-i18n="mod.rev.title.sponsor">협찬·광고 제안</div><div class="s-sub">케이뷰티코 · Instagram DM · 1월 15일 · 200만원</div><div class="bubble"><div class="b-who">@kbeauty_brand1</div>"신제품 쿠션 광고 협업 제안드리고 싶어요. 광고비 200만원 생각 중입니다."</div><div class="bubble ai"><div class="b-who ai" data-i18n="mod.urgent.ai_draft">Ssobi AI 초안</div>안녕하세요! 제안 감사드려요. 자세한 협의는 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="ec85828a83ac81858080858185808085c28f83">[email&#160;protected]</a> 또는 카카오 @millimilli 로 연락 주시면 빠르게 안내드릴게요 :)</div><button class="btn-p" onclick="cm('m-rev1')"><span data-i18n="btn.approve_send">승인 · 바로 발송</span></button><button class="btn-s" onclick="cm('m-rev1')"><span data-i18n="btn.edit_more">수정하기</span></button></div></div>
 <div class="ov" id="m-rev2" onclick="co(event,'m-rev2')"><div class="sheet"><div class="s-bar"></div><div class="s-title" data-i18n="mod.rev.title.export">수출 문의</div><div class="s-sub">재팬뷰티 · DM · 1월 14일 · ~4,500만원</div><div class="bubble"><div class="b-who">@japan_import_co</div>"K-뷰티 BEST 제품 수출 가능한지요? 초도 물량 500만엔 규모입니다."</div><div class="bubble ai"><div class="b-who ai" data-i18n="mod.urgent.ai_draft">Ssobi AI 초안</div>안녕하세요! 관심 감사해요. 수출 관련 협의는 <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d7beb9b1b897babebbbbbebabebbbbbef9b4b8">[email&#160;protected]</a> 로 연락 주시면 담당자가 빠르게 안내드릴게요.</div><button class="btn-p" onclick="cm('m-rev2')"><span data-i18n="btn.approve_send">승인 · 바로 발송</span></button><button class="btn-s" onclick="cm('m-rev2')"><span data-i18n="btn.edit_more">수정하기</span></button></div></div>
 <div class="ov" id="m-rev3" onclick="co(event,'m-rev3')"><div class="sheet"><div class="s-bar"></div><div class="s-title" data-i18n="mod.rev.title.amazon">Amazon 판매 제안</div><div class="s-sub">US K-Beauty · DM · 1월 13일 · ~4,200만원</div><div class="bubble"><div class="b-who">@us_kbeauty_shop</div>"Interested in reselling MILLIMILLI on Amazon US. 2,000 units, ~$30,000."</div><div class="bubble ai"><div class="b-who ai" data-i18n="mod.urgent.ai_draft">Ssobi AI 초안</div>Hello! Thank you for your interest. Please contact us at <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="254c4b434a65484c49494c484c49494c0b464a">[email&#160;protected]</a> for detailed distribution terms.</div><button class="btn-p" onclick="cm('m-rev3')"><span data-i18n="btn.approve_send">승인 · 바로 발송</span></button><button class="btn-s" onclick="cm('m-rev3')"><span data-i18n="btn.edit_more">수정하기</span></button></div></div>
+
+<!-- 학습 자료 상세 — 어떤 내용을 외웠는지 -->
+<div class="ov" id="m-learn-detail" onclick="co(event,'m-learn-detail')"><div class="sheet" style="padding:18px 20px 28px;max-height:82vh;overflow-y:auto"><div class="s-bar"></div>
+  <div id="learn-detail-head" style="padding:4px 0 12px;border-bottom:1px solid var(--b);margin-bottom:14px">
+    <div id="learn-detail-host" style="font-size:11px;color:var(--t3);margin-bottom:4px"></div>
+    <div id="learn-detail-title" style="font-size:16px;font-weight:800;color:var(--t1);letter-spacing:-.3px;line-height:1.4"></div>
+    <div id="learn-detail-meta" style="font-size:12px;color:var(--t2);margin-top:6px"></div>
+  </div>
+  <div id="learn-detail-list" style="display:flex;flex-direction:column;gap:10px"></div>
+  <button class="btn-s" onclick="cm('m-learn-detail')" style="margin-top:18px">닫기</button>
+</div></div>
 
 <!-- 긴급 메시지 설정 -->
 <div class="ov" id="m-bulk-setting" onclick="co(event,'m-bulk-setting')"><div class="sheet"><div class="s-bar"></div><div class="s-title" data-i18n="mod.bulk.title">안내 메시지 설정</div><div class="s-sub">긴급 댓글·DM에 일괄 발송할 메시지를 설정하세요</div><div style="font-size:12px;font-weight:600;color:var(--t3);margin-bottom:6px">연락처</div><input class="sheet-in" type="text" value="카카오 @millimilli" placeholder="카카오 @계정 또는 이메일"><div style="font-size:12px;font-weight:600;color:var(--t3);margin-top:14px;margin-bottom:6px">안내 메시지</div><textarea class="sheet-ta" rows="4">"안녕하세요! 소중한 말씀 감사해요. 자세한 확인을 위해 카카오 @millimilli 로 연락 주시면 빠르게 도와드릴게요 :)"</textarea><button class="btn-p" onclick="saveBulk()"><span data-i18n="btn.save">저장</span></button><button class="btn-s" onclick="cm('m-bulk-setting')"><span data-i18n="btn.close">닫기</span></button></div></div>
@@ -5212,7 +5490,7 @@ document.addEventListener('DOMContentLoaded', syncToneChip);
 var I18N = {
   ko: {
     // 탭바
-    'tab.home':'홈', 'tab.grow':'자동응대', 'tab.learn':'AI 학습',
+    'tab.home':'홈', 'tab.grow':'응대', 'tab.learn':'AI 학습',
     'tab.link':'내 링크', 'tab.profile':'내 정보',
     // 공통 버튼
     'btn.next':'다음', 'btn.back':'이전', 'btn.save':'저장',
@@ -16157,14 +16435,13 @@ function setTab(t){
   ['urgent','comments','crm','revenue','insight'].forEach(function(x){
     var tb=document.getElementById('tab-'+x), tc=document.getElementById('tc-'+x);
     if(tb) tb.classList.remove('on');
-    if(tc) tc.classList.remove('on');
+    if(tc){ tc.classList.remove('on'); tc.style.display='none'; }
   });
   var tb=document.getElementById('tab-'+t), tc=document.getElementById('tc-'+t);
   if(tb) tb.classList.add('on');
-  if(tc) tc.classList.add('on');
+  if(tc){ tc.classList.add('on'); tc.style.display = (t==='urgent' ? 'flex' : 'block'); }
   if(t==='comments') loadPendingDrafts();
   if(t==='urgent') loadPendingDrafts();
-  if(t==='insight') loadInsights();
   if(t==='revenue') loadProposalList();
 }
 
@@ -16563,6 +16840,15 @@ function devSimulate(kind, level){
 }
 
 function toggleAcc(id){ document.getElementById(id).classList.toggle('open'); }
+function repToggle(id){
+  var el = document.getElementById(id); if(!el) return
+  var body = el.querySelector('.rep-acc-body')
+  var chev = el.querySelector('.rep-acc-chev')
+  if(!body) return
+  var open = body.style.display === 'block'
+  body.style.display = open ? 'none' : 'block'
+  if(chev) chev.style.transform = open ? 'rotate(0)' : 'rotate(180deg)'
+}
 function openAcc(id){ document.getElementById(id).classList.add('open'); }
 function openModal(id){ var el = document.getElementById(id); if(el) el.classList.add('on'); if(id==='m-ai-style') loadToneState(); if(id==='m-plan' && typeof planInitOnOpen==='function') planInitOnOpen(); }
 
@@ -17964,22 +18250,8 @@ async function checkAuth() {
     go(initialView);
     loadDashboardData();
     bootstrapUser();
-    // 가입 직후 또는 온보딩 미완료 → 통합 온보딩 자동 트리거 (주제·말투)
-    //   완료 신호 3가지 중 하나라도 있으면 skip (방어적 체크)
-    //     1) ssobi_onboarding (topics + tone 둘 다)
-    //     2) ssobi_disc_topic (만들기 흐름에서 카테고리 저장됨)
-    //     3) ssobi_onboarding_dismissed (사용자가 이전에 닫음)
-    setTimeout(function(){
-      try {
-        var saved = JSON.parse(localStorage.getItem('ssobi_onboarding') || '{}');
-        var discTopic = localStorage.getItem('ssobi_disc_topic') || '';
-        var dismissed = localStorage.getItem('ssobi_onboarding_dismissed') || '';
-        var hasOnboarded = (saved.topics?.length && saved.tone) || discTopic || dismissed;
-        if(!hasOnboarded){
-          if(typeof openOnboarding === 'function') openOnboarding();
-        }
-      } catch(_){ /* silent — 자동 호출 안 함 (사용자 직접 클릭 시 동작) */ }
-    }, 800);
+    // v2 pivot: 주제·말투 온보딩 모달 제거 (만들기/페르소나 폐기됨)
+    // 가입 검증은 별도 5문항 톤 검증 화면(v-onb-learn)에서 진행
   } else if (hash === 'signup') {
     go('signup');
   } else if (hash === 'login') {
@@ -18222,117 +18494,342 @@ async function loadGrowAccounts(){
 }
 
 // 홈 탭 v2 — Day 1 vs ROI 분기 + 사용자 유형별 카피
+// 홈탭 더미 ticker 이벤트 — 클로드 디자인 FEED_EVENTS 결
+var HOME_LIVE_EVENTS_DEFAULT = [
+  { t:'방금',   who:'@yujin_0810',  act:'에 답장',  msg:'환불 가능해요?',         tag:'환불 정책', kind:'reply' },
+  { t:'34초 전', who:'@summer.luv', act:'결제 완료', msg:'시카밤 본품 ×1',          price:'₩48,000', kind:'sale' },
+  { t:'1분 전',  who:'@_chaewon__', act:'에 답장',  msg:'여드름 피부도 써도 돼요?', tag:'제품 FAQ',  kind:'reply' },
+  { t:'2분 전',  who:'@hyunji_log', act:'에 답장',  msg:'배송 언제 와요?',         tag:'배송 정책', kind:'reply' },
+  { t:'4분 전',  who:'@minjeong.k', act:'댓글 답장', msg:'저도 이거 써봤어요!',                       kind:'comment' },
+  { t:'6분 전',  who:'@dahyun_77',  act:'결제 완료', msg:'여름신상 세트',           price:'₩72,000', kind:'sale' },
+  { t:'8분 전',  who:'@jiwoo.0204', act:'에 답장',  msg:'협찬은 어디로?',          tag:'비즈니스',   kind:'reply' },
+  { t:'11분 전', who:'@haeun_mom',  act:'에 답장',  msg:'임산부도 써도 돼요?',     tag:'성분 안내', kind:'reply' },
+]
+
+// 시간대별 활동 바 기본 패턴 (오전 한산 → 저녁 피크)
+var HOME_ACTIVITY_PATTERN_DEFAULT = [2,1,1,2,3,2,1,0,0,1,2,3,4,5,4,3,2,3,5,7,6,4,3,5]
+
+function homeRenderActivityBar(bars){
+  var wrap = document.getElementById('home-activity-bar')
+  if(!wrap) return
+  while(wrap.firstChild) wrap.removeChild(wrap.firstChild)
+  var max = Math.max.apply(null, bars) || 1
+  var nowHour = new Date().getHours()
+  bars.forEach(function(b, i){
+    var night = (i >= 22 || i < 7)
+    var isNow = (i === nowHour)
+    var bar = document.createElement('div')
+    var h = 12 + (b / max) * 78
+    // 입체감 — 그라데이션 (위쪽 mint, 아래쪽 살짝 어둡게)
+    var bgGrad
+    if(isNow){
+      bgGrad = 'linear-gradient(180deg,var(--mint) 0%,var(--mint-d) 100%)'
+    } else if(night){
+      bgGrad = 'linear-gradient(180deg,var(--mint) 0%,var(--mint-d) 100%)'
+    } else {
+      bgGrad = 'linear-gradient(180deg,#A7F3D0 0%,var(--mint-l) 100%)'
+    }
+    bar.style.cssText = 'flex:1;position:relative;height:'+h+'%;border-radius:3px 3px 1px 1px;background:'+bgGrad+';box-shadow:'+(isNow?'0 4px 10px rgba(0,200,150,.35)':(night?'0 2px 4px rgba(0,200,150,.18)':'none'))+';transition:opacity .2s'
+    if(isNow){
+      var dot = document.createElement('span')
+      dot.style.cssText = 'position:absolute;top:-5px;left:50%;transform:translateX(-50%);width:6px;height:6px;border-radius:3px;background:var(--mint);box-shadow:0 0 0 3px rgba(0,200,150,.2);animation:bl 1.4s ease infinite'
+      bar.appendChild(dot)
+    }
+    wrap.appendChild(bar)
+  })
+}
+
+// 심플 ticker — 한 줄, dot + who + 시간 + msg
+function homeRenderLiveList(events){
+  var list = document.getElementById('home-live-list')
+  if(!list) return
+  while(list.firstChild) list.removeChild(list.firstChild)
+  var doubled = events.concat(events)
+  doubled.forEach(function(e, i){
+    var highlight = (i === 0)
+    var sale = e.kind === 'sale'
+
+    var row = document.createElement('div')
+    row.style.cssText = 'padding:7px 16px;display:flex;align-items:center;gap:10px'
+    if(highlight) row.classList.add('ssobi-blink')
+
+    // 좌측 점만 (실시간 인디케이터)
+    var dot = document.createElement('span')
+    dot.style.cssText = 'width:5px;height:5px;border-radius:50%;flex-shrink:0;background:'+(highlight?'var(--mint)':(sale?'var(--mint-d)':'var(--t3)'))+';box-shadow:'+(highlight?'0 0 8px rgba(0,200,150,.5)':'none')
+    row.appendChild(dot)
+
+    var body = document.createElement('div')
+    body.style.cssText = 'flex:1;min-width:0;display:flex;align-items:baseline;gap:6px'
+    body.innerHTML = '<span style="font-size:12.5px;font-weight:700;color:var(--t1);white-space:nowrap">'+e.who+'</span>'
+      + '<span style="font-size:12px;color:var(--t2);line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0">'+e.act+' <span style="color:var(--t3)">"'+e.msg+'"</span></span>'
+    row.appendChild(body)
+
+    var meta = document.createElement('div')
+    meta.style.cssText = 'flex-shrink:0;display:flex;align-items:center;gap:6px'
+    if(sale && e.price){
+      meta.innerHTML = '<span class="tnum" style="font-size:11px;font-weight:800;color:var(--mint-d)">'+e.price+'</span>'
+    }
+    meta.innerHTML += '<span class="tnum" style="font-size:10px;color:var(--t3);min-width:34px;text-align:right">'+e.t+'</span>'
+    row.appendChild(meta)
+
+    list.appendChild(row)
+  })
+}
+
+function goHomeUrgentTarget(){ go('manage'); if(typeof setTab === 'function') setTimeout(function(){ setTab('urgent') }, 40) }
+
+function homeRenderDay1Demo(){
+  var tasks = document.getElementById('home-day1-tasks')
+  if(!tasks) return
+  while(tasks.firstChild) tasks.removeChild(tasks.firstChild)
+  var demoSteps = [
+    { n:1, done:false, title:'인스타 연동', sub:'댓글·DM 자동 학습 시작', cta:false },
+    { n:2, done:false, title:'내 링크 만들기', sub:'3분이면 끝나요', cta:true },
+    { n:3, done:false, title:'프로필에 링크 붙이기', sub:'ssobi.ai/u/[핸들]', cta:false },
+  ]
+  demoSteps.forEach(function(s){
+    var card = document.createElement('div')
+    card.style.cssText = 'background:#fff;border:1px solid var(--b);border-radius:16px;overflow:hidden'
+    var row = document.createElement('div')
+    row.style.cssText = 'display:flex;align-items:stretch'
+    var rail = document.createElement('div')
+    rail.style.cssText = 'width:48px;display:flex;align-items:center;justify-content:center;background:transparent;border-right:1px solid var(--b)'
+    rail.innerHTML = '<div style="width:22px;height:22px;border-radius:11px;border:1.6px solid var(--b);color:var(--t3);font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center">'+s.n+'</div>'
+    row.appendChild(rail)
+    var body = document.createElement('div')
+    body.style.cssText = 'flex:1;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px'
+    body.innerHTML = '<div style="min-width:0;flex:1"><div style="font-size:14px;font-weight:700;color:var(--t1);letter-spacing:-.2px">'+s.title+'</div><div style="font-size:11px;color:var(--t2);margin-top:1px">'+s.sub+'</div></div>'
+    if(s.cta){
+      body.innerHTML += '<div style="padding:6px 10px;border-radius:8px;background:var(--mint);color:#fff;font-size:11px;font-weight:700;flex-shrink:0">시작</div>'
+    } else {
+      body.innerHTML += '<svg width="7" height="12" viewBox="0 0 8 14" style="flex-shrink:0"><path d="M1 1l6 6-6 6" stroke="var(--t3)" stroke-width="2" fill="none" stroke-linecap="round"/></svg>'
+    }
+    row.appendChild(body)
+    card.appendChild(row)
+    tasks.appendChild(card)
+  })
+}
+
+// 1응대 ≈ 4분 절약 가정. 한국어 단위
+function homeFormatHM(minutes){
+  if(minutes < 60) return minutes + '분'
+  var h = Math.floor(minutes/60), m = minutes % 60
+  return m === 0 ? h+'시간' : h+'시간 '+m+'분'
+}
+
 async function loadHomeDashboard(){
   var day1El = document.getElementById('home-day1')
-  var roiEl = document.getElementById('home-roi')
-  var fansEl = document.getElementById('home-fans')
-  var helpedEl = document.getElementById('home-helped')
-  var liveWrap = document.getElementById('home-live-wrap')
-  var lifetimeEl = document.getElementById('home-lifetime')
-  if(!day1El) return
+  var roiEl = document.getElementById('home-roi-wrap')
+  if(!day1El || !roiEl) return
+
+  // 활동 바 + 라이브 ticker 는 항상 demo로 채워둠 (실데이터 들어오면 갈아끼움)
+  homeRenderActivityBar(HOME_ACTIVITY_PATTERN_DEFAULT)
+  homeRenderLiveList(HOME_LIVE_EVENTS_DEFAULT)
+
   try {
     var h = await authHeaders()
     var res = await fetch('/api/home/dashboard', { headers: h, credentials: 'include' })
     if(!res.ok){
-      // 비로그인 — 다 숨기고 Day 1 안내만
+      // 비로그인 데모 — Day 1 카드 3개 채워서 보여줌
       day1El.style.display = 'block'
-      document.getElementById('home-day1-status').textContent = '로그인이 필요해요'
+      roiEl.style.display = 'none'
+      document.getElementById('home-day1-status').textContent = '인스타 연동 필요 · 학습 자료 추가 필요'
+      document.getElementById('home-day1-progress').textContent = '0 / 3 단계'
+      homeRenderDay1Demo()
       return
     }
     var j = await res.json()
 
+    // 이름 — IG handle 또는 link handle 우선
+    var nameSpan = document.getElementById('home-day1-name')
+    if(nameSpan){
+      var displayName = j.ig_username || j.link_handle || '민혜'
+      // 한 글자만 em-serif 강조 (이름 그대로)
+      nameSpan.textContent = displayName.replace(/^@/, '')
+    }
+
     if(j.mode === 'day1'){
       day1El.style.display = 'block'
       roiEl.style.display = 'none'
-      fansEl.style.display = 'none'
-      helpedEl.style.display = 'none'
-      liveWrap.style.display = 'none'
-      lifetimeEl.style.display = 'none'
 
-      // 진행 상태 메시지
+      // 진행 상태 칩
+      var done = 0
+      if(j.signals.has_ig) done++
+      if(j.signals.has_kb) done++
       var statusParts = []
-      if(j.signals.has_ig) statusParts.push('인스타 연동 완료')
-      else statusParts.push('인스타 연동 필요')
-      if(j.signals.has_kb) statusParts.push('지식 학습됨')
-      else statusParts.push('학습 자료 추가 필요')
+      statusParts.push(j.signals.has_ig ? '인스타 연동 완료' : '인스타 연동 필요')
+      statusParts.push(j.signals.has_kb ? '학습 자료 있음' : '학습 자료 추가 필요')
       document.getElementById('home-day1-status').textContent = statusParts.join(' · ')
+      document.getElementById('home-day1-progress').textContent = done + ' / 3 단계'
 
-      // 다음 액션 박스
+      // 3-step 카드 렌더 (디자인 핸드오프 결)
       var tasks = document.getElementById('home-day1-tasks')
       while(tasks.firstChild) tasks.removeChild(tasks.firstChild)
-      var stepIdx = 1
-      function addTask(title, desc, action, done){
+
+      var steps = [
+        { n:1, done: j.signals.has_ig, title:'인스타 연동',
+          sub: j.signals.has_ig && j.ig_username ? '@'+j.ig_username+' 연동 완료' : '댓글·DM 자동 학습 시작',
+          action: function(){ if(typeof connectIG === 'function') connectIG() } },
+        { n:2, done: j.signals.has_kb, title:'내 링크 만들기',
+          sub: j.signals.has_kb ? '학습 자료 등록 완료' : '3분이면 끝나요',
+          action: function(){ go('link') } },
+        { n:3, done: false, title:'프로필에 링크 붙이기',
+          sub: j.link_handle ? 'ssobi.ai/u/'+j.link_handle : '핸들 먼저 설정',
+          action: function(){
+            if(j.link_handle){
+              try { navigator.clipboard.writeText('https://ssobi.ai/u/'+j.link_handle); if(typeof lkeShowToast === 'function') lkeShowToast('링크 복사됨') } catch(_){}
+            } else go('link')
+          },
+          urlChip: !!j.link_handle && j.signals.has_kb,
+          handle: j.link_handle },
+      ]
+
+      steps.forEach(function(s){
+        var card = document.createElement('div')
+        card.style.cssText = 'background:#fff;border:1px solid var(--b);border-radius:16px;overflow:hidden'
+
         var row = document.createElement('div')
-        row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 0' + (done ? ';opacity:.5' : '')
-        var dot = document.createElement('div')
-        dot.style.cssText = 'width:24px;height:24px;border-radius:50%;background:'+(done?'var(--mint)':'#fff')+';border:1.5px solid var(--mint);color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;flex-shrink:0'
-        dot.textContent = done ? '✓' : String(stepIdx)
-        var info = document.createElement('div')
-        info.style.cssText = 'flex:1;min-width:0'
-        info.innerHTML = '<div style="font-size:13px;font-weight:700;color:var(--t1)">'+title+'</div><div style="font-size:11.5px;color:var(--t3);margin-top:2px">'+desc+'</div>'
-        row.appendChild(dot); row.appendChild(info)
-        if(action){
-          var btn = document.createElement('button')
-          btn.textContent = done ? '완료' : '시작'
-          btn.style.cssText = 'padding:6px 12px;border-radius:8px;font-size:11px;font-weight:700;border:none;background:'+(done?'var(--bg)':'var(--dark)')+';color:'+(done?'var(--t3)':'#fff')+';cursor:'+(done?'default':'pointer')
-          if(!done) btn.onclick = action
-          row.appendChild(btn)
+        row.style.cssText = 'display:flex;align-items:stretch'
+
+        // 좌측 레일 (단계 번호 / 체크)
+        var rail = document.createElement('div')
+        rail.style.cssText = 'width:48px;display:flex;align-items:center;justify-content:center;background:'+(s.done?'var(--mint-l)':'transparent')+';border-right:1px solid var(--b)'
+        if(s.done){
+          rail.innerHTML = '<div style="width:22px;height:22px;border-radius:11px;background:var(--mint);display:flex;align-items:center;justify-content:center"><svg width="11" height="11" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3 3 6-7" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>'
+        } else {
+          rail.innerHTML = '<div style="width:22px;height:22px;border-radius:11px;border:1.6px solid var(--b);color:var(--t3);font-weight:700;font-size:11px;display:flex;align-items:center;justify-content:center">'+s.n+'</div>'
         }
-        tasks.appendChild(row)
-        if(!done) stepIdx++
-      }
-      addTask('인스타 연동', '@username 으로 자동 학습 시작', function(){ if(typeof connectIG === 'function') connectIG() }, j.signals.has_ig)
-      addTask('내 링크 만들기', '학습 자료 자동 등록 + 외부 공개 페이지', function(){ go('link') }, j.signals.has_kb)
-      addTask('인스타 바이오에 링크', j.link_handle ? 'ssobi.ai/u/'+j.link_handle : 'ssobi.ai/u/[handle]', function(){
-        if(j.link_handle){
-          try { navigator.clipboard.writeText('https://ssobi.ai/u/'+j.link_handle); lkeShowToast && lkeShowToast('링크 복사됨') } catch(_){}
-        } else go('link')
-      }, false)
+        row.appendChild(rail)
+
+        // 본문 + 우측 액션
+        var body = document.createElement('div')
+        body.style.cssText = 'flex:1;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:'+(s.done?'default':'pointer')
+        var info = document.createElement('div')
+        info.style.cssText = 'min-width:0;flex:1'
+        info.innerHTML = '<div style="font-size:14px;font-weight:700;color:'+(s.done?'var(--t3)':'var(--t1)')+';text-decoration:'+(s.done?'line-through':'none')+';letter-spacing:-.2px">'+s.title+'</div>'
+          + '<div style="font-size:11px;color:var(--t2);margin-top:1px">'+s.sub+'</div>'
+        body.appendChild(info)
+        if(!s.done){
+          if(s.n === 2){
+            // CTA pill
+            var pill = document.createElement('div')
+            pill.style.cssText = 'padding:6px 10px;border-radius:8px;background:var(--mint);color:#fff;font-size:11px;font-weight:700;flex-shrink:0'
+            pill.textContent = '시작'
+            body.appendChild(pill)
+          } else {
+            // chevron
+            body.innerHTML += '<svg width="7" height="12" viewBox="0 0 8 14" style="flex-shrink:0"><path d="M1 1l6 6-6 6" stroke="var(--t3)" stroke-width="2" fill="none" stroke-linecap="round"/></svg>'
+          }
+        }
+        if(s.action && !s.done) body.onclick = s.action
+        row.appendChild(body)
+        card.appendChild(row)
+
+        // step 3 URL strip
+        if(s.n === 3 && s.urlChip && s.handle){
+          var strip = document.createElement('div')
+          strip.style.cssText = 'padding:0 14px 12px 62px'
+          strip.innerHTML = '<div style="padding:8px 11px;border-radius:8px;background:var(--bg);border:1px solid var(--b);font-family:\'JetBrains Mono\',ui-monospace,monospace;font-size:11px;color:var(--t1);display:flex;align-items:center;justify-content:space-between">'
+            +'<span><span style="color:var(--t3)">ssobi.ai/u/</span>'+s.handle+'</span>'
+            +'<span style="color:var(--mint-d);font-weight:700;cursor:pointer" onclick="event.stopPropagation();navigator.clipboard.writeText(\'https://ssobi.ai/u/'+s.handle+'\');if(typeof lkeShowToast===\'function\')lkeShowToast(\'링크 복사됨\')">복사</span>'
+            +'</div>'
+          card.appendChild(strip)
+        }
+
+        tasks.appendChild(card)
+      })
+
       return
     }
 
-    // ROI 모드 (어제 데이터 있음)
+    // ─────────────── ROI 모드 ───────────────
     day1El.style.display = 'none'
     roiEl.style.display = 'block'
-    fansEl.style.display = 'block'
-    helpedEl.style.display = 'block'
-    lifetimeEl.style.display = 'block'
 
-    // Hero — 유저 유형 별 동적
-    var y = j.yesterday
-    var heroValueEl = document.getElementById('home-hero-value')
-    var heroLabelEl = document.getElementById('home-hero-label')
-    var heroSubEl = document.getElementById('home-hero-sub')
-    if(y){
-      if(y.headline_unit === 'KRW'){
-        heroValueEl.textContent = '₩' + (y.headline_value || 0).toLocaleString()
-      } else {
-        heroValueEl.textContent = (y.headline_value || 0).toLocaleString() + (y.headline_unit ? y.headline_unit : '')
-      }
-      heroLabelEl.textContent = y.headline_label
-      heroSubEl.textContent = y.click_count + '명 클릭 · ' + y.reply_count + '건 응대'
-        + (y.urgent_count > 0 ? ' · 긴급 ' + y.urgent_count + '건' : '')
+    var y = j.yesterday || {}
+    var lifetime = j.lifetime || {}
+
+    // 긴급 알림 pill — 항상 표시. urgent > 0 이면 빨간, 없으면 mint 안전
+    var urgentPill = document.getElementById('home-urgent-pill')
+    var urgentEl = document.getElementById('home-urgent')
+    urgentPill.style.display = 'flex'
+    if((y.urgent_count || 0) > 0){
+      // 빨간 변환
+      document.getElementById('home-urgent-pill-glow').style.background = 'radial-gradient(circle,rgba(255,77,77,.32),transparent 60%)'
+      document.getElementById('home-urgent-pill-dot-inner').style.background = 'var(--red)'
+      document.getElementById('home-urgent-pill-msg').textContent = '긴급 응대 ' + y.urgent_count + '건 대기'
+      document.getElementById('home-urgent-pill-sub').textContent = '곧 만료 — 지금 확인'
+      var cta = document.getElementById('home-urgent-pill-cta')
+      cta.style.background = 'var(--red)'
+      document.getElementById('home-urgent-pill-cta-text').innerHTML = '확인 <svg width="6" height="10" viewBox="0 0 8 14" style="vertical-align:middle"><path d="M1 1l6 6-6 6" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>'
+
+      // quote 카드도 표시
+      urgentEl.style.display = 'flex'
+      document.getElementById('home-urgent-msg').textContent = '"긴급 응대 ' + y.urgent_count + '건 대기 중"'
+      document.getElementById('home-urgent-from').textContent = '실시간 관리 탭'
+      document.getElementById('home-urgent-time').textContent = '곧 만료'
+    } else {
+      // mint 안전 변환 (디폴트 — 이미 HTML 에 설정)
+      document.getElementById('home-urgent-pill-glow').style.background = 'radial-gradient(circle,rgba(0,200,150,.3),transparent 60%)'
+      document.getElementById('home-urgent-pill-dot-inner').style.background = 'var(--mint)'
+      document.getElementById('home-urgent-pill-msg').textContent = '모든 응대 정상'
+      document.getElementById('home-urgent-pill-sub').textContent = '긴급 대기 없음'
+      var cta2 = document.getElementById('home-urgent-pill-cta')
+      cta2.style.background = 'var(--mint)'
+      document.getElementById('home-urgent-pill-cta-text').textContent = '안전'
+
+      // quote 카드 숨김
+      urgentEl.style.display = 'none'
     }
+
+    // Hero — 클로드 디자인: "가입 N일째 · 누적" + "Ssobi 가 대신 응대한 시간" + 누적 시간 hero
+    var days = lifetime.days || 1
+    var totalSavedMin = (lifetime.total_replies || 0) * 4
+    var totalHours = Math.floor(totalSavedMin / 60)
+
+    document.getElementById('home-hero-eyebrow').textContent = '가입 ' + days + '일째 · 누적'
+    document.getElementById('home-hero-label').textContent = 'Ssobi 가 대신 응대한 시간'
+    document.getElementById('home-hero-value').textContent = totalHours.toLocaleString()
+    document.getElementById('home-hero-unit').textContent = '시간'
+
+    // hero sub — 누적 대화 N건 · 댓글 N · DM N (대략 6:4)
+    var totalDm = Math.round((lifetime.total_replies || 0) * 0.4)
+    var totalComment = (lifetime.total_replies || 0) - totalDm
+    document.getElementById('home-hero-sub').innerHTML =
+      '누적 대화 <span class="tnum" style="color:var(--t1);font-weight:700">' + (lifetime.total_replies || 0).toLocaleString() + '건</span>'
+      + (lifetime.total_replies > 0 ? ' <span style="opacity:.4;margin:0 2px">·</span> 댓글 ' + totalComment.toLocaleString() + ' · DM ' + totalDm.toLocaleString() : '')
+
+    // 타임라인 (오늘/어제/이번주) — 어제 daily_report 만 있으므로 단순 분기
+    var todayMin = (y.reply_count || 0) * 4
+    document.getElementById('home-tl-today-v').textContent = homeFormatHM(todayMin)
+    document.getElementById('home-tl-today-h').textContent = (y.reply_count || 0) + '건'
+    document.getElementById('home-tl-yest-v').textContent = homeFormatHM(todayMin) // fallback
+    document.getElementById('home-tl-yest-h').textContent = (y.reply_count || 0) + '건'
+    // 이번 달 — 일평균 × 30 (실데이터 들어오면 실제 합산으로 교체)
+    var monthMin = todayMin * 30
+    document.getElementById('home-tl-week-v').textContent = homeFormatHM(monthMin)
+    document.getElementById('home-tl-week-h').textContent = ((y.reply_count || 0) * 30) + '건'
+
+    // 활동 바
+    homeRenderActivityBar(HOME_ACTIVITY_PATTERN_DEFAULT)
+    document.getElementById('home-bar-count').textContent = (y.reply_count || 0)
+    document.getElementById('home-bar-saved').textContent = homeFormatHM(todayMin)
 
     // 팬 활동
     document.getElementById('home-returning').textContent = j.week.returning_fans
+    document.getElementById('home-returning-delta').textContent = '+' + j.week.returning_fans + ' 이번주'
     document.getElementById('home-newfans').textContent = j.week.new_fans
+    document.getElementById('home-newfans-delta').textContent = '+' + j.week.new_fans + ' 이번주'
 
-    // Ssobi 가 도와준 일
-    if(y){
-      var hours = Math.round((y.reply_count * 3) / 60)  // 1응대=3분 가정
-      document.getElementById('home-helped-summary').textContent =
-        y.reply_count + '건 응대 · 약 ' + hours + '시간 절약'
-    }
+    // 최근 5분
+    document.getElementById('home-recent-count').textContent = (y.reply_count || 0) + '건'
 
-    // 누적
-    var lifetime = j.lifetime
-    var ltText = lifetime.days + '일째 · 누적 ' + lifetime.total_replies + '건 응대'
-    if(lifetime.est_revenue_krw > 0){
-      var lakh = (lifetime.est_revenue_krw / 1_000_000).toFixed(1)
-      ltText += ' · ₩' + lakh + 'M 매출 영향'
-    }
-    document.getElementById('home-lifetime-text').textContent = ltText
+    // 누적 footer
+    var lt = []
+    lt.push('가입 ' + days + '일째')
+    if(lifetime.total_replies > 0) lt.push('누적 ' + lifetime.total_replies.toLocaleString() + '건')
+    if(lifetime.est_revenue_krw > 0) lt.push('₩' + (lifetime.est_revenue_krw/10000).toFixed(0) + '만 영향')
+    document.getElementById('home-lifetime-text').textContent = lt.join(' · ')
 
   } catch(e){
     console.error('[loadHomeDashboard]', e)
@@ -18340,199 +18837,402 @@ async function loadHomeDashboard(){
 }
 
 // AI 학습 탭 — overview fetch + 카드 렌더
-async function loadLearnOverview(){
-  var toneText = document.getElementById('learn-tone-text');
-  var personaText = document.getElementById('learn-persona-text');
-  var productsList = document.getElementById('learn-products-list');
-  var filesList = document.getElementById('learn-files-list');
-  var urgentList = document.getElementById('learn-urgent-list');
-  var productsCount = document.getElementById('learn-products-count');
-  var filesCount = document.getElementById('learn-files-count');
-  var urgentCount = document.getElementById('learn-urgent-count');
-  if(!toneText) return;
+// ─────────────── AI 학습 — 클로드 디자인 LearningChat 결 ───────────────
+var learnCurrentView = 'chat'
+var learnPendingFile = null
 
-  try {
-    var h = await authHeaders();
-    var res = await fetch('/api/learn/overview', { headers: h, credentials: 'include' });
-    if(!res.ok){
-      toneText.textContent = '로그인이 필요해요';
-      personaText.textContent = '';
-      return;
-    }
-    var j = await res.json();
+// 첨부 카드 — 클로드 디자인 AttachmentCard
+function learnRenderAttachment(opts){
+  var dark = !!opts.onDark
+  var card = document.createElement('div')
+  card.style.cssText = 'margin-top:8px;display:flex;align-items:center;gap:11px;padding:10px 12px;border-radius:10px;'
+    +'background:'+(dark?'rgba(255,255,255,.08)':'var(--bg)')+';'
+    +'border:1px solid '+(dark?'rgba(255,255,255,.14)':'var(--b)')
+    +(opts.onClick?';cursor:pointer':'')
+  if(opts.onClick){ card.onclick = opts.onClick }
 
-    // 말투
-    if(j.tone && j.tone.learned_style){
-      var ls = j.tone.learned_style;
-      toneText.textContent = typeof ls === 'string' ? ls : (ls.summary || JSON.stringify(ls).slice(0, 160));
-    } else {
-      toneText.innerHTML = '<span style="color:var(--t3)">아직 학습 전 — 인스타 연동 후 자동 학습돼요</span>';
-    }
+  // glyph
+  var glyph = document.createElement('div')
+  glyph.style.cssText = 'width:32px;height:32px;border-radius:8px;flex-shrink:0;display:flex;align-items:center;justify-content:center;'
+    +'background:'+(dark?'rgba(255,255,255,.08)':'#fff')+';'
+    +'border:1px solid '+(dark?'rgba(255,255,255,.14)':'var(--b)')+';'
+    +'color:'+(dark?'rgba(255,255,255,.85)':'var(--t1)')
+  if(opts.kind === 'file' && opts.ext){
+    glyph.style.fontSize = '9px'
+    glyph.style.fontWeight = '800'
+    glyph.style.letterSpacing = '0.4px'
+    glyph.textContent = opts.ext
+  } else if(opts.kind === 'note'){
+    glyph.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M3 3h8v8H3z M5 6h4 M5 8h3"/></svg>'
+  } else {
+    // url / link
+    glyph.innerHTML = '<svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M6 8a2.5 2.5 0 003.5 0l2-2A2.5 2.5 0 008 2.5L7.5 3"/><path d="M8 6a2.5 2.5 0 00-3.5 0l-2 2A2.5 2.5 0 006 11.5l.5-.5"/></svg>'
+  }
+  card.appendChild(glyph)
+  var info = document.createElement('div')
+  info.style.cssText = 'flex:1;min-width:0'
+  info.innerHTML = '<div style="font-size:13px;font-weight:700;letter-spacing:-.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:'+(dark?'#fff':'var(--t1)')+'">'+(opts.title||'')+'</div>'
+    + '<div style="font-size:11px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:'+(dark?'rgba(255,255,255,.6)':'var(--t3)')+'">'+(opts.host?opts.host+' · ':'')+(opts.meta||'')+'</div>'
+  card.appendChild(info)
+  return card
+}
 
-    // 페르소나
-    if(j.tone && j.tone.persona_summary){
-      personaText.textContent = j.tone.persona_summary;
-    } else {
-      personaText.innerHTML = '<span style="color:var(--t3)">아직 학습 전</span>';
-    }
-
-    // 제품·자료
-    productsCount.textContent = j.stats && j.stats.total_products > 0 ? '(' + j.stats.total_products + ')' : '';
-    while(productsList.firstChild) productsList.removeChild(productsList.firstChild);
-    if(!j.products || j.products.length === 0){
-      var empty = document.createElement('div');
-      empty.style.cssText = 'font-size:12px;color:var(--t3);text-align:center;padding:16px;border:1px dashed var(--b);border-radius:12px';
-      empty.textContent = '내 링크에 URL 추가하면 자동 학습돼요';
-      productsList.appendChild(empty);
-    } else {
-      j.products.slice(0, 12).forEach(function(p){
-        var card = document.createElement('div');
-        card.style.cssText = 'background:#fff;border:1px solid var(--b);border-radius:10px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:10px';
-        // 카테고리 아이콘
-        var icoEmoji = (p.category === 'product') ? '🛍' : (p.category === 'content') ? '🎬' : (p.category === 'class') ? '🎓' : '🔗';
-        var ico = document.createElement('div');
-        ico.style.cssText = 'width:32px;height:32px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0';
-        ico.textContent = icoEmoji;
-        card.appendChild(ico);
-        var info = document.createElement('div');
-        info.style.cssText = 'flex:1;min-width:0';
-        var label = document.createElement('div');
-        label.style.cssText = 'font-size:13px;font-weight:700;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
-        label.textContent = p.source_label || p.source_url || '';
-        info.appendChild(label);
-        var sub = document.createElement('div');
-        sub.style.cssText = 'font-size:11px;color:var(--t3);margin-top:2px';
-        var parts = [];
-        if(p.source_domain) parts.push(p.source_domain);
-        if(p.price) parts.push((p.currency === 'KRW' ? '₩' : '$') + Number(p.price).toLocaleString());
-        if(p.chunk_count) parts.push(p.chunk_count + '개 청크');
-        sub.textContent = parts.join(' · ');
-        info.appendChild(sub);
-        card.appendChild(info);
-        productsList.appendChild(card);
-      });
-      if(j.products.length > 12){
-        var more = document.createElement('div');
-        more.style.cssText = 'font-size:11px;color:var(--t3);text-align:center;padding:6px';
-        more.textContent = '+ ' + (j.products.length - 12) + '개 더';
-        productsList.appendChild(more);
-      }
-    }
-
-    // 파일
-    filesCount.textContent = j.files && j.files.length > 0 ? '(' + j.files.length + ')' : '';
-    while(filesList.firstChild) filesList.removeChild(filesList.firstChild);
-    if(!j.files || j.files.length === 0){
-      var empty2 = document.createElement('div');
-      empty2.style.cssText = 'font-size:12px;color:var(--t3);text-align:center;padding:8px';
-      empty2.textContent = '아직 첨부된 자료가 없어요';
-      filesList.appendChild(empty2);
-    } else {
-      j.files.forEach(function(f){
-        var card = document.createElement('div');
-        card.style.cssText = 'background:#fff;border:1px solid var(--b);border-radius:10px;padding:10px 12px;margin-bottom:6px;display:flex;align-items:center;gap:10px';
-        var ico = document.createElement('div');
-        ico.style.cssText = 'width:32px;height:32px;border-radius:8px;background:var(--bg);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--t2);flex-shrink:0';
-        ico.textContent = f.file_type.toUpperCase().slice(0, 3);
-        card.appendChild(ico);
-        var info = document.createElement('div');
-        info.style.cssText = 'flex:1;min-width:0';
-        var label = document.createElement('div');
-        label.style.cssText = 'font-size:13px;font-weight:700;color:var(--t1);overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
-        label.textContent = f.file_name;
-        info.appendChild(label);
-        var sub = document.createElement('div');
-        sub.style.cssText = 'font-size:11px;color:var(--t3);margin-top:2px';
-        sub.textContent = (f.chunk_count || 0) + '개 청크 · ' + f.status;
-        info.appendChild(sub);
-        card.appendChild(info);
-        filesList.appendChild(card);
-      });
-    }
-
-    // 긴급 공지
-    urgentCount.textContent = j.urgent && j.urgent.length > 0 ? '(' + j.urgent.length + ')' : '';
-    while(urgentList.firstChild) urgentList.removeChild(urgentList.firstChild);
-    if(!j.urgent || j.urgent.length === 0){
-      var empty3 = document.createElement('div');
-      empty3.style.cssText = 'font-size:12px;color:var(--t3);text-align:center;padding:8px';
-      empty3.textContent = '활성 공지가 없어요';
-      urgentList.appendChild(empty3);
-    } else {
-      j.urgent.forEach(function(u){
-        var card = document.createElement('div');
-        card.style.cssText = 'background:#FFF7ED;border:1px solid #FED7AA;border-radius:10px;padding:10px 12px;margin-bottom:6px';
-        var content = document.createElement('div');
-        content.style.cssText = 'font-size:13px;color:#9A3412;line-height:1.5';
-        content.textContent = u.content;
-        card.appendChild(content);
-        if(u.expires_at){
-          var expSub = document.createElement('div');
-          expSub.style.cssText = 'font-size:11px;color:#C2410C;margin-top:4px';
-          var diffDays = Math.ceil((new Date(u.expires_at).getTime() - Date.now()) / (24 * 3600 * 1000));
-          expSub.textContent = diffDays > 0 ? diffDays + '일 후 만료' : '만료됨';
-          card.appendChild(expSub);
-        }
-        var rm = document.createElement('button');
-        rm.style.cssText = 'margin-top:8px;background:none;border:none;color:#9A3412;font-size:11px;font-weight:700;cursor:pointer;padding:0';
-        rm.textContent = '삭제';
-        rm.onclick = function(){ learnDeleteUrgent(u.id); };
-        card.appendChild(rm);
-        urgentList.appendChild(card);
-      });
-    }
-  } catch(e){
-    if(toneText) toneText.textContent = '데이터를 불러올 수 없어요';
-    console.error('[loadLearnOverview]', e);
+function learnSetView(v){
+  learnCurrentView = v
+  var chatV = document.getElementById('learn-view-chat')
+  var listV = document.getElementById('learn-view-list')
+  var chatBtn = document.getElementById('learn-tab-chat')
+  var listBtn = document.getElementById('learn-tab-list')
+  if(v === 'list'){
+    chatV.style.display = 'none'
+    listV.style.display = 'block'
+    chatBtn.style.background = 'transparent'; chatBtn.style.color = 'var(--t2)'
+    listBtn.style.background = 'var(--t1)'; listBtn.style.color = '#fff'
+  } else {
+    chatV.style.display = 'block'
+    listV.style.display = 'none'
+    chatBtn.style.background = 'var(--t1)'; chatBtn.style.color = '#fff'
+    listBtn.style.background = 'transparent'; listBtn.style.color = 'var(--t2)'
   }
 }
 
-function learnOpenUrgent(){
-  var content = prompt('긴급 공지 내용을 입력하세요 (즉시 응대에 반영):');
-  if(!content || content.trim().length < 5) return;
-  (async function(){
-    var h = await authHeaders();
-    var res = await fetch('/api/learn/urgent', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...h },
-      credentials: 'include',
-      body: JSON.stringify({ content: content.trim(), expires_in_days: 3 }),
-    });
-    if(res.ok) loadLearnOverview();
-    else alert('등록 실패');
-  })();
+function learnRenderListGroup(label, hint, items){
+  var wrap = document.createElement('div')
+  // header
+  var hdr = document.createElement('div')
+  hdr.style.cssText = 'display:flex;align-items:baseline;justify-content:space-between;padding:0 4px 8px'
+  hdr.innerHTML = '<span style="font-size:12px;font-weight:700;color:var(--t1);letter-spacing:-.2px">'+label+'</span>'
+    +'<span style="font-size:11px;color:var(--t3)">'+hint+' · '+items.length+'개</span>'
+  wrap.appendChild(hdr)
+  // card
+  var card = document.createElement('div')
+  card.style.cssText = 'background:#fff;border:1px solid var(--b);border-radius:14px;overflow:hidden'
+  items.forEach(function(it, i){
+    var row = document.createElement('div')
+    row.style.cssText = 'display:flex;align-items:center;gap:12px;padding:14px;'+(i<items.length-1?'border-bottom:1px solid var(--b)':'')+(it._src?';cursor:pointer':'')
+    if(it._src){ row.onclick = function(){ openLearnDetail(it._src, it._label||it.title, it._domain||'') } }
+    // glyph
+    var att = learnRenderAttachment({ kind: it.kind, ext: it.ext, title: '', meta: '' })
+    var glyph = att.firstChild
+    glyph.style.marginRight = '0'
+    row.appendChild(glyph)
+    var info = document.createElement('div')
+    info.style.cssText = 'flex:1;min-width:0'
+    info.innerHTML = '<div style="display:flex;align-items:center;gap:6px"><span style="font-size:13px;font-weight:700;color:var(--t1);letter-spacing:-.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+it.title+'</span>'
+      +(it.pinned ? '<span style="padding:1px 6px;border-radius:999px;background:var(--mint-l);color:var(--mint-d);font-size:9px;font-weight:800;letter-spacing:.4px">긴급</span>' : '')
+      +'</div>'
+      +'<div style="font-size:11px;color:var(--t3);margin-top:1px">'+it.meta+'</div>'
+    row.appendChild(info)
+    var right = document.createElement('div')
+    right.style.cssText = 'flex-shrink:0;text-align:right'
+    right.innerHTML = '<div style="font-size:11px;color:var(--t1);font-weight:600">'+(it.used||'')+'</div>'
+      +'<div style="font-size:10px;color:var(--t3);margin-top:1px">'+(it.when||'')+'</div>'
+    row.appendChild(right)
+    card.appendChild(row)
+  })
+  wrap.appendChild(card)
+  return wrap
 }
 
-async function learnDeleteUrgent(id){
-  if(!confirm('이 긴급 공지를 비활성화할까요?')) return;
-  var h = await authHeaders();
-  var res = await fetch('/api/learn/urgent?id=' + encodeURIComponent(id), { method: 'DELETE', headers: h, credentials: 'include' });
-  if(res.ok) loadLearnOverview();
-}
-
-function learnOpenAddSheet(){
-  var url = prompt('학습할 URL 을 입력하세요 (스마트스토어·블로그·YouTube 등):');
-  if(!url || !/^https?:\/\//i.test(url)) return;
-  (async function(){
-    var h = await authHeaders();
-    var res = await fetch('/api/learn/url', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', ...h },
-      credentials: 'include',
-      body: JSON.stringify({ url, persist: true }),
-    });
-    var j = await res.json();
-    if(j.flow === 'migration'){
-      alert('🎉 ' + (j.result.service || '링크인바이오') + ' 발견! ' + (j.result.links?.length || 0) + '개 링크가 있어요. (마이그레이션은 곧 추가될 예정)');
-    } else if(j.flow === 'blocked' || j.flow === 'image_page'){
-      alert('⚠️ 이 사이트는 자동 학습이 어려워요. 상세 페이지 사진이나 PDF 첨부 기능이 곧 추가됩니다.');
-    } else if(j.kb && j.kb.inserted > 0){
-      alert('✓ 학습 완료! ' + j.kb.inserted + '개 청크가 추가됐어요.');
-      loadLearnOverview();
-    } else {
-      alert('학습 실패: ' + (j.result?.error || j.error || 'unknown'));
+async function loadLearnOverview(){
+  // 헤더 + persona 카드 + 채팅 자동 학습 자료
+  try {
+    var h = await authHeaders()
+    var res = await fetch('/api/learn/overview', { headers: h, credentials: 'include' })
+    if(!res.ok){
+      // 비로그인 — 기본 상태 (Ssobi welcome 만 표시)
+      document.getElementById('learn-meta').textContent = '로그인 후 자료가 보여요'
+      return
     }
-  })();
+    var j = await res.json()
+
+    // 헤더 sub: 자료 N개 · 외운 게 M개
+    var totalChunks = j.stats?.total_chunks || 0
+    var totalItems = (j.stats?.total_products || 0) + (j.stats?.total_files || 0) + (j.urgent?.length || 0)
+    document.getElementById('learn-meta').textContent = '자료 ' + totalItems + '개 · 외운 게 ' + totalChunks + '개'
+
+    // Persona 카드
+    var nameEl = document.getElementById('learn-persona-name')
+    var descEl = document.getElementById('learn-persona-desc')
+    if(j.tone && j.tone.persona_summary){
+      nameEl.textContent = (j.ig_username ? j.ig_username : '내') + '의 Ssobi'
+      descEl.innerHTML = (j.tone.learned_style && typeof j.tone.learned_style === 'string' ? j.tone.learned_style.slice(0, 60) : '학습 완료')
+        + (j.tone.persona_summary ? '<br/><span style="color:var(--t3)">'+j.tone.persona_summary.slice(0, 60)+'</span>' : '')
+    } else {
+      nameEl.textContent = '내 Ssobi'
+      descEl.textContent = '말투 학습 전 — 인스타 연동 후 자동 학습돼요'
+    }
+
+    // 자동 학습 자료 — Ssobi 메시지 + AttachmentCard 들
+    var autoList = document.getElementById('learn-auto-list')
+    var autoMsg = document.getElementById('learn-auto-msg')
+    while(autoList.firstChild) autoList.removeChild(autoList.firstChild)
+    var autoItems = (j.products || []).slice(0, 5)
+    if(autoItems.length > 0){
+      autoMsg.style.display = 'flex'
+      autoItems.forEach(function(p){
+        autoList.appendChild(learnRenderAttachment({
+          kind: 'link',
+          host: p.source_domain || 'ssobi.ai',
+          title: p.source_label || p.source_url || '제목 없음',
+          meta: (p.category === 'product' ? '제품' : p.category === 'content' ? '콘텐츠' : p.category === 'class' ? '강의' : '링크') + ' · ' + (p.chunk_count || 0) + '개 기억',
+          onClick: function(){ openLearnDetail(p.source_url || p.source_label, p.source_label || p.source_url, p.source_domain) },
+        }))
+      })
+    } else {
+      autoMsg.style.display = 'none'
+    }
+
+    // 사용자 추가 메시지 (Today) — files + urgent
+    var userMsgs = document.getElementById('learn-user-msgs')
+    while(userMsgs.firstChild) userMsgs.removeChild(userMsgs.firstChild)
+    var todayItems = (j.files || []).concat((j.urgent || []).map(function(u){ return { _urgent: true, content: u.content, id: u.id } }))
+    if(todayItems.length > 0){
+      // Today divider
+      var div = document.getElementById('learn-today-divider')
+      div.style.display = 'flex'
+      var d = new Date()
+      document.getElementById('learn-today-label').textContent = '오늘 · ' + (d.getMonth()+1) + '월 ' + d.getDate() + '일'
+      // 각 자료: UserMsg (attachment 또는 메모) + SsobiMsg 응답
+      todayItems.forEach(function(it){
+        userMsgs.appendChild(learnRenderUserMsg(it))
+        userMsgs.appendChild(learnRenderSsobiResponse(it))
+      })
+    } else {
+      document.getElementById('learn-today-divider').style.display = 'none'
+    }
+
+    // 목록 뷰 채우기
+    learnRenderListView(j)
+  } catch(e){
+    console.error('[loadLearnOverview]', e)
+  }
+}
+
+async function openLearnDetail(source, label, domain){
+  if(!source) return
+  var listEl = document.getElementById('learn-detail-list')
+  var titleEl = document.getElementById('learn-detail-title')
+  var hostEl = document.getElementById('learn-detail-host')
+  var metaEl = document.getElementById('learn-detail-meta')
+  titleEl.textContent = label || '학습 자료'
+  hostEl.textContent = domain || ''
+  metaEl.textContent = '불러오는 중…'
+  while(listEl.firstChild) listEl.removeChild(listEl.firstChild)
+  openModal('m-learn-detail')
+  try {
+    var h = await authHeaders()
+    var res = await fetch('/api/learn/detail?source=' + encodeURIComponent(source), { headers: h, credentials: 'include' })
+    if(!res.ok){ metaEl.textContent = '불러오기 실패'; return }
+    var j = await res.json()
+    var cat = j.source?.category
+    var catLabel = cat === 'product' ? '제품' : cat === 'content' ? '콘텐츠' : cat === 'class' ? '강의' : '링크'
+    metaEl.textContent = catLabel + ' · 외운 게 ' + (j.count || 0) + '개'
+    if(!j.chunks || j.chunks.length === 0){
+      var empty = document.createElement('div')
+      empty.style.cssText = 'padding:30px 0;text-align:center;font-size:12px;color:var(--t3)'
+      empty.textContent = '외운 내용이 없어요.'
+      listEl.appendChild(empty)
+      return
+    }
+    j.chunks.forEach(function(c, i){
+      var row = document.createElement('div')
+      row.style.cssText = 'background:var(--bg);border:1px solid var(--b);border-radius:12px;padding:12px 14px'
+      var num = document.createElement('div')
+      num.style.cssText = 'font-size:10px;font-weight:800;letter-spacing:.6px;color:var(--t3);margin-bottom:6px'
+      num.textContent = '#' + (i+1)
+      var body = document.createElement('div')
+      body.style.cssText = 'font-size:13px;color:var(--t1);line-height:1.6;white-space:pre-wrap;word-break:break-word'
+      body.textContent = c.content || ''
+      row.appendChild(num); row.appendChild(body)
+      listEl.appendChild(row)
+    })
+  } catch(e){
+    console.error('[openLearnDetail]', e)
+    metaEl.textContent = '불러오기 실패'
+  }
+}
+
+function learnRenderUserMsg(it){
+  var row = document.createElement('div')
+  row.style.cssText = 'display:flex;justify-content:flex-end;margin-top:18px'
+  var bubble = document.createElement('div')
+  bubble.style.cssText = 'max-width:86%;background:var(--t1);color:#fff;padding:12px 14px;border-radius:14px 14px 4px 14px'
+  if(it._urgent){
+    bubble.innerHTML = '<div style="font-size:14px;line-height:1.5">'+escapeHtml(it.content)+'</div>'
+  } else {
+    bubble.appendChild(learnRenderAttachment({
+      kind: 'file',
+      ext: (it.file_type || 'FILE').toUpperCase().slice(0, 4),
+      title: it.file_name,
+      meta: ((it.file_size_bytes/1024/1024).toFixed(1)) + ' MB',
+      onDark: true,
+    }))
+  }
+  row.appendChild(bubble)
+  return row
+}
+
+function learnRenderSsobiResponse(it){
+  var col = document.createElement('div')
+  col.style.cssText = 'display:flex;flex-direction:column;align-items:flex-start;margin-top:18px'
+  col.innerHTML = '<div style="font-size:11px;font-weight:600;color:var(--t3);letter-spacing:-.1px;margin-bottom:5px;padding-left:2px">Ssobi</div>'
+  var bubble = document.createElement('div')
+  bubble.style.cssText = 'max-width:86%;background:#fff;color:var(--t1);padding:12px 14px;border-radius:14px 14px 14px 4px;border:1px solid var(--b)'
+  if(it._urgent){
+    bubble.innerHTML = '<div style="font-size:14px;line-height:1.55">긴급 공지로 표시했어요.<br/><span style="color:var(--t2)">관련 응대에 즉시 반영됩니다.</span></div>'
+      +'<div style="margin-top:10px;display:inline-flex;align-items:center;gap:6px;padding:5px 10px;border-radius:999px;background:var(--mint-l);color:var(--mint-d);font-size:11px;font-weight:700;letter-spacing:-.1px"><span style="width:5px;height:5px;border-radius:3px;background:var(--mint-d)"></span>긴급 공지 활성</div>'
+  } else {
+    bubble.innerHTML = '<div style="font-size:14px;line-height:1.55">잘 받았어요. <span style="font-weight:700">'+(it.chunk_count||0)+'개</span>로 외워뒀습니다.<br/><span style="color:var(--t2)">관련 질문이 오면 인용해서 답할게요.</span></div>'
+  }
+  col.appendChild(bubble)
+  return col
+}
+
+function learnRenderListView(j){
+  var autoWrap = document.getElementById('learn-list-auto')
+  var manualWrap = document.getElementById('learn-list-manual')
+  while(autoWrap.firstChild) autoWrap.removeChild(autoWrap.firstChild)
+  while(manualWrap.firstChild) manualWrap.removeChild(manualWrap.firstChild)
+
+  // 자동 학습 그룹
+  var autoItems = (j.products || []).map(function(p){
+    return {
+      kind: 'link',
+      title: p.source_label || p.source_url || '제목 없음',
+      meta: (p.category === 'product' ? '제품' : p.category === 'content' ? '콘텐츠' : p.category === 'class' ? '강의' : '링크') + ' · ' + (p.chunk_count || 0) + '개 기억',
+      used: '',
+      when: '',
+      _src: p.source_url || p.source_label,
+      _label: p.source_label || p.source_url,
+      _domain: p.source_domain,
+    }
+  })
+  if(autoItems.length > 0){
+    autoWrap.appendChild(learnRenderListGroup('자동 학습', '인스타 · 내 링크', autoItems))
+  }
+
+  // 추가 학습 그룹 (files + urgent)
+  var manualItems = []
+  ;(j.files || []).forEach(function(f){
+    manualItems.push({
+      kind: 'file', ext: (f.file_type || 'FILE').toUpperCase().slice(0, 4),
+      title: f.file_name,
+      meta: ((f.file_size_bytes/1024/1024).toFixed(1)) + ' MB · ' + (f.chunk_count||0) + '개 기억',
+      used: '', when: '',
+      _src: f.file_name,
+      _label: f.file_name,
+    })
+  })
+  ;(j.urgent || []).forEach(function(u){
+    manualItems.push({
+      kind: 'note',
+      title: u.content.slice(0, 40),
+      meta: '메모 · 긴급 공지',
+      used: '', when: '',
+      pinned: true,
+    })
+  })
+  if(manualItems.length > 0){
+    manualWrap.appendChild(learnRenderListGroup('추가 학습', '내가 보낸 자료', manualItems))
+  }
+
+  if(autoItems.length === 0 && manualItems.length === 0){
+    var empty = document.createElement('div')
+    empty.style.cssText = 'padding:40px 0;text-align:center;font-size:12px;color:var(--t3)'
+    empty.textContent = '학습된 자료가 없어요. 채팅에서 파일이나 링크를 보내주세요.'
+    autoWrap.appendChild(empty)
+  }
+}
+
+// Input bar handlers
+function learnAutoResize(el){
+  el.style.height = 'auto'
+  el.style.height = Math.min(120, el.scrollHeight) + 'px'
+}
+function learnHandleKey(e){
+  if(e.key === 'Enter' && !e.shiftKey && !('ontouchstart' in window)){
+    e.preventDefault()
+    learnSend()
+  }
+}
+function learnPickFile(input){
+  var f = input.files && input.files[0]
+  if(!f) return
+  learnPendingFile = f
+  var preview = document.getElementById('learn-attach-preview')
+  var name = document.getElementById('learn-attach-name')
+  if(preview){
+    preview.style.display = 'flex'
+    if(name) name.textContent = f.name + ' · ' + Math.round(f.size/1024) + 'KB'
+  }
+}
+function learnClearAttach(){
+  learnPendingFile = null
+  var preview = document.getElementById('learn-attach-preview')
+  var input = document.getElementById('learn-file-input')
+  if(preview) preview.style.display = 'none'
+  if(input) input.value = ''
+}
+
+async function learnSend(){
+  var input = document.getElementById('learn-chat-input')
+  if(!input) return
+  var text = (input.value || '').trim()
+  var file = learnPendingFile
+  if(!text && !file) return
+
+  input.value = ''
+  input.style.height = 'auto'
+  learnClearAttach()
+
+  try {
+    if(file){
+      alert('파일 업로드는 곧 열려요. 지금은 URL이나 텍스트로 보내주세요.')
+      return
+    }
+    // URL 감지
+    var urlMatch = text.match(/https?:\/\/[^\s]+/)
+    if(urlMatch){
+      var h = await authHeaders()
+      var res = await fetch('/api/learn/url', {
+        method:'POST', headers:{'Content-Type':'application/json',...h}, credentials:'include',
+        body: JSON.stringify({ url: urlMatch[0], persist: true })
+      })
+      var j = await res.json()
+      if(j.kb && j.kb.inserted > 0) loadLearnOverview()
+      else if(j.flow === 'blocked' || j.flow === 'image_page') alert('이 사이트는 못 읽었어요. 캡처나 PDF로 보내주세요.')
+      return
+    }
+    // 긴급 prefix
+    if(/^긴급[:：]?\s*/.test(text) || /^urgent[:：]?\s*/i.test(text)){
+      var content = text.replace(/^긴급[:：]?\s*/, '').replace(/^urgent[:：]?\s*/i, '').trim()
+      if(content.length < 3) return
+      var h2 = await authHeaders()
+      var res2 = await fetch('/api/learn/urgent', {
+        method:'POST', headers:{'Content-Type':'application/json',...h2}, credentials:'include',
+        body: JSON.stringify({ content: content, expires_in_days: 3 })
+      })
+      if(res2.ok) loadLearnOverview()
+      return
+    }
+    // 일반 메모 → 7일 컨텍스트
+    if(text.length >= 10){
+      var h3 = await authHeaders()
+      var res3 = await fetch('/api/learn/urgent', {
+        method:'POST', headers:{'Content-Type':'application/json',...h3}, credentials:'include',
+        body: JSON.stringify({ content: text, expires_in_days: 7 })
+      })
+      if(res3.ok) loadLearnOverview()
+    }
+  } catch(e){
+    console.error('[learnSend]', e)
+  }
+}
+
+// xss-safe 텍스트 → html
+function escapeHtml(s){
+  return String(s||'').replace(/[&<>"']/g, function(c){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c] })
 }
 
 async function disconnectIG(){
