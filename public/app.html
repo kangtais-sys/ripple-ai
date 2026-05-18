@@ -2548,7 +2548,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <!-- Day 1 — 가입 직후 -->
     <div style="display:flex;align-items:center;gap:10px;padding:20px 0 6px">
       <div style="flex:1;height:1px;background:var(--b)"></div>
-      <span style="font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--t3);text-transform:uppercase" data-i18n="learn2.divider_day1">가입 직후</span>
+      <span style="font-size:10px;font-weight:700;letter-spacing:.8px;color:var(--t3);text-transform:uppercase" id="learn-divider-day1" data-i18n="learn2.divider_day1">가입 직후</span>
       <div style="flex:1;height:1px;background:var(--b)"></div>
     </div>
 
@@ -5302,6 +5302,7 @@ var I18N = {
     'learn2.persona_learn_toast':'✓ 말투 학습 완료',
     'learn2.edit_btn':'수정',
     'learn2.divider_day1':'가입 직후',
+    'learn2.divider_joined_fmt':'{date} 가입',
     'learn2.divider_today_pre':'오늘 · ',
     'learn2.divider_today_month':'월 ',
     'learn2.divider_today_day':'일',
@@ -6276,6 +6277,7 @@ var I18N = {
     'learn2.persona_learn_toast':'✓ Tone learning complete',
     'learn2.edit_btn':'Edit',
     'learn2.divider_day1':'Day 1',
+    'learn2.divider_joined_fmt':'Joined {date}',
     'learn2.divider_today_pre':'Today · ',
     'learn2.divider_today_month':'/',
     'learn2.divider_today_day':'',
@@ -19048,6 +19050,18 @@ function renderLearnOverview(j){
     var totalChunks = j.stats?.total_chunks || 0
     var totalItems = (j.stats?.total_products || 0) + (j.stats?.total_files || 0) + (j.urgent?.length || 0)
     document.getElementById('learn-meta').textContent = t('learn2.meta_fmt','자료 {n}개 · 외운 게 {m}개').replace('{n}', totalItems).replace('{m}', totalChunks)
+
+    // 가입일 divider — joined_at 있으면 실제 날짜로 표시
+    var dividerEl = document.getElementById('learn-divider-day1')
+    if(dividerEl && j.joined_at){
+      var dj = new Date(j.joined_at)
+      if(!isNaN(dj.getTime())){
+        var dateStr = ssobiCurrentLang === 'en'
+          ? dj.toLocaleDateString('en-US', {year:'numeric', month:'short', day:'numeric'})
+          : (dj.getFullYear() + '. ' + (dj.getMonth()+1) + '. ' + dj.getDate())
+        dividerEl.textContent = t('learn2.divider_joined_fmt','{date} 가입').replace('{date}', dateStr)
+      }
+    }
 
     // Persona 카드
     var nameEl = document.getElementById('learn-persona-name')

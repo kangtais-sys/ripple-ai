@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
       .eq('user_id', u.id)
       .maybeSingle(),
     sb.from('profiles')
-      .select('user_type, user_type_manual, reply_mode, draft_mode_until')
+      .select('user_type, user_type_manual, reply_mode, draft_mode_until, created_at')
       .eq('id', u.id)
       .maybeSingle(),
     sb.from('knowledge_chunks')
@@ -106,6 +106,7 @@ export async function GET(req: NextRequest) {
     tone: toneR.data,
     profile: profR.data,
     ig_username: igR.data?.ig_username || null,
+    joined_at: profR.data?.created_at || null,
     products: products.slice(0, 50),
     files: filesR.data || [],
     urgent: urgentR.data || [],
