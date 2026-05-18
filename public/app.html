@@ -2138,35 +2138,35 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <!-- 인사말 -->
     <div style="padding:0 4px 16px">
       <div style="font-size:24px;font-weight:800;letter-spacing:-.8px;line-height:1.2;color:var(--t1)">
-        어서오세요, <span class="em-serif" id="home-day1-name" style="color:var(--mint-d)">민혜</span>님 👋
+        <span data-i18n="home2.day1.welcome_pre">어서오세요, </span><span class="em-serif" id="home-day1-name" style="color:var(--mint-d)">민혜</span><span data-i18n="home2.day1.welcome_post">님 👋</span>
       </div>
       <div style="margin-top:10px;display:inline-flex;align-items:center;gap:7px;padding:5px 10px;background:#fff;border-radius:999px;border:1px solid var(--b);font-size:12px;color:var(--t2)">
         <span style="width:5px;height:5px;border-radius:3px;background:var(--mint)"></span>
-        <span id="home-day1-status">진행 상태 불러오는 중…</span>
+        <span id="home-day1-status" data-i18n="home2.day1.status_loading">진행 상태 불러오는 중…</span>
       </div>
     </div>
 
     <!-- 다음 액션 (3-step 카드) -->
     <div style="display:flex;align-items:baseline;justify-content:space-between;padding:0 4px 8px">
-      <div style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px">다음 액션</div>
-      <div style="font-size:12px;color:var(--t3)" id="home-day1-progress">0 / 3 단계</div>
+      <div style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px" data-i18n="home2.day1.next_action">다음 액션</div>
+      <div style="font-size:12px;color:var(--t3)" id="home-day1-progress">0 / 3</div>
     </div>
     <div id="home-day1-tasks" style="display:flex;flex-direction:column;gap:8px"></div>
 
     <!-- 작동 미리보기 -->
     <div style="padding:18px 4px 0">
-      <div style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px;margin-bottom:8px">이렇게 작동할 거예요</div>
+      <div style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px;margin-bottom:8px" data-i18n="home2.day1.preview_label">이렇게 작동할 거예요</div>
       <div style="padding:12px 14px;border-radius:12px;background:#fff;border:1px dashed var(--b);display:flex;flex-direction:column;gap:8px">
         <div style="display:flex;justify-content:flex-start">
           <div style="max-width:78%;padding:7px 11px;border-radius:12px;background:var(--bg);color:var(--t1);font-size:12px;line-height:1.45">
             <div style="font-size:9px;font-weight:700;opacity:.65;margin-bottom:1px">@minju_fan</div>
-            이거 언제 와요?
+            <span data-i18n="home2.day1.preview_q">이거 언제 와요?</span>
           </div>
         </div>
         <div style="display:flex;justify-content:flex-end">
           <div style="max-width:78%;padding:7px 11px;border-radius:12px;background:var(--mint-d);color:#fff;font-size:12px;line-height:1.45">
             <div style="font-size:9px;font-weight:700;opacity:.65;margin-bottom:1px">ssobi</div>
-            영업일 2~3일이면 도착해용 💌
+            <span data-i18n="home2.day1.preview_a">영업일 2~3일이면 도착해용 💌</span>
           </div>
         </div>
       </div>
@@ -2176,7 +2176,7 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
     <div style="padding:14px 4px 0;text-align:center">
       <div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--t2)">
         <svg width="12" height="12" viewBox="0 0 14 14" fill="none" stroke="var(--t3)" stroke-width="1.6"><path d="M7 1v6l3 2"/><circle cx="7" cy="7" r="6"/></svg>
-        첫 응대가 오면 알림 보내드릴게요
+        <span data-i18n="home2.day1.hint">첫 응대가 오면 알림 보내드릴게요</span>
       </div>
     </div>
   </div>
@@ -2192,10 +2192,10 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         <span style="width:10px;height:1px;background:var(--t3);display:inline-block"></span>
         <span id="home-hero-eyebrow">가입 1일째 · 누적</span>
       </div>
-      <div style="font-size:13px;font-weight:600;color:var(--t2);margin-top:10px;letter-spacing:-.2px" id="home-hero-label">Ssobi 가 대신 응대한 시간</div>
+      <div style="font-size:13px;font-weight:600;color:var(--t2);margin-top:10px;letter-spacing:-.2px" id="home-hero-label" data-i18n="home2.roi.label">Ssobi 가 대신 응대한 시간</div>
       <div class="ssobi-rise" style="display:flex;align-items:baseline;gap:6px;margin-top:4px">
         <div class="tnum" id="home-hero-value" style="font-size:48px;font-weight:800;letter-spacing:-1.8px;color:var(--t1);line-height:1">0</div>
-        <div id="home-hero-unit" style="font-size:20px;font-weight:700;color:var(--t2);letter-spacing:-.4px">시간</div>
+        <div id="home-hero-unit" style="font-size:20px;font-weight:700;color:var(--t2);letter-spacing:-.4px" data-i18n="home2.roi.unit_hour">시간</div>
       </div>
       <div style="font-size:11px;color:var(--t3);margin-top:10px" id="home-hero-sub">—</div>
     </div>
@@ -2205,18 +2205,18 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <div style="background:#fff;border:1px solid var(--b);border-radius:16px;overflow:hidden;display:grid;grid-template-columns:1fr 1fr 1fr;box-shadow:0 1px 2px rgba(16,24,40,.04)">
         <div style="padding:13px 12px;background:var(--mint-l)">
           <div style="font-size:10px;font-weight:700;letter-spacing:.4px;color:var(--mint-d);text-transform:uppercase;display:flex;align-items:center;gap:4px">
-            <span style="width:5px;height:5px;border-radius:3px;background:var(--mint-d)"></span>오늘
+            <span style="width:5px;height:5px;border-radius:3px;background:var(--mint-d)"></span><span data-i18n="home2.roi.tl_today">오늘</span>
           </div>
           <div class="tnum" id="home-tl-today-v" style="font-size:17px;font-weight:800;color:var(--t1);letter-spacing:-.4px;margin-top:5px;line-height:1.1">—</div>
           <div style="font-size:10px;color:var(--t3);margin-top:3px" id="home-tl-today-h">—</div>
         </div>
         <div style="padding:13px 12px;border-left:1px solid var(--b)">
-          <div style="font-size:10px;font-weight:700;letter-spacing:.4px;color:var(--t3);text-transform:uppercase">어제</div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:.4px;color:var(--t3);text-transform:uppercase" data-i18n="home2.roi.tl_yest">어제</div>
           <div class="tnum" id="home-tl-yest-v" style="font-size:17px;font-weight:800;color:var(--t1);letter-spacing:-.4px;margin-top:5px;line-height:1.1">—</div>
           <div style="font-size:10px;color:var(--t3);margin-top:3px" id="home-tl-yest-h">—</div>
         </div>
         <div style="padding:13px 12px;border-left:1px solid var(--b)">
-          <div style="font-size:10px;font-weight:700;letter-spacing:.4px;color:var(--t3);text-transform:uppercase">이번 달</div>
+          <div style="font-size:10px;font-weight:700;letter-spacing:.4px;color:var(--t3);text-transform:uppercase" data-i18n="home2.roi.tl_month">이번 달</div>
           <div class="tnum" id="home-tl-week-v" style="font-size:17px;font-weight:800;color:var(--t1);letter-spacing:-.4px;margin-top:5px;line-height:1.1">—</div>
           <div style="font-size:10px;color:var(--t3);margin-top:3px" id="home-tl-week-h">—</div>
         </div>
@@ -2228,33 +2228,33 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <div style="background:linear-gradient(180deg,#fff 0%,#FAFBFC 100%);border:1px solid var(--b);border-radius:18px;overflow:hidden;box-shadow:0 8px 24px rgba(16,24,40,.06),0 1px 2px rgba(16,24,40,.04)">
         <div style="padding:16px 18px 10px;display:flex;align-items:center;gap:8px">
           <span style="width:6px;height:6px;border-radius:50%;background:var(--mint);animation:bl 1.5s ease infinite"></span>
-          <span style="font-size:11px;font-weight:700;color:var(--t2);letter-spacing:.3px;text-transform:uppercase">오늘 · 시간대별 응대</span>
+          <span style="font-size:11px;font-weight:700;color:var(--t2);letter-spacing:.3px;text-transform:uppercase" data-i18n="home2.roi.activity_title">오늘 · 시간대별 응대</span>
         </div>
         <div id="home-activity-bar" style="display:flex;align-items:flex-end;gap:3px;padding:6px 18px 4px;height:48px"></div>
         <!-- 시간 축 (0/6/12/18/23) -->
         <div class="tnum" style="display:flex;justify-content:space-between;padding:0 18px 12px;font-size:9px;color:var(--t3);font-weight:600;letter-spacing:.3px">
-          <span>0시</span>
-          <span>6시</span>
-          <span>12시</span>
-          <span>18시</span>
-          <span>23시</span>
+          <span data-i18n="home2.roi.hour_0">0시</span>
+          <span data-i18n="home2.roi.hour_6">6시</span>
+          <span data-i18n="home2.roi.hour_12">12시</span>
+          <span data-i18n="home2.roi.hour_18">18시</span>
+          <span data-i18n="home2.roi.hour_23">23시</span>
         </div>
         <!-- hidden: JS 호환 -->
         <span id="home-bar-count" style="display:none"></span>
         <span id="home-bar-saved" style="display:none"></span>
         <div style="display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--b);background:#fff">
           <div style="padding:14px 18px">
-            <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.3px;text-transform:uppercase">재방문 팬</div>
+            <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.3px;text-transform:uppercase" data-i18n="home2.roi.returning">재방문 팬</div>
             <div style="display:flex;align-items:baseline;gap:6px;margin-top:4px">
               <div class="tnum" id="home-returning" style="font-size:22px;font-weight:800;color:var(--t1);letter-spacing:-.4px;line-height:1">0</div>
-              <div style="font-size:11px;font-weight:700;color:var(--mint-d)" id="home-returning-delta">+0 이번주</div>
+              <div style="font-size:11px;font-weight:700;color:var(--mint-d)" id="home-returning-delta">+0</div>
             </div>
           </div>
           <div style="padding:14px 18px;border-left:1px solid var(--b)">
-            <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.3px;text-transform:uppercase">새 팬</div>
+            <div style="font-size:10px;font-weight:700;color:var(--t3);letter-spacing:.3px;text-transform:uppercase" data-i18n="home2.roi.newfans">새 팬</div>
             <div style="display:flex;align-items:baseline;gap:6px;margin-top:4px">
               <div class="tnum" id="home-newfans" style="font-size:22px;font-weight:800;color:var(--t1);letter-spacing:-.4px;line-height:1">0</div>
-              <div style="font-size:11px;font-weight:700;color:var(--mint-d)" id="home-newfans-delta">+0 이번주</div>
+              <div style="font-size:11px;font-weight:700;color:var(--mint-d)" id="home-newfans-delta">+0</div>
             </div>
           </div>
         </div>
@@ -2266,9 +2266,9 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       <div style="display:flex;align-items:center;gap:8px;padding:0 4px 8px">
         <span style="display:inline-flex;align-items:center;gap:5px;padding:2px 8px;border-radius:999px;background:var(--red);color:#fff;font-size:9px;font-weight:800;letter-spacing:.5px">
           <span style="width:5px;height:5px;border-radius:3px;background:#fff;animation:bl 1.5s ease infinite"></span>
-          LIVE
+          <span data-i18n="home2.roi.live">LIVE</span>
         </span>
-        <span style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px">지금 응대중</span>
+        <span style="font-size:13px;font-weight:600;color:var(--t2);letter-spacing:-.2px" data-i18n="home2.roi.live_label">지금 응대중</span>
       </div>
       <div style="background:#fff;border:1px solid var(--b);border-radius:14px;overflow:hidden;box-shadow:0 1px 2px rgba(16,24,40,.04)">
         <!-- ticker + fade 마스크 한 컨테이너 안에 -->
@@ -2280,8 +2280,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
           <div style="position:absolute;bottom:0;left:0;right:0;height:24px;background:linear-gradient(to top,#fff 0%,rgba(255,255,255,.7) 50%,rgba(255,255,255,0) 100%);pointer-events:none"></div>
         </div>
         <div style="padding:9px 14px;border-top:1px solid var(--b);display:flex;align-items:center;justify-content:space-between;cursor:pointer" onclick="go('manage')">
-          <span class="tnum" style="font-size:11px;color:var(--t2)">최근 5분 <span style="color:var(--t1);font-weight:700" id="home-recent-count">0건</span></span>
-          <span style="font-size:11px;color:var(--mint-d);font-weight:700">전체 보기 →</span>
+          <span class="tnum" style="font-size:11px;color:var(--t2)"><span data-i18n="home2.roi.recent5_pre">최근 5분 </span><span style="color:var(--t1);font-weight:700" id="home-recent-count">0건</span></span>
+          <span style="font-size:11px;color:var(--mint-d);font-weight:700" data-i18n="home2.roi.see_all">전체 보기 →</span>
         </div>
       </div>
       <span id="home-live-typing" style="display:none"></span>
@@ -2294,18 +2294,18 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
         <span id="home-urgent-pill-dot-inner" style="position:absolute;inset:0;border-radius:50%;background:var(--mint);animation:ssobi-pulse 1.4s ease-out infinite"></span>
       </span>
       <div style="flex:1;min-width:0;z-index:1;font-size:13px;font-weight:700;color:#fff;letter-spacing:-.2px">
-        <span id="home-urgent-pill-msg">모든 응대 정상</span>
-        <span style="color:rgba(255,255,255,.55);font-weight:500;margin-left:6px" id="home-urgent-pill-sub">긴급 대기 없음</span>
+        <span id="home-urgent-pill-msg" data-i18n="home2.urgent.safe_msg">모든 응대 정상</span>
+        <span style="color:rgba(255,255,255,.55);font-weight:500;margin-left:6px" id="home-urgent-pill-sub" data-i18n="home2.urgent.safe_sub">긴급 대기 없음</span>
       </div>
       <div id="home-urgent-pill-cta" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:999px;background:var(--mint);color:#fff;font-size:10px;font-weight:800;letter-spacing:.3px;flex-shrink:0;z-index:1">
-        <span id="home-urgent-pill-cta-text">안전</span>
+        <span id="home-urgent-pill-cta-text" data-i18n="home2.urgent.safe_cta">안전</span>
       </div>
     </div>
 
     <!-- 긴급 quote 카드 (긴급 떴을 때만) -->
     <div id="home-urgent" style="display:none;padding:12px 14px;background:var(--t1);border-radius:14px;align-items:center;gap:12px;cursor:pointer;box-shadow:0 4px 16px rgba(16,24,40,.14);margin-bottom:18px" onclick="goHomeUrgentTarget()">
       <div style="flex-shrink:0">
-        <div style="padding:3px 8px;border-radius:4px;background:var(--red);color:#fff;font-size:9px;font-weight:800;letter-spacing:.5px">긴급</div>
+        <div style="padding:3px 8px;border-radius:4px;background:var(--red);color:#fff;font-size:9px;font-weight:800;letter-spacing:.5px" data-i18n="home2.urgent_q.badge">긴급</div>
       </div>
       <div style="flex:1;min-width:0">
         <div id="home-urgent-msg" style="font-size:13px;color:#fff;font-weight:600;line-height:1.4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">—</div>
@@ -5235,6 +5235,60 @@ document.addEventListener('DOMContentLoaded', syncToneChip);
 // ═══════════════════════════════════════════════════════════════════
 var I18N = {
   ko: {
+    // ─────── home2.* — v2 홈탭 (Day1 + ROI + 긴급) ───────
+    'home2.day1.welcome_pre':'어서오세요, ',
+    'home2.day1.welcome_post':'님 👋',
+    'home2.day1.status_loading':'진행 상태 불러오는 중…',
+    'home2.day1.status_ig_done':'인스타 연동 완료',
+    'home2.day1.status_ig_pending':'인스타 연동 필요',
+    'home2.day1.status_kb_done':'학습 자료 있음',
+    'home2.day1.status_kb_pending':'학습 자료 추가 필요',
+    'home2.day1.next_action':'다음 액션',
+    'home2.day1.progress_unit':'단계',
+    'home2.day1.preview_label':'이렇게 작동할 거예요',
+    'home2.day1.preview_q':'이거 언제 와요?',
+    'home2.day1.preview_a':'영업일 2~3일이면 도착해용 💌',
+    'home2.day1.hint':'첫 응대가 오면 알림 보내드릴게요',
+    'home2.day1.step1_title':'인스타 연동',
+    'home2.day1.step1_sub_done_pre':'',
+    'home2.day1.step1_sub_done_post':' 연동 완료',
+    'home2.day1.step1_sub_pending':'댓글·DM 자동 학습 시작',
+    'home2.day1.step2_title':'내 링크 만들기',
+    'home2.day1.step2_sub_done':'학습 자료 등록 완료',
+    'home2.day1.step2_sub_pending':'3분이면 끝나요',
+    'home2.day1.step3_title':'프로필에 링크 붙이기',
+    'home2.day1.step3_sub_pending':'핸들 먼저 설정',
+    'home2.day1.cta_start':'시작',
+    'home2.day1.copy_btn':'복사',
+    'home2.day1.copy_toast':'링크 복사됨',
+    'home2.roi.eyebrow_pre':'가입 ',
+    'home2.roi.eyebrow_mid':'일째 · 누적',
+    'home2.roi.label':'Ssobi 가 대신 응대한 시간',
+    'home2.roi.unit_hour':'시간',
+    'home2.roi.unit_min':'분',
+    'home2.roi.tl_today':'오늘',
+    'home2.roi.tl_yest':'어제',
+    'home2.roi.tl_month':'이번 달',
+    'home2.roi.activity_title':'오늘 · 시간대별 응대',
+    'home2.roi.hour_0':'0시', 'home2.roi.hour_6':'6시', 'home2.roi.hour_12':'12시', 'home2.roi.hour_18':'18시', 'home2.roi.hour_23':'23시',
+    'home2.roi.returning':'재방문 팬',
+    'home2.roi.newfans':'새 팬',
+    'home2.roi.delta_week_post':' 이번주',
+    'home2.roi.live':'LIVE',
+    'home2.roi.live_label':'지금 응대중',
+    'home2.roi.recent5_pre':'최근 5분 ',
+    'home2.roi.count_suffix':'건',
+    'home2.roi.see_all':'전체 보기 →',
+    'home2.urgent.safe_msg':'모든 응대 정상',
+    'home2.urgent.safe_sub':'긴급 대기 없음',
+    'home2.urgent.safe_cta':'안전',
+    'home2.urgent.alert_msg_post':'건 대기',
+    'home2.urgent.alert_msg_pre':'긴급 응대 ',
+    'home2.urgent.alert_sub':'곧 만료 — 지금 확인',
+    'home2.urgent.alert_cta':'확인',
+    'home2.urgent_q.badge':'긴급',
+    'home2.urgent_q.from':'실시간 관리 탭',
+    'home2.urgent_q.time':'곧 만료',
     // 탭바
     'tab.home':'홈', 'tab.grow':'응대', 'tab.learn':'AI 학습',
     'tab.link':'내 링크', 'tab.profile':'내 정보',
@@ -6050,6 +6104,60 @@ var I18N = {
     'newbie.live.sub':'이건 다른 유저들의 실시간 활동이에요\n체크리스트 끝나면 내 피드도 채워집니다',
   },
   en: {
+    // ─────── home2.* — v2 home tab ───────
+    'home2.day1.welcome_pre':'Welcome, ',
+    'home2.day1.welcome_post':' 👋',
+    'home2.day1.status_loading':'Loading status…',
+    'home2.day1.status_ig_done':'Instagram connected',
+    'home2.day1.status_ig_pending':'Connect Instagram',
+    'home2.day1.status_kb_done':'Resources ready',
+    'home2.day1.status_kb_pending':'Add resources',
+    'home2.day1.next_action':'Next steps',
+    'home2.day1.progress_unit':'done',
+    'home2.day1.preview_label':'Here\'s how it works',
+    'home2.day1.preview_q':'When will it arrive?',
+    'home2.day1.preview_a':'2–3 business days 💌',
+    'home2.day1.hint':'We\'ll notify you on the first reply',
+    'home2.day1.step1_title':'Connect Instagram',
+    'home2.day1.step1_sub_done_pre':'',
+    'home2.day1.step1_sub_done_post':' connected',
+    'home2.day1.step1_sub_pending':'Auto-learn comments & DMs',
+    'home2.day1.step2_title':'Build my link page',
+    'home2.day1.step2_sub_done':'Resources added',
+    'home2.day1.step2_sub_pending':'Takes 3 min',
+    'home2.day1.step3_title':'Add link to profile',
+    'home2.day1.step3_sub_pending':'Set handle first',
+    'home2.day1.cta_start':'Start',
+    'home2.day1.copy_btn':'Copy',
+    'home2.day1.copy_toast':'Link copied',
+    'home2.roi.eyebrow_pre':'Day ',
+    'home2.roi.eyebrow_mid':' · all-time',
+    'home2.roi.label':'Time Ssobi handled for you',
+    'home2.roi.unit_hour':'h',
+    'home2.roi.unit_min':'m',
+    'home2.roi.tl_today':'Today',
+    'home2.roi.tl_yest':'Yesterday',
+    'home2.roi.tl_month':'This month',
+    'home2.roi.activity_title':'Today · hourly activity',
+    'home2.roi.hour_0':'0h', 'home2.roi.hour_6':'6h', 'home2.roi.hour_12':'12h', 'home2.roi.hour_18':'18h', 'home2.roi.hour_23':'23h',
+    'home2.roi.returning':'Returning fans',
+    'home2.roi.newfans':'New fans',
+    'home2.roi.delta_week_post':' this week',
+    'home2.roi.live':'LIVE',
+    'home2.roi.live_label':'Live now',
+    'home2.roi.recent5_pre':'Last 5 min · ',
+    'home2.roi.count_suffix':'',
+    'home2.roi.see_all':'See all →',
+    'home2.urgent.safe_msg':'All clear',
+    'home2.urgent.safe_sub':'No urgent items',
+    'home2.urgent.safe_cta':'Safe',
+    'home2.urgent.alert_msg_pre':'',
+    'home2.urgent.alert_msg_post':' urgent waiting',
+    'home2.urgent.alert_sub':'Expiring — review now',
+    'home2.urgent.alert_cta':'Review',
+    'home2.urgent_q.badge':'URGENT',
+    'home2.urgent_q.from':'Live manage tab',
+    'home2.urgent_q.time':'Expiring',
     // tab bar
     'tab.home':'Home', 'tab.grow':'Reply', 'tab.learn':'AI Learn',
     'tab.link':'My Link', 'tab.profile':'Profile',
@@ -6907,6 +7015,8 @@ function applyI18n(lang){
   } catch(_){}
   // 긴급 응대 대기 카드 즉시 갱신
   try { if(typeof loadPendingDrafts === 'function') loadPendingDrafts(); } catch(_){}
+  // 홈탭 동적 텍스트 즉시 갱신 (Day1 task / ROI hero / 긴급 pill)
+  try { if(typeof loadHomeDashboard === 'function') loadHomeDashboard(); } catch(_){}
   // 만들기 탭 "내 주제 · ___" 라벨 갱신 (lang 따라 카테고리명 swap)
   try { if(typeof syncToneChip === 'function') syncToneChip(); } catch(_){}
   // edt-size-badge 갱신 (사용자가 cs-4 에 있을 때 lang 변경되면)
@@ -18307,9 +18417,9 @@ function homeRenderDay1Demo(){
   if(!tasks) return
   while(tasks.firstChild) tasks.removeChild(tasks.firstChild)
   var demoSteps = [
-    { n:1, done:false, title:'인스타 연동', sub:'댓글·DM 자동 학습 시작', cta:false },
-    { n:2, done:false, title:'내 링크 만들기', sub:'3분이면 끝나요', cta:true },
-    { n:3, done:false, title:'프로필에 링크 붙이기', sub:'ssobi.ai/u/[핸들]', cta:false },
+    { n:1, done:false, title:t('home2.day1.step1_title','인스타 연동'), sub:t('home2.day1.step1_sub_pending','댓글·DM 자동 학습 시작'), cta:false },
+    { n:2, done:false, title:t('home2.day1.step2_title','내 링크 만들기'), sub:t('home2.day1.step2_sub_pending','3분이면 끝나요'), cta:true },
+    { n:3, done:false, title:t('home2.day1.step3_title','프로필에 링크 붙이기'), sub:'ssobi.ai/u/[handle]', cta:false },
   ]
   demoSteps.forEach(function(s){
     var card = document.createElement('div')
@@ -18324,7 +18434,7 @@ function homeRenderDay1Demo(){
     body.style.cssText = 'flex:1;padding:11px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px'
     body.innerHTML = '<div style="min-width:0;flex:1"><div style="font-size:14px;font-weight:700;color:var(--t1);letter-spacing:-.2px">'+s.title+'</div><div style="font-size:11px;color:var(--t2);margin-top:1px">'+s.sub+'</div></div>'
     if(s.cta){
-      body.innerHTML += '<div style="padding:6px 10px;border-radius:8px;background:var(--mint);color:#fff;font-size:11px;font-weight:700;flex-shrink:0">시작</div>'
+      body.innerHTML += '<div style="padding:6px 10px;border-radius:8px;background:var(--mint);color:#fff;font-size:11px;font-weight:700;flex-shrink:0">'+t('home2.day1.cta_start','시작')+'</div>'
     } else {
       body.innerHTML += '<svg width="7" height="12" viewBox="0 0 8 14" style="flex-shrink:0"><path d="M1 1l6 6-6 6" stroke="var(--t3)" stroke-width="2" fill="none" stroke-linecap="round"/></svg>'
     }
@@ -18334,11 +18444,13 @@ function homeRenderDay1Demo(){
   })
 }
 
-// 1응대 ≈ 4분 절약 가정. 한국어 단위
+// 1응대 ≈ 4분 절약. i18n 단위 (분/시간 또는 m/h)
 function homeFormatHM(minutes){
-  if(minutes < 60) return minutes + '분'
+  var uM = t('home2.roi.unit_min','분')
+  var uH = t('home2.roi.unit_hour','시간')
+  if(minutes < 60) return minutes + uM
   var h = Math.floor(minutes/60), m = minutes % 60
-  return m === 0 ? h+'시간' : h+'시간 '+m+'분'
+  return m === 0 ? h+uH : h+uH+' '+m+uM
 }
 
 async function loadHomeDashboard(){
@@ -18366,8 +18478,8 @@ async function loadHomeDashboard(){
       // 비로그인 데모 — Day 1 카드 3개 채워서 보여줌
       day1El.style.display = 'block'
       roiEl.style.display = 'none'
-      document.getElementById('home-day1-status').textContent = '인스타 연동 필요 · 학습 자료 추가 필요'
-      document.getElementById('home-day1-progress').textContent = '0 / 3 단계'
+      document.getElementById('home-day1-status').textContent = t('home2.day1.status_ig_pending','인스타 연동 필요') + ' · ' + t('home2.day1.status_kb_pending','학습 자료 추가 필요')
+      document.getElementById('home-day1-progress').textContent = '0 / 3 ' + t('home2.day1.progress_unit','단계')
       homeRenderDay1Demo()
       return
     }
@@ -18391,27 +18503,27 @@ async function loadHomeDashboard(){
       if(j.signals.has_ig) done++
       if(j.signals.has_kb) done++
       var statusParts = []
-      statusParts.push(j.signals.has_ig ? '인스타 연동 완료' : '인스타 연동 필요')
-      statusParts.push(j.signals.has_kb ? '학습 자료 있음' : '학습 자료 추가 필요')
+      statusParts.push(j.signals.has_ig ? t('home2.day1.status_ig_done','인스타 연동 완료') : t('home2.day1.status_ig_pending','인스타 연동 필요'))
+      statusParts.push(j.signals.has_kb ? t('home2.day1.status_kb_done','학습 자료 있음') : t('home2.day1.status_kb_pending','학습 자료 추가 필요'))
       document.getElementById('home-day1-status').textContent = statusParts.join(' · ')
-      document.getElementById('home-day1-progress').textContent = done + ' / 3 단계'
+      document.getElementById('home-day1-progress').textContent = done + ' / 3 ' + t('home2.day1.progress_unit','단계')
 
       // 3-step 카드 렌더 (디자인 핸드오프 결)
       var tasks = document.getElementById('home-day1-tasks')
       while(tasks.firstChild) tasks.removeChild(tasks.firstChild)
 
       var steps = [
-        { n:1, done: j.signals.has_ig, title:'인스타 연동',
-          sub: j.signals.has_ig && j.ig_username ? '@'+j.ig_username+' 연동 완료' : '댓글·DM 자동 학습 시작',
+        { n:1, done: j.signals.has_ig, title:t('home2.day1.step1_title','인스타 연동'),
+          sub: j.signals.has_ig && j.ig_username ? ('@'+j.ig_username+t('home2.day1.step1_sub_done_post',' 연동 완료')) : t('home2.day1.step1_sub_pending','댓글·DM 자동 학습 시작'),
           action: function(){ if(typeof connectIG === 'function') connectIG() } },
-        { n:2, done: j.signals.has_kb, title:'내 링크 만들기',
-          sub: j.signals.has_kb ? '학습 자료 등록 완료' : '3분이면 끝나요',
+        { n:2, done: j.signals.has_kb, title:t('home2.day1.step2_title','내 링크 만들기'),
+          sub: j.signals.has_kb ? t('home2.day1.step2_sub_done','학습 자료 등록 완료') : t('home2.day1.step2_sub_pending','3분이면 끝나요'),
           action: function(){ go('link') } },
-        { n:3, done: false, title:'프로필에 링크 붙이기',
-          sub: j.link_handle ? 'ssobi.ai/u/'+j.link_handle : '핸들 먼저 설정',
+        { n:3, done: false, title:t('home2.day1.step3_title','프로필에 링크 붙이기'),
+          sub: j.link_handle ? 'ssobi.ai/u/'+j.link_handle : t('home2.day1.step3_sub_pending','핸들 먼저 설정'),
           action: function(){
             if(j.link_handle){
-              try { navigator.clipboard.writeText('https://ssobi.ai/u/'+j.link_handle); if(typeof lkeShowToast === 'function') lkeShowToast('링크 복사됨') } catch(_){}
+              try { navigator.clipboard.writeText('https://ssobi.ai/u/'+j.link_handle); if(typeof lkeShowToast === 'function') lkeShowToast(t('home2.day1.copy_toast','링크 복사됨')) } catch(_){}
             } else go('link')
           },
           urlChip: !!j.link_handle && j.signals.has_kb,
@@ -18448,7 +18560,7 @@ async function loadHomeDashboard(){
             // CTA pill
             var pill = document.createElement('div')
             pill.style.cssText = 'padding:6px 10px;border-radius:8px;background:var(--mint);color:#fff;font-size:11px;font-weight:700;flex-shrink:0'
-            pill.textContent = '시작'
+            pill.textContent = t('home2.day1.cta_start','시작')
             body.appendChild(pill)
           } else {
             // chevron
@@ -18465,7 +18577,7 @@ async function loadHomeDashboard(){
           strip.style.cssText = 'padding:0 14px 12px 62px'
           strip.innerHTML = '<div style="padding:8px 11px;border-radius:8px;background:var(--bg);border:1px solid var(--b);font-family:\'JetBrains Mono\',ui-monospace,monospace;font-size:11px;color:var(--t1);display:flex;align-items:center;justify-content:space-between">'
             +'<span><span style="color:var(--t3)">ssobi.ai/u/</span>'+s.handle+'</span>'
-            +'<span style="color:var(--mint-d);font-weight:700;cursor:pointer" onclick="event.stopPropagation();navigator.clipboard.writeText(\'https://ssobi.ai/u/'+s.handle+'\');if(typeof lkeShowToast===\'function\')lkeShowToast(\'링크 복사됨\')">복사</span>'
+            +'<span style="color:var(--mint-d);font-weight:700;cursor:pointer" onclick="event.stopPropagation();navigator.clipboard.writeText(\'https://ssobi.ai/u/'+s.handle+'\');if(typeof lkeShowToast===\'function\')lkeShowToast(t(\'home2.day1.copy_toast\',\'링크 복사됨\'))">'+t('home2.day1.copy_btn','복사')+'</span>'
             +'</div>'
           card.appendChild(strip)
         }
@@ -18492,26 +18604,26 @@ async function loadHomeDashboard(){
       // 빨간 변환
       document.getElementById('home-urgent-pill-glow').style.background = 'radial-gradient(circle,rgba(255,77,77,.32),transparent 60%)'
       document.getElementById('home-urgent-pill-dot-inner').style.background = 'var(--red)'
-      document.getElementById('home-urgent-pill-msg').textContent = '긴급 응대 ' + y.urgent_count + '건 대기'
-      document.getElementById('home-urgent-pill-sub').textContent = '곧 만료 — 지금 확인'
+      document.getElementById('home-urgent-pill-msg').textContent = t('home2.urgent.alert_msg_pre','긴급 응대 ') + y.urgent_count + t('home2.urgent.alert_msg_post','건 대기')
+      document.getElementById('home-urgent-pill-sub').textContent = t('home2.urgent.alert_sub','곧 만료 — 지금 확인')
       var cta = document.getElementById('home-urgent-pill-cta')
       cta.style.background = 'var(--red)'
-      document.getElementById('home-urgent-pill-cta-text').innerHTML = '확인 <svg width="6" height="10" viewBox="0 0 8 14" style="vertical-align:middle"><path d="M1 1l6 6-6 6" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>'
+      document.getElementById('home-urgent-pill-cta-text').innerHTML = t('home2.urgent.alert_cta','확인') + ' <svg width="6" height="10" viewBox="0 0 8 14" style="vertical-align:middle"><path d="M1 1l6 6-6 6" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>'
 
       // quote 카드도 표시
       urgentEl.style.display = 'flex'
-      document.getElementById('home-urgent-msg').textContent = '"긴급 응대 ' + y.urgent_count + '건 대기 중"'
-      document.getElementById('home-urgent-from').textContent = '실시간 관리 탭'
-      document.getElementById('home-urgent-time').textContent = '곧 만료'
+      document.getElementById('home-urgent-msg').textContent = '"' + t('home2.urgent.alert_msg_pre','긴급 응대 ') + y.urgent_count + t('home2.urgent.alert_msg_post','건 대기') + '"'
+      document.getElementById('home-urgent-from').textContent = t('home2.urgent_q.from','실시간 관리 탭')
+      document.getElementById('home-urgent-time').textContent = t('home2.urgent_q.time','곧 만료')
     } else {
       // mint 안전 변환 (디폴트 — 이미 HTML 에 설정)
       document.getElementById('home-urgent-pill-glow').style.background = 'radial-gradient(circle,rgba(0,200,150,.3),transparent 60%)'
       document.getElementById('home-urgent-pill-dot-inner').style.background = 'var(--mint)'
-      document.getElementById('home-urgent-pill-msg').textContent = '모든 응대 정상'
-      document.getElementById('home-urgent-pill-sub').textContent = '긴급 대기 없음'
+      document.getElementById('home-urgent-pill-msg').textContent = t('home2.urgent.safe_msg','모든 응대 정상')
+      document.getElementById('home-urgent-pill-sub').textContent = t('home2.urgent.safe_sub','긴급 대기 없음')
       var cta2 = document.getElementById('home-urgent-pill-cta')
       cta2.style.background = 'var(--mint)'
-      document.getElementById('home-urgent-pill-cta-text').textContent = '안전'
+      document.getElementById('home-urgent-pill-cta-text').textContent = t('home2.urgent.safe_cta','안전')
 
       // quote 카드 숨김
       urgentEl.style.display = 'none'
@@ -18522,28 +18634,29 @@ async function loadHomeDashboard(){
     var totalSavedMin = (lifetime.total_replies || 0) * 4
     var totalHours = Math.floor(totalSavedMin / 60)
 
-    document.getElementById('home-hero-eyebrow').textContent = '가입 ' + days + '일째 · 누적'
-    document.getElementById('home-hero-label').textContent = 'Ssobi 가 대신 응대한 시간'
+    document.getElementById('home-hero-eyebrow').textContent = t('home2.roi.eyebrow_pre','가입 ') + days + t('home2.roi.eyebrow_mid','일째 · 누적')
+    document.getElementById('home-hero-label').textContent = t('home2.roi.label','Ssobi 가 대신 응대한 시간')
     document.getElementById('home-hero-value').textContent = totalHours.toLocaleString()
-    document.getElementById('home-hero-unit').textContent = '시간'
+    document.getElementById('home-hero-unit').textContent = t('home2.roi.unit_hour','시간')
 
-    // hero sub — 누적 대화 N건 · 댓글 N · DM N (대략 6:4)
+    // hero sub — Ssobi 가 대응한 누적 통계 (i18n 없이 숫자 위주)
     var totalDm = Math.round((lifetime.total_replies || 0) * 0.4)
     var totalComment = (lifetime.total_replies || 0) - totalDm
-    document.getElementById('home-hero-sub').innerHTML =
-      '누적 대화 <span class="tnum" style="color:var(--t1);font-weight:700">' + (lifetime.total_replies || 0).toLocaleString() + '건</span>'
-      + (lifetime.total_replies > 0 ? ' <span style="opacity:.4;margin:0 2px">·</span> 댓글 ' + totalComment.toLocaleString() + ' · DM ' + totalDm.toLocaleString() : '')
+    var subParts = [(lifetime.total_replies || 0).toLocaleString() + t('home2.roi.count_suffix','건')]
+    if(lifetime.total_replies > 0) subParts.push('· ' + totalComment.toLocaleString() + ' / ' + totalDm.toLocaleString())
+    document.getElementById('home-hero-sub').textContent = subParts.join(' ')
 
     // 타임라인 (오늘/어제/이번주) — 어제 daily_report 만 있으므로 단순 분기
     var todayMin = (y.reply_count || 0) * 4
+    var cs = t('home2.roi.count_suffix','건')
     document.getElementById('home-tl-today-v').textContent = homeFormatHM(todayMin)
-    document.getElementById('home-tl-today-h').textContent = (y.reply_count || 0) + '건'
+    document.getElementById('home-tl-today-h').textContent = (y.reply_count || 0) + cs
     document.getElementById('home-tl-yest-v').textContent = homeFormatHM(todayMin) // fallback
-    document.getElementById('home-tl-yest-h').textContent = (y.reply_count || 0) + '건'
+    document.getElementById('home-tl-yest-h').textContent = (y.reply_count || 0) + cs
     // 이번 달 — 일평균 × 30 (실데이터 들어오면 실제 합산으로 교체)
     var monthMin = todayMin * 30
     document.getElementById('home-tl-week-v').textContent = homeFormatHM(monthMin)
-    document.getElementById('home-tl-week-h').textContent = ((y.reply_count || 0) * 30) + '건'
+    document.getElementById('home-tl-week-h').textContent = ((y.reply_count || 0) * 30) + cs
 
     // 활동 바
     homeRenderActivityBar(HOME_ACTIVITY_PATTERN_DEFAULT)
@@ -18551,20 +18664,17 @@ async function loadHomeDashboard(){
     document.getElementById('home-bar-saved').textContent = homeFormatHM(todayMin)
 
     // 팬 활동
+    var dw = t('home2.roi.delta_week_post',' 이번주')
     document.getElementById('home-returning').textContent = j.week.returning_fans
-    document.getElementById('home-returning-delta').textContent = '+' + j.week.returning_fans + ' 이번주'
+    document.getElementById('home-returning-delta').textContent = '+' + j.week.returning_fans + dw
     document.getElementById('home-newfans').textContent = j.week.new_fans
-    document.getElementById('home-newfans-delta').textContent = '+' + j.week.new_fans + ' 이번주'
+    document.getElementById('home-newfans-delta').textContent = '+' + j.week.new_fans + dw
 
     // 최근 5분
-    document.getElementById('home-recent-count').textContent = (y.reply_count || 0) + '건'
+    document.getElementById('home-recent-count').textContent = (y.reply_count || 0) + cs
 
-    // 누적 footer
-    var lt = []
-    lt.push('가입 ' + days + '일째')
-    if(lifetime.total_replies > 0) lt.push('누적 ' + lifetime.total_replies.toLocaleString() + '건')
-    if(lifetime.est_revenue_krw > 0) lt.push('₩' + (lifetime.est_revenue_krw/10000).toFixed(0) + '만 영향')
-    document.getElementById('home-lifetime-text').textContent = lt.join(' · ')
+    // 누적 footer (hidden — 호환성)
+    document.getElementById('home-lifetime-text').textContent = ''
 
   } catch(e){
     console.error('[loadHomeDashboard]', e)
