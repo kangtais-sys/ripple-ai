@@ -113,12 +113,44 @@ export async function POST(req: NextRequest) {
 }
 
 // 백그라운드 KB 임베딩 — 링크 블록의 텍스트 + 외부 URL 자동 학습
+// 신규 URL 만 처리 (knowledge_chunks 에 이미 있는 URL skip — 비용 절감)
 async function embedLinkBlocksBackground(sb: SupabaseClient, userId: string, blocks: AnyRecord[]): Promise<void> {
   const { storeKnowledge } = await import('@/lib/kb/store')
   const { quickParse } = await import('@/lib/parsers/quick')
 
+  // 1) 모든 URL 수집 (단일 블록 + items 배열)
+  type UrlEntry = { url: string; label: string }
+  const allUrls: UrlEntry[] = []
   for (const block of blocks) {
-    // 1) 블록 자체 텍스트 임베딩 (title/sub/text/desc/caption 합쳐서)
+    const url = typeof block.url === 'string' ? block.url : ''
+    if (url && /^https?:\/\//.test(url)) {
+      allUrls.push({ url, label: (block.title as string) || (block.label as string) || 'external link' })
+    }
+    if (Array.isArray(block.items)) {
+      for (const item of block.items as AnyRecord[]) {
+        const iu = typeof item.url === 'string' ? item.url : ''
+        if (iu && /^https?:\/\//.test(iu)) {
+          allUrls.push({ url: iu, label: (item.title as string) || (item.label as string) || 'external link' })
+        }
+      }
+    }
+  }
+
+  // 2) 이미 임베딩된 URL 조회 — skip 대상
+  const uniqueUrls = Array.from(new Set(allUrls.map(u => u.url)))
+  let alreadyEmbedded = new Set<string>()
+  if (uniqueUrls.length > 0) {
+    const { data: existingChunks } = await sb
+      .from('knowledge_chunks')
+      .select('source_url')
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .in('source_url', uniqueUrls)
+    alreadyEmbedded = new Set((existingChunks || []).map((c: { source_url: string | null }) => c.source_url).filter(Boolean) as string[])
+  }
+
+  // 3) block 자체 텍스트 임베딩 (변경 적은 영역 — 매번 새로 저장)
+  for (const block of blocks) {
     const blockText = ['title', 'sub', 'text', 'desc', 'caption']
       .map((k) => (typeof block[k] === 'string' ? block[k] : ''))
       .filter(Boolean)
@@ -133,45 +165,30 @@ async function embedLinkBlocksBackground(sb: SupabaseClient, userId: string, blo
         console.error('[embedLinkBlocks] block text failed:', e)
       }
     }
+  }
 
-    // 2) 외부 URL 자동 학습 (있으면)
-    const url = typeof block.url === 'string' ? block.url : ''
-    if (url && /^https?:\/\//.test(url)) {
-      try {
-        const parsed = await quickParse(url)
-        if (parsed.ok && parsed.text) {
-          const content = [parsed.title, parsed.description, parsed.text].filter(Boolean).join('\n\n')
-          await storeKnowledge(sb, userId, content, {
-            sourceType: 'link_url',
-            sourceUrl: url,
-            sourceLabel: parsed.title || (block.title as string) || 'external link',
-          })
-        }
-      } catch (e) {
-        console.error('[embedLinkBlocks] url failed:', url, e)
+  // 4) 신규 URL 만 외부 임베딩 (병렬 — 단, 너무 많으면 throttle)
+  const toEmbed = allUrls.filter(u => !alreadyEmbedded.has(u.url))
+  // 중복 제거 (같은 URL 여러 블록)
+  const seen = new Set<string>()
+  const dedup = toEmbed.filter(u => { if (seen.has(u.url)) return false; seen.add(u.url); return true })
+  console.log(`[embedLinkBlocks] ${dedup.length} new urls to embed (skip ${alreadyEmbedded.size})`)
+  for (const { url, label } of dedup) {
+    try {
+      const parsed = await quickParse(url)
+      if (parsed.ok && parsed.text) {
+        const content = [parsed.title, parsed.description, parsed.text].filter(Boolean).join('\n\n')
+        await storeKnowledge(sb, userId, content, {
+          sourceType: 'link_url',
+          sourceUrl: url,
+          sourceLabel: parsed.title || label,
+        })
+        console.log(`[embedLinkBlocks] embedded: ${url}`)
+      } else {
+        console.warn(`[embedLinkBlocks] parse failed: ${url}`, parsed.error || 'no text')
       }
-    }
-
-    // 3) items 안의 url 들도 (quicklinks·grid)
-    if (Array.isArray(block.items)) {
-      for (const item of (block.items as AnyRecord[]).slice(0, 10)) {
-        const itemUrl = typeof item.url === 'string' ? item.url : ''
-        if (itemUrl && /^https?:\/\//.test(itemUrl)) {
-          try {
-            const p = await quickParse(itemUrl)
-            if (p.ok && p.text) {
-              const content = [p.title, p.description, p.text].filter(Boolean).join('\n\n')
-              await storeKnowledge(sb, userId, content, {
-                sourceType: 'link_url',
-                sourceUrl: itemUrl,
-                sourceLabel: p.title || (item.title as string) || 'external link',
-              })
-            }
-          } catch (e) {
-            console.error('[embedLinkBlocks] item url failed:', itemUrl, e)
-          }
-        }
-      }
+    } catch (e) {
+      console.error('[embedLinkBlocks] url failed:', url, e)
     }
   }
 }
