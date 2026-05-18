@@ -99,25 +99,49 @@ export async function GET(req: NextRequest) {
     if (c.detected_price && !entry.price) entry.price = c.detected_price
   }
 
-  // 내 링크 페이지의 모든 link 블록 → products 와 merge (knowledge_chunks 에 없는 링크는 chunk_count:0)
+  // 내 링크 페이지의 모든 URL 추출 (link / event / bigbanner / grid items / quicklinks items / socials items)
+  type LinkLike = { url: string; title?: string; kind?: string; price?: string }
+  function extractBlockLinks(block: Record<string, unknown>): LinkLike[] {
+    const out: LinkLike[] = []
+    if (!block) return out
+    const type = String(block.type || '')
+    const url = typeof block.url === 'string' ? block.url : ''
+    const title = (block.title || block.text || block.label || '') as string
+    if (['link', 'event', 'bigbanner'].includes(type) && url) {
+      out.push({ url, title: title || url, kind: type })
+    }
+    if (['grid', 'quicklinks', 'socials'].includes(type) && Array.isArray(block.items)) {
+      for (const it of block.items as Record<string, unknown>[]) {
+        const itUrl = typeof it?.url === 'string' ? it.url : ''
+        if (!itUrl) continue
+        out.push({
+          url: itUrl,
+          title: String(it.title || it.label || itUrl),
+          kind: String(it.kind || type),
+          price: typeof it.price === 'string' ? it.price : undefined,
+        })
+      }
+    }
+    return out
+  }
+
   const linkBlocks = Array.isArray(linkR.data?.blocks) ? linkR.data.blocks : []
-  type LinkBlock = { type?: string; url?: string; title?: string; label?: string; sub?: string }
-  for (const blk of linkBlocks as LinkBlock[]) {
-    if (blk?.type !== 'link' || !blk.url) continue
-    const key = blk.url
-    if (productMap.has(key)) continue // knowledge_chunks 에서 이미 잡힘
-    let domain: string | null = null
-    try { domain = new URL(blk.url).hostname.replace(/^www\./, '') } catch {}
-    productMap.set(key, {
-      source_url: blk.url,
-      source_label: blk.title || blk.label || blk.url,
-      source_domain: domain,
-      category: null,
-      price: null,
-      currency: null,
-      chunk_count: 0,
-      content_preview: '',
-    })
+  for (const blk of linkBlocks as Record<string, unknown>[]) {
+    for (const link of extractBlockLinks(blk)) {
+      if (productMap.has(link.url)) continue // knowledge_chunks 에서 이미 잡힘
+      let domain: string | null = null
+      try { domain = new URL(link.url).hostname.replace(/^www\./, '') } catch {}
+      productMap.set(link.url, {
+        source_url: link.url,
+        source_label: link.title || link.url,
+        source_domain: domain,
+        category: link.kind === 'product' ? 'product' : null,
+        price: null,
+        currency: null,
+        chunk_count: 0,
+        content_preview: '',
+      })
+    }
   }
 
   const products = Array.from(productMap.values()).sort((a, b) => {
