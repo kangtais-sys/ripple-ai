@@ -5297,8 +5297,9 @@ var I18N = {
     'learn2.persona_done':'학습 완료',
     'learn2.persona_owner_post':'의 Ssobi',
     'learn2.persona_learning':'말투 학습 중…',
-    'learn2.persona_learning_sub':'최근 게시물 캡션을 분석하고 있어요',
+    'learn2.persona_learning_sub':'최근 게시물 캡션을 분석하고 있어요. 이 페이지를 나가도 자동으로 진행돼요',
     'learn2.persona_learn_failed':'학습 실패 — 잠시 후 다시 시도해주세요',
+    'learn2.persona_learn_toast':'✓ 말투 학습 완료',
     'learn2.edit_btn':'수정',
     'learn2.divider_day1':'가입 직후',
     'learn2.divider_today_pre':'오늘 · ',
@@ -6270,8 +6271,9 @@ var I18N = {
     'learn2.persona_done':'Learned',
     'learn2.persona_owner_post':'\'s Ssobi',
     'learn2.persona_learning':'Learning your tone…',
-    'learn2.persona_learning_sub':'Analyzing recent post captions',
+    'learn2.persona_learning_sub':'Analyzing recent post captions. Runs in the background — feel free to leave this page',
     'learn2.persona_learn_failed':'Learning failed — please try again later',
+    'learn2.persona_learn_toast':'✓ Tone learning complete',
     'learn2.edit_btn':'Edit',
     'learn2.divider_day1':'Day 1',
     'learn2.divider_today_pre':'Today · ',
@@ -19129,24 +19131,34 @@ var learnToneAutoState = 'idle' // idle | running | done | failed
 async function learnAutoStartTone(){
   if(learnToneAutoState !== 'idle') return
   learnToneAutoState = 'running'
+  var t0 = performance.now()
+  console.log('[learnAutoStartTone] start', new Date().toISOString())
   try {
     var h = await authHeaders()
+    var tFetch0 = performance.now()
     var postsRes = await fetch('/api/tone/fetch-posts', {credentials:'include', headers: h})
     if(!postsRes.ok) throw new Error('fetch-posts failed: ' + postsRes.status)
     var posts = await postsRes.json()
+    console.log('[learnAutoStartTone] fetch-posts done in', ((performance.now()-tFetch0)/1000).toFixed(1)+'s', 'captions:', (posts.captions||[]).length)
     var captions = posts.captions || []
     var h2 = await authHeaders()
     var body = captions.length < 3
       ? JSON.stringify({ samples: captions, use_default: true })
       : JSON.stringify({ samples: captions.slice(0, 15) })
+    var tLearn0 = performance.now()
     var learnRes = await fetch('/api/tone/learn', {
       method:'POST', headers: h2, credentials:'include', body: body
     })
+    console.log('[learnAutoStartTone] tone/learn done in', ((performance.now()-tLearn0)/1000).toFixed(1)+'s', 'status:', learnRes.status)
     if(!learnRes.ok) throw new Error('tone learn failed: ' + learnRes.status)
     var result = await learnRes.json()
     if(result.success){
       learnToneAutoState = 'done'
-      // overview 다시 불러와서 persona 갱신 (j.tone 채워짐 → 정상 분기)
+      var totalSec = ((performance.now()-t0)/1000).toFixed(1)
+      console.log('[learnAutoStartTone] complete in', totalSec+'s')
+      // 완료 토스트 (학습탭에 있을 때만 잘 보임 — 다른 탭에 있어도 표시됨)
+      if(typeof lkeShowToast === 'function') lkeShowToast(t('learn2.persona_learn_toast','✓ 말투 학습 완료'))
+      // overview 다시 불러와서 persona 갱신
       loadLearnOverview()
     } else {
       throw new Error('learn returned not success: ' + JSON.stringify(result).slice(0, 100))
