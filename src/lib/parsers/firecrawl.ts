@@ -44,7 +44,8 @@ export async function firecrawlScrape(url: string): Promise<FirecrawlResult> {
       },
       body: JSON.stringify({
         url,
-        formats: ['markdown', 'html'],
+        // OCR 비활성화 동안엔 html 안 받아도 됨 — 메모리 압박 줄임 (100~500KB 절약)
+        formats: ['markdown'],
         onlyMainContent: true,
         timeout: SCRAPE_TIMEOUT_MS,
       }),
