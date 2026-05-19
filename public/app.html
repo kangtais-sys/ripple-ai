@@ -19027,8 +19027,11 @@ async function runSyncLinksLoop(){
     for(var i = 0; i < 20; i++){ // 최대 20 batch (40 URL)
       var h = await authHeaders()
       var r = await fetch('/api/learn/sync-links', { method:'POST', headers: h, credentials:'include' })
-      if(!r.ok) break
-      var j = await r.json()
+      var j = await r.json().catch(function(){ return {} })
+      if(!r.ok){
+        console.error('[sync-links] failed status:', r.status, 'error:', j.error, 'detail:', j.detail)
+        break
+      }
       console.log('[sync-links] batch', i+1, '— embedded:', j.embedded, 'ocrChunks:', j.ocrChunks, 'failed:', j.failed, 'remaining:', j.remaining, 'hasMore:', j.hasMore)
       // 이번 batch 에 진전 있으면 overview 갱신
       if(j.embedded > 0 || j.ocrChunks > 0) loadLearnOverview()
