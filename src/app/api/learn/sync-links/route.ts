@@ -91,12 +91,12 @@ export async function POST(req: NextRequest) {
       (existingChunks || []).map((c: { source_url: string | null }) => c.source_url).filter(Boolean) as string[]
     )
 
-    // 5) 이미 큐에 pending/processing 인 URL skip
+    // 5) 큐에 같은 URL 이 어떤 status 든 있으면 skip (재적재 방지)
+    //    한 번 시도된 URL 은 다시 안 넣음. 사용자가 재시도하려면 학습탭에서 URL 직접 입력 (chat source).
     const { data: existingQueue } = await sb
       .from('learn_queue')
       .select('url')
       .eq('user_id', u.id)
-      .in('status', ['pending', 'processing'])
       .in('url', urls)
     const alreadyQueued = new Set(
       (existingQueue || []).map((q: { url: string }) => q.url)

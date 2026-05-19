@@ -177,10 +177,10 @@ async function queueLinkBlocksForLearning(sb: SupabaseClient, userId: string, bl
       .eq('user_id', userId)
       .eq('is_active', true)
       .in('source_url', urls),
+    // 큐에 어떤 status 든 같은 URL 있으면 skip — 재적재 방지
     sb.from('learn_queue')
       .select('url')
       .eq('user_id', userId)
-      .in('status', ['pending', 'processing'])
       .in('url', urls),
   ])
   const alreadyEmbedded = new Set(
