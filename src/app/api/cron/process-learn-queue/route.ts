@@ -26,8 +26,10 @@ export const dynamic = 'force-dynamic'
 export const maxDuration = 300
 
 const MAX_ATTEMPTS = 3
-const OCR_MAX_IMAGES = 20
-const OCR_CONCURRENCY = 4
+// OCR 동시 처리는 Vercel lambda memory limit 압박 — 이전 시도(concurrency 6→2)
+// 에서 'instance' 에러로 lambda kill. 보수적 값으로 유지.
+const OCR_MAX_IMAGES = 10
+const OCR_CONCURRENCY = 2
 
 function admin() {
   return createAdminClient(
