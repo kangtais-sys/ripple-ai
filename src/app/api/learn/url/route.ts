@@ -3,26 +3,21 @@
 //
 // 분기:
 //   A. 링크인바이오 서비스 (linktr.ee, infolink 등)
-//      → parseLinkbio() → 프로필 + 링크 N개 추출 → preview 반환
+//      → parseLinkbio() → 프로필 + 링크 N개 추출 → preview 반환 (동기, 가벼움)
 //      → 사용자 [그대로 옮길게요] 클릭 시 /api/learn/migrate 호출
-//   B. 일반 URL (스마트스토어, blog 등)
-//      → quickParse() → 1차 시도
-//      → 성공 시 KB 임베딩 즉시 + result 반환
-//      → 봇 차단 시 fallback 옵션 안내
+//   B. 일반 URL
+//      → 알려진 봇 차단 도메인이면 즉시 'blocked' 안내
+//      → 그 외에는 learn_queue 에 적재 (status='pending', source='chat')
+//      → cron 이 1분 이내 처리 (Firecrawl scrape + OCR)
 //
-// 가입 직후 첫 URL 또는 학습 탭에서 신규 URL 추가 시 양쪽 다 호출
-//
-// Body: { url: string, persist?: boolean }
-//   persist=false → preview 만 (linkbio 마이그레이션 전 확인용)
-//   persist=true  → KB 에 즉시 임베딩 (일반 URL 의 경우)
-// Response: ParseResult + KB insert 결과
+// 이전 구조: Vercel function 안에서 quickParse → storeKnowledge 동기 호출.
+//   → JS 렌더링 페이지·봇 차단·OCR 시 timeout/instance kill.
+// 새 구조: 큐에 insert 만 하고 즉시 응답 → cron 이 처리.
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { getUserFromRequest } from '@/lib/auth-helper'
 import { parseLinkbio, detectLinkbioService } from '@/lib/parsers/linkbio'
-import { quickParse } from '@/lib/parsers/quick'
-import { storeKnowledge } from '@/lib/kb/store'
 import { extractDomain } from '@/lib/kb/chunker'
 
 export const dynamic = 'force-dynamic'
@@ -40,9 +35,9 @@ export async function POST(req: NextRequest) {
   const u = await getUserFromRequest(req)
   if (!u) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
 
-  const body = await req.json().catch(() => ({})) as { url?: string; persist?: boolean }
+  const body = await req.json().catch(() => ({})) as { url?: string; label?: string }
   const url = (body.url || '').trim()
-  const persist = body.persist !== false  // default: persist
+  const label = (body.label || '').trim() || undefined
 
   if (!url || !/^https?:\/\//i.test(url)) {
     return NextResponse.json({ error: 'invalid_url' }, { status: 400 })
@@ -51,28 +46,23 @@ export async function POST(req: NextRequest) {
   const sb = admin()
   const domain = extractDomain(url) || 'unknown'
 
-  // 1) 도메인 정책 캐시 확인 — 봇 차단 알려진 도메인이면 즉시 fallback 안내
+  // 1) 링크인바이오 → 마이그레이션 preview (동기, 가벼움)
+  const linkbioService = detectLinkbioService(url)
+  if (linkbioService) {
+    const result = await parseLinkbio(url)
+    if (result.ok && (result.links?.length || 0) > 0) {
+      return NextResponse.json({ flow: 'migration', result })
+    }
+    // fallthrough — linkbio 파싱 실패 시 일반 큐로
+  }
+
+  // 2) 알려진 봇 차단 도메인 → 즉시 안내 (큐에 안 넣음)
   const { data: policy } = await sb
     .from('crawl_policies')
     .select('policy, service_type, notes')
     .eq('domain', domain)
     .maybeSingle()
 
-  // 2) 링크인바이오 서비스 감지 → 마이그레이션 preview
-  const linkbioService = detectLinkbioService(url)
-  if (linkbioService) {
-    const result = await parseLinkbio(url)
-    if (result.ok && (result.links?.length || 0) > 0) {
-      return NextResponse.json({
-        flow: 'migration',
-        result,
-        policy_hint: policy?.policy,
-      })
-    }
-    // fallthrough — linkbio 파싱 실패 시 일반 fallback
-  }
-
-  // 3) 알려진 봇 차단 → 즉시 fallback 안내 (시간 낭비 방지)
   if (policy?.policy === 'bot_blocked') {
     return NextResponse.json({
       flow: 'blocked',
@@ -82,65 +72,57 @@ export async function POST(req: NextRequest) {
     })
   }
 
-  // 4) 일반 URL — quick 파서
-  const parsed = await quickParse(url)
-
-  // 5) 차단 감지 시 정책 캐시 업데이트
-  if (parsed.type === 'blocked') {
-    await sb.from('crawl_policies').upsert({
-      domain,
-      policy: 'bot_blocked',
-      fail_count: (policy?.notes ? 1 : 0) + 1,
-      last_checked_at: new Date().toISOString(),
-      notes: parsed.error,
-    }, { onConflict: 'domain' })
+  // 3) 이미 학습된 URL → skip 안내
+  const { data: existing } = await sb
+    .from('knowledge_chunks')
+    .select('id')
+    .eq('user_id', u.id)
+    .eq('source_url', url)
+    .eq('is_active', true)
+    .limit(1)
+  if (existing && existing.length > 0) {
     return NextResponse.json({
-      flow: 'blocked',
-      result: parsed,
+      flow: 'already_learned',
+      result: { ok: true, url, domain },
     })
   }
 
-  // 6) 이미지 페이지 → Vision fallback 안내
-  if (parsed.type === 'image_page') {
-    await sb.from('crawl_policies').upsert({
-      domain,
-      policy: 'image_page',
-      last_checked_at: new Date().toISOString(),
-    }, { onConflict: 'domain' })
+  // 4) 이미 큐에 있으면 재적재 X
+  const { data: queuedExisting } = await sb
+    .from('learn_queue')
+    .select('id, status')
+    .eq('user_id', u.id)
+    .eq('url', url)
+    .in('status', ['pending', 'processing'])
+    .limit(1)
+    .maybeSingle()
+  if (queuedExisting) {
     return NextResponse.json({
-      flow: 'image_page',
-      result: parsed,
+      flow: 'queued',
+      result: { id: queuedExisting.id, status: queuedExisting.status, url, label, queued_at: 'already' },
     })
   }
 
-  // 7) 성공 — persist 옵션이면 KB 에 즉시 임베딩
-  let storeResult = null
-  if (persist && parsed.ok && parsed.text) {
-    const contentForKb = [
-      parsed.title,
-      parsed.description,
-      parsed.text,
-    ].filter(Boolean).join('\n\n')
-
-    storeResult = await storeKnowledge(sb, u.id, contentForKb, {
-      sourceType: 'link_url',
-      sourceUrl: url,
-      sourceLabel: parsed.title || domain,
+  // 5) 큐 적재 → 즉시 응답 (cron 이 1분 이내 처리)
+  const { data: queued, error: queueErr } = await sb
+    .from('learn_queue')
+    .insert({
+      user_id: u.id,
+      url,
+      label: label || domain,
+      status: 'pending',
+      source: 'chat',
     })
+    .select('id, status, created_at')
+    .single()
 
-    // 정책 캐시 — 성공
-    await sb.from('crawl_policies').upsert({
-      domain,
-      policy: 'quick_ok',
-      success_count: (policy?.notes ? 0 : 0) + 1,
-      service_type: parsed.type === 'product' ? 'commerce' : 'other',
-      last_checked_at: new Date().toISOString(),
-    }, { onConflict: 'domain' })
+  if (queueErr) {
+    console.error('[learn/url] queue insert failed:', queueErr)
+    return NextResponse.json({ error: 'queue_insert_failed', detail: queueErr.message }, { status: 500 })
   }
 
   return NextResponse.json({
-    flow: parsed.type,
-    result: parsed,
-    kb: storeResult,
+    flow: 'queued',
+    result: { id: queued.id, status: queued.status, url, label, queued_at: queued.created_at },
   })
 }

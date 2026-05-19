@@ -1,16 +1,19 @@
 // POST /api/learn/sync-links
-//   사용자 link_pages.blocks 의 모든 URL 을 자동 임베딩 (신규만)
-//   학습탭 진입 또는 명시적 trigger 시 호출
+//   사용자 link_pages.blocks 의 모든 URL 을 학습 큐에 적재.
+//   학습탭 진입 또는 명시적 trigger 시 호출.
+//
+// 이전 구조: URL 을 동기로 처리 → Vercel function 500/instance kill.
+// 새 구조: learn_queue 에 insert 만 하고 즉시 응답 → cron 이 처리.
 //
 // Body: {} (인증 헤더만)
-// Response: { triggered: number, skipped: number }
+// Response: { queued, skipped, alreadyEmbedded, alreadyQueued }
 
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { getUserFromRequest } from '@/lib/auth-helper'
 
 export const dynamic = 'force-dynamic'
-export const maxDuration = 300 // 11개 × 평균 5초 + buffer
+export const maxDuration = 10
 
 function admin() {
   return createAdminClient(
@@ -43,108 +46,107 @@ export async function POST(req: NextRequest) {
 
     const blocks: AnyRecord[] = Array.isArray(page?.blocks) ? page.blocks : []
     if (blocks.length === 0) {
-      return NextResponse.json({ triggered: 0, skipped: 0, reason: 'no_blocks' })
+      return NextResponse.json({ queued: 0, skipped: 0, reason: 'no_blocks' })
     }
 
-  // 2) URL 수집
-  type UrlEntry = { url: string; label: string }
-  const allUrls: UrlEntry[] = []
-  for (const block of blocks) {
-    const url = typeof block.url === 'string' ? block.url : ''
-    if (url && /^https?:\/\//.test(url)) {
-      allUrls.push({ url, label: (block.title as string) || (block.label as string) || 'external link' })
-    }
-    if (Array.isArray(block.items)) {
-      for (const item of block.items as AnyRecord[]) {
-        const iu = typeof item.url === 'string' ? item.url : ''
-        if (iu && /^https?:\/\//.test(iu)) {
-          allUrls.push({ url: iu, label: (item.title as string) || (item.label as string) || 'external link' })
+    // 2) URL 수집
+    type UrlEntry = { url: string; label: string }
+    const allUrls: UrlEntry[] = []
+    for (const block of blocks) {
+      const url = typeof block.url === 'string' ? block.url : ''
+      if (url && /^https?:\/\//.test(url)) {
+        allUrls.push({ url, label: (block.title as string) || (block.label as string) || 'external link' })
+      }
+      if (Array.isArray(block.items)) {
+        for (const item of block.items as AnyRecord[]) {
+          const iu = typeof item.url === 'string' ? item.url : ''
+          if (iu && /^https?:\/\//.test(iu)) {
+            allUrls.push({ url: iu, label: (item.title as string) || (item.label as string) || 'external link' })
+          }
         }
       }
     }
-  }
 
-  // 3) 이미 임베딩된 URL skip
-  const uniqueUrls = Array.from(new Set(allUrls.map(u => u.url)))
-  let alreadyEmbedded = new Set<string>()
-  if (uniqueUrls.length > 0) {
+    // 3) dedup
+    const seen = new Set<string>()
+    const uniqueUrls = allUrls.filter(u => {
+      if (seen.has(u.url)) return false
+      seen.add(u.url)
+      return true
+    })
+
+    if (uniqueUrls.length === 0) {
+      return NextResponse.json({ queued: 0, skipped: 0, reason: 'no_urls' })
+    }
+
+    // 4) 이미 학습된 URL skip
+    const urls = uniqueUrls.map(u => u.url)
     const { data: existingChunks } = await sb
       .from('knowledge_chunks')
       .select('source_url')
       .eq('user_id', u.id)
       .eq('is_active', true)
-      .in('source_url', uniqueUrls)
-    alreadyEmbedded = new Set((existingChunks || []).map((c: { source_url: string | null }) => c.source_url).filter(Boolean) as string[])
-  }
+      .in('source_url', urls)
+    const alreadyEmbedded = new Set(
+      (existingChunks || []).map((c: { source_url: string | null }) => c.source_url).filter(Boolean) as string[]
+    )
 
-  const seen = new Set<string>()
-  const allToEmbed = allUrls.filter(u => {
-    if (alreadyEmbedded.has(u.url)) return false
-    if (seen.has(u.url)) return false
-    seen.add(u.url)
-    return true
-  })
-  // Vercel function 300s timeout 안에서 한 번에 1개 URL 만 처리 (OCR 30+ 장 안전)
-  // 나머지는 client 가 재호출 (response.hasMore)
-  const BATCH_SIZE = 1
-  const toEmbed = allToEmbed.slice(0, BATCH_SIZE)
-  const hasMore = allToEmbed.length > BATCH_SIZE
+    // 5) 이미 큐에 pending/processing 인 URL skip
+    const { data: existingQueue } = await sb
+      .from('learn_queue')
+      .select('url')
+      .eq('user_id', u.id)
+      .in('status', ['pending', 'processing'])
+      .in('url', urls)
+    const alreadyQueued = new Set(
+      (existingQueue || []).map((q: { url: string }) => q.url)
+    )
 
-  // 4) 신규 URL 처리 — quickParse + 본문 이미지 OCR
-  const { storeKnowledge } = await import('@/lib/kb/store')
-  const { quickParse } = await import('@/lib/parsers/quick')
-  const { ocrImages } = await import('@/lib/kb/image-ocr')
+    // 6) 신규 URL → learn_queue insert
+    const toQueue = uniqueUrls.filter(u =>
+      !alreadyEmbedded.has(u.url) && !alreadyQueued.has(u.url)
+    )
 
-  let ok = 0
-  let failed = 0
-  let ocrCount = 0
-  for (const { url, label } of toEmbed) {
-    try {
-      const parsed = await quickParse(url)
-      if (!parsed.ok) {
-        failed++
-        console.warn('[sync-links] parse failed:', url, 'error:', parsed.error, 'type:', parsed.type)
-        // placeholder chunk 저장 → 다음 batch 에서 skip (무한 재시도 방지)
-        try {
-          await storeKnowledge(sb, u.id, `[학습 불가: ${url} — ${parsed.error || parsed.type}]`, {
-            sourceType: 'link_url',
-            sourceUrl: url,
-            sourceLabel: label,
-          })
-        } catch (_) {}
-        continue
-      }
-      // 본문 텍스트 임베딩
-      if (parsed.text) {
-        const content = [parsed.title, parsed.description, parsed.text].filter(Boolean).join('\n\n')
-        await storeKnowledge(sb, u.id, content, {
-          sourceType: 'link_url',
-          sourceUrl: url,
-          sourceLabel: parsed.title || label,
-        })
-      }
-      // OCR 임시 비활성화 — Vercel instance crash 디버깅 중
-      // TODO: 별도 background endpoint 로 분리
-      ok++
-    } catch (e) {
-      failed++
-      console.error('[sync-links] error:', url, e)
+    if (toQueue.length === 0) {
+      return NextResponse.json({
+        queued: 0,
+        skipped: alreadyEmbedded.size + alreadyQueued.size,
+        alreadyEmbedded: alreadyEmbedded.size,
+        alreadyQueued: alreadyQueued.size,
+      })
     }
-  }
+
+    const insertRows = toQueue.map(item => ({
+      user_id: u.id,
+      url: item.url,
+      label: item.label,
+      status: 'pending' as const,
+      source: 'sync_links' as const,
+    }))
+
+    const { error: insertErr } = await sb
+      .from('learn_queue')
+      .insert(insertRows)
+
+    if (insertErr) {
+      // unique index conflict (race) 발생 시 skip 처리하고 정상 응답
+      // 그 외 에러는 진짜 실패
+      const isUniqueConflict = insertErr.code === '23505'
+      if (!isUniqueConflict) {
+        console.error('[sync-links] queue insert failed:', insertErr)
+        return NextResponse.json({ error: 'queue_insert_failed', detail: insertErr.message }, { status: 500 })
+      }
+    }
 
     return NextResponse.json({
-      triggered: toEmbed.length,
-      embedded: ok,
-      ocrChunks: ocrCount,
-      failed,
-      skipped: alreadyEmbedded.size,
-      remaining: hasMore ? allToEmbed.length - BATCH_SIZE : 0,
-      hasMore,
+      queued: insertRows.length,
+      skipped: alreadyEmbedded.size + alreadyQueued.size,
+      alreadyEmbedded: alreadyEmbedded.size,
+      alreadyQueued: alreadyQueued.size,
     })
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e)
-    const stack = e instanceof Error ? e.stack : ''
-    console.error('[sync-links] fatal:', msg, stack)
+    console.error('[sync-links] fatal:', msg)
     return NextResponse.json({ error: 'sync_failed', detail: msg }, { status: 500 })
   }
 }

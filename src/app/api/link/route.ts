@@ -103,23 +103,23 @@ export async function POST(req: NextRequest) {
   // ISR 캐시 무효화 — 저장 직후 /u/[handle] 페이지 캐시 비움 → 다음 방문은 새 데이터
   try { revalidatePath('/u/' + body.handle) } catch (_) {}
 
-  // 백그라운드 KB 학습 — 링크 블록 텍스트 + 외부 URL 자동 임베딩
-  //   await 안 해도 됨 (fire-and-forget, 응답 빠르게 반환)
-  embedLinkBlocksBackground(sb, user.id, blocks).catch((e) => {
-    console.error('[/api/link] background KB embed failed:', e)
+  // 링크 블록 텍스트 + 외부 URL → learn_queue 적재 (즉시 응답)
+  //   이전: fire-and-forget → Vercel function kill → 학습 안 됨.
+  //   이제: 큐에만 넣고 cron 이 1분마다 1개씩 처리.
+  await queueLinkBlocksForLearning(sb, user.id, blocks).catch((e) => {
+    console.error('[/api/link] queue insert failed:', e)
   })
 
   return NextResponse.json({ page: data })
 }
 
-// 백그라운드 KB 임베딩 — 링크 블록의 텍스트 + 외부 URL 자동 학습
-// 신규 URL 만 처리 (knowledge_chunks 에 이미 있는 URL skip — 비용 절감)
-async function embedLinkBlocksBackground(sb: SupabaseClient, userId: string, blocks: AnyRecord[]): Promise<void> {
+// 링크 블록의 외부 URL 들을 learn_queue 에 적재.
+// 텍스트 임베딩(block 자체 텍스트) 는 storeKnowledge 로 즉시 처리 — 빠르고 외부 호출 없음.
+// 외부 URL 크롤링·OCR 은 cron 이 1개씩 처리.
+async function queueLinkBlocksForLearning(sb: SupabaseClient, userId: string, blocks: AnyRecord[]): Promise<void> {
   const { storeKnowledge } = await import('@/lib/kb/store')
-  const { quickParse } = await import('@/lib/parsers/quick')
-  const { ocrImages } = await import('@/lib/kb/image-ocr')
 
-  // 1) 모든 URL 수집 (단일 블록 + items 배열)
+  // 1) 모든 외부 URL 수집
   type UrlEntry = { url: string; label: string }
   const allUrls: UrlEntry[] = []
   for (const block of blocks) {
@@ -136,22 +136,10 @@ async function embedLinkBlocksBackground(sb: SupabaseClient, userId: string, blo
       }
     }
   }
+  const seen = new Set<string>()
+  const uniqueUrls = allUrls.filter(u => { if (seen.has(u.url)) return false; seen.add(u.url); return true })
 
-  // 2) 이미 임베딩된 URL 조회 — skip 대상
-  const uniqueUrls = Array.from(new Set(allUrls.map(u => u.url)))
-  let alreadyEmbedded = new Set<string>()
-  if (uniqueUrls.length > 0) {
-    const { data: existingChunks } = await sb
-      .from('knowledge_chunks')
-      .select('source_url')
-      .eq('user_id', userId)
-      .eq('is_active', true)
-      .in('source_url', uniqueUrls)
-    alreadyEmbedded = new Set((existingChunks || []).map((c: { source_url: string | null }) => c.source_url).filter(Boolean) as string[])
-  }
-
-  // 3) block 자체 텍스트 임베딩 — url 있으면 같이 저장 (외부 URL chunks 와 통합)
-  //    dedup: 같은 content + source_label 이미 있으면 skip (저장 반복으로 중복 누적 방지)
+  // 2) 블록 자체 텍스트는 외부 호출 없이 바로 storeKnowledge (가벼움)
   for (const block of blocks) {
     const blockText = ['title', 'sub', 'text', 'desc', 'caption']
       .map((k) => (typeof block[k] === 'string' ? block[k] : ''))
@@ -160,7 +148,6 @@ async function embedLinkBlocksBackground(sb: SupabaseClient, userId: string, blo
     if (blockText.length <= 30) continue
     const blockLabel = (block.title as string) || (block.label as string) || (block.type as string) || 'link block'
     const blockUrl = typeof block.url === 'string' && /^https?:\/\//.test(block.url) ? block.url : undefined
-    // 중복 체크: 같은 user + content + source_label 이 이미 있으면 skip
     const { data: dup } = await sb
       .from('knowledge_chunks')
       .select('id')
@@ -177,52 +164,45 @@ async function embedLinkBlocksBackground(sb: SupabaseClient, userId: string, blo
         sourceLabel: blockLabel,
       })
     } catch (e) {
-      console.error('[embedLinkBlocks] block text failed:', e)
+      console.error('[queueLinkBlocks] block text failed:', e)
     }
   }
 
-  // 4) 신규 URL 만 외부 임베딩 (병렬 — 단, 너무 많으면 throttle)
-  const toEmbed = allUrls.filter(u => !alreadyEmbedded.has(u.url))
-  // 중복 제거 (같은 URL 여러 블록)
-  const seen = new Set<string>()
-  const dedup = toEmbed.filter(u => { if (seen.has(u.url)) return false; seen.add(u.url); return true })
-  console.log(`[embedLinkBlocks] ${dedup.length} new urls to embed (skip ${alreadyEmbedded.size})`)
-  for (const { url, label } of dedup) {
-    try {
-      const parsed = await quickParse(url)
-      if (!parsed.ok) {
-        console.warn(`[embedLinkBlocks] parse failed: ${url}`, parsed.error)
-        continue
-      }
-      // 본문 텍스트
-      if (parsed.text) {
-        const content = [parsed.title, parsed.description, parsed.text].filter(Boolean).join('\n\n')
-        await storeKnowledge(sb, userId, content, {
-          sourceType: 'link_url',
-          sourceUrl: url,
-          sourceLabel: parsed.title || label,
-        })
-      }
-      // 본문 이미지 OCR (전성분·사용법 등)
-      if (parsed.contentImages && parsed.contentImages.length > 0) {
-        const ocrResults = await ocrImages(parsed.contentImages, { concurrency: 4, max: 40 })
-        let ocrSaved = 0
-        for (const r of ocrResults) {
-          if (!r.text) continue
-          await storeKnowledge(sb, userId, r.text, {
-            sourceType: 'link_url',
-            sourceUrl: url,
-            sourceLabel: parsed.title || label,
-          })
-          ocrSaved++
-        }
-        console.log(`[embedLinkBlocks] ${url}: ${ocrSaved}/${ocrResults.length} ocr saved`)
-      } else {
-        console.log(`[embedLinkBlocks] embedded (no images): ${url}`)
-      }
-    } catch (e) {
-      console.error('[embedLinkBlocks] url failed:', url, e)
-    }
+  // 3) 외부 URL → 큐 적재 (이미 학습됐거나 큐에 있는 건 skip)
+  if (uniqueUrls.length === 0) return
+  const urls = uniqueUrls.map(u => u.url)
+  const [embeddedR, queuedR] = await Promise.all([
+    sb.from('knowledge_chunks')
+      .select('source_url')
+      .eq('user_id', userId)
+      .eq('is_active', true)
+      .in('source_url', urls),
+    sb.from('learn_queue')
+      .select('url')
+      .eq('user_id', userId)
+      .in('status', ['pending', 'processing'])
+      .in('url', urls),
+  ])
+  const alreadyEmbedded = new Set(
+    (embeddedR.data || []).map((c: { source_url: string | null }) => c.source_url).filter(Boolean) as string[]
+  )
+  const alreadyQueued = new Set((queuedR.data || []).map((q: { url: string }) => q.url))
+
+  const toQueue = uniqueUrls.filter(u =>
+    !alreadyEmbedded.has(u.url) && !alreadyQueued.has(u.url)
+  )
+  if (toQueue.length === 0) return
+
+  const rows = toQueue.map(item => ({
+    user_id: userId,
+    url: item.url,
+    label: item.label,
+    status: 'pending' as const,
+    source: 'sync_links' as const,
+  }))
+  const { error } = await sb.from('learn_queue').insert(rows)
+  if (error && error.code !== '23505') {
+    console.error('[queueLinkBlocks] queue insert failed:', error)
   }
 }
 

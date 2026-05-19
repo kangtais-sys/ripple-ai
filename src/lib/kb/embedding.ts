@@ -10,6 +10,9 @@
 const VOYAGE_API_URL = 'https://api.voyageai.com/v1/embeddings'
 const VOYAGE_MODEL = 'voyage-3-lite'
 const VOYAGE_DIMENSIONS = 1024
+// Voyage API hang 방지 — 응답이 15초 안에 안 오면 abort.
+// 이전: signal 없음 → hang 시 outer try/catch 못 잡고 instance kill.
+const VOYAGE_TIMEOUT_MS = 15_000
 
 export interface EmbeddingResult {
   embedding: number[]
@@ -41,6 +44,7 @@ export async function generateEmbedding(text: string): Promise<EmbeddingResult> 
       input: text,
       input_type: 'document',
     }),
+    signal: AbortSignal.timeout(VOYAGE_TIMEOUT_MS),
   })
 
   if (!res.ok) {
@@ -80,6 +84,7 @@ export async function generateEmbeddingsBatch(texts: string[]): Promise<Embeddin
       input: validTexts,
       input_type: 'document',
     }),
+    signal: AbortSignal.timeout(VOYAGE_TIMEOUT_MS),
   })
 
   if (!res.ok) {
@@ -113,6 +118,7 @@ export async function generateQueryEmbedding(query: string): Promise<EmbeddingRe
       input: query,
       input_type: 'query',
     }),
+    signal: AbortSignal.timeout(VOYAGE_TIMEOUT_MS),
   })
 
   if (!res.ok) {

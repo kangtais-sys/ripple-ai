@@ -4704,9 +4704,12 @@ function go(v){
     setTimeout(renderCalendar, 80);
     if(typeof loadHomeDashboard === 'function') setTimeout(loadHomeDashboard, 60);
   }
-  // v-create (만들기) 제거됨. v-learn (AI 학습) — KB 카드 로드
+  // v-create (만들기) 제거됨. v-learn (AI 학습) — KB 카드 로드 + 큐 polling 시작
   if(id === 'learn') {
     if(typeof loadLearnOverview === 'function') setTimeout(loadLearnOverview, 60)
+    if(typeof learnStartPolling === 'function') learnStartPolling()
+  } else {
+    if(typeof learnStopPolling === 'function') learnStopPolling()
   }
   if(id === 'link') {
     setTimeout(initLinkView, 80);
@@ -18961,6 +18964,44 @@ function learnRenderAttachment(opts){
   return card
 }
 
+// 학습 큐 상태 → meta 텍스트 변환
+//   cron 이 1분마다 처리. blocked = Firecrawl 도 못 긁은 사이트 (직접 추가 유도)
+function learnQueueMeta(status, err){
+  if(status === 'processing') return t('learn2.q_processing','⏳ 학습 중…')
+  if(status === 'pending')    return t('learn2.q_pending','⏳ 학습 대기 중')
+  if(status === 'blocked')    return t('learn2.q_blocked','⚠️ 자동 학습 불가 · 직접 추가해주세요')
+  if(status === 'failed')     return t('learn2.q_failed','⚠️ 일시 오류 · 곧 재시도')
+  return ''
+}
+
+// blocked 카드 클릭 → 채팅 입력창으로 포커스 + URL prefill
+function learnFocusInput(url){
+  try { learnSetView('chat') } catch(_){}
+  var input = document.getElementById('learn-chat-input')
+  if(!input) return
+  if(url){ input.value = url + '\n'; try{ learnAutoResize(input) }catch(_){} }
+  setTimeout(function(){
+    try { input.focus(); input.setSelectionRange(input.value.length, input.value.length) } catch(_){}
+  }, 80)
+}
+
+// 학습탭 polling — 처리중인 큐가 있으면 30초마다 overview 새로 가져옴
+var learnPollTimer = null
+function learnStartPolling(){
+  if(learnPollTimer) return
+  learnPollTimer = setInterval(function(){
+    var lv = document.getElementById('v-learn')
+    if(!lv || lv.style.display === 'none'){
+      learnStopPolling()
+      return
+    }
+    if(typeof loadLearnOverview === 'function') loadLearnOverview()
+  }, 30000)
+}
+function learnStopPolling(){
+  if(learnPollTimer){ clearInterval(learnPollTimer); learnPollTimer = null }
+}
+
 function learnSetView(v){
   learnCurrentView = v
   var chatV = document.getElementById('learn-view-chat')
@@ -19075,7 +19116,12 @@ function renderLearnOverview(j){
     // 헤더 sub
     var totalChunks = j.stats?.total_chunks || 0
     var totalItems = (j.stats?.total_products || 0) + (j.stats?.total_files || 0) + (j.urgent?.length || 0)
-    document.getElementById('learn-meta').textContent = t('learn2.meta_fmt','자료 {n}개 · 외운 게 {m}개').replace('{n}', totalItems).replace('{m}', totalChunks)
+    var queuedCount = j.stats?.queued || 0
+    var blockedCount = j.stats?.blocked || 0
+    var metaTxt = t('learn2.meta_fmt','자료 {n}개 · 외운 게 {m}개').replace('{n}', totalItems).replace('{m}', totalChunks)
+    if(queuedCount > 0)  metaTxt += ' · ' + t('learn2.meta_queued','처리중 {n}개').replace('{n}', queuedCount)
+    if(blockedCount > 0) metaTxt += ' · ' + t('learn2.meta_blocked','직접 추가 {n}개').replace('{n}', blockedCount)
+    document.getElementById('learn-meta').textContent = metaTxt
 
     // 가입일 divider — joined_at 있으면 실제 날짜로 표시
     var dividerEl = document.getElementById('learn-divider-day1')
@@ -19124,12 +19170,28 @@ function renderLearnOverview(j){
     }
 
     // 자동 학습 자료 — Ssobi 메시지 + AttachmentCard 들
+    //   큐(처리중·차단) 항목을 위에 먼저 표시 → 완료된 자료 카드 아래에
     var autoList = document.getElementById('learn-auto-list')
     var autoMsg = document.getElementById('learn-auto-msg')
     while(autoList.firstChild) autoList.removeChild(autoList.firstChild)
+    var queueItems = (j.queue || [])
     var autoItems = (j.products || [])
-    if(autoItems.length > 0){
+    if(queueItems.length > 0 || autoItems.length > 0){
       autoMsg.style.display = 'flex'
+      // 큐 카드 (처리중/대기/차단/실패)
+      queueItems.forEach(function(q){
+        var host = ''
+        try { host = new URL(q.url).hostname.replace(/^www\./, '') } catch(_){}
+        var clickable = (q.status === 'blocked' || q.status === 'failed')
+        autoList.appendChild(learnRenderAttachment({
+          kind: 'link',
+          host: host,
+          title: q.label || q.url,
+          meta: learnQueueMeta(q.status, q.error),
+          onClick: clickable ? function(){ learnFocusInput(q.url) } : null,
+        }))
+      })
+      // 완료된 자동 학습 자료
       autoItems.forEach(function(p){
         var catLabel = p.category === 'product' ? t('learn2.cat_product','제품') : p.category === 'content' ? t('learn2.cat_content','콘텐츠') : p.category === 'class' ? t('learn2.cat_class','강의') : t('learn2.cat_link','링크')
         autoList.appendChild(learnRenderAttachment({
@@ -19143,6 +19205,9 @@ function renderLearnOverview(j){
     } else {
       autoMsg.style.display = 'none'
     }
+
+    // 큐에 처리중/대기 있으면 polling 켜기 (학습탭 진입 시 자동 호출됨, 여기선 idempotent)
+    if(queuedCount > 0) learnStartPolling()
 
     // 사용자 추가 메시지 (Today) — files + urgent
     var userMsgs = document.getElementById('learn-user-msgs')
@@ -19309,6 +19374,21 @@ function learnRenderListView(j){
   while(autoWrap.firstChild) autoWrap.removeChild(autoWrap.firstChild)
   while(manualWrap.firstChild) manualWrap.removeChild(manualWrap.firstChild)
 
+  // 학습 대기 그룹 (pending/processing/blocked/failed) — 완료된 자료 위에
+  var queueItems = (j.queue || []).map(function(q){
+    var host = ''
+    try { host = new URL(q.url).hostname.replace(/^www\./, '') } catch(_){}
+    return {
+      kind: 'link',
+      title: q.label || q.url,
+      meta: learnQueueMeta(q.status, q.error) + (host ? ' · ' + host : ''),
+      used: '', when: '',
+    }
+  })
+  if(queueItems.length > 0){
+    autoWrap.appendChild(learnRenderListGroup(t('learn2.group_queue','학습 대기'), t('learn2.group_queue_hint','자동 처리 중'), queueItems))
+  }
+
   // 자동 학습 그룹
   var autoItems = (j.products || []).map(function(p){
     var catLabel = p.category === 'product' ? t('learn2.cat_product','제품') : p.category === 'content' ? t('learn2.cat_content','콘텐츠') : p.category === 'class' ? t('learn2.cat_class','강의') : t('learn2.cat_link','링크')
@@ -19352,7 +19432,7 @@ function learnRenderListView(j){
     manualWrap.appendChild(learnRenderListGroup(t('learn2.group_manual','추가 학습'), t('learn2.group_manual_hint','내가 보낸 자료'), manualItems))
   }
 
-  if(autoItems.length === 0 && manualItems.length === 0){
+  if(autoItems.length === 0 && manualItems.length === 0 && queueItems.length === 0){
     var empty = document.createElement('div')
     empty.style.cssText = 'padding:40px 0;text-align:center;font-size:12px;color:var(--t3)'
     empty.textContent = t('learn2.empty','학습된 자료가 없어요. 채팅에서 파일이나 링크를 보내주세요.')

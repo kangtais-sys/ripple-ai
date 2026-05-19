@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
   const now = new Date().toISOString()
 
   // 병렬 fetch
-  const [toneR, profR, chunksR, filesR, urgentR, igR, linkR] = await Promise.all([
+  const [toneR, profR, chunksR, filesR, urgentR, igR, linkR, queueR] = await Promise.all([
     sb.from('tone_profiles')
       .select('learned_style, persona_summary, persona_details, user_corrections, validation_completed_at')
       .eq('user_id', u.id)
@@ -66,6 +66,12 @@ export async function GET(req: NextRequest) {
       .select('blocks, handle')
       .eq('user_id', u.id)
       .maybeSingle(),
+    sb.from('learn_queue')
+      .select('id, url, label, status, last_error, result, created_at, updated_at')
+      .eq('user_id', u.id)
+      .in('status', ['pending', 'processing', 'blocked', 'failed'])
+      .order('created_at', { ascending: false })
+      .limit(50),
   ])
 
   // ─── link_pages 블록 = 카드 기준 ───
@@ -195,6 +201,27 @@ export async function GET(req: NextRequest) {
     return b.chunk_count - a.chunk_count
   })
 
+  // 큐 항목 — 학습탭 UI 에 처리 상태 표시용
+  const queue = (queueR.data || []).map((q: {
+    id: string
+    url: string
+    label: string | null
+    status: string
+    last_error: string | null
+    result: Record<string, unknown> | null
+    created_at: string
+    updated_at: string
+  }) => ({
+    id: q.id,
+    url: q.url,
+    label: q.label || q.url,
+    status: q.status,           // pending | processing | blocked | failed
+    error: q.last_error,
+    result: q.result,
+    created_at: q.created_at,
+    updated_at: q.updated_at,
+  }))
+
   return NextResponse.json({
     tone: toneR.data,
     profile: profR.data,
@@ -203,10 +230,13 @@ export async function GET(req: NextRequest) {
     products: products.slice(0, 50),
     files: filesR.data || [],
     urgent: urgentR.data || [],
+    queue,
     stats: {
       total_products: products.length,
       total_chunks: chunksR.data?.length || 0,
       total_files: filesR.data?.length || 0,
+      queued: queue.filter(q => q.status === 'pending' || q.status === 'processing').length,
+      blocked: queue.filter(q => q.status === 'blocked').length,
     },
   })
 }
