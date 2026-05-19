@@ -33,6 +33,12 @@
       "schedule": "*/1 * * * *"
     }
   ],
+  "functions": {
+    "src/app/api/cron/process-learn-queue/route.ts": {
+      "memory": 3008,
+      "maxDuration": 300
+    }
+  },
   "rewrites": [
     { "source": "/", "destination": "/landing.html" },
     { "source": "/en", "destination": "/landing-en.html" },
