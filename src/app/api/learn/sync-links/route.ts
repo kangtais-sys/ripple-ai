@@ -84,9 +84,9 @@ export async function POST(req: NextRequest) {
     seen.add(u.url)
     return true
   })
-  // Vercel function 300s timeout 안에서 한 번에 2개 URL 만 처리 (OCR 포함 안전)
+  // Vercel function 300s timeout 안에서 한 번에 1개 URL 만 처리 (OCR 30+ 장 안전)
   // 나머지는 client 가 재호출 (response.hasMore)
-  const BATCH_SIZE = 2
+  const BATCH_SIZE = 1
   const toEmbed = allToEmbed.slice(0, BATCH_SIZE)
   const hasMore = allToEmbed.length > BATCH_SIZE
 
@@ -115,9 +115,9 @@ export async function POST(req: NextRequest) {
           sourceLabel: parsed.title || label,
         })
       }
-      // 본문 이미지 OCR — Claude Vision
+      // 본문 이미지 OCR — Claude Vision (max 15장 — timeout 안전)
       if (parsed.contentImages && parsed.contentImages.length > 0) {
-        const ocrResults = await ocrImages(parsed.contentImages, { concurrency: 4, max: 40 })
+        const ocrResults = await ocrImages(parsed.contentImages, { concurrency: 6, max: 15 })
         for (const r of ocrResults) {
           if (!r.text) continue
           await storeKnowledge(sb, u.id, r.text, {
