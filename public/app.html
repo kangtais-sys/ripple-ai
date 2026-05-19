@@ -19171,11 +19171,15 @@ function renderLearnOverview(j){
 
     // 자동 학습 자료 — Ssobi 메시지 + AttachmentCard 들
     //   큐(처리중·차단) 항목을 위에 먼저 표시 → 완료된 자료 카드 아래에
+    //   dedup: queue 에 있는 URL 은 products 에서 제외 (같은 URL 두 카드 방지)
     var autoList = document.getElementById('learn-auto-list')
     var autoMsg = document.getElementById('learn-auto-msg')
     while(autoList.firstChild) autoList.removeChild(autoList.firstChild)
     var queueItems = (j.queue || [])
-    var autoItems = (j.products || [])
+    var queueUrls = new Set(queueItems.map(function(q){ return q.url }))
+    var autoItems = (j.products || []).filter(function(p){
+      return !queueUrls.has(p.source_url)
+    })
     if(queueItems.length > 0 || autoItems.length > 0){
       autoMsg.style.display = 'flex'
       // 큐 카드 (처리중/대기/차단/실패)
@@ -19389,8 +19393,11 @@ function learnRenderListView(j){
     autoWrap.appendChild(learnRenderListGroup(t('learn2.group_queue','학습 대기'), t('learn2.group_queue_hint','자동 처리 중'), queueItems))
   }
 
-  // 자동 학습 그룹
-  var autoItems = (j.products || []).map(function(p){
+  // 자동 학습 그룹 (queue 에 있는 URL 은 제외 — 위 queue 그룹에 표시되니까)
+  var queueUrlsList = new Set((j.queue || []).map(function(q){ return q.url }))
+  var autoItems = (j.products || []).filter(function(p){
+    return !queueUrlsList.has(p.source_url)
+  }).map(function(p){
     var catLabel = p.category === 'product' ? t('learn2.cat_product','제품') : p.category === 'content' ? t('learn2.cat_content','콘텐츠') : p.category === 'class' ? t('learn2.cat_class','강의') : t('learn2.cat_link','링크')
     return {
       kind: 'link',
