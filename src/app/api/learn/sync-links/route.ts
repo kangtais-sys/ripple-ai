@@ -123,19 +123,8 @@ export async function POST(req: NextRequest) {
           sourceLabel: parsed.title || label,
         })
       }
-      // 본문 이미지 OCR — Claude Vision (보수적: concurrency 2, max 10장 — instance memory 안전)
-      if (parsed.contentImages && parsed.contentImages.length > 0) {
-        const ocrResults = await ocrImages(parsed.contentImages, { concurrency: 2, max: 10 })
-        for (const r of ocrResults) {
-          if (!r.text) continue
-          await storeKnowledge(sb, u.id, r.text, {
-            sourceType: 'link_url',
-            sourceUrl: url,
-            sourceLabel: parsed.title || label,
-          })
-          ocrCount++
-        }
-      }
+      // OCR 임시 비활성화 — Vercel instance crash 디버깅 중
+      // TODO: 별도 background endpoint 로 분리
       ok++
     } catch (e) {
       failed++
