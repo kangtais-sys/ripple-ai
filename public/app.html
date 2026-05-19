@@ -19018,6 +19018,28 @@ function learnRenderListGroup(label, hint, items){
   return wrap
 }
 
+// sync-links 가 한 번에 batch (2 URL) 만 처리 → hasMore 면 자동 재호출
+var syncLinksRunning = false
+async function runSyncLinksLoop(){
+  if(syncLinksRunning) return
+  syncLinksRunning = true
+  try {
+    for(var i = 0; i < 20; i++){ // 최대 20 batch (40 URL)
+      var h = await authHeaders()
+      var r = await fetch('/api/learn/sync-links', { method:'POST', headers: h, credentials:'include' })
+      if(!r.ok) break
+      var j = await r.json()
+      console.log('[sync-links] batch', i+1, '— embedded:', j.embedded, 'ocrChunks:', j.ocrChunks, 'failed:', j.failed, 'remaining:', j.remaining, 'hasMore:', j.hasMore)
+      // 이번 batch 에 진전 있으면 overview 갱신
+      if(j.embedded > 0 || j.ocrChunks > 0) loadLearnOverview()
+      if(!j.hasMore) break
+      // 다음 batch 직전에 잠깐 쉬기 (Claude API rate limit 회피)
+      await new Promise(function(res){ setTimeout(res, 1500) })
+    }
+  } catch(e){ console.warn('[sync-links] loop error', e) }
+  finally { syncLinksRunning = false }
+}
+
 async function loadLearnOverview(){
   // 1) 캐시된 응답 있으면 즉시 렌더 (깜빡임 제거)
   try {
@@ -19027,21 +19049,13 @@ async function loadLearnOverview(){
       if(cached) renderLearnOverview(cached)
     }
   } catch(_){}
-  // 1.5) 신규 URL 백그라운드 임베딩 trigger (5분당 1회)
+  // 1.5) 신규 URL 백그라운드 임베딩 trigger (1분당 1회) — hasMore 면 loop
   try {
     var lastSync = parseInt(localStorage.getItem('ssobi_sync_links_at') || '0', 10)
     var now = Date.now()
-    if(now - lastSync > 5 * 60 * 1000){
+    if(now - lastSync > 60 * 1000){
       localStorage.setItem('ssobi_sync_links_at', String(now))
-      authHeaders().then(function(h){
-        return fetch('/api/learn/sync-links', { method:'POST', headers: h, credentials:'include' })
-      }).then(function(r){ return r && r.ok ? r.json() : null }).then(function(j){
-        if(j && j.embedded > 0){
-          console.log('[sync-links] embedded:', j.embedded, '/ failed:', j.failed, '/ skipped:', j.skipped)
-          // 새 자료 들어왔으면 overview 다시 fetch
-          loadLearnOverview()
-        }
-      }).catch(function(e){ console.warn('[sync-links] error', e) })
+      runSyncLinksLoop()
     }
   } catch(_){}
   // 2) fetch 시작 (background)

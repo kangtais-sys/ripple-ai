@@ -72,12 +72,17 @@ export async function POST(req: NextRequest) {
   }
 
   const seen = new Set<string>()
-  const toEmbed = allUrls.filter(u => {
+  const allToEmbed = allUrls.filter(u => {
     if (alreadyEmbedded.has(u.url)) return false
     if (seen.has(u.url)) return false
     seen.add(u.url)
     return true
   })
+  // Vercel function 300s timeout 안에서 한 번에 2개 URL 만 처리 (OCR 포함 안전)
+  // 나머지는 client 가 재호출 (response.hasMore)
+  const BATCH_SIZE = 2
+  const toEmbed = allToEmbed.slice(0, BATCH_SIZE)
+  const hasMore = allToEmbed.length > BATCH_SIZE
 
   // 4) 신규 URL 처리 — quickParse + 본문 이미지 OCR
   const { storeKnowledge } = await import('@/lib/kb/store')
@@ -130,5 +135,7 @@ export async function POST(req: NextRequest) {
     ocrChunks: ocrCount,
     failed,
     skipped: alreadyEmbedded.size,
+    remaining: hasMore ? allToEmbed.length - BATCH_SIZE : 0,
+    hasMore,
   })
 }
