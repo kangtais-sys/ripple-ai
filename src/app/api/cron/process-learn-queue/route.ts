@@ -20,7 +20,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { firecrawlScrape } from '@/lib/parsers/firecrawl'
 import { storeKnowledge } from '@/lib/kb/store'
-import { ocrImages } from '@/lib/kb/image-ocr'
+// OCR 일시 비활성화 — 별도 워커로 분리 예정
+// import { ocrImages } from '@/lib/kb/image-ocr'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300
@@ -123,27 +124,14 @@ export async function GET(req: NextRequest) {
       textChunks = r.inserted
     }
 
-    // 4) 이미지 OCR → 성공한 것만 저장 (개별 실패는 skip)
-    let ocrChunks = 0
-    if (scraped.images && scraped.images.length > 0) {
-      const ocrResults = await ocrImages(scraped.images, {
-        concurrency: OCR_CONCURRENCY,
-        max: OCR_MAX_IMAGES,
-      })
-      for (const r of ocrResults) {
-        if (!r.text) continue
-        try {
-          const stored = await storeKnowledge(sb, user_id, r.text, {
-            sourceType: 'link_url',
-            sourceUrl: url,
-            sourceLabel: scraped.title || label || url,
-          })
-          ocrChunks += stored.inserted
-        } catch (e) {
-          console.warn('[process-learn-queue] OCR chunk store failed:', e)
-        }
-      }
-    }
+    // 4) 이미지 OCR — 일시 비활성화
+    //    원인: Vercel lambda memory 한계(default 1024MB) 에서 base64 이미지 누적 시
+    //    'instance' 에러로 kill. vercel.json functions matcher 로 3008MB 시도했으나
+    //    Next.js 16/turbopack 빌드 산출물 매처가 불확실해 적용 X.
+    //    근본 해결: OCR 을 별도 워커(Inngest/Trigger.dev) 또는 다른 endpoint 로 분리.
+    //    임시: text chunks 만 저장 → 가격·소재·옵션 등 핵심 정보 학습은 가능.
+    const ocrChunks = 0
+    // const ocrChunks = ...OCR 처리 (추후 분리)
 
     // 5) 완료
     await sb.from('learn_queue').update({
