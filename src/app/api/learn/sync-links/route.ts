@@ -23,22 +23,28 @@ function admin() {
 type AnyRecord = Record<string, unknown>
 
 export async function POST(req: NextRequest) {
-  const u = await getUserFromRequest(req)
-  if (!u) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  try {
+    const u = await getUserFromRequest(req)
+    if (!u) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
 
-  const sb = admin()
+    const sb = admin()
 
-  // 1) link_pages.blocks 조회
-  const { data: page } = await sb
-    .from('link_pages')
-    .select('blocks')
-    .eq('user_id', u.id)
-    .maybeSingle()
+    // 1) link_pages.blocks 조회
+    const { data: page, error: pageErr } = await sb
+      .from('link_pages')
+      .select('blocks')
+      .eq('user_id', u.id)
+      .maybeSingle()
 
-  const blocks: AnyRecord[] = Array.isArray(page?.blocks) ? page.blocks : []
-  if (blocks.length === 0) {
-    return NextResponse.json({ triggered: 0, skipped: 0, reason: 'no_blocks' })
-  }
+    if (pageErr) {
+      console.error('[sync-links] page fetch error:', pageErr)
+      return NextResponse.json({ error: 'page_fetch_failed', detail: pageErr.message }, { status: 500 })
+    }
+
+    const blocks: AnyRecord[] = Array.isArray(page?.blocks) ? page.blocks : []
+    if (blocks.length === 0) {
+      return NextResponse.json({ triggered: 0, skipped: 0, reason: 'no_blocks' })
+    }
 
   // 2) URL 수집
   type UrlEntry = { url: string; label: string }
@@ -129,13 +135,19 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  return NextResponse.json({
-    triggered: toEmbed.length,
-    embedded: ok,
-    ocrChunks: ocrCount,
-    failed,
-    skipped: alreadyEmbedded.size,
-    remaining: hasMore ? allToEmbed.length - BATCH_SIZE : 0,
-    hasMore,
-  })
+    return NextResponse.json({
+      triggered: toEmbed.length,
+      embedded: ok,
+      ocrChunks: ocrCount,
+      failed,
+      skipped: alreadyEmbedded.size,
+      remaining: hasMore ? allToEmbed.length - BATCH_SIZE : 0,
+      hasMore,
+    })
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e)
+    const stack = e instanceof Error ? e.stack : ''
+    console.error('[sync-links] fatal:', msg, stack)
+    return NextResponse.json({ error: 'sync_failed', detail: msg }, { status: 500 })
+  }
 }
