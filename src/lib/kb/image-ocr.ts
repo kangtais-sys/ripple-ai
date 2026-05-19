@@ -77,7 +77,7 @@ export async function ocrImage(imageUrl: string): Promise<string> {
   })
   if (!imgRes.ok) throw new Error(`fetch ${imgRes.status}`)
   const buf = await imgRes.arrayBuffer()
-  if (buf.byteLength > 5 * 1024 * 1024) throw new Error(`too large: ${buf.byteLength}`)
+  if (buf.byteLength > 3 * 1024 * 1024) throw new Error(`too large: ${buf.byteLength}`)
   if (buf.byteLength < 5 * 1024) return '' // 5KB 미만 placeholder/icon 스킵
 
   // magic bytes 로 실제 type 판별 (content-type 헤더 무시)

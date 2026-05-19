@@ -123,9 +123,9 @@ export async function POST(req: NextRequest) {
           sourceLabel: parsed.title || label,
         })
       }
-      // 본문 이미지 OCR — Claude Vision (max 15장 — timeout 안전)
+      // 본문 이미지 OCR — Claude Vision (보수적: concurrency 2, max 10장 — instance memory 안전)
       if (parsed.contentImages && parsed.contentImages.length > 0) {
-        const ocrResults = await ocrImages(parsed.contentImages, { concurrency: 6, max: 15 })
+        const ocrResults = await ocrImages(parsed.contentImages, { concurrency: 2, max: 10 })
         for (const r of ocrResults) {
           if (!r.text) continue
           await storeKnowledge(sb, u.id, r.text, {
