@@ -27,6 +27,17 @@ export interface OcrResult {
   error?: string
 }
 
+// magic bytes 로 실제 image type 판별 (content-type 헤더가 부정확한 케이스 대응)
+function detectImageType(buf: ArrayBuffer): 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp' | null {
+  const b = new Uint8Array(buf, 0, Math.min(16, buf.byteLength))
+  if (b[0] === 0xFF && b[1] === 0xD8 && b[2] === 0xFF) return 'image/jpeg'
+  if (b[0] === 0x89 && b[1] === 0x50 && b[2] === 0x4E && b[3] === 0x47) return 'image/png'
+  if (b[0] === 0x47 && b[1] === 0x49 && b[2] === 0x46) return 'image/gif'
+  if (b[0] === 0x52 && b[1] === 0x49 && b[2] === 0x46 && b[3] === 0x46
+      && b[8] === 0x57 && b[9] === 0x45 && b[10] === 0x42 && b[11] === 0x50) return 'image/webp'
+  return null
+}
+
 // 단일 이미지 OCR
 export async function ocrImage(imageUrl: string): Promise<string> {
   // 1) 이미지 download
@@ -36,10 +47,12 @@ export async function ocrImage(imageUrl: string): Promise<string> {
   })
   if (!imgRes.ok) throw new Error(`fetch ${imgRes.status}`)
   const buf = await imgRes.arrayBuffer()
-  const mediaType = (imgRes.headers.get('content-type') || 'image/png').split(';')[0].trim()
-  if (!mediaType.startsWith('image/')) throw new Error(`not image: ${mediaType}`)
   if (buf.byteLength > 5 * 1024 * 1024) throw new Error(`too large: ${buf.byteLength}`)
-  if (buf.byteLength < 1024) return '' // tiny placeholder
+  if (buf.byteLength < 5 * 1024) return '' // 5KB 미만 placeholder/icon 스킵
+
+  // magic bytes 로 실제 type 판별 (content-type 헤더 무시)
+  const mediaType = detectImageType(buf)
+  if (!mediaType) throw new Error('unknown image format')
 
   const base64 = Buffer.from(buf).toString('base64')
 
@@ -110,6 +123,8 @@ export function extractContentImages(html: string, baseUrl: string): string[] {
     // 본문 이미지 패턴 — NNEditor / upload / editor / detail / web/product (extra 상세)
     const isContentImg = /\/(NNEditor|editor|upload\/|web\/product\/(?:big|extra)|product\/.*detail|prdDetail)/i.test(u)
     if (!isContentImg) continue
+    // 불필요 이미지 제외 (로고·배너·아이콘·이모티콘)
+    if (/\/(logo|banner|icon|favicon|btn_|ico_|category\/|skin\/)/i.test(u)) continue
     if (u.startsWith('//')) u = 'https:' + u
     else if (u.startsWith('/')) {
       try {
