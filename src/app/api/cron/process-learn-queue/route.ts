@@ -47,12 +47,19 @@ export async function GET(req: NextRequest) {
   const sb = admin()
 
   // 0) stale 'processing' 정리 — lambda timeout/crash 시 status 가 잠긴 채 남음
-  //    5분 이상 processing 상태 + attempts<MAX_ATTEMPTS → pending 으로 복귀해 다시 시도
+  //    5분+ processing & attempts<MAX → pending 복귀해 재시도
+  //    5분+ processing & attempts>=MAX → blocked 로 영구 마킹 (무한 stuck 방지)
+  const staleThreshold = new Date(Date.now() - 5 * 60 * 1000).toISOString()
   await sb.from('learn_queue')
     .update({ status: 'pending' })
     .eq('status', 'processing')
     .lt('attempts', MAX_ATTEMPTS)
-    .lt('updated_at', new Date(Date.now() - 5 * 60 * 1000).toISOString())
+    .lt('updated_at', staleThreshold)
+  await sb.from('learn_queue')
+    .update({ status: 'blocked', last_error: 'stale_processing_max_attempts' })
+    .eq('status', 'processing')
+    .gte('attempts', MAX_ATTEMPTS)
+    .lt('updated_at', staleThreshold)
 
   // 1) 가장 오래된 pending 1개 → status='processing' 으로 잠금
   const { data: candidate } = await sb
