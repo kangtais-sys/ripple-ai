@@ -23,6 +23,7 @@ export interface ParseResult {
   description?: string
   imageUrl?: string
   text?: string          // 본문 (generic·product)
+  contentImages?: string[]  // 본문 영역 이미지 URL (OCR 후보)
   price?: number
   currency?: string
   domain: string

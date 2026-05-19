@@ -5,6 +5,7 @@
 import * as cheerio from 'cheerio'
 import type { ParseResult } from './types'
 import { extractPrice, extractDomain } from '@/lib/kb/chunker'
+import { extractContentImages } from '@/lib/kb/image-ocr'
 
 const USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
 
@@ -31,6 +32,8 @@ export async function quickParse(url: string): Promise<ParseResult> {
 
     const html = await res.text()
     const $ = cheerio.load(html)
+    // 본문 이미지 URL 추출 (OCR 후보) — script/style 제거 전에
+    const contentImages = extractContentImages(html, url)
 
     // OG 메타
     const ogTitle = $('meta[property="og:title"]').attr('content') || $('title').text() || ''
@@ -102,6 +105,7 @@ export async function quickParse(url: string): Promise<ParseResult> {
       description: ogDescription,
       imageUrl: ogImage,
       text: bodyText.slice(0, 5000),     // 청크화 전 max
+      contentImages,
       price,
       currency,
       domain,

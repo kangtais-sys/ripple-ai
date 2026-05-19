@@ -117,6 +117,7 @@ export async function POST(req: NextRequest) {
 async function embedLinkBlocksBackground(sb: SupabaseClient, userId: string, blocks: AnyRecord[]): Promise<void> {
   const { storeKnowledge } = await import('@/lib/kb/store')
   const { quickParse } = await import('@/lib/parsers/quick')
+  const { ocrImages } = await import('@/lib/kb/image-ocr')
 
   // 1) 모든 URL 수집 (단일 블록 + items 배열)
   type UrlEntry = { url: string; label: string }
@@ -189,16 +190,35 @@ async function embedLinkBlocksBackground(sb: SupabaseClient, userId: string, blo
   for (const { url, label } of dedup) {
     try {
       const parsed = await quickParse(url)
-      if (parsed.ok && parsed.text) {
+      if (!parsed.ok) {
+        console.warn(`[embedLinkBlocks] parse failed: ${url}`, parsed.error)
+        continue
+      }
+      // 본문 텍스트
+      if (parsed.text) {
         const content = [parsed.title, parsed.description, parsed.text].filter(Boolean).join('\n\n')
         await storeKnowledge(sb, userId, content, {
           sourceType: 'link_url',
           sourceUrl: url,
           sourceLabel: parsed.title || label,
         })
-        console.log(`[embedLinkBlocks] embedded: ${url}`)
+      }
+      // 본문 이미지 OCR (전성분·사용법 등)
+      if (parsed.contentImages && parsed.contentImages.length > 0) {
+        const ocrResults = await ocrImages(parsed.contentImages, { concurrency: 4, max: 40 })
+        let ocrSaved = 0
+        for (const r of ocrResults) {
+          if (!r.text) continue
+          await storeKnowledge(sb, userId, r.text, {
+            sourceType: 'link_url',
+            sourceUrl: url,
+            sourceLabel: parsed.title || label,
+          })
+          ocrSaved++
+        }
+        console.log(`[embedLinkBlocks] ${url}: ${ocrSaved}/${ocrResults.length} ocr saved`)
       } else {
-        console.warn(`[embedLinkBlocks] parse failed: ${url}`, parsed.error || 'no text')
+        console.log(`[embedLinkBlocks] embedded (no images): ${url}`)
       }
     } catch (e) {
       console.error('[embedLinkBlocks] url failed:', url, e)

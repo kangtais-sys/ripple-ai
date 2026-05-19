@@ -79,27 +79,45 @@ export async function POST(req: NextRequest) {
     return true
   })
 
-  // 4) 신규 URL 즉시 처리 (await — vercel maxDuration 안에서)
+  // 4) 신규 URL 처리 — quickParse + 본문 이미지 OCR
   const { storeKnowledge } = await import('@/lib/kb/store')
   const { quickParse } = await import('@/lib/parsers/quick')
+  const { ocrImages } = await import('@/lib/kb/image-ocr')
 
   let ok = 0
   let failed = 0
+  let ocrCount = 0
   for (const { url, label } of toEmbed) {
     try {
       const parsed = await quickParse(url)
-      if (parsed.ok && parsed.text) {
+      if (!parsed.ok) {
+        failed++
+        console.warn('[sync-links] parse failed:', url, parsed.error)
+        continue
+      }
+      // 본문 텍스트 임베딩
+      if (parsed.text) {
         const content = [parsed.title, parsed.description, parsed.text].filter(Boolean).join('\n\n')
         await storeKnowledge(sb, u.id, content, {
           sourceType: 'link_url',
           sourceUrl: url,
           sourceLabel: parsed.title || label,
         })
-        ok++
-      } else {
-        failed++
-        console.warn('[sync-links] parse failed:', url, parsed.error || 'no text')
       }
+      // 본문 이미지 OCR — Claude Vision
+      if (parsed.contentImages && parsed.contentImages.length > 0) {
+        const ocrResults = await ocrImages(parsed.contentImages, { concurrency: 4, max: 40 })
+        for (const r of ocrResults) {
+          if (!r.text) continue
+          await storeKnowledge(sb, u.id, r.text, {
+            sourceType: 'link_url',
+            sourceUrl: url,
+            sourceLabel: parsed.title || label,
+          })
+          ocrCount++
+        }
+      }
+      ok++
     } catch (e) {
       failed++
       console.error('[sync-links] error:', url, e)
@@ -109,6 +127,7 @@ export async function POST(req: NextRequest) {
   return NextResponse.json({
     triggered: toEmbed.length,
     embedded: ok,
+    ocrChunks: ocrCount,
     failed,
     skipped: alreadyEmbedded.size,
   })
