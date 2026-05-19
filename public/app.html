@@ -19052,15 +19052,7 @@ async function loadLearnOverview(){
       if(cached) renderLearnOverview(cached)
     }
   } catch(_){}
-  // 1.5) 신규 URL 백그라운드 임베딩 trigger (1분당 1회) — hasMore 면 loop
-  try {
-    var lastSync = parseInt(localStorage.getItem('ssobi_sync_links_at') || '0', 10)
-    var now = Date.now()
-    if(now - lastSync > 60 * 1000){
-      localStorage.setItem('ssobi_sync_links_at', String(now))
-      runSyncLinksLoop()
-    }
-  } catch(_){}
+  // 1.5) sync-links 자동 호출 비활성화 — 디버깅 중. 링크 저장 시 hook 으로 처리
   // 2) fetch 시작 (background)
   try {
     var h = await authHeaders()
