@@ -103,7 +103,15 @@ export async function POST(req: NextRequest) {
       const parsed = await quickParse(url)
       if (!parsed.ok) {
         failed++
-        console.warn('[sync-links] parse failed:', url, parsed.error)
+        console.warn('[sync-links] parse failed:', url, 'error:', parsed.error, 'type:', parsed.type)
+        // placeholder chunk 저장 → 다음 batch 에서 skip (무한 재시도 방지)
+        try {
+          await storeKnowledge(sb, u.id, `[학습 불가: ${url} — ${parsed.error || parsed.type}]`, {
+            sourceType: 'link_url',
+            sourceUrl: url,
+            sourceLabel: label,
+          })
+        } catch (_) {}
         continue
       }
       // 본문 텍스트 임베딩
