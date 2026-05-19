@@ -19059,28 +19059,27 @@ function learnRenderListGroup(label, hint, items){
   return wrap
 }
 
-// sync-links 가 한 번에 batch (2 URL) 만 처리 → hasMore 면 자동 재호출
+// 내 링크의 모든 URL 을 learn_queue 로 적재 (큐 시스템 — insert 만, <100ms)
+//   cron 이 1분마다 1개씩 Firecrawl + OCR 처리.
+//   throttle: 5분 안엔 재호출 안 함 (overview polling 으로 충분).
 var syncLinksRunning = false
 async function runSyncLinksLoop(){
   if(syncLinksRunning) return
+  var lastAt = parseInt(localStorage.getItem('ssobi_sync_links_at') || '0', 10)
+  if(Date.now() - lastAt < 5 * 60 * 1000) return  // 5분 throttle
   syncLinksRunning = true
   try {
-    for(var i = 0; i < 20; i++){ // 최대 20 batch (40 URL)
-      var h = await authHeaders()
-      var r = await fetch('/api/learn/sync-links', { method:'POST', headers: h, credentials:'include' })
-      var j = await r.json().catch(function(){ return {} })
-      if(!r.ok){
-        console.error('[sync-links] failed status:', r.status, 'error:', j.error, 'detail:', j.detail)
-        break
-      }
-      console.log('[sync-links] batch', i+1, '— embedded:', j.embedded, 'ocrChunks:', j.ocrChunks, 'failed:', j.failed, 'remaining:', j.remaining, 'hasMore:', j.hasMore)
-      // 이번 batch 에 진전 있으면 overview 갱신
-      if(j.embedded > 0 || j.ocrChunks > 0) loadLearnOverview()
-      if(!j.hasMore) break
-      // 다음 batch 직전에 잠깐 쉬기 (Claude API rate limit 회피)
-      await new Promise(function(res){ setTimeout(res, 1500) })
+    var h = await authHeaders()
+    var r = await fetch('/api/learn/sync-links', { method:'POST', headers: h, credentials:'include' })
+    var j = await r.json().catch(function(){ return {} })
+    if(!r.ok){
+      console.error('[sync-links] failed status:', r.status, 'error:', j.error, 'detail:', j.detail)
+      return
     }
-  } catch(e){ console.warn('[sync-links] loop error', e) }
+    localStorage.setItem('ssobi_sync_links_at', String(Date.now()))
+    console.log('[sync-links] queued:', j.queued, 'skipped:', j.skipped, '(embedded:', j.alreadyEmbedded, '/ queued:', j.alreadyQueued, ')')
+    if(j.queued > 0) loadLearnOverview()
+  } catch(e){ console.warn('[sync-links] error', e) }
   finally { syncLinksRunning = false }
 }
 
@@ -19093,7 +19092,8 @@ async function loadLearnOverview(){
       if(cached) renderLearnOverview(cached)
     }
   } catch(_){}
-  // 1.5) sync-links 자동 호출 비활성화 — 디버깅 중. 링크 저장 시 hook 으로 처리
+  // 1.5) 기존 내 링크의 URL 도 학습 큐에 적재 (5분 throttle, 큐 insert 만)
+  try { runSyncLinksLoop() } catch(_){}
   // 2) fetch 시작 (background)
   try {
     var h = await authHeaders()
