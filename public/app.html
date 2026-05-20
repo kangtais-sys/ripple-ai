@@ -19078,7 +19078,7 @@ async function runSyncLinksLoop(){
       return
     }
     localStorage.setItem('ssobi_sync_links_at', String(Date.now()))
-    console.log('[sync-links] queued:', j.queued, 'skipped:', j.skipped, '(embedded:', j.alreadyEmbedded, '/ queued:', j.alreadyQueued, ')')
+    console.log('[sync-links]', { queued: j.queued, reason: j.reason, ids: j.inngestIds?.length })
     if(j.queued > 0) loadLearnOverview()
   } catch(e){ console.warn('[sync-links] error', e) }
   finally { syncLinksRunning = false }

@@ -53,7 +53,7 @@ export async function storeKnowledge(
   if (isEmbeddingConfigured()) {
     try {
       const results = await generateEmbeddingsBatch(chunks.map((c) => c.content))
-      embeddings = results.map((r) => r.embedding)
+      embeddings = results
     } catch (e) {
       console.error('[kb/store] embedding failed:', e)
       // fail-soft: 임베딩 없이도 청크 저장 (검색 못 함, 추후 backfill)

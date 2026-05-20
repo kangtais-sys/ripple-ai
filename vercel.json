@@ -27,12 +27,11 @@
     {
       "path": "/api/cron/daily-report",
       "schedule": "10 15 * * *"
-    },
-    {
-      "path": "/api/cron/process-learn-queue",
-      "schedule": "*/1 * * * *"
     }
   ],
+  "functions": {
+    "src/app/api/inngest/route.ts": { "maxDuration": 60 }
+  },
   "rewrites": [
     { "source": "/", "destination": "/landing.html" },
     { "source": "/en", "destination": "/landing-en.html" },

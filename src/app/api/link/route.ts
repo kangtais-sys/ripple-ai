@@ -8,6 +8,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { revalidatePath } from 'next/cache'
 import { getUserFromRequest, adminClient } from '@/lib/auth-helper'
+import { inngest } from '@/inngest/client'
+import { extractUrlsFromBlocks } from '@/lib/link/extract-urls'
 
 const HANDLE_RE = /^[a-z0-9_-]{3,30}$/
 
@@ -119,27 +121,7 @@ export async function POST(req: NextRequest) {
 async function queueLinkBlocksForLearning(sb: SupabaseClient, userId: string, blocks: AnyRecord[]): Promise<void> {
   const { storeKnowledge } = await import('@/lib/kb/store')
 
-  // 1) 모든 외부 URL 수집
-  type UrlEntry = { url: string; label: string }
-  const allUrls: UrlEntry[] = []
-  for (const block of blocks) {
-    const url = typeof block.url === 'string' ? block.url : ''
-    if (url && /^https?:\/\//.test(url)) {
-      allUrls.push({ url, label: (block.title as string) || (block.label as string) || 'external link' })
-    }
-    if (Array.isArray(block.items)) {
-      for (const item of block.items as AnyRecord[]) {
-        const iu = typeof item.url === 'string' ? item.url : ''
-        if (iu && /^https?:\/\//.test(iu)) {
-          allUrls.push({ url: iu, label: (item.title as string) || (item.label as string) || 'external link' })
-        }
-      }
-    }
-  }
-  const seen = new Set<string>()
-  const uniqueUrls = allUrls.filter(u => { if (seen.has(u.url)) return false; seen.add(u.url); return true })
-
-  // 2) 블록 자체 텍스트는 외부 호출 없이 바로 storeKnowledge (가벼움)
+  // 1) 블록 자체 텍스트는 외부 호출 없이 바로 storeKnowledge (가벼움)
   for (const block of blocks) {
     const blockText = ['title', 'sub', 'text', 'desc', 'caption']
       .map((k) => (typeof block[k] === 'string' ? block[k] : ''))
@@ -168,41 +150,21 @@ async function queueLinkBlocksForLearning(sb: SupabaseClient, userId: string, bl
     }
   }
 
-  // 3) 외부 URL → 큐 적재 (이미 학습됐거나 큐에 있는 건 skip)
-  if (uniqueUrls.length === 0) return
-  const urls = uniqueUrls.map(u => u.url)
-  const [embeddedR, queuedR] = await Promise.all([
-    sb.from('knowledge_chunks')
-      .select('source_url')
-      .eq('user_id', userId)
-      .eq('is_active', true)
-      .in('source_url', urls),
-    // 큐에 어떤 status 든 같은 URL 있으면 skip — 재적재 방지
-    sb.from('learn_queue')
-      .select('url')
-      .eq('user_id', userId)
-      .in('url', urls),
-  ])
-  const alreadyEmbedded = new Set(
-    (embeddedR.data || []).map((c: { source_url: string | null }) => c.source_url).filter(Boolean) as string[]
-  )
-  const alreadyQueued = new Set((queuedR.data || []).map((q: { url: string }) => q.url))
-
-  const toQueue = uniqueUrls.filter(u =>
-    !alreadyEmbedded.has(u.url) && !alreadyQueued.has(u.url)
-  )
-  if (toQueue.length === 0) return
-
-  const rows = toQueue.map(item => ({
-    user_id: userId,
-    url: item.url,
-    label: item.label,
-    status: 'pending' as const,
-    source: 'sync_links' as const,
-  }))
-  const { error } = await sb.from('learn_queue').insert(rows)
-  if (error && error.code !== '23505') {
-    console.error('[queueLinkBlocks] queue insert failed:', error)
+  // 2) 외부 URL → Inngest enqueue (이전: learn_queue 적재 → 폐기)
+  const externalUrls = extractUrlsFromBlocks(blocks)
+  if (externalUrls.length > 0) {
+    await inngest.send(
+      externalUrls.map((u) => ({
+        name: 'learn/url.requested' as const,
+        data: {
+          userId,
+          url: u.url,
+          sourceLabel: u.label,
+          sourceType: 'link_block' as const,
+          blockId: u.blockId,
+        },
+      })),
+    )
   }
 }
 
