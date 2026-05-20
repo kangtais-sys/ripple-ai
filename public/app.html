@@ -18740,10 +18740,11 @@ async function loadHomeDashboard(){
       day1El.style.display = 'block'
       roiEl.style.display = 'none'
 
-      // 진행 상태 칩
+      // 진행 상태 칩 — 3단계 (IG / KB / link_handle)
       var done = 0
       if(j.signals.has_ig) done++
       if(j.signals.has_kb) done++
+      if(j.link_handle) done++
       var statusParts = []
       statusParts.push(j.signals.has_ig ? t('home2.day1.status_ig_done','인스타 연동 완료') : t('home2.day1.status_ig_pending','인스타 연동 필요'))
       statusParts.push(j.signals.has_kb ? t('home2.day1.status_kb_done','학습 자료 있음') : t('home2.day1.status_kb_pending','학습 자료 추가 필요'))
@@ -18761,7 +18762,7 @@ async function loadHomeDashboard(){
         { n:2, done: j.signals.has_kb, title:t('home2.day1.step2_title','내 링크 만들기'),
           sub: j.signals.has_kb ? t('home2.day1.step2_sub_done','학습 자료 등록 완료') : t('home2.day1.step2_sub_pending','3분이면 끝나요'),
           action: function(){ go('link') } },
-        { n:3, done: false, title:t('home2.day1.step3_title','프로필에 링크 붙이기'),
+        { n:3, done: !!j.link_handle, title:t('home2.day1.step3_title','프로필에 링크 붙이기'),
           sub: j.link_handle ? 'ssobi.ai/u/'+j.link_handle : t('home2.day1.step3_sub_pending','핸들 먼저 설정'),
           action: function(){
             if(j.link_handle){

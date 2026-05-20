@@ -99,8 +99,11 @@ export async function GET(req: NextRequest) {
   const newFansCount = weekFans.filter((f) => new Date(f.first_seen_at as string).getTime() >= weekAgoTs).length
   const returningFansCount = weekFans.length - newFansCount
 
-  // 모드 결정 — KB 없거나 어제 데이터 없으면 Day 1
-  const mode = (hasKB && y) ? 'roi' : 'day1'
+  // 모드 결정 — 첫날 onboarding 3단계 (IG 연동 / KB 등록 / 내 링크 핸들 설정)
+  //   모두 완료 시 실데이터(roi) 모드. 어제 daily_report 없어도 진입 가능
+  //   (첫날엔 당연히 어제 데이터 없음).
+  const hasLinkHandle = !!profile?.link_handle
+  const mode = (hasIG && hasKB && hasLinkHandle) ? 'roi' : 'day1'
 
   return NextResponse.json({
     mode,
