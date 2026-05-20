@@ -71,9 +71,10 @@ export const embedChunksWorker = inngest.createFunction(
         for (let i = 0; i < rows.length; i++) {
           const { error: updErr } = await sb
             .from('knowledge_chunks')
-            .update({ embedding: vectors[i] })
+            .update({ embedding: '[' + vectors[i].join(',') + ']' })
             .eq('id', rows[i].id)
-          if (!updErr) updated++
+          if (updErr) throw new Error(`embedding_update_failed: ${updErr.message} (chunk ${rows[i].id})`)
+          updated++
         }
 
         logger.info('[embed-chunks] batch done', {
