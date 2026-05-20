@@ -20,7 +20,7 @@ export const chunkTextWorker = inngest.createFunction(
     id: 'learn-chunk-text',
     name: '학습 텍스트 청크화',
     retries: 1,
-    concurrency: { limit: 10 },
+    concurrency: { limit: 5 },
     triggers: { event: 'learn/text.ready' },
   },
   async ({ event, step, logger }) => {
