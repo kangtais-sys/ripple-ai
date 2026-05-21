@@ -27,6 +27,9 @@ export interface GenerateResult {
   used_recent_count: number  // 최근 대화 N개 사용
   tone_applied: boolean
   context_tier: 'general' | 'returning' | 'vip' | 'urgent'
+  // OCR ROI 로깅 — handleInboundMessage 가 conversations row 업데이트에 사용
+  top_similarity: number       // 0~1, chunks 없으면 0
+  fallback_triggered: boolean  // sim<0.45 또는 chunks=0 → 채널 fallback
 }
 
 function pickContextTier(fanProfile: {
@@ -79,7 +82,15 @@ export async function generateReply(
     const fb = input.intent.is_urgent
       ? '정확하게 알려드리고 싶어서요, 카톡 채널로 바로 안내드릴게요! 거기에 메시지 주시면 빠르게 도와드릴 수 있어요 🙏'
       : '조금 더 자세한 내용은 카톡 채널로 안내드릴게요 😊 거기에 남겨주시면 정확하게 답해드릴 수 있어요'
-    return { reply: fb, used_chunks: [], used_recent_count: 0, tone_applied: false, context_tier: tier }
+    return {
+      reply: fb,
+      used_chunks: [],
+      used_recent_count: 0,
+      tone_applied: false,
+      context_tier: tier,
+      top_similarity: topSim,
+      fallback_triggered: true,
+    }
   }
 
   const kbContext = chunks.map((c, i) =>
@@ -171,5 +182,7 @@ ${input.intent.is_urgent ? '- 긴급 문의 — 공감 먼저, 해결책 제시 
     used_recent_count: recentCount,
     tone_applied: !!tone?.learned_style,
     context_tier: tier,
+    top_similarity: topSim,
+    fallback_triggered: false,
   }
 }

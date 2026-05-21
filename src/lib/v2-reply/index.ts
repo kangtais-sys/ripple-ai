@@ -122,6 +122,17 @@ export async function handleInboundMessage(
     }
   }
 
+  // 4-b) RAG 로깅 — fire-and-forget (응대 흐름 차단 X, OCR ROI 데이터 수집)
+  if (conversationId) {
+    sb.from('conversations')
+      .update({
+        top_similarity: result.top_similarity,
+        fallback_triggered: result.fallback_triggered,
+      })
+      .eq('id', conversationId)
+      .then(() => {})  // ROI 데이터 실패 시 응대 흐름 영향 X
+  }
+
   // 5) 안전 체크
   const safety = await checkSafety(sb, {
     userId: msg.userId,
