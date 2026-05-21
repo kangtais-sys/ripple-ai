@@ -70,6 +70,18 @@ export async function generateReply(
   // 3) RAG 검색
   const kbLimit = tier === 'urgent' ? 7 : 5
   const chunks = await searchKnowledge(sb, input.userId, input.message, kbLimit)
+
+  // 자사 chunks 매칭이 약하면 추측 말고 채널 유도 (Claude 자율성 의존 X)
+  // baseline 측정: Q1 "사용법"=0.348 fail / Q0,Q2,Q3=0.55~0.58 pass → 임계 0.45
+  const topSim = chunks[0]?.similarity ?? 0
+  const FALLBACK_THRESHOLD = 0.45
+  if (chunks.length === 0 || topSim < FALLBACK_THRESHOLD) {
+    const fb = input.intent.is_urgent
+      ? '정확하게 알려드리고 싶어서요, 카톡 채널로 바로 안내드릴게요! 거기에 메시지 주시면 빠르게 도와드릴 수 있어요 🙏'
+      : '조금 더 자세한 내용은 카톡 채널로 안내드릴게요 😊 거기에 남겨주시면 정확하게 답해드릴 수 있어요'
+    return { reply: fb, used_chunks: [], used_recent_count: 0, tone_applied: false, context_tier: tier }
+  }
+
   const kbContext = chunks.map((c, i) =>
     `[${i + 1}] (${c.source_type}${c.source_label ? ' · ' + c.source_label : ''}, priority=${c.priority})\n${c.content}`
   ).join('\n\n')
@@ -115,6 +127,7 @@ ${correctionsList.length > 0 ? `사용자 수정 사례 (학습된 보정):\n${J
 - 줄바꿈 자연스럽게
 - 이모지 절제
 - 확실하지 않은 정보는 추측 X (모르면 "확인해볼게요" 같은 솔직한 답변)
+- 효능·성분 표현은 [관련 지식] 청크에 명시된 자사 공식 표현만 사용. 새 효능 표현·의약품 효능·"치료/100% 안전" 단정 금지
 - 24시간 응대 윈도우 안에서만 발송 가능
 ${input.intent.is_urgent ? '- 긴급 문의 — 공감 먼저, 해결책 제시 (환불·반품·불량 등은 명확한 안내)' : ''}`
 
