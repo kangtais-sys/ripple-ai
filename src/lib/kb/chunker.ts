@@ -72,6 +72,7 @@ export function chunkText(
     if (content.length > 0) {
       chunks.push({ content, index: idx++ })
     }
+    if (end >= clean.length) break // 텍스트 끝 도달 시 정상 종료 (start 정체 무한루프 차단)
     start = end - overlap
     if (start >= clean.length) break
   }
