@@ -49,6 +49,10 @@ export interface PlanDef {
   imageUploadLimit: number  // -1 = 무제한
   imageMaxMb: number        // 1장당 최대 용량
 
+  // OCR 학습 (Phase 2 — SaaS 비용 통제, 무제한 금지)
+  ocrMonthly: number        // 월 OCR 호출 한도 (cache hit 제외)
+  ocrTrialOnce: number      // 신규 가입 1회 부여 체험권 (FREE 만)
+
   // 팀 (Phase 3 — TEAM 전용)
   teamMembers: number       // 0 = 솔로
 }
@@ -70,6 +74,8 @@ export const PLANS: Record<PlanKey, PlanDef> = {
     scheduledPublish: false,
     imageUploadLimit: 5,
     imageMaxMb: 2,
+    ocrMonthly: 0,
+    ocrTrialOnce: 10,
     teamMembers: 0,
   },
   basic: {
@@ -88,6 +94,8 @@ export const PLANS: Record<PlanKey, PlanDef> = {
     scheduledPublish: true,
     imageUploadLimit: 20,
     imageMaxMb: 5,
+    ocrMonthly: 50,
+    ocrTrialOnce: 0,
     teamMembers: 0,
   },
   premium: {
@@ -106,6 +114,8 @@ export const PLANS: Record<PlanKey, PlanDef> = {
     scheduledPublish: true,
     imageUploadLimit: -1,
     imageMaxMb: 10,
+    ocrMonthly: 300,
+    ocrTrialOnce: 0,
     teamMembers: 0,
   },
   business: {
@@ -124,6 +134,8 @@ export const PLANS: Record<PlanKey, PlanDef> = {
     scheduledPublish: true,
     imageUploadLimit: -1,
     imageMaxMb: 10,
+    ocrMonthly: 2000,                       // ⚠️ 무제한 금지 — TEAM 도 상한 (SaaS 비용 통제)
+    ocrTrialOnce: 0,
     teamMembers: 3,
   },
 }
@@ -162,6 +174,24 @@ export function getEffectivePlan(p: BetaSignals): PlanDef {
 
 export function isOverLimit(plan: string, commentCount: number, dmCount: number): boolean {
   return (commentCount + dmCount) >= getPlan(plan).limit
+}
+
+/**
+ * OCR quota 체크 — cache hit 은 카운트 안 함 (호출자가 cached=false 인 row 만 카운트)
+ * @param plan          DB enum (free/basic/premium/business)
+ * @param monthlyUsed   이번 달 cached=false 카운트 (실제 API 호출 수)
+ * @param totalLifetime 가입 후 전체 cached=false 카운트 (체험권 차감용)
+ * @returns 발급 가능 여부 + 남은 한도
+ */
+export function checkOcrQuota(
+  plan: string,
+  monthlyUsed: number,
+  totalLifetime: number,
+): { allowed: boolean; monthlyLeft: number; trialLeft: number } {
+  const p = getPlan(plan)
+  const monthlyLeft = Math.max(0, p.ocrMonthly - monthlyUsed)
+  const trialLeft = Math.max(0, p.ocrTrialOnce - totalLifetime)
+  return { allowed: (monthlyLeft + trialLeft) > 0, monthlyLeft, trialLeft }
 }
 
 export function getUsagePercent(plan: string, commentCount: number, dmCount: number): number {

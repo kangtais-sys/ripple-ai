@@ -119,10 +119,13 @@ export async function ocrImage(imageUrl: string): Promise<string> {
   return text
 }
 
-// 여러 이미지 병렬 OCR — batch
+// 여러 이미지 batch OCR
+// SaaS 비용 통제 + OOM 방지:
+//   max 7 default (2026-05-21 baseline: 본문 5장 중 유효 OCR 2장 = 40%, cap 7장 충분)
+//   concurrency 1 default (warm instance 누적 OOM 차단)
 export async function ocrImages(urls: string[], opts?: { concurrency?: number; max?: number }): Promise<OcrResult[]> {
-  const concurrency = opts?.concurrency ?? 4
-  const max = opts?.max ?? 50
+  const concurrency = opts?.concurrency ?? 1
+  const max = opts?.max ?? 7
   const targets = Array.from(new Set(urls)).slice(0, max)
   const results: OcrResult[] = []
   for (let i = 0; i < targets.length; i += concurrency) {
@@ -154,8 +157,10 @@ export function extractContentImages(html: string, baseUrl: string): string[] {
     // 본문 이미지 패턴 — NNEditor / upload / editor / detail / web/product (extra 상세)
     const isContentImg = /\/(NNEditor|editor|upload\/|web\/product\/(?:big|extra)|product\/.*detail|prdDetail)/i.test(u)
     if (!isContentImg) continue
-    // 불필요 이미지 제외 (로고·배너·아이콘·이모티콘)
-    if (/\/(logo|banner|icon|favicon|btn_|ico_|category\/|skin\/)/i.test(u)) continue
+    // 불필요 이미지 제외 (로고·배너·아이콘·이모티콘·팝업)
+    if (/\/(logo|banner|icon|favicon|btn_|ico_|category\/|skin\/|popup|emoticon|emoji|bullet|spinner|loading|line_|divider|footer)/i.test(u)) continue
+    // custom_ 같은 cafe24 마케팅 이미지도 텍스트 밀도 낮음 (5/21 baseline: custom_*.gif/png 모두 SKIP 됨)
+    if (/\/web\/upload\/custom_/i.test(u)) continue
     if (u.startsWith('//')) u = 'https:' + u
     else if (u.startsWith('/')) {
       try {
