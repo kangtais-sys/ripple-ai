@@ -22,15 +22,35 @@ export function chunkText(
   chunkSize: number = DEFAULT_CHUNK_SIZE,
   overlap: number = DEFAULT_OVERLAP,
 ): Chunk[] {
+  console.log('[chunker] start', { textLen: text.length, chunkSize, overlap })
   const clean = text.replace(/\s+/g, ' ').trim()
+  console.log('[chunker] cleaned', { cleanLen: clean.length })
   if (clean.length === 0) return []
   if (clean.length <= chunkSize) return [{ content: clean, index: 0 }]
 
   const chunks: Chunk[] = []
   let start = 0
   let idx = 0
+  let iter = 0
+  let prevStart = -1
 
   while (start < clean.length) {
+    iter++
+    // 정체 감지 — 직전 iter와 start가 같으면 무한루프
+    if (start === prevStart) {
+      console.error('[chunker] stuck', { iter, start, chunks: chunks.length })
+      break
+    }
+    prevStart = start
+    // safety break — 10000 iter 초과 시 강제 종료 (OOM 방지)
+    if (iter > 10000) {
+      console.error('[chunker] safety break', { iter, start, chunks: chunks.length })
+      break
+    }
+    if (iter % 100 === 0) {
+      console.log('[chunker] iter', { iter, start, chunks: chunks.length })
+    }
+
     let end = Math.min(start + chunkSize, clean.length)
 
     // 가능하면 문장 경계 (., !, ?, 。) 에서 자르기
@@ -56,6 +76,7 @@ export function chunkText(
     if (start >= clean.length) break
   }
 
+  console.log('[chunker] done', { iter, chunks: chunks.length })
   return chunks
 }
 
