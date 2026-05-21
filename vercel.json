@@ -30,7 +30,7 @@
     }
   ],
   "functions": {
-    "src/app/api/inngest/route.ts": { "maxDuration": 60 }
+    "src/app/api/inngest/route.ts": { "maxDuration": 60, "memory": 3009 }
   },
   "rewrites": [
     { "source": "/", "destination": "/landing.html" },

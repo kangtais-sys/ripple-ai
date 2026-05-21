@@ -7,16 +7,25 @@
 // - 응답 시간 ~500ms (이전엔 30~300초 timeout 위험)
 
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { inngest } from '@/inngest/client'
 import { getUserFromRequest } from '@/lib/auth-helper' // 기존 함수 그대로
 import { extractUrlsFromBlocks } from '@/lib/link/extract-urls'
 
-const admin = () =>
-  createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  )
+let _admin: SupabaseClient | null = null
+const admin = (): SupabaseClient => {
+  if (!_admin) {
+    _admin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: { persistSession: false },
+        realtime: { params: { eventsPerSecond: 0 } },
+      },
+    )
+  }
+  return _admin
+}
 
 export const maxDuration = 30 // 30초면 충분
 

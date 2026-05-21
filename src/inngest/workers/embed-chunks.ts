@@ -1,13 +1,32 @@
 // src/inngest/workers/embed-chunks.ts
 import { inngest } from '../client'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { generateEmbeddingsBatch } from '@/lib/kb/embedding'
 
-const admin = () =>
-  createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  )
+let _admin: SupabaseClient | null = null
+const admin = (): SupabaseClient => {
+  if (!_admin) {
+    _admin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: { persistSession: false },
+        realtime: { params: { eventsPerSecond: 0 } },
+      },
+    )
+  }
+  return _admin
+}
+
+function memSnap(logger: { info: (msg: string, data?: object) => void }, label: string) {
+  const m = process.memoryUsage()
+  logger.info(`[mem] ${label}`, {
+    heapUsedMB: Math.round(m.heapUsed / 1024 / 1024),
+    heapTotalMB: Math.round(m.heapTotal / 1024 / 1024),
+    rssMB: Math.round(m.rss / 1024 / 1024),
+    externalMB: Math.round(m.external / 1024 / 1024),
+  })
+}
 
 const BATCH_SIZE = 32 // Voyage max 128이지만 메모리 안전하게 32
 
@@ -28,6 +47,7 @@ export const embedChunksWorker = inngest.createFunction(
   async ({ event, step, logger }) => {
     const { userId, url, chunkIds } = event.data
     const sb = admin()
+    memSnap(logger, 'embed-chunks:enter')
 
     if (chunkIds.length === 0) return { ok: true, embedded: 0 }
 
@@ -44,6 +64,7 @@ export const embedChunksWorker = inngest.createFunction(
 
       // 각 배치를 별도 step으로 — step 끝나면 메모리 해제됨
       const embedded = await step.run(`embed-batch-${batchIdx}`, async () => {
+        memSnap(logger, `batch-${batchIdx}:before`)
         // 1) 청크 내용 가져오기
         const { data: rows, error: fetchErr } = await sb
           .from('knowledge_chunks')
@@ -54,9 +75,11 @@ export const embedChunksWorker = inngest.createFunction(
         if (!rows || rows.length === 0) return 0
 
         const contents = rows.map((r) => r.content as string)
+        memSnap(logger, `batch-${batchIdx}:before-voyage`)
 
         // 2) Voyage 호출 (이 함수 내부에 timeout 있음)
         const vectors = await generateEmbeddingsBatch(contents)
+        memSnap(logger, `batch-${batchIdx}:after-voyage`)
 
         if (vectors.length !== rows.length) {
           throw new Error(
@@ -83,14 +106,17 @@ export const embedChunksWorker = inngest.createFunction(
           updated,
           total: rows.length,
         })
+        memSnap(logger, `batch-${batchIdx}:after`)
         return updated
       })
+      memSnap(logger, `after-batch-${batchIdx}-step`)
 
       totalEmbedded += embedded
     }
 
     // queue 최종 상태
     await step.run('mark-done', async () => {
+      memSnap(logger, 'mark-done:before')
       await sb
         .from('learn_queue')
         .update({
@@ -100,7 +126,9 @@ export const embedChunksWorker = inngest.createFunction(
         })
         .eq('user_id', userId)
         .eq('url', url)
+      memSnap(logger, 'mark-done:after')
     })
+    memSnap(logger, 'embed-chunks:exit')
 
     return { ok: true, embedded: totalEmbedded, batches: batches.length }
   },

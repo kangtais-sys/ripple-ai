@@ -1,13 +1,32 @@
 // src/inngest/workers/chunk-text.ts
 import { inngest } from '../client'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { chunkText } from '@/lib/kb/chunker'
 
-const admin = () =>
-  createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  )
+let _admin: SupabaseClient | null = null
+const admin = (): SupabaseClient => {
+  if (!_admin) {
+    _admin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: { persistSession: false },
+        realtime: { params: { eventsPerSecond: 0 } },
+      },
+    )
+  }
+  return _admin
+}
+
+function memSnap(logger: { info: (msg: string, data?: object) => void }, label: string) {
+  const m = process.memoryUsage()
+  logger.info(`[mem] ${label}`, {
+    heapUsedMB: Math.round(m.heapUsed / 1024 / 1024),
+    heapTotalMB: Math.round(m.heapTotal / 1024 / 1024),
+    rssMB: Math.round(m.rss / 1024 / 1024),
+    externalMB: Math.round(m.external / 1024 / 1024),
+  })
+}
 
 /**
  * Step 2: raw_text를 chunks로 분할 + DB insert (embedding=null)
@@ -26,9 +45,11 @@ export const chunkTextWorker = inngest.createFunction(
   async ({ event, step, logger }) => {
     const { userId, url, sourceLabel, rawTextId } = event.data
     const sb = admin()
+    memSnap(logger, 'chunk-text:enter')
 
     // raw_text 읽기
     const rawText = await step.run('load-raw-text', async () => {
+      memSnap(logger, 'load-raw:before')
       const { data, error } = await sb
         .from('learn_queue')
         .select('raw_text, raw_meta')
@@ -38,24 +59,32 @@ export const chunkTextWorker = inngest.createFunction(
       if (error || !data?.raw_text) {
         throw new Error(`raw_text_not_found: ${error?.message}`)
       }
+      memSnap(logger, 'load-raw:after')
       return data.raw_text as string
     })
+    memSnap(logger, 'after-load-raw-step')
 
     // 기존 청크 정리 (재학습 시 중복 방지)
     await step.run('cleanup-old-chunks', async () => {
+      memSnap(logger, 'cleanup:before')
       await sb
         .from('knowledge_chunks')
         .delete()
         .eq('user_id', userId)
         .eq('source_url', url)
+      memSnap(logger, 'cleanup:after')
     })
+    memSnap(logger, 'after-cleanup-step')
 
     // 청크화 — 300자 단위, 50자 overlap
     const chunks = await step.run('split-chunks', async () => {
+      memSnap(logger, 'split:before')
       const result = chunkText(rawText, 300, 50)
       logger.info('[chunk-text] split', { url, count: result.length })
+      memSnap(logger, 'split:after')
       return result
     })
+    memSnap(logger, 'after-split-step')
 
     if (chunks.length === 0) {
       logger.warn('[chunk-text] no chunks generated', { url })
@@ -76,6 +105,7 @@ export const chunkTextWorker = inngest.createFunction(
     })()
 
     const chunkIds = await step.run('insert-chunks', async () => {
+      memSnap(logger, 'insert:before')
       const rows = chunks.map((chunk) => ({
         user_id: userId,
         source_type: 'link_url',
@@ -94,11 +124,14 @@ export const chunkTextWorker = inngest.createFunction(
         .select('id')
 
       if (error) throw new Error(`chunks_insert_failed: ${error.message}`)
+      memSnap(logger, 'insert:after')
       return (data ?? []).map((r) => r.id as string)
     })
+    memSnap(logger, 'after-insert-step')
 
     // queue 상태 업데이트
     await step.run('mark-chunks-ready', async () => {
+      memSnap(logger, 'mark-chunks:before')
       await sb
         .from('learn_queue')
         .update({
@@ -107,6 +140,7 @@ export const chunkTextWorker = inngest.createFunction(
           updated_at: new Date().toISOString(),
         })
         .eq('id', rawTextId)
+      memSnap(logger, 'mark-chunks:after')
     })
 
     // 임베딩 워커 트리거
@@ -119,6 +153,7 @@ export const chunkTextWorker = inngest.createFunction(
         chunkIds,
       },
     })
+    memSnap(logger, 'chunk-text:exit')
 
     return { ok: true, chunks: chunkIds.length }
   },

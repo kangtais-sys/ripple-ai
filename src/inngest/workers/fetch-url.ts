@@ -1,13 +1,34 @@
 // src/inngest/workers/fetch-url.ts
 import { inngest } from '../client'
-import { createClient } from '@supabase/supabase-js'
+import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import { extractContent } from '@/lib/parsers/extractor'
 
-const admin = () =>
-  createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  )
+// module-level singleton — Vercel function warm instance에서 client 재사용
+let _admin: SupabaseClient | null = null
+const admin = (): SupabaseClient => {
+  if (!_admin) {
+    _admin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      {
+        auth: { persistSession: false },
+        realtime: { params: { eventsPerSecond: 0 } },
+      },
+    )
+  }
+  return _admin
+}
+
+// 메모리 진단용 — 어느 step에서 heap이 폭증하는지 핀포인트
+function memSnap(logger: { info: (msg: string, data?: object) => void }, label: string) {
+  const m = process.memoryUsage()
+  logger.info(`[mem] ${label}`, {
+    heapUsedMB: Math.round(m.heapUsed / 1024 / 1024),
+    heapTotalMB: Math.round(m.heapTotal / 1024 / 1024),
+    rssMB: Math.round(m.rss / 1024 / 1024),
+    externalMB: Math.round(m.external / 1024 / 1024),
+  })
+}
 
 /**
  * Step 1: URL을 fetch + 본문 텍스트 추출
@@ -31,9 +52,11 @@ export const fetchUrlWorker = inngest.createFunction(
   async ({ event, step, logger }) => {
     const { userId, url, sourceLabel, sourceType, blockId } = event.data
     const sb = admin()
+    memSnap(logger, 'fetch-url:enter')
 
     // step.run으로 감싸면 실패 시 이 step만 재시도. 메모리도 step 끝나면 해제.
     const result = await step.run('extract-content', async () => {
+      memSnap(logger, 'extract:before')
       logger.info('[fetch-url] start', { url })
 
       const extracted = await extractContent(url, {
@@ -48,11 +71,14 @@ export const fetchUrlWorker = inngest.createFunction(
         )
       }
 
+      memSnap(logger, 'extract:after')
       return extracted
     })
+    memSnap(logger, 'after-extract-step')
 
     // raw_text를 learn_queue에 저장 (다음 step이 읽어감)
     const rawTextId = await step.run('save-raw-text', async () => {
+      memSnap(logger, 'save-raw:before')
       const { data, error } = await sb
         .from('learn_queue')
         .upsert(
@@ -74,8 +100,10 @@ export const fetchUrlWorker = inngest.createFunction(
         .single()
 
       if (error) throw new Error(`learn_queue_upsert_failed: ${error.message}`)
+      memSnap(logger, 'save-raw:after')
       return data.id as string
     })
+    memSnap(logger, 'after-save-raw-step')
 
     // 다음 step 트리거 (chunk worker)
     await step.sendEvent('trigger-chunk', {
@@ -89,6 +117,7 @@ export const fetchUrlWorker = inngest.createFunction(
         rawTextId,
       },
     })
+    memSnap(logger, 'fetch-url:exit')
 
     return { ok: true, rawTextId, extractor: result.source, length: result.text.length }
   },
