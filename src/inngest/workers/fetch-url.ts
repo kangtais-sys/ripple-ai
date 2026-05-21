@@ -24,7 +24,7 @@ export const fetchUrlWorker = inngest.createFunction(
     name: '학습 URL fetch',
     retries: 2, // 일시적 네트워크 오류 대응
     concurrency: {
-      limit: 5, // 동시 5개까지만 fetch (외부 API rate limit 보호)
+      limit: 1, // OOM 방지 — warm instance 동시 run 누적 차단
     },
     triggers: { event: 'learn/url.requested' },
   },
