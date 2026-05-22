@@ -16725,7 +16725,7 @@ async function authHeaders(){
 }
 
 async function loadPendingDrafts(){
-  var box = document.getElementById('drafts-pending');
+  var box = document.getElementById('manage-urgent-list');
   if(!box) return;
   var h = await authHeaders();
   fetch('/api/replies?status=pending&limit=20', {credentials:'include', headers: h})
@@ -16740,7 +16740,7 @@ async function loadPendingDrafts(){
 function renderPendingDrafts(box, drafts){
   while(box.firstChild) box.removeChild(box.firstChild);
   // 긴급 탭의 빈 상태 박스 토글
-  var urgentEmpty = document.getElementById('urgent-empty');
+  var urgentEmpty = document.getElementById('manage-urgent-empty');
   if(!drafts.length){
     if(urgentEmpty) urgentEmpty.style.display = '';
     return;
@@ -17212,8 +17212,7 @@ async function connectIG(){
   var scope = [
     'instagram_business_basic',
     'instagram_business_manage_messages',
-    'instagram_business_manage_comments',
-    'instagram_business_manage_insights'
+    'instagram_business_manage_comments'
   ].join(',');
   var url = 'https://www.instagram.com/oauth/authorize'
     + '?client_id=' + appId
