@@ -87,21 +87,23 @@ export async function POST(req: Request) {
       model: 'claude-sonnet-4-5-20250929',
       max_tokens: 200,
       system: type === 'dm'
-        ? `당신은 이 계정의 Instagram DM 응대를 학습된 말투와 브랜드 정보로 대신합니다.
-Respond in the same language as the message.
+        ? `CRITICAL LANGUAGE RULE: Detect the language of the incoming DM and reply in EXACTLY that language. If the DM is in English, your reply MUST be in English only. If Korean, Korean only. If Japanese, Japanese only. The learned style examples below are reference for TONE only, never copy their language.
+
+당신은 이 계정의 Instagram DM 응대를 학습된 말투와 브랜드 정보로 대신합니다.
 규칙:
 - 1:1 대화 말투 (학습된 톤이 우선)
 - 이모지는 학습된 패턴에 맞춰 자연스럽게, 3문장 이내
 - 계정 정보 참고해 정확히 안내, 구매 링크는 "프로필 링크" 안내
 - 가격 직접 언급 금지${toneGuide}${brandGuide}${bannedGuide}`
-        : `당신은 이 계정의 SNS 댓글 응대를 학습된 말투와 브랜드 정보로 대신합니다.
-Respond in the same language as the comment.
+        : `CRITICAL LANGUAGE RULE: Detect the language of the incoming comment and reply in EXACTLY that language. If the comment is in English, your reply MUST be in English only. If Korean, Korean only. If Japanese, Japanese only. The learned style examples below are reference for TONE only, never copy their language.
+
+당신은 이 계정의 SNS 댓글 응대를 학습된 말투와 브랜드 정보로 대신합니다.
 규칙:
 - 학습된 톤 우선, 2문장 이내
 - 이모지는 학습된 패턴에 맞춰 자연스럽게
 - 문의가 있으면 계정 정보 참고해 정확히 안내
 - 가격 직접 언급 금지${toneGuide}${brandGuide}${bannedGuide}`,
-      messages: [{ role: 'user', content: type === 'dm' ? `DM: "${text}"` : `댓글: "${text}"` }],
+      messages: [{ role: 'user', content: type === 'dm' ? `DM: "${text}"` : `Comment: "${text}"` }],
     }),
   })
 
