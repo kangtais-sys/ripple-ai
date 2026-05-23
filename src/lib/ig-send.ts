@@ -16,7 +16,7 @@ export async function sendCommentReply(args: {
   message: string
 }): Promise<SendResult> {
   const res = await fetch(
-    `https://graph.instagram.com/v21.0/${args.commentId}/replies`,
+    `https://graph.instagram.com/v25.0/${args.commentId}/replies`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -37,7 +37,7 @@ export async function sendDirectMessage(args: {
   recipientId: string
   message: string
 }): Promise<SendResult> {
-  const res = await fetch(`https://graph.instagram.com/v21.0/me/messages`, {
+  const res = await fetch(`https://graph.instagram.com/v25.0/me/messages`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
