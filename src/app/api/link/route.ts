@@ -144,6 +144,10 @@ async function queueLinkBlocksForLearning(sb: SupabaseClient, userId: string, bl
         sourceType: 'link',
         sourceUrl: blockUrl,
         sourceLabel: blockLabel,
+        // 링크 블록 텍스트는 사용자가 편집할 때마다 storeKnowledge 가 다시 불림.
+        // 매번 같은 source 로 INSERT 만 하면 chunks 누적 → 누적 재발 방지를 위해 활성화.
+        // INSERT 성공 후 같은 source 의 옛 활성 chunks 만 soft-deactivate (DELETE X).
+        replaceBySource: true,
       })
     } catch (e) {
       console.error('[queueLinkBlocks] block text failed:', e)

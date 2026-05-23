@@ -5304,7 +5304,7 @@ var I18N = {
     'learn2.persona_learning_sub':'최근 게시물 캡션을 분석하고 있어요. 이 페이지를 나가도 자동으로 진행돼요',
     'learn2.persona_learn_failed':'학습 실패 — 잠시 후 다시 시도해주세요',
     'learn2.persona_learn_toast':'✓ 말투 학습 완료',
-    'learn2.edit_btn':'수정',
+    'learn2.edit_btn':'말투 수정',
     'learn2.divider_day1':'가입 직후',
     'learn2.divider_joined_fmt':'{date} 가입',
     'learn2.divider_today_pre':'오늘 · ',
@@ -5325,6 +5325,13 @@ var I18N = {
     'learn2.cat_class':'강의',
     'learn2.cat_link':'링크',
     'learn2.unit_memory_post':'개 기억',
+    'learn2.badge_relearn':'재학습 필요',
+    'learn2.badge_blocked':'접근 차단됨',
+    'learn2.q_done_no_data':'학습 완료 (저장된 청크 없음)',
+    'learn2.relative_just':'방금',
+    'learn2.relative_min':'분 전',
+    'learn2.relative_hour':'시간 전',
+    'learn2.relative_day':'일 전',
     'learn2.group_auto':'자동 학습',
     'learn2.group_auto_hint':'인스타 · 내 링크',
     'learn2.group_manual':'추가 학습',
@@ -6292,7 +6299,7 @@ var I18N = {
     'learn2.persona_learning_sub':'Analyzing recent post captions. Runs in the background — feel free to leave this page',
     'learn2.persona_learn_failed':'Learning failed — please try again later',
     'learn2.persona_learn_toast':'✓ Tone learning complete',
-    'learn2.edit_btn':'Edit',
+    'learn2.edit_btn':'Edit tone',
     'learn2.divider_day1':'Day 1',
     'learn2.divider_joined_fmt':'Joined {date}',
     'learn2.divider_today_pre':'Today · ',
@@ -6313,6 +6320,13 @@ var I18N = {
     'learn2.cat_class':'Class',
     'learn2.cat_link':'Link',
     'learn2.unit_memory_post':' memories',
+    'learn2.badge_relearn':'Not learned',
+    'learn2.badge_blocked':'Blocked',
+    'learn2.q_done_no_data':'Learned (no stored chunks)',
+    'learn2.relative_just':'just now',
+    'learn2.relative_min':'m ago',
+    'learn2.relative_hour':'h ago',
+    'learn2.relative_day':'d ago',
     'learn2.group_auto':'Auto-learned',
     'learn2.group_auto_hint':'Instagram · my link',
     'learn2.group_manual':'Added by me',
@@ -19022,7 +19036,27 @@ function learnRenderAttachment(opts){
   info.innerHTML = '<div style="font-size:13px;font-weight:700;letter-spacing:-.2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:'+(dark?'#fff':'var(--t1)')+'">'+(opts.title||'')+'</div>'
     + '<div style="font-size:11px;margin-top:1px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:'+(dark?'rgba(255,255,255,.6)':'var(--t3)')+'">'+(opts.host?opts.host+' · ':'')+(opts.meta||'')+'</div>'
   card.appendChild(info)
+  // 비정상 상태 배지 (재학습 필요 / 접근 차단됨) — textContent 만 사용
+  if(opts.badge){
+    var bg = opts.badgeTone === 'warn' ? '#F59E0B' : 'var(--red)'
+    var badge = document.createElement('span')
+    badge.style.cssText = 'flex-shrink:0;font-size:10px;font-weight:800;padding:3px 7px;border-radius:5px;background:'+bg+';color:#fff;letter-spacing:-.1px'
+    badge.textContent = opts.badge
+    card.appendChild(badge)
+  }
   return card
+}
+
+// ISO timestamp → 상대 시간 짧은 문자열 ("방금", "12분 전", "3시간 전", "2일 전")
+function learnRelativeTime(iso){
+  if(!iso) return ''
+  var t0 = new Date(iso).getTime()
+  if(isNaN(t0)) return ''
+  var diffSec = Math.max(0, Math.floor((Date.now() - t0) / 1000))
+  if(diffSec < 60) return t('learn2.relative_just','방금')
+  if(diffSec < 3600) return Math.floor(diffSec/60) + t('learn2.relative_min','분 전')
+  if(diffSec < 86400) return Math.floor(diffSec/3600) + t('learn2.relative_hour','시간 전')
+  return Math.floor(diffSec/86400) + t('learn2.relative_day','일 전')
 }
 
 // 학습 큐 상태 → meta 텍스트 변환
@@ -19243,16 +19277,34 @@ function renderLearnOverview(j){
     })
     if(queueItems.length > 0 || autoItems.length > 0){
       autoMsg.style.display = 'flex'
-      // 큐 카드 (처리중/대기/차단/실패)
+      // 큐 카드 (처리중/대기/차단/실패/완료 done — 비정상 항목은 빨간 배지)
       queueItems.forEach(function(q){
         var host = ''
         try { host = new URL(q.url).hostname.replace(/^www\./, '') } catch(_){}
-        var clickable = (q.status === 'blocked' || q.status === 'failed')
+        // 메타 텍스트 결정
+        var meta = ''
+        if(q.status === 'processing')      meta = t('learn2.q_processing','⏳ 학습 중…')
+        else if(q.status === 'pending')    meta = t('learn2.q_pending','⏳ 학습 대기 중')
+        else if(q.is_blocked)              meta = t('learn2.q_blocked','⚠️ 자동 학습 불가 · 직접 추가해주세요')
+        else if(q.status === 'failed')     meta = t('learn2.q_failed','⚠️ 일시 오류 · 곧 재시도')
+        else if(q.chunk_count != null && q.chunk_count > 0){
+          // 정상 완료: chunk 수 + 마지막 학습 시각
+          meta = q.chunk_count + t('learn2.unit_memory_post','개 기억')
+          if(q.updated_at) meta += ' · ' + learnRelativeTime(q.updated_at)
+        } else if(q.needs_relearn){
+          meta = t('learn2.q_done_no_data','학습 완료 (저장된 청크 없음)')
+        }
+        // 배지 결정
+        var badge = null
+        if(q.is_blocked) badge = t('learn2.badge_blocked','접근 차단됨')
+        else if(q.needs_relearn) badge = t('learn2.badge_relearn','재학습 필요')
+        var clickable = (q.is_blocked || q.status === 'failed')
         autoList.appendChild(learnRenderAttachment({
           kind: 'link',
           host: host,
           title: q.label || q.url,
-          meta: learnQueueMeta(q.status, q.error),
+          meta: meta,
+          badge: badge,
           onClick: clickable ? function(){ learnFocusInput(q.url) } : null,
         }))
       })

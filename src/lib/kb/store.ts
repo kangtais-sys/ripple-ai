@@ -21,6 +21,11 @@ export interface StoreOptions {
   sourceUrl?: string
   priority?: number      // default 1, urgent=10
   expiresAt?: string     // ISO timestamp, 긴급 컨텍스트 만료
+  // INSERT 성공 후 같은 user + source_url(없으면 source_label)의
+  // 기존 활성 chunks 를 is_active=false 로 soft-deactivate.
+  // 자기 자신(방금 INSERT 한 chunkIds)은 제외. INSERT 실패 시 미실행.
+  // 답글 검색은 is_active=true 만 보므로 답글 흐름 영향 0.
+  replaceBySource?: boolean
 }
 
 export interface StoreResult {
@@ -90,6 +95,38 @@ export async function storeKnowledge(
   if (error) {
     console.error('[kb/store] insert failed:', error)
     return { inserted: 0, chunkIds: [], skipped: chunks.length, error: error.message }
+  }
+
+  // 3-b) replaceBySource: INSERT 성공 후에만 같은 source 의 옛 chunks soft-deactivate
+  //   - 같은 user_id + source_url (없으면 source_label) 매치
+  //   - 방금 INSERT 한 chunkIds 는 제외 (자기 자신 비활성화 방지)
+  //   - update 실패해도 throw 안 함 (INSERT 는 이미 성공, fail-soft)
+  if (options.replaceBySource && data && data.length > 0) {
+    const newIds = data.map((r) => r.id as string)
+    try {
+      let q = sb
+        .from('knowledge_chunks')
+        .update({ is_active: false, updated_at: new Date().toISOString() })
+        .eq('user_id', userId)
+        .eq('is_active', true)
+        .not('id', 'in', `(${newIds.join(',')})`)
+      if (options.sourceUrl) {
+        q = q.eq('source_url', options.sourceUrl)
+      } else if (options.sourceLabel) {
+        q = q.is('source_url', null).eq('source_label', options.sourceLabel)
+      } else {
+        // source 키가 없으면 deactivate 대상 없음 → skip
+        q = null as never
+      }
+      if (q) {
+        const { error: deactErr } = await q
+        if (deactErr) {
+          console.warn('[kb/store] replaceBySource deactivate failed (insert succeeded):', deactErr.message)
+        }
+      }
+    } catch (e) {
+      console.warn('[kb/store] replaceBySource exception (insert succeeded):', e)
+    }
   }
 
   // 4) user_type 비동기 재분류 (debounce 없이 매 저장마다 — 가벼움)

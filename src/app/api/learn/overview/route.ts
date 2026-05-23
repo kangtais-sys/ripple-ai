@@ -69,9 +69,9 @@ export async function GET(req: NextRequest) {
     sb.from('learn_queue')
       .select('id, url, label, status, last_error, result, created_at, updated_at')
       .eq('user_id', u.id)
-      .in('status', ['pending', 'processing', 'blocked', 'failed'])
+      .in('status', ['pending', 'processing', 'blocked', 'failed', 'done', 'chunks_ready', 'text_ready'])
       .order('created_at', { ascending: false })
-      .limit(50),
+      .limit(100),
   ])
 
   // ─── link_pages 블록 = 카드 기준 ───
@@ -202,6 +202,9 @@ export async function GET(req: NextRequest) {
   })
 
   // 큐 항목 — 학습탭 UI 에 처리 상태 표시용
+  //  - done / chunks_ready / text_ready 도 포함 (가시성)
+  //  - needs_relearn: done 인데 chunks 0/null (학습 완료로 잡혔지만 청크 없음 → 재학습 필요)
+  //  - is_blocked: status==='blocked' 또는 result.error 가 blocked 류
   const queue = (queueR.data || []).map((q: {
     id: string
     url: string
@@ -211,16 +214,30 @@ export async function GET(req: NextRequest) {
     result: Record<string, unknown> | null
     created_at: string
     updated_at: string
-  }) => ({
-    id: q.id,
-    url: q.url,
-    label: q.label || q.url,
-    status: q.status,           // pending | processing | blocked | failed
-    error: q.last_error,
-    result: q.result,
-    created_at: q.created_at,
-    updated_at: q.updated_at,
-  }))
+  }) => {
+    const resultChunks = q.result && typeof (q.result as { chunks?: unknown }).chunks === 'number'
+      ? ((q.result as { chunks?: number }).chunks ?? null)
+      : null
+    const isBlocked = q.status === 'blocked'
+      || (typeof (q.result as { error?: unknown } | null)?.error === 'string'
+        && /block/i.test(String((q.result as { error?: string }).error)))
+    const needsRelearn = (q.status === 'done' || q.status === 'chunks_ready' || q.status === 'text_ready')
+      && !isBlocked
+      && (resultChunks === 0 || resultChunks === null)
+    return {
+      id: q.id,
+      url: q.url,
+      label: q.label || q.url,
+      status: q.status,
+      error: q.last_error,
+      result: q.result,
+      chunk_count: resultChunks,
+      needs_relearn: needsRelearn,
+      is_blocked: isBlocked,
+      created_at: q.created_at,
+      updated_at: q.updated_at,
+    }
+  })
 
   return NextResponse.json({
     tone: toneR.data,
@@ -236,7 +253,9 @@ export async function GET(req: NextRequest) {
       total_chunks: chunksR.data?.length || 0,
       total_files: filesR.data?.length || 0,
       queued: queue.filter(q => q.status === 'pending' || q.status === 'processing').length,
-      blocked: queue.filter(q => q.status === 'blocked').length,
+      blocked: queue.filter(q => q.is_blocked).length,
+      done: queue.filter(q => q.status === 'done').length,
+      needs_relearn: queue.filter(q => q.needs_relearn).length,
     },
   })
 }
