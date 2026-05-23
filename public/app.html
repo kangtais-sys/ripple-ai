@@ -2649,9 +2649,9 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
       </div>
       <!-- DEV 시뮬레이션 -->
       <div class="dev-only" style="display:none;margin-top:10px;gap:6px;flex-wrap:wrap">
-        <button onclick="devSimulate('comment','urgent')" style="padding:8px 12px;border-radius:8px;background:#FEE2E2;border:1px dashed var(--red);color:#991B1B;font-size:11px;font-weight:800;cursor:pointer">🧪 긴급 댓글</button>
-        <button onclick="devSimulate('dm','urgent')" style="padding:8px 12px;border-radius:8px;background:#FEE2E2;border:1px dashed var(--red);color:#991B1B;font-size:11px;font-weight:800;cursor:pointer;margin-left:6px">🧪 긴급 DM</button>
-        <button onclick="devRealComment()" style="padding:8px 12px;border-radius:8px;background:#CFFAE6;border:1px dashed var(--mint-d);color:var(--mint-d);font-size:11px;font-weight:800;cursor:pointer;margin-left:6px">🎯 검수용 실제 발송</button>
+        <button onclick="devSimulate('comment','urgent')" style="padding:8px 12px;border-radius:8px;background:#FEE2E2;border:1px dashed var(--red);color:#991B1B;font-size:11px;font-weight:800;cursor:pointer" data-i18n="dev.btn.urgent_comment">🧪 긴급 댓글</button>
+        <button onclick="devSimulate('dm','urgent')" style="padding:8px 12px;border-radius:8px;background:#FEE2E2;border:1px dashed var(--red);color:#991B1B;font-size:11px;font-weight:800;cursor:pointer;margin-left:6px" data-i18n="dev.btn.urgent_dm">🧪 긴급 DM</button>
+        <button onclick="devRealComment()" style="padding:8px 12px;border-radius:8px;background:#CFFAE6;border:1px dashed var(--mint-d);color:var(--mint-d);font-size:11px;font-weight:800;cursor:pointer;margin-left:6px" data-i18n="dev.btn.real_send">🎯 검수용 실제 발송</button>
       </div>
     </div>
 
@@ -2700,8 +2700,8 @@ textarea.lke-field-input{resize:vertical;font-family:'Pretendard',sans-serif;lin
 
     <!-- DEV: 일반 시뮬레이션 -->
     <div class="dev-only" style="display:none;gap:6px">
-      <button onclick="devSimulate('comment')" style="padding:8px 12px;border-radius:8px;background:#FEF3C7;border:1px dashed #F59E0B;color:#78350F;font-size:11px;font-weight:800;cursor:pointer">🧪 일반 댓글</button>
-      <button onclick="devSimulate('dm')" style="padding:8px 12px;border-radius:8px;background:#FEF3C7;border:1px dashed #F59E0B;color:#78350F;font-size:11px;font-weight:800;cursor:pointer;margin-left:6px">🧪 일반 DM</button>
+      <button onclick="devSimulate('comment')" style="padding:8px 12px;border-radius:8px;background:#FEF3C7;border:1px dashed #F59E0B;color:#78350F;font-size:11px;font-weight:800;cursor:pointer" data-i18n="dev.btn.normal_comment">🧪 일반 댓글</button>
+      <button onclick="devSimulate('dm')" style="padding:8px 12px;border-radius:8px;background:#FEF3C7;border:1px dashed #F59E0B;color:#78350F;font-size:11px;font-weight:800;cursor:pointer;margin-left:6px" data-i18n="dev.btn.normal_dm">🧪 일반 DM</button>
     </div>
 
   </div><!-- /tc-urgent -->
@@ -5477,6 +5477,11 @@ var I18N = {
     'dev.sim.urgent_dm':'🧪 긴급 DM (승인 대기)',
     'dev.sim.normal_comment':'🧪 일반 댓글 (자동발송)',
     'dev.sim.normal_dm':'🧪 일반 DM (자동발송)',
+    'dev.btn.urgent_comment':'🧪 긴급 댓글',
+    'dev.btn.urgent_dm':'🧪 긴급 DM',
+    'dev.btn.normal_comment':'🧪 일반 댓글',
+    'dev.btn.normal_dm':'🧪 일반 DM',
+    'dev.btn.real_send':'🎯 검수용 실제 발송',
     'draft.urgent_badge':'긴급',
     'draft.high_badge':'중요',
     'draft.new_dm':'새 DM',
@@ -6452,6 +6457,11 @@ var I18N = {
     'dev.sim.urgent_dm':'🧪 Urgent DM (pending)',
     'dev.sim.normal_comment':'🧪 Comment (auto-send)',
     'dev.sim.normal_dm':'🧪 DM (auto-send)',
+    'dev.btn.urgent_comment':'🧪 Urgent Comment',
+    'dev.btn.urgent_dm':'🧪 Urgent DM',
+    'dev.btn.normal_comment':'🧪 Comment',
+    'dev.btn.normal_dm':'🧪 DM',
+    'dev.btn.real_send':'🎯 Live Send (Review)',
     'draft.urgent_badge':'Urgent',
     'draft.high_badge':'Important',
     'draft.new_dm':'New DM',
