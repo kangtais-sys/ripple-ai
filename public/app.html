@@ -5489,6 +5489,7 @@ var I18N = {
     'dev.real.success_toast':'✓ 실제 발송 카드 생성 — 위 긴급 탭에서 [승인·발송] 누르면 진짜 인스타로 나갑니다',
     'dev.real.failed':'실패: ',
     'dev.real.network_error':'네트워크 오류',
+    'ig.connected_toast':'@{username} 연동 완료! 내 게시물로 말투를 학습할게요.',
     'draft.urgent_badge':'긴급',
     'draft.high_badge':'중요',
     'draft.new_dm':'새 DM',
@@ -6476,6 +6477,7 @@ var I18N = {
     'dev.real.success_toast':'✓ Live-send card created — tap Approve · Send in the Urgent tab above to post it on Instagram for real',
     'dev.real.failed':'Failed: ',
     'dev.real.network_error':'Network error',
+    'ig.connected_toast':"@{username} connected! We'll learn your reply style from your posts.",
     'draft.urgent_badge':'Urgent',
     'draft.high_badge':'Important',
     'draft.new_dm':'New DM',
@@ -17272,7 +17274,6 @@ async function connectIG(){
   var redirectUri = 'https://ssobi.ai/api/auth/instagram/callback';
   var scope = [
     'instagram_business_basic',
-    'instagram_business_manage_messages',
     'instagram_business_manage_comments'
   ].join(',');
   var url = 'https://www.instagram.com/oauth/authorize'
@@ -18348,7 +18349,7 @@ async function checkAuth() {
 
   // IG 연동 결과 표시 + 말투 자동 학습 트리거
   if (params.get('ig_connected')) {
-    alert('@' + params.get('ig_connected') + ' 연동 완료! 내 게시물로 말투를 학습할게요.');
+    alert(t('ig.connected_toast','@{username} 연동 완료! 내 게시물로 말투를 학습할게요.').replace('{username}', params.get('ig_connected')));
     window.history.replaceState({}, '', '/app.html');
     // 세션 붙은 뒤(아래 bootstrapUser 완료 시점) 학습 자동 실행
     setTimeout(autoLearnAfterConnect, 2500);
