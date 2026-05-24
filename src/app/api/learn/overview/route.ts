@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
       .eq('user_id', u.id)
       .maybeSingle(),
     sb.from('learn_queue')
-      .select('id, url, label, status, last_error, result, created_at, updated_at')
+      .select('id, url, label, status, last_error, result, chunk_count, embedded_count, created_at, updated_at')
       .eq('user_id', u.id)
       .in('status', ['pending', 'processing', 'blocked', 'failed', 'done', 'chunks_ready', 'text_ready'])
       .order('created_at', { ascending: false })
@@ -202,28 +202,59 @@ export async function GET(req: NextRequest) {
   })
 
   // 큐 항목 — 학습탭 UI 에 처리 상태 표시용
-  //  - done / chunks_ready / text_ready 도 포함 (가시성)
-  //  - needs_relearn: done 인데 chunks 0/null (학습 완료로 잡혔지만 청크 없음 → 재학습 필요)
+  //  - chunk_count 판정 우선순위:
+  //    1) knowledge_chunks 의 실제 is_active=true COUNT (가장 신뢰)
+  //    2) learn_queue.chunk_count 컬럼 (chunk-text worker 가 채움)
+  //    3) result.chunks (legacy JSON, 옛 cron 잔재라 신뢰도 낮음)
+  //  - needs_relearn: done/chunks_ready/text_ready 인데 실제 active chunks 0 (재학습 필요)
   //  - is_blocked: status==='blocked' 또는 result.error 가 blocked 류
-  const queue = (queueR.data || []).map((q: {
+  const queueRaw = (queueR.data || []) as Array<{
     id: string
     url: string
     label: string | null
     status: string
     last_error: string | null
     result: Record<string, unknown> | null
+    chunk_count: number | null
+    embedded_count: number | null
     created_at: string
     updated_at: string
-  }) => {
-    const resultChunks = q.result && typeof (q.result as { chunks?: unknown }).chunks === 'number'
+  }>
+
+  // queue URL 리스트로 active chunks COUNT 를 source_url 별로 한 번에 집계
+  // (overview API 는 SELECT only — UPDATE/INSERT/DELETE 절대 안 함)
+  const queueUrls = Array.from(new Set(queueRaw.map(q => q.url).filter(Boolean)))
+  const activeCountByUrl = new Map<string, number>()
+  if (queueUrls.length > 0) {
+    const { data: activeRows } = await sb
+      .from('knowledge_chunks')
+      .select('source_url')
+      .eq('user_id', u.id)
+      .eq('is_active', true)
+      .in('source_url', queueUrls)
+    for (const row of (activeRows || []) as Array<{ source_url: string | null }>) {
+      const url = row.source_url
+      if (!url) continue
+      activeCountByUrl.set(url, (activeCountByUrl.get(url) || 0) + 1)
+    }
+  }
+
+  const queue = queueRaw.map((q) => {
+    // 1순위: 실제 활성 chunks 카운트
+    const actualActive = activeCountByUrl.get(q.url) ?? null
+    // 2순위: learn_queue.chunk_count 컬럼
+    // 3순위: result.chunks (legacy)
+    const legacyResultChunks = q.result && typeof (q.result as { chunks?: unknown }).chunks === 'number'
       ? ((q.result as { chunks?: number }).chunks ?? null)
       : null
+    const effectiveChunks = actualActive ?? q.chunk_count ?? legacyResultChunks
+
     const isBlocked = q.status === 'blocked'
       || (typeof (q.result as { error?: unknown } | null)?.error === 'string'
         && /block/i.test(String((q.result as { error?: string }).error)))
     const needsRelearn = (q.status === 'done' || q.status === 'chunks_ready' || q.status === 'text_ready')
       && !isBlocked
-      && (resultChunks === 0 || resultChunks === null)
+      && (effectiveChunks === 0 || effectiveChunks === null)
     return {
       id: q.id,
       url: q.url,
@@ -231,7 +262,8 @@ export async function GET(req: NextRequest) {
       status: q.status,
       error: q.last_error,
       result: q.result,
-      chunk_count: resultChunks,
+      chunk_count: effectiveChunks,
+      actual_active_chunks: actualActive,
       needs_relearn: needsRelearn,
       is_blocked: isBlocked,
       created_at: q.created_at,

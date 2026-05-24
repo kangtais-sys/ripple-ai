@@ -19187,8 +19187,12 @@ async function loadLearnOverview(){
       if(cached) renderLearnOverview(cached)
     }
   } catch(_){}
-  // 1.5) 기존 내 링크의 URL 도 학습 큐에 적재 (5분 throttle, 큐 insert 만)
-  try { runSyncLinksLoop() } catch(_){}
+  // 1.5) ★ Meta 검수 진행 중 자동 sync-links 비활성화 (2026-05-24)
+  //   기존 동작: 학습 탭 진입 시 runSyncLinksLoop() 자동 호출 → sync-links →
+  //   chunk-text worker 의 cleanup-old-chunks 가 옛 chunks 를 DELETE 후 재크롤.
+  //   재크롤 실패(firecrawl 500 등) 시 데이터 손실 위험.
+  //   검수 끝나면 이 줄 복원 ↓
+  // try { runSyncLinksLoop() } catch(_){}
   // 2) fetch 시작 (background)
   try {
     var h = await authHeaders()
