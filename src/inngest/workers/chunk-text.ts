@@ -64,17 +64,12 @@ export const chunkTextWorker = inngest.createFunction(
     })
     memSnap(logger, 'after-load-raw-step')
 
-    // 기존 청크 정리 (재학습 시 중복 방지)
-    await step.run('cleanup-old-chunks', async () => {
-      memSnap(logger, 'cleanup:before')
-      await sb
-        .from('knowledge_chunks')
-        .delete()
-        .eq('user_id', userId)
-        .eq('source_url', url)
-      memSnap(logger, 'cleanup:after')
-    })
-    memSnap(logger, 'after-cleanup-step')
+    // ★ C단계(soft-deactivate): 여기서 옛 chunks 를 DELETE 하지 않는다.
+    //   기존: cleanup-old-chunks 가 INSERT 전에 hard DELETE → 재크롤이 빈텍스트/봇차단/INSERT실패 시
+    //         옛 chunks 만 사라지고 새것은 못 들어와 데이터 손실.
+    //   변경: 새 chunks 를 먼저 INSERT 하고, 임베딩까지 끝난 뒤(embed-chunks worker) 같은 source_url 의
+    //         옛 활성 chunks 를 is_active=false 로 soft-deactivate. INSERT/임베딩 실패 시 옛것 그대로 → 손실 0.
+    //         답글 검색(search_knowledge)은 is_active=true 만 보므로 발송 흐름 영향 0.
 
     // 청크화 — 300자 단위, 50자 overlap
     const chunks = await step.run('split-chunks', async () => {
@@ -87,6 +82,7 @@ export const chunkTextWorker = inngest.createFunction(
     memSnap(logger, 'after-split-step')
 
     if (chunks.length === 0) {
+      // soft-deactivate 방식: DELETE 안 했으므로 옛 chunks 가 그대로 살아있음 → 빈 재크롤로 인한 손실 0.
       logger.warn('[chunk-text] no chunks generated', { url })
       await sb
         .from('learn_queue')

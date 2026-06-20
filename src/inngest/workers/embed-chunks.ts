@@ -114,6 +114,32 @@ export const embedChunksWorker = inngest.createFunction(
       totalEmbedded += embedded
     }
 
+    // ★ C단계(soft-deactivate): 새 chunks 임베딩까지 끝난 지금, 같은 source_url 의 옛 활성 chunks 를 비활성화.
+    //   - 여기서(임베딩 후) 끄는 이유: 그 전까지 옛 chunks 가 답글 검색에 살아있어 검색 끊김 0.
+    //     (search_knowledge 는 embedding IS NOT NULL 만 보므로, embedding=null 인 새 chunks 는 임베딩 전엔 검색 안 됨)
+    //   - 방금 임베딩한 chunkIds 는 제외. is_active=true 인 옛것만 끔. DELETE 아님 → 손실 0, 복구 가능.
+    //   - 실패해도 throw 안 함(fail-soft): 새 chunks 는 이미 active+embedded. 옛것이 잠깐 더 남아도 손실 아님.
+    //   - source_url 단위 매칭(source_type 무관)은 기존 동작과 동일 — "1 URL = 최신본".
+    await step.run('deactivate-old-chunks', async () => {
+      try {
+        const { error: deactErr } = await sb
+          .from('knowledge_chunks')
+          .update({ is_active: false, updated_at: new Date().toISOString() })
+          .eq('user_id', userId)
+          .eq('source_url', url)
+          .eq('is_active', true)
+          .not('id', 'in', `(${chunkIds.join(',')})`)
+        if (deactErr) {
+          logger.warn('[embed-chunks] deactivate old chunks failed (new chunks already active+embedded)', {
+            url,
+            error: deactErr.message,
+          })
+        }
+      } catch (e) {
+        logger.warn('[embed-chunks] deactivate exception (fail-soft)', { url, error: String(e) })
+      }
+    })
+
     // queue 최종 상태
     await step.run('mark-done', async () => {
       memSnap(logger, 'mark-done:before')
