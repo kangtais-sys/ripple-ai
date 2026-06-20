@@ -36,6 +36,9 @@ yarn-error.log*
 # vercel
 .vercel
 
+# DB backups (contains user data + IG access tokens — never commit)
+db-backups/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
