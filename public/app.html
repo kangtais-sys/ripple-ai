@@ -17119,32 +17119,13 @@ async function saveToneContext(){
 
 // IG 연동 직후 자동 말투 학습 (게시물 <3 이면 기본 말투로)
 async function autoLearnAfterConnect(){
+  // 학습은 서버 워커('learn/ig.connected', IG 연동 콜백에서 발사)가 백그라운드로 수행한다.
+  //   bio + 최근 게시물 10개 → 말투·캐릭터(persona) → tone_profiles. 응대(generate.ts)가 즉시 사용.
+  //   클라이언트는 진행 알림 + 폴링만 — 중복 학습 제거(서버 워커와 충돌 방지).
   try {
-    var h = await authHeaders();
-    if(!h.Authorization) return;  // 세션 없으면 스킵
-    // 기존 학습 있으면 스킵 (재연동 케이스는 해제 시 null 처리됨)
-    var g = await fetch('/api/tone/learn', {credentials:'include', headers: h});
-    var gj = await g.json();
-    if(gj.learned_style) return;
-    // 게시물 fetch
-    var pr = await fetch('/api/tone/fetch-posts', {credentials:'include', headers: h});
-    var pj = await pr.json();
-    var caps = pj.captions || [];
-    var h2 = await authHeaders();
-    if(caps.length >= 3){
-      await fetch('/api/tone/learn', {
-        method:'POST', headers: h2, credentials:'include',
-        body: JSON.stringify({ samples: caps.slice(0, 15) })
-      });
-      if(typeof lkeShowToast==='function') lkeShowToast('✓ 내 말투 학습 완료');
-    } else {
-      await fetch('/api/tone/learn', {
-        method:'POST', headers: h2, credentials:'include',
-        body: JSON.stringify({ samples: caps, use_default: true })
-      });
-      if(typeof lkeShowToast==='function') lkeShowToast('기본 말투 적용 · 게시물 늘면 자동 재학습');
-    }
-  } catch(e){ console.warn('[auto-learn] failed', e); }
+    if(typeof lkeShowToast==='function') lkeShowToast(t('ig.learning_started','✓ 말투·캐릭터를 학습하고 있어요'));
+    if(typeof loadLearnOverview==='function') loadLearnOverview();
+  } catch(e){ console.warn('[auto-learn] notify failed', e); }
 }
 
 async function triggerToneLearn(){
@@ -19413,44 +19394,31 @@ var learnToneAutoState = 'idle' // idle | running | done | failed
 async function learnAutoStartTone(){
   if(learnToneAutoState !== 'idle') return
   learnToneAutoState = 'running'
-  var t0 = performance.now()
-  console.log('[learnAutoStartTone] start', new Date().toISOString())
-  try {
-    var h = await authHeaders()
-    var tFetch0 = performance.now()
-    var postsRes = await fetch('/api/tone/fetch-posts', {credentials:'include', headers: h})
-    if(!postsRes.ok) throw new Error('fetch-posts failed: ' + postsRes.status)
-    var posts = await postsRes.json()
-    console.log('[learnAutoStartTone] fetch-posts done in', ((performance.now()-tFetch0)/1000).toFixed(1)+'s', 'captions:', (posts.captions||[]).length)
-    var captions = posts.captions || []
-    var h2 = await authHeaders()
-    var body = captions.length < 3
-      ? JSON.stringify({ samples: captions, use_default: true })
-      : JSON.stringify({ samples: captions.slice(0, 15) })
-    var tLearn0 = performance.now()
-    var learnRes = await fetch('/api/tone/learn', {
-      method:'POST', headers: h2, credentials:'include', body: body
-    })
-    console.log('[learnAutoStartTone] tone/learn done in', ((performance.now()-tLearn0)/1000).toFixed(1)+'s', 'status:', learnRes.status)
-    if(!learnRes.ok) throw new Error('tone learn failed: ' + learnRes.status)
-    var result = await learnRes.json()
-    if(result.success){
-      learnToneAutoState = 'done'
-      var totalSec = ((performance.now()-t0)/1000).toFixed(1)
-      console.log('[learnAutoStartTone] complete in', totalSec+'s')
-      // 완료 토스트 (학습탭에 있을 때만 잘 보임 — 다른 탭에 있어도 표시됨)
-      if(typeof lkeShowToast === 'function') lkeShowToast(t('learn2.persona_learn_toast','✓ 말투 학습 완료'))
-      // overview 다시 불러와서 persona 갱신
-      loadLearnOverview()
-    } else {
-      throw new Error('learn returned not success: ' + JSON.stringify(result).slice(0, 100))
+  // 학습은 서버 워커('learn/ig.connected')가 백그라운드로 수행한다(말투+캐릭터).
+  //   클라이언트는 결과(tone_profiles)를 폴링만 — 중복 학습 금지(서버 워커와 충돌 방지).
+  console.log('[learnAutoStartTone] poll server-side learning', new Date().toISOString())
+  var tries = 0
+  var poll = setInterval(async function(){
+    tries++
+    try {
+      var h = await authHeaders()
+      var r = await fetch('/api/learn/overview', {credentials:'include', headers: h})
+      var j = await r.json()
+      if(j && j.tone && (j.tone.persona_summary || j.tone.learned_style)){
+        clearInterval(poll)
+        learnToneAutoState = 'done'
+        if(typeof lkeShowToast === 'function') lkeShowToast(t('learn2.persona_learn_toast','✓ 말투·캐릭터 학습 완료'))
+        if(typeof renderLearnOverview === 'function') renderLearnOverview(j)
+        return
+      }
+    } catch(e){ console.warn('[learnAutoStartTone] poll', e) }
+    if(tries >= 30){  // ~2분(4s×30) 후에도 미완 → 폴링 중단, 다음 진입 때 재시도 허용
+      clearInterval(poll)
+      learnToneAutoState = 'idle'
+      var descEl = document.getElementById('learn-persona-desc')
+      if(descEl) descEl.textContent = t('learn2.persona_learn_failed','학습이 지연되고 있어요 — 잠시 후 새로고침해주세요')
     }
-  } catch(e){
-    console.error('[learnAutoStartTone]', e)
-    learnToneAutoState = 'failed'
-    var descEl = document.getElementById('learn-persona-desc')
-    if(descEl) descEl.textContent = t('learn2.persona_learn_failed','학습 실패 — 잠시 후 다시 시도해주세요')
-  }
+  }, 4000)
 }
 
 function learnRenderUserMsg(it){

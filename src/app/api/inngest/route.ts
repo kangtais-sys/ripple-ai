@@ -4,10 +4,11 @@ import { inngest } from '@/inngest/client'
 import { fetchUrlWorker } from '@/inngest/workers/fetch-url'
 import { chunkTextWorker } from '@/inngest/workers/chunk-text'
 import { embedChunksWorker } from '@/inngest/workers/embed-chunks'
+import { learnIgPersonaWorker } from '@/inngest/workers/learn-ig-persona'
 
 export const { GET, POST, PUT } = serve({
   client: inngest,
-  functions: [fetchUrlWorker, chunkTextWorker, embedChunksWorker],
+  functions: [fetchUrlWorker, chunkTextWorker, embedChunksWorker, learnIgPersonaWorker],
   streaming: false,
 })
 

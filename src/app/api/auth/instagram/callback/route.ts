@@ -1,6 +1,7 @@
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest, NextResponse } from 'next/server'
+import { inngest } from '@/inngest/client'
 
 export async function GET(request: NextRequest) {
   const code = request.nextUrl.searchParams.get('code')
@@ -118,6 +119,14 @@ export async function GET(request: NextRequest) {
     }
 
     await admin.from('profiles').update({ ig_linked_at: new Date().toISOString() }).eq('id', userId)
+
+    // IG 연동 직후 말투·캐릭터 자동학습 (백그라운드 Inngest — 유저가 탭 닫아도 진행).
+    //   토큰은 이벤트에 안 싣고 워커가 ig_accounts 에서 읽음. 실패해도 연동 흐름엔 영향 0.
+    try {
+      await inngest.send({ name: 'learn/ig.connected', data: { userId } })
+    } catch (enqErr) {
+      console.error('[IG OAuth] persona learn enqueue failed:', enqErr)
+    }
 
     // Webhook 구독 활성화: POST /me/subscribed_apps (body 형식 필수)
     //   Query string 방식은 Meta 에 저장 안 됨 (확인 완료). POST body 로 전송.

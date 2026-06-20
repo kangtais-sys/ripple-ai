@@ -30,6 +30,11 @@ export type Events = {
       chunkIds: string[] // knowledge_chunks.id 배열 (embedding=null 상태)
     }
   }
+  'learn/ig.connected': {
+    data: {
+      userId: string // IG 연동 직후 — 토큰은 ig_accounts 에서 워커가 읽음(이벤트에 안 실음)
+    }
+  }
 }
 
 export const inngest = new Inngest({
